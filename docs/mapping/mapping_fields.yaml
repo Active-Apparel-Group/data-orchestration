@@ -1,0 +1,139 @@
+  # Field Mapping Reference
+  # Use this file to standardize field names and types across SQL, DataFrames, and matching logic.
+  field-names:
+    - name: MO_Number
+      aliases: [MO_NUMBER, MO Number, MO_NUMBER, MO_Number]
+      type: string
+      description: Manufacturing order number
+    - name: Incoterms
+      aliases: [DELIVERY TERMS, Incoterms]
+      type: string
+      description: Delivery terms (Incoterms)
+    - name: Shipping_Method
+      aliases: [PLANNED DELIVERY METHOD, Shipping_Method]
+      type: string
+      description: Planned shipping/delivery method
+    - name: QTY_PACKED_NOT_SHIPPED
+      aliases: [QTY PACKED NOT SHIPPED, Qty_Packed_Not_Shipped]
+      type: integer
+      description: Quantity packed but not shipped
+    - name: QTY_SHIPPED
+      aliases: [QTY SHIPPED, Qty_Shipped]
+      type: integer
+      description: Quantity shipped
+    - name: ORDER_TYPE
+      aliases: [ORDER TYPE, Order_Type]
+      type: string
+      description: Order type
+    - name: DESTINATION
+      aliases: [DESTINATION, Destination]
+      type: string
+      description: Destination
+    - name: DESTINATION_WAREHOUSE
+      aliases: [DESTINATION WAREHOUSE, Destination_Warehouse]
+      type: string
+      description: Destination warehouse
+    - name: Customer
+      aliases: [Customer_name, Belongs_Customer, belongs_customer]
+      type: string
+      description: Customer name (standardized, uppercase)
+    - name: Style
+      aliases: [style, style_number]
+      type: string
+      description: Product style code
+    - name: Color
+      aliases: [color]
+      type: string
+      description: Product color
+    - name: Size
+      aliases: [size]
+      type: string
+      description: Product size
+    - name: SKUBarcode
+      aliases: [skuBarcode, ean, Skubarcode]
+      type: string
+      description: Product barcode (SKU or EAN)
+    - name: Qty
+      aliases: [PCSQty, pcs_number, qty]
+      type: integer
+      description: Quantity of product units
+    - name: Status
+      aliases: [status]
+      type: string
+      description: Status label for the record
+    - name: Customer_PO
+      aliases: [PO, po, instoreweek]
+      type: string
+      description: Customer purchase order or instore week
+    - name: Season
+      aliases: [season]
+      type: string
+      description: Product season
+    - name: CartonID
+      aliases: [cartonid, shipmentid]
+      type: string
+      description: Carton or shipment identifier
+    - name: Pack_Date
+      aliases: [Pack_Date, createtime]
+      type: date
+      description: Date the product was packed
+    - name: Shipped_Date
+      aliases: [Shipped_Date, Ex-factoryDate, exFactoryDate]
+      type: date
+      description: Date the product was shipped
+    - name: Shipping_Method
+      aliases: [IsAir, PLANNED DELIVERY METHOD, Shipping_Method]
+      type: string
+      description: Planned shipping/delivery method or air shipment flag
+    - name: shippingCountry
+      aliases: [shippingCountry, Country]
+      type: string
+      description: Shipping country
+    - name: parent_item_id
+      aliases: [parent_item_id, ParentItemID]
+      type: string
+      description: Parent item ID from MON_CustMasterSchedule
+    - name: subitem_id
+      aliases: [subitem_id, SubItemID]
+      type: string
+      description: Monday.com subitem ID
+    - name: subitem_board_id
+      aliases: [subitem_board_id, SubItemBoardID]
+      type: string
+      description: Monday.com subitem board ID
+    - name: QTY_ORDERED
+      aliases: [OrderQty, Order Qty, QTY_ORDERED]
+      type: integer
+      description: Quantity ordered for the subitem
+    - name: Cut_Qty
+      aliases: [CutQty, Cut Qty]
+      type: integer
+      description: Quantity cut for the subitem
+    - name: Sew_Qty
+      aliases: [SewQty, Sew Qty]
+      type: integer
+      description: Quantity sewn for the subitem
+    - name: Finishing_Qty
+      aliases: [FinishingQty, Finishing Qty]
+      type: integer
+      description: Quantity finished for the subitem
+    - name: QTY_RECEIVED_NOT_SHIPPED
+      aliases: [ReceivedNotShippedQty, Received not Shipped Qty, QTY_RECEIVED_NOT_SHIPPED]
+      type: integer
+      description: Quantity received but not shipped for the subitem
+    - name: Packed_Qty
+      aliases: [PackedQty, Packed Qty]
+      type: integer
+      description: Quantity packed for the subitem
+    - name: Shipped_Qty
+      aliases: [ShippedQty, Shipped Qty]
+      type: integer
+      description: Quantity shipped for the subitem
+    - name: ORDER_LINE_STATUS
+      aliases: [ORDER LINE STATUS, OrderLineStatus]
+      type: string
+      description: Status of the order line
+    - name: Item_ID
+      aliases: [ItemID, Item ID]
+      type: string
+      description: Item ID from MON_CustMasterSchedule

@@ -1,0 +1,15 @@
+{
+    "name": "customer-mapping-ui",
+    "version": "1.0.0",
+    "description": "Electron UI for managing customer_mapping.yaml",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "dependencies": {
+        "js-yaml": "^4.1.0"
+    },
+    "devDependencies": {
+        "electron": "^29.0.0"
+    }
+}

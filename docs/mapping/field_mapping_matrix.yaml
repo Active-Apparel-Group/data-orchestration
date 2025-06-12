@@ -1,0 +1,192 @@
+# Field Mapping Matrix
+# This file maps standardized field names to their equivalents in each source view/table.
+
+# List of all standardized fields and their corresponding names in each view
+fields:
+  - name: parent_item_id
+    v_mon_customer_ms_subitems: parent_item_id
+  - name: subitem_id
+    v_mon_customer_ms_subitems: subitem_id
+  - name: subitem_board_id
+    v_mon_customer_ms_subitems: subitem_board_id
+  - name: QTY_ORDERED
+    v_mon_customer_ms_subitems: Order Qty
+  - name: Cut_Qty
+    v_mon_customer_ms_subitems: Cut Qty
+  - name: Sew_Qty
+    v_mon_customer_ms_subitems: Sew Qty
+  - name: Finishing_Qty
+    v_mon_customer_ms_subitems: Finishing Qty
+  - name: QTY_RECEIVED_NOT_SHIPPED
+    v_mon_customer_ms_subitems: Received not Shipped Qty
+  - name: Packed_Qty
+    v_mon_customer_ms_subitems: Packed Qty
+  - name: Shipped_Qty
+    v_mon_customer_ms_subitems: Shipped Qty
+  - name: ORDER_LINE_STATUS
+    v_mon_customer_ms_subitems: ORDER LINE STATUS
+  - name: Item_ID
+    v_mon_customer_ms_subitems: Item ID
+  - name: MO_Number
+    v_orders_shipped: null
+    v_packed_products: null
+    v_received_products: MO_Number
+    v_scanned_not_delivered: MO_Number
+    v_mon_customer_ms: MO_Number
+  - name: Incoterms
+    v_orders_shipped: null
+    v_packed_products: null
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_mon_customer_ms: Incoterms
+  - name: Shipping_Method
+    v_orders_shipped: null
+    v_packed_products: null
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_mon_customer_ms: Shipping_Method
+  - name: QTY_PACKED_NOT_SHIPPED
+    v_orders_shipped: null
+    v_packed_products: Qty
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_mon_customer_ms: QTY_PACKED_NOT_SHIPPED
+  - name: QTY_SHIPPED
+    v_orders_shipped: Qty
+    v_packed_products: null
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_mon_customer_ms: QTY_SHIPPED
+  - name: ORDER_TYPE
+    v_orders_shipped: null
+    v_packed_products: null
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_mon_customer_ms: ORDER_TYPE
+  - name: DESTINATION
+    v_orders_shipped: null
+    v_packed_products: null
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_mon_customer_ms: DESTINATION
+  - name: DESTINATION_WAREHOUSE
+    v_orders_shipped: null
+    v_packed_products: null
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_mon_customer_ms: DESTINATION_WAREHOUSE
+  - name: CartonID
+    v_orders_shipped: cartonid
+    v_packed_products: cartonid
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_shipped: CartonID
+  - name: Customer_PO
+    v_orders_shipped: Customer_PO
+    v_packed_products: Customer_PO
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_shipped: Customer_PO
+  - name: Season
+    v_orders_shipped: Season
+    v_packed_products: Season
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_shipped: Season
+  - name: Shipped_Date
+    v_orders_shipped: Shipped_Date
+    v_packed_products: null
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_shipped: Shipped_Date
+  - name: Shipping_Method
+    v_orders_shipped: null
+    v_packed_products: IsAir
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_shipped: IsAir
+    v_mon_customer_ms: Shipping_Method
+  - name: shippingCountry
+    v_orders_shipped: null
+    v_packed_products: shippingCountry
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_shipped: shippingCountry
+  - name: Customer
+    v_orders_shipped: Customer
+    v_packed_products: Customer
+    v_received_products: Customer
+    v_scanned_not_delivered: Customer
+  - name: Customer_PO
+    v_orders_shipped: Customer_PO
+    v_packed_products: Customer_PO
+    v_received_products: null
+    v_scanned_not_delivered: null
+    v_shipped: Customer_PO
+    v_mon_customer_ms: Customer_PO
+    v_mon_customer_ms_subitems: PO NUMBER
+  - name: Season
+    v_orders_shipped: Season
+    v_packed_products: Season
+    v_received_products: null
+    v_scanned_not_delivered: null
+  - name: CartonID
+    v_orders_shipped: cartonid
+    v_packed_products: cartonid
+    v_received_products: null
+    v_scanned_not_delivered: null
+  - name: Pack_Date
+    v_orders_shipped: Pack_Date
+    v_packed_products: Pack_Date
+    v_received_products: null
+    v_scanned_not_delivered: null
+  - name: Style
+    v_orders_shipped: Style
+    v_packed_products: Style
+    v_received_products: Style
+    v_scanned_not_delivered: Style
+    v_mon_customer_ms: Style
+    v_mon_customer_ms_subitems: Style
+  - name: Color
+    v_orders_shipped: Color
+    v_packed_products: Color
+    v_received_products: Color
+    v_scanned_not_delivered: Color
+  - name: Size
+    v_orders_shipped: Size
+    v_packed_products: Size
+    v_received_products: Size
+    v_scanned_not_delivered: Size
+    v_mon_customer_ms: Size
+    v_mon_customer_ms_subitems: Size
+  - name: SKUBarcode
+    v_orders_shipped: SKUBarcode
+    v_packed_products: SKUBarcode
+    v_received_products: SKUBarcode
+    v_scanned_not_delivered: SKUBarcode
+  - name: Qty
+    v_orders_shipped: Qty
+    v_packed_products: Qty
+    v_received_products: Qty
+    v_scanned_not_delivered: Qty
+    v_shipped: Qty
+  - name: Shipped_Date
+    v_orders_shipped: Shipped_Date
+    v_packed_products: null
+    v_received_products: null
+    v_scanned_not_delivered: null
+  - name: Stock_Age
+    v_orders_shipped: null
+    v_packed_products: Stock_Age
+    v_received_products: null
+    v_scanned_not_delivered: null
+  - name: ReceivedDate
+    v_orders_shipped: null
+    v_packed_products: null
+    v_received_products: ReceivedDate
+    v_scanned_not_delivered: null
+  - name: MO_Number
+    v_orders_shipped: null
+    v_packed_products: null
+    v_received_products: MO_Number
+    v_scanned_not_delivered: MO_Number
