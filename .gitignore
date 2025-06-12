@@ -55,6 +55,12 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 # Logs
 *.log
 logs/
@@ -86,7 +92,7 @@ dmypy.json
 # Docker
 .dockerignore
 
-# Output files
+# Output files (consider if you want to track sample outputs)
 outputs/
 *.csv
 *.xlsx
@@ -99,3 +105,11 @@ tmp/
 # Configuration files with secrets
 config.yaml
 config.yml
+.env.local
+.env.*.local
+
+# Azure and deployment files
+.azure/
+
+# Backup files
+__backup/
