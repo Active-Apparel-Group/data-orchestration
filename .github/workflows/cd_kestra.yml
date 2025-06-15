@@ -1,1 +1,14 @@
-# CD placeholder
+name: CD Pipeline
+on:
+  push:
+    branches:
+        - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Deploy step
+        run: echo "Deploying application..."
