@@ -5,8 +5,28 @@ This module provides functionality to sync board groups from Monday.com boards t
 ## Files
 
 - `sync_board_groups.py` - Main sync script
+- `add_board_groups.py` - Create and manage board groups
 - `test_sync.py` - Test script to verify functionality
 - `__init__.py` - Module initialization
+
+## Scripts Overview
+
+### `sync_board_groups.py`
+Syncs board groups from Monday.com boards to the ORDERS database. Maintains a local copy of group structure for reference and tracking.
+
+### `add_board_groups.py`
+Provides functionality to create and manage groups on Monday.com boards:
+- Create new groups
+- Check if groups exist
+- List all groups on a board
+- Ensure groups exist (create if needed)
+- Delete groups
+
+**Key Functions:**
+- `ensure_group_exists(board_id, group_name)` - Most commonly used function
+- `create_board_group(board_id, group_name)` - Create new group
+- `check_group_exists(board_id, group_name)` - Check existence
+- `list_board_groups(board_id)` - List all groups
 
 ## Usage
 

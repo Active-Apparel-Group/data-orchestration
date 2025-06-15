@@ -44,15 +44,15 @@
 
 ## Close Matches (Mapping with Translation)
 
-| ORDERS_UNIFIED Column                                          | Monday.com Column          | Mapping Notes                                       |
-| -------------------------------------------------------------- | -------------------------- | --------------------------------------------------- |
-| `CUSTOMER NAME`                                                | `CUSTOMER`                 | Customer name vs customer dropdown                  |
-| `CUSTOMER STYLE`                                               | `STYLE`                    | Customer style vs style dropdown                    |
-| `ALIAS/RELATED ITEM`                                           | `ALIAS RELATED ITEM`       | Minor naming difference                             |
-| `CUSTOMER'S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS` | `COLOR`                    | Color code vs color dropdown                        |
-| `ETA CUSTOMER WAREHOUSE DATE`                                  | `CUSTOMER REQ IN DC DATE`  | Similar delivery date concepts                      |
-| `EX FACTORY DATE`                                              | `CUSTOMER EX FACTORY DATE` | Same concept, slight naming difference              |
-| `ORDER TYPE`                                                   | `ORDER STATUS`             | Value mapping: ACTIVE→RECEIVED, CANCELLED→CANCELLED |
+| ORDERS_UNIFIED Column         | Monday.com Column          | Mapping Notes                                       |
+| ----------------------------- | -------------------------- | --------------------------------------------------- |
+| `CUSTOMER NAME`               | `CUSTOMER`                 | Customer name vs customer dropdown                  |
+| `CUSTOMER STYLE`              | `STYLE`                    | Customer style vs style dropdown                    |
+| `ALIAS/RELATED ITEM`          | `ALIAS RELATED ITEM`       | Minor naming difference                             |
+| `CUSTOMER COLOUR DESCRIPTION` | `COLOR`                    | Color code vs color dropdown                        |
+| `ETA CUSTOMER WAREHOUSE DATE` | `CUSTOMER REQ IN DC DATE`  | Similar delivery date concepts                      |
+| `EX FACTORY DATE`             | `CUSTOMER EX FACTORY DATE` | Same concept, slight naming difference              |
+| `ORDER TYPE`                  | `ORDER STATUS`             | Value mapping: ACTIVE→RECEIVED, CANCELLED→CANCELLED |
 
 ## Value Mappings Required
 

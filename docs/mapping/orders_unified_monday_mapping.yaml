@@ -117,9 +117,16 @@ exact_matches:
     target_column_id: "dropdown_mkr518fc"
     source_type: "NVARCHAR(MAX)"
     target_type: "dropdown"
+    transformation: "value_mapping"
+    mapping_rules:
+      - source_value: "ACTIVE"
+        target_value: "RECEIVED"
+      - source_value: "CANCELLED"
+        target_value: "CANCELLED"
     sample_data:
-      source: "RECEIVED"
+      source: "ACTIVE"
       target: "RECEIVED"
+    notes: "Status value transformation required"
 
   - source_field: "DESTINATION"
     target_field: "DESTINATION"
@@ -403,7 +410,7 @@ mapped_fields:
       target: ""
     notes: "Minor naming difference only"
 
-  - source_field: "CUSTOMER'S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS"
+  - source_field: "CUSTOMER COLOUR DESCRIPTION"
     target_field: "COLOR"
     target_column_id: "dropdown_mkr5677f"
     source_type: "NVARCHAR(MAX)"
@@ -435,22 +442,6 @@ mapped_fields:
       source: "2025-09-26"
       target: "2025-09-26"
     notes: "Same concept, slight naming difference"
-
-  - source_field: "ORDER TYPE"
-    target_field: "ORDER STATUS"
-    target_column_id: "color_mkr5j5pp"
-    source_type: "NVARCHAR(MAX)"
-    target_type: "status"
-    transformation: "value_mapping"
-    mapping_rules:
-      - source_value: "ACTIVE"
-        target_value: "RECEIVED"
-      - source_value: "CANCELLED"
-        target_value: "CANCELLED"
-    sample_data:
-      source: "ACTIVE"
-      target: "RECEIVED"
-    notes: "Status value transformation required"
 
 # Aggregated/computed fields
 computed_fields:
