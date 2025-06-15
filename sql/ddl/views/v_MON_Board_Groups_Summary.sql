@@ -2,7 +2,7 @@
 -- Provides summary statistics and analytics for board groups
 -- Created: June 15, 2025
 
-CREATE VIEW [dbo].[v_MON_Board_Groups_Summary] AS
+CREATE VIEW [dbo].[v_mon_boards_groups_Summary] AS
 SELECT 
     board_id,
     board_name,
@@ -33,7 +33,7 @@ SELECT
     AVG(DATEDIFF(day, created_date, GETDATE())) AS avg_days_since_created,
     AVG(DATEDIFF(day, updated_date, GETDATE())) AS avg_days_since_updated
 
-FROM [dbo].[MON_Board_Groups]
+FROM [dbo].[mon_boards_groups]
 GROUP BY board_id, board_name
 
 GO
@@ -43,4 +43,4 @@ EXEC sp_addextendedproperty
     @name = N'MS_Description', 
     @value = N'Summary analytics view for Monday.com board groups with counts and statistics', 
     @level0type = N'SCHEMA', @level0name = N'dbo',
-    @level1type = N'VIEW', @level1name = N'v_MON_Board_Groups_Summary';
+    @level1type = N'VIEW', @level1name = N'v_mon_boards_groups_Summary';

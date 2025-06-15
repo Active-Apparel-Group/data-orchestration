@@ -2,7 +2,7 @@
 -- Provides a comprehensive view of all board groups with useful metadata
 -- Created: June 15, 2025
 
-CREATE VIEW [dbo].[v_MON_Board_Groups] AS
+CREATE VIEW [dbo].[v_mon_boards_groups] AS
 SELECT 
     bg.board_id,
     bg.board_name,
@@ -58,7 +58,7 @@ SELECT
     FORMAT(bg.created_date, 'yyyy-MM-dd HH:mm') AS created_date_formatted,
     FORMAT(bg.updated_date, 'yyyy-MM-dd HH:mm') AS updated_date_formatted
 
-FROM [dbo].[MON_Board_Groups] bg
+FROM [dbo].[mon_boards_groups] bg
 
 -- Add metadata about the view
 GO
@@ -68,16 +68,16 @@ EXEC sp_addextendedproperty
     @name = N'MS_Description', 
     @value = N'Comprehensive view of Monday.com board groups with calculated fields and categorization', 
     @level0type = N'SCHEMA', @level0name = N'dbo',
-    @level1type = N'VIEW', @level1name = N'v_MON_Board_Groups';
+    @level1type = N'VIEW', @level1name = N'v_mon_boards_groups';
 
 EXEC sp_addextendedproperty 
     @name = N'Created', 
     @value = N'2025-06-15', 
     @level0type = N'SCHEMA', @level0name = N'dbo',
-    @level1type = N'VIEW', @level1name = N'v_MON_Board_Groups';
+    @level1type = N'VIEW', @level1name = N'v_mon_boards_groups';
 
 EXEC sp_addextendedproperty 
     @name = N'Purpose', 
     @value = N'Provides enhanced querying capabilities for Monday.com board groups data', 
     @level0type = N'SCHEMA', @level0name = N'dbo',
-    @level1type = N'VIEW', @level1name = N'v_MON_Board_Groups';
+    @level1type = N'VIEW', @level1name = N'v_mon_boards_groups';

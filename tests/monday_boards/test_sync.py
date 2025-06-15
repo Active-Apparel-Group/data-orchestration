@@ -19,7 +19,7 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 warnings.filterwarnings("ignore", category=UserWarning, module="pandas")
 
-from sync_board_groups import MondayBoardGroupsSync
+from monday_boards.sync_board_groups import MondayBoardGroupsSync
 
 
 def test_sync(board_id='9200517329'):

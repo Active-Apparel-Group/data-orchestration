@@ -3,7 +3,7 @@ Monday.com Board Groups Sync Script
 ===================================
 
 This script fetches board groups from Monday.com Customer Master Schedule board 
-and upserts them into the ORDERS database MON_Board_Groups table.
+and upserts them into the ORDERS database MON_Boards_Groups table.
 
 Author: System
 Created: June 15, 2025
@@ -255,12 +255,12 @@ class MondayBoardGroupsSync:
         return cursor.fetchone()[0] > 0
     
     def _create_table(self, conn) -> None:
-        """Create MON_Board_Groups table if it doesn't exist"""
+        """Create MON_Boards_Groups table if it doesn't exist"""
         cursor = conn.cursor()
         
         # Create table first
         create_table_sql = """
-        CREATE TABLE [dbo].[MON_Board_Groups] (
+        CREATE TABLE [dbo].[MON_Boards_Groups] (
             [board_id] NVARCHAR(20) NOT NULL,
             [board_name] NVARCHAR(255) NOT NULL,
             [group_id] NVARCHAR(50) NOT NULL,
@@ -269,18 +269,18 @@ class MondayBoardGroupsSync:
             [updated_date] DATETIME2 NOT NULL DEFAULT GETDATE(),
             [is_active] BIT NOT NULL DEFAULT 1,
             
-            CONSTRAINT [PK_MON_Board_Groups] PRIMARY KEY CLUSTERED ([board_id], [group_id])
+            CONSTRAINT [PK_MON_Boards_Groups] PRIMARY KEY CLUSTERED ([board_id], [group_id])
         )
         """
         cursor.execute(create_table_sql)
         
         # Create indexes separately (skip filtered index for compatibility)
         index_sqls = [
-            """CREATE NONCLUSTERED INDEX [IX_MON_Board_Groups_BoardId] 
-               ON [dbo].[MON_Board_Groups] ([board_id]) 
+            """CREATE NONCLUSTERED INDEX [IX_MON_Boards_Groups_BoardId] 
+               ON [dbo].[MON_Boards_Groups] ([board_id]) 
                INCLUDE ([board_name], [group_title], [is_active])""",
-            """CREATE NONCLUSTERED INDEX [IX_MON_Board_Groups_GroupTitle] 
-               ON [dbo].[MON_Board_Groups] ([group_title]) 
+            """CREATE NONCLUSTERED INDEX [IX_MON_Boards_Groups_GroupTitle] 
+               ON [dbo].[MON_Boards_Groups] ([group_title]) 
                INCLUDE ([board_id], [group_id], [is_active])"""
         ]
         
@@ -289,8 +289,8 @@ class MondayBoardGroupsSync:
                 cursor.execute(index_sql)
             except Exception as e:
                 self.logger.warning(f"Could not create index: {e}")
-        
-        self.logger.info("Created MON_Board_Groups table with indexes")
+
+        self.logger.info("Created MON_Boards_Groups table with indexes")
     
     def upsert_board_groups(self, board_groups: List[Dict[str, Any]]) -> None:
         """Upsert board groups into ORDERS database"""
@@ -302,8 +302,8 @@ class MondayBoardGroupsSync:
             # Get database connection
             with self._get_db_connection() as conn:
                 # Check if table exists, create if not
-                if not self._table_exists(conn, 'MON_Board_Groups'):
-                    self.logger.info("MON_Board_Groups table does not exist, creating...")
+                if not self._table_exists(conn, 'MON_Boards_Groups'):
+                    self.logger.info("MON_Boards_Groups table does not exist, creating...")
                     self._create_table(conn)
                     conn.commit()
                 
@@ -311,7 +311,7 @@ class MondayBoardGroupsSync:
                 
                 # Upsert logic
                 upsert_sql = """
-                MERGE [dbo].[MON_Board_Groups] AS target
+                MERGE [dbo].[MON_Boards_Groups] AS target
                 USING (VALUES (?, ?, ?, ?)) AS source ([board_id], [board_name], [group_id], [group_title])
                 ON target.[board_id] = source.[board_id] AND target.[group_id] = source.[group_id]
                 WHEN MATCHED THEN
@@ -341,7 +341,7 @@ class MondayBoardGroupsSync:
                 if current_group_ids:
                     placeholders = ','.join(['?' for _ in current_group_ids])
                     deactivate_sql = f"""
-                    UPDATE [dbo].[MON_Board_Groups] 
+                    UPDATE [dbo].[MON_Boards_Groups] 
                     SET [is_active] = 0, [updated_date] = GETDATE()
                     WHERE [board_id] = ? AND [group_id] NOT IN ({placeholders})
                     """
