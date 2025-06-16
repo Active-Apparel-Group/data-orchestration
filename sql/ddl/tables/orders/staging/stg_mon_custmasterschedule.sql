@@ -1,26 +1,26 @@
--- DDL for dbo.MON_CustMasterSchedule
--- Generated from database: ORDERS
--- Schema: dbo
--- Generated on: data_orchestration project
+-- Table: dbo.STG_MON_CustMasterSchedule
+-- Database: ORDERS
+-- Purpose: Staging table for Monday.com Customer Master Schedule integration
+-- Dependencies: Mirrors MON_CustMasterSchedule with additional staging columns
 
--- CREATE TABLE Statement
-CREATE TABLE [dbo].[MON_CustMasterSchedule] (
+CREATE TABLE [dbo].[STG_MON_CustMasterSchedule] (
+    -- All columns from MON_CustMasterSchedule (production table)
     [Title] NVARCHAR(MAX) NULL,
     [UpdateDate] NVARCHAR(MAX) NULL,
     [Group] NVARCHAR(MAX) NULL,
     [Subitems] NVARCHAR(MAX) NULL,
-    [CUSTOMER] NVARCHAR(MAX) NULL,
-    [AAG ORDER NUMBER] NVARCHAR(MAX) NULL,
-    [AAG SEASON] NVARCHAR(MAX) NULL,
+    [CUSTOMER] NVARCHAR(200) NULL,
+    [AAG ORDER NUMBER] NVARCHAR(200) NULL,
+    [AAG SEASON] NVARCHAR(200) NULL,
     [ORDER DATE PO RECEIVED] DATE NULL,
     [CUSTOMER SEASON] NVARCHAR(MAX) NULL,
     [DROP] NVARCHAR(MAX) NULL,
-    [PO NUMBER] NVARCHAR(MAX) NULL,
-    [CUSTOMER ALT PO] NVARCHAR(MAX) NULL,
-    [STYLE] NVARCHAR(MAX) NULL,
-    [STYLE DESCRIPTION] NVARCHAR(MAX) NULL,
-    [ALIAS RELATED ITEM] NVARCHAR(MAX) NULL,
-    [COLOR] NVARCHAR(MAX) NULL,
+    [PO NUMBER] NVARCHAR(200) NULL,
+    [CUSTOMER ALT PO] NVARCHAR(200) NULL,
+    [STYLE] NVARCHAR(200) NULL,
+    [STYLE DESCRIPTION] NVARCHAR(500) NULL,
+    [ALIAS RELATED ITEM] NVARCHAR(200) NULL,
+    [COLOR] NVARCHAR(200) NULL,
     [CATEGORY] NVARCHAR(MAX) NULL,
     [PATTERN ID] NVARCHAR(MAX) NULL,
     [UNIT OF MEASURE] NVARCHAR(MAX) NULL,
@@ -85,6 +85,23 @@ CREATE TABLE [dbo].[MON_CustMasterSchedule] (
     [PPS CMT DUE] DATE NULL,
     [PPS CMT RCV] DATE NULL,
     [REVENUE (FOB)] FLOAT NULL,
-    [ORDER STATUS] NVARCHAR(MAX) NULL
+    [ORDER STATUS] NVARCHAR(MAX) NULL,
+
+    -- Staging-specific columns for workflow management
+    [stg_id] BIGINT IDENTITY(1,1) PRIMARY KEY,
+    [stg_batch_id] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+    [stg_customer_batch] NVARCHAR(100) NULL,
+    [stg_status] NVARCHAR(50) DEFAULT 'PENDING', -- PENDING, API_SUCCESS, API_FAILED, PROMOTED
+    [stg_monday_item_id] BIGINT NULL,
+    [stg_error_message] NVARCHAR(MAX) NULL,
+    [stg_api_payload] NVARCHAR(MAX) NULL, -- Store the API payload for debugging
+    [stg_retry_count] INT DEFAULT 0,
+    [stg_created_date] DATETIME2 DEFAULT GETDATE(),
+    [stg_processed_date] DATETIME2 NULL
 );
 
+-- Create indexes for performance
+CREATE INDEX IX_STG_MON_CustMasterSchedule_BatchId ON [dbo].[STG_MON_CustMasterSchedule] ([stg_batch_id]);
+CREATE INDEX IX_STG_MON_CustMasterSchedule_Status ON [dbo].[STG_MON_CustMasterSchedule] ([stg_status]);
+CREATE INDEX IX_STG_MON_CustMasterSchedule_CustomerBatch ON [dbo].[STG_MON_CustMasterSchedule] ([stg_customer_batch]);
+CREATE INDEX IX_STG_MON_CustMasterSchedule_OrderNumber ON [dbo].[STG_MON_CustMasterSchedule] ([AAG ORDER NUMBER]);

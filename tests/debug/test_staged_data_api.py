@@ -6,7 +6,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
 
-from customer_master_schedule.order_sync import get_db_connection, get_monday_column_values_for_staged_order, monday_api_call, BOARD_ID
+from customer_master_schedule.add_bulk_orders import get_db_connection, get_monday_column_values_for_staged_order, monday_api_call, BOARD_ID
 import pandas as pd
 import json
 
@@ -85,7 +85,7 @@ def test_with_staged_data():
                 print(f"\n3. Testing actual Monday.com API call...")
                 
                 # Create item name and group name using the same logic as main script
-                from customer_master_schedule.order_sync import create_item_name, create_group_name, ensure_group_exists
+                from customer_master_schedule.add_bulk_orders import create_item_name, create_group_name, ensure_group_exists
                 
                 item_name = create_item_name(order_row)
                 group_name = create_group_name(order_row)

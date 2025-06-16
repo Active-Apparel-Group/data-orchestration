@@ -12,7 +12,7 @@ from customer_master_schedule.order_mapping import (
     transform_order_data,
     get_monday_column_values_dict
 )
-from customer_master_schedule.order_sync import monday_api_call, BOARD_ID
+from customer_master_schedule.add_bulk_orders import monday_api_call, BOARD_ID
 import pandas as pd
 import json
 import requests
