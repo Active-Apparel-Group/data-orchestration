@@ -1,0 +1,16 @@
+id: simple-test-workflow
+namespace: company.team
+description: "Simple test workflow for deployment testing"
+
+tasks:
+  - id: hello_world
+    type: io.kestra.plugin.core.log.Log
+    message: "Hello from Kestra deployment test!"
+    
+  - id: environment_info
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Deployment test successful!
+      Timestamp: {{ now() }}
+      Namespace: {{ flow.namespace }}
+      Flow ID: {{ flow.id }}

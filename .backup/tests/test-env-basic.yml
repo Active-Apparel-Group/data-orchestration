@@ -1,0 +1,15 @@
+id: test-env-basic
+namespace: company.team
+
+tasks:
+  - id: list_env_vars
+    type: io.kestra.plugin.scripts.python.Commands
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+      pullPolicy: NEVER
+    containerImage: my-custom-kestra:latest
+    commands:
+      - python3 -c "import os; print('=== Environment Variables Test ==='); print('Total variables:', len(os.environ))"
+      - python3 -c "import os; db_vars = [k for k in os.environ if k.startswith('DB_')]; print('DB_ variables:', len(db_vars)); [print(k) for k in sorted(db_vars)[:5]]"
+      - python3 -c "import os; secret_vars = [k for k in os.environ if k.startswith('SECRET_DB_')]; print('SECRET_DB_ variables:', len(secret_vars)); [print(k) for k in sorted(secret_vars)[:5]]"
+      - python3 -c "import os; print('Sample variable test:'); print('DB_ORDERS_PORT:', os.getenv('DB_ORDERS_PORT', 'NOT_FOUND'))"

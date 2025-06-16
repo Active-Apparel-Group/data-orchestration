@@ -1,0 +1,54 @@
+id: test-enhanced-sql-script
+namespace: company.team
+description: "Test the enhanced SQL script v2.0 with improved logging and fallback handling"
+
+tasks:
+  - id: test_enhanced_database_script
+    type: io.kestra.plugin.core.flow.WorkingDirectory
+    description: "Run enhanced SQL script with better error handling and logging"    
+    namespaceFiles:
+      enabled: true
+      include:
+        - scripts/test_sql_enhanced.py
+        - queries/v_master_order_list.sql
+    tasks:
+      - id: log_test_info
+        type: io.kestra.plugin.core.log.Log
+        message: |
+          🚀 Testing Enhanced SQL Script v2.0
+          📅 Timestamp: {{ now() }}
+          🏷️  Workflow: {{ flow.id }}
+          📁 Namespace: {{ flow.namespace }}
+          🔧 Features: Enhanced logging, fallback queries, connection testing
+          
+      - id: run_enhanced_script
+        type: io.kestra.plugin.scripts.python.Commands
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+          pullPolicy: NEVER
+        containerImage: my-custom-kestra:latest
+        description: "Execute enhanced database script with comprehensive testing"
+        namespaceFiles:
+          enabled: true
+        env:
+          # Database configuration - same as working version
+          DB_ORDERS_HOST: "ross-db-srv-test.database.windows.net"
+          DB_ORDERS_PORT: "1433"
+          DB_ORDERS_DATABASE: "ORDERS"
+          DB_ORDERS_USERNAME: "admin_ross"
+          DB_ORDERS_PASSWORD: "Active@IT2023"
+          DB_ORDERS_ENCRYPT: "yes"
+          DB_ORDERS_TRUSTSERVERCERTIFICATE: "yes"
+        commands:
+          - echo "🚀 === Enhanced Database Test Starting ==="
+          - echo "📄 Running enhanced script with v2.0 features..."
+          - python scripts/test_sql_enhanced.py
+          - echo "✅ === Enhanced Database Test Completed ==="
+          
+      - id: log_completion
+        type: io.kestra.plugin.core.log.Log
+        message: |
+          ✅ Enhanced SQL script test completed successfully!
+          🎯 Results: Check the task output above for detailed test results
+          📊 Features tested: Database connectivity, fallback handling, enhanced logging
+          ⏰ Completed at: {{ now() }}

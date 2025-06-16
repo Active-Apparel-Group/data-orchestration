@@ -1,0 +1,59 @@
+id: monday-boards
+namespace: company.team
+description: "manage monday.com board groups and config"
+
+tasks:
+  - id: setup_and_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Starting Workflow: {{ flow.id }}
+      Timestamp: {{ now() }}
+      Namespace: {{ flow.namespace }}
+      Description: manage monday.com board groups and config
+      Script Location: scripts/monday_boards/
+      Database Connections: 1
+      
+  - id: execute_main_workflow
+    type: io.kestra.plugin.core.flow.WorkingDirectory
+    description: "Execute monday-boards main script with environment configuration"
+    namespaceFiles:
+      enabled: true
+      include:
+        - scripts/monday_boards/sync_board_groups.py
+        - queries/monday_boards_*.sql
+    tasks:
+      - id: run_main_script
+        type: io.kestra.plugin.scripts.python.Commands
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+          pullPolicy: NEVER
+        containerImage: my-custom-kestra:latest
+        description: "Execute main workflow logic for monday-boards"
+        namespaceFiles:
+          enabled: true
+        env:
+          # Database configuration - actual values from config.yaml
+          # ORDERS Database
+          DB_ORDERS_HOST: "ross-db-srv-test.database.windows.net"
+          DB_ORDERS_PORT: "1433"
+          DB_ORDERS_DATABASE: "ORDERS"
+          DB_ORDERS_USERNAME: "admin_ross"
+          DB_ORDERS_PASSWORD: "Active@IT2023"
+          DB_ORDERS_ENCRYPT: "yes"
+          DB_ORDERS_TRUSTSERVERCERTIFICATE: "yes"
+          MONDAY_API_KEY: "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE5NzM0MzUxMiwiYWFpIjoxMSwidWlkIjozMTk3MDg4OSwiaWFkIjoiMjAyMi0xMS0yMVQwNTo1MTowNi4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTI3NDEyODgsInJnbiI6InVzZTEifQ.K2zXiugzNiYW5xo0tuXpAuZexBdv5xaAXPxubwxhNAM"
+        commands:
+          - echo "=== manage monday.com board groups and config Starting ==="
+          - echo "Executing main script..."
+          - python scripts/monday_boards/sync_board_groups.py
+          - echo "Executing planning_board ..."
+          - python scripts/monday_boards/sync_board_groups.py
+          - echo "=== manage monday.com board groups and config Completed ==="
+          
+  - id: completion_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      Workflow completed successfully!
+      Workflow: monday-boards
+      Results: Check task outputs above for detailed execution results
+      ⏰ Completed at: {{ now() }}

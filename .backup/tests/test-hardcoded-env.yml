@@ -1,0 +1,22 @@
+id: test-hardcoded-env
+namespace: company.team
+
+tasks:
+  - id: test_hardcoded_values
+    type: io.kestra.plugin.scripts.python.Commands
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+      pullPolicy: NEVER
+    containerImage: my-custom-kestra:latest
+    env:
+      DB_ORDERS_PORT: "1433"
+      DB_QUICKDATA_HOST: "192.168.30.206"
+      DB_ORDERS_USERNAME: "admin_ross"
+      DB_DMS_USERNAME: "admin_ross" 
+      DB_WMS_USERNAME: "sa"
+    commands:
+      - echo "=== Hardcoded Environment Test ==="
+      - python3 -c "import os; print('DB_ORDERS_PORT:', os.getenv('DB_ORDERS_PORT'))"
+      - python3 -c "import os; print('DB_QUICKDATA_HOST:', os.getenv('DB_QUICKDATA_HOST'))"
+      - python3 -c "import os; print('DB_ORDERS_USERNAME:', os.getenv('DB_ORDERS_USERNAME'))"
+      - python3 -c "import os; print('SUCCESS: Hardcoded values work!')"

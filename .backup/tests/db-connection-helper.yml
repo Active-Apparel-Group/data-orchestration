@@ -1,0 +1,87 @@
+id: db-connection-helper
+namespace: company.team
+
+tasks:
+  - id: setup_database_connections
+    type: io.kestra.plugin.scripts.python.Script
+    docker:
+      image: my-custom-kestra:latest
+    script: |
+      import os
+      import base64
+      import pyodbc
+      
+      def get_db_config(db_prefix):
+          """Extract database configuration from environment variables"""
+          config = {}
+          
+          # Direct environment variables
+          config['host'] = os.getenv(f'DB_{db_prefix}_HOST')
+          config['port'] = os.getenv(f'DB_{db_prefix}_PORT', '1433')
+          config['database'] = os.getenv(f'DB_{db_prefix}_DATABASE')
+          config['username'] = os.getenv(f'DB_{db_prefix}_USERNAME')
+          config['password'] = os.getenv(f'DB_{db_prefix}_PASSWORD')
+          config['encrypt'] = os.getenv(f'DB_{db_prefix}_ENCRYPT', 'yes')
+          config['trust_cert'] = os.getenv(f'DB_{db_prefix}_TRUSTSERVERCERTIFICATE', 'yes')
+          
+          # Check for encoded secrets
+          for key in ['HOST', 'PORT', 'DATABASE', 'USERNAME', 'PASSWORD']:
+              secret_key = f'SECRET_DB_{db_prefix}_{key}'
+              encoded_value = os.getenv(secret_key)
+              if encoded_value and not config.get(key.lower()):
+                  try:
+                      decoded_value = base64.b64decode(encoded_value).decode('utf-8').strip()
+                      config[key.lower()] = decoded_value
+                      print(f"Using decoded {key} for {db_prefix}")
+                  except Exception as e:
+                      print(f"Failed to decode {secret_key}: {e}")
+          
+          return config
+      
+      def create_connection_string(config):
+          """Create SQL Server connection string"""
+          if not all([config.get('host'), config.get('database'), config.get('username')]):
+              return None
+              
+          conn_str = (
+              f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+              f"SERVER={config['host']},{config['port']};"
+              f"DATABASE={config['database']};"
+              f"UID={config['username']};"
+              f"PWD={config.get('password', '')};"
+              f"Encrypt={config['encrypt']};"
+              f"TrustServerCertificate={config['trust_cert']};"
+          )
+          return conn_str
+      
+      # Test different database configurations
+      databases = ['ORDERS', 'QUICKDATA', 'DMS', 'WMS', 'GFS', 'DISTRIBUTION']
+      
+      print("=== DATABASE CONFIGURATIONS ===")
+      for db in databases:
+          print(f"\n--- {db} Database ---")
+          config = get_db_config(db)
+          
+          print(f"Host: {config.get('host', 'NOT SET')}")
+          print(f"Port: {config.get('port', 'NOT SET')}")
+          print(f"Database: {config.get('database', 'NOT SET')}")
+          print(f"Username: {config.get('username', 'NOT SET')}")
+          print(f"Password: {'SET' if config.get('password') else 'NOT SET'}")
+          
+          conn_str = create_connection_string(config)
+          if conn_str:
+              print(f"Connection String: DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={config['host']},{config['port']};DATABASE={config['database']};UID={config['username']};PWD=***;Encrypt={config['encrypt']};TrustServerCertificate={config['trust_cert']};")
+              
+              # Test connection (comment out if you don't want to actually connect)
+              # try:
+              #     conn = pyodbc.connect(conn_str, timeout=5)
+              #     print(f"✅ Connection to {db} successful!")
+              #     conn.close()
+              # except Exception as e:
+              #     print(f"❌ Connection to {db} failed: {e}")
+          else:
+              print("❌ Insufficient configuration for connection")
+      
+      print("\n=== SUMMARY ===")
+      print("Environment variables are available in Kestra tasks!")
+      print("Use the configurations above to connect to your databases.")

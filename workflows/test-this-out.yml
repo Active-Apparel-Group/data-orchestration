@@ -1,0 +1,57 @@
+id: test-this-out
+namespace: company.team
+description: "testing"
+
+tasks:
+  - id: setup_and_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      🚀 Starting Workflow: {{ flow.id }}
+      📅 Timestamp: {{ now() }}
+      🏷️  Namespace: {{ flow.namespace }}
+      📝 Description: testing
+      📁 Script Location: scripts/{{flow.id}}/
+      🗄️  Database Connections: 1
+      
+  - id: execute_main_workflow
+    type: io.kestra.plugin.core.flow.WorkingDirectory
+    description: "Execute {{flow.id}} main script with environment configuration"
+    namespaceFiles:
+      enabled: true
+      include:
+        - scripts/{{flow.id}}/**
+        - config.yaml
+        - queries/{{flow.id}}_*.sql
+    tasks:
+      - id: run_main_script
+        type: io.kestra.plugin.scripts.python.Commands
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+          pullPolicy: NEVER
+        containerImage: my-custom-kestra:latest
+        description: "Execute main workflow logic for {{flow.id}}"
+        namespaceFiles:
+          enabled: true
+        env:
+          # Database configuration - actual values from config.yaml
+          # ORDERS Database
+          DB_ORDERS_HOST: "ross-db-srv-test.database.windows.net"
+          DB_ORDERS_PORT: "1433"
+          DB_ORDERS_DATABASE: "ORDERS"
+          DB_ORDERS_USERNAME: "admin_ross"
+          DB_ORDERS_PASSWORD: "Active@IT2023"
+          DB_ORDERS_ENCRYPT: "yes"
+          DB_ORDERS_TRUSTSERVERCERTIFICATE: "yes"
+        commands:
+          - echo "🚀 === testing Starting ==="
+          - echo "📄 Executing main script for {{flow.id}}..."
+          - python scripts/{{flow.id}}/main.py
+          - echo "✅ === testing Completed ==="
+          
+  - id: completion_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      ✅ Workflow completed successfully!
+      🎯 Workflow: {{flow.id}}
+      📊 Results: Check task outputs above for detailed execution results
+      ⏰ Completed at: {{ now() }}

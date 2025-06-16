@@ -1,0 +1,45 @@
+id: hello-import-test
+namespace: company.team            # keep inside the same namespace tree
+description: |
+  Proof-of-concept: can a Python task inside Kestra import a module from a
+  nested package (customer_master_schedule.order_mapping) and print “Hello
+  World”?  Pattern mirrors the ‘monday-boards’ workflow.
+
+tasks:
+  # 1️⃣ Optional log banner – matches your style
+  - id: start_banner
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      🚀 Starting hello-import-test · {{ now() }}
+
+  # 2️⃣ Shared working dir so batch_processor & package live together
+  - id: hello_workdir
+    type: io.kestra.plugin.core.flow.WorkingDirectory
+    description: "Run batch_processor.py in a shared workspace"
+
+    # Pull only the test files from your repo/namespace storage
+    namespaceFiles:
+      enabled: true
+      include:
+        - scripts/{{flow.id}}/batch_processor.py
+        - scripts/{{flow.id}}/order_mapping.py
+
+    tasks:
+      - id: run_batch_processor
+        type: io.kestra.plugin.scripts.python.Commands
+
+        # Re-use your custom image or a vanilla one
+        containerImage: my-custom-kestra:latest         # or my-custom-kestra:latest
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+          pullPolicy: NEVER
+
+        commands:
+          - echo "Running hello-import-test…"
+          - python scripts/{{flow.id}}/batch_processor.py
+
+  # 3️⃣ Completion banner
+  - id: end_banner
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      ✅ hello-import-test finished at {{ now() }}

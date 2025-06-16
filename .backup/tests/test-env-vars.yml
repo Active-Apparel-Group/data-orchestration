@@ -1,0 +1,86 @@
+id: test-env-vars
+namespace: company.team
+
+tasks:
+  - id: test_environment_variables
+    type: io.kestra.plugin.scripts.python.Commands
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+      pullPolicy: NEVER
+    containerImage: my-custom-kestra:latest
+    env:
+      DB_ORDERS_PORT: "{{ envs.db_orders_port }}"
+      DB_QUICKDATA_HOST: "{{ envs.db_quickdata_host }}" 
+      DB_ORDERS_USERNAME: "{{ envs.db_orders_username }}"
+      DB_DMS_USERNAME: "{{ envs.db_dms_username }}"
+      DB_WMS_USERNAME: "{{ envs.db_wms_username }}"
+      # Additional variables for testing
+      DB_ORDERS_HOST: "{{ envs.db_orders_host }}"
+      DB_ORDERS_DATABASE: "{{ envs.db_orders_database }}"
+      SECRET_DB_ORDERS_PORT: "{{ envs.secret_db_orders_port }}"
+      SECRET_DB_QUICKDATA_HOST: "{{ envs.secret_db_quickdata_host }}"
+      SECRET_DB_ORDERS_USERNAME: "{{ envs.secret_db_orders_username }}"
+    commands:
+      - |
+        python3 -c "
+        import os
+        
+        print('=== Testing Environment Variables ===')
+        
+        # Check if we're in the right environment
+        print(f'Container working directory: {os.getcwd()}')
+        print(f'Python executable: {os.sys.executable}')
+        
+        # Test the specific variables you mentioned
+        test_vars = [
+            'DB_ORDERS_PORT',
+            'DB_QUICKDATA_HOST', 
+            'DB_ORDERS_USERNAME',
+            'DB_DMS_USERNAME',
+            'DB_WMS_USERNAME',
+            'DB_ORDERS_HOST',
+            'DB_ORDERS_DATABASE'
+        ]
+        
+        print('\n=== Direct Environment Variables ===')
+        for var in test_vars:
+            value = os.getenv(var)
+            print(f'{var}: {value if value else \"NOT FOUND\"}')
+        
+        # Check all DB variables
+        print(f'\n=== All DB_* Variables ===')
+        db_vars = {k: v for k, v in os.environ.items() if k.startswith('DB_')}
+        for key, value in sorted(db_vars.items())[:10]:  # Show first 10
+            print(f'{key}: {value}')
+        
+        print(f'\nTotal DB_* variables found: {len(db_vars)}')
+        
+        if len(db_vars) > 0:
+            print('✅ Environment variables are accessible!')
+        else:
+            print('❌ No environment variables found')
+        
+        # Also check for SECRET_DB_* variables
+        print(f'\n=== Checking SECRET_DB_* Variables ===')
+        secret_vars = {k: v for k, v in os.environ.items() if k.startswith('SECRET_DB_')}
+        for key in sorted(secret_vars.keys())[:5]:
+            print(f'{key}: [PRESENT]')
+        
+        print(f'Total SECRET_DB_* variables found: {len(secret_vars)}')
+        
+        if len(secret_vars) > 0:
+            print('✅ Secret environment variables are accessible!')
+        else:
+            print('❌ No secret environment variables found')
+        
+        # Test decoding a secret variable
+        if secret_vars:
+            import base64
+            try:
+                sample_key = list(secret_vars.keys())[0]
+                sample_value = secret_vars[sample_key]
+                decoded = base64.b64decode(sample_value).decode('utf-8').strip()
+                print(f'Sample decoded secret ({sample_key}): {decoded[:10]}...')
+            except Exception as e:
+                print(f'Could not decode secret: {e}')
+        "

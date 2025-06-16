@@ -1,0 +1,27 @@
+id: database-connection-test
+namespace: company.team
+
+tasks:
+  - id: test_orders_database_connection
+    type: io.kestra.plugin.scripts.python.Commands
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+      pullPolicy: NEVER
+    containerImage: my-custom-kestra:latest
+    env:
+      # ORDERS Database Configuration
+      DB_HOST: "ross-db-srv-test.database.windows.net"
+      DB_PORT: "1433"
+      DB_DATABASE: "ORDERS"
+      DB_USERNAME: "admin_ross"
+      DB_ENCRYPT: "yes"
+      DB_TRUST_CERT: "yes"
+      # Note: Password would need to be added securely
+    commands:
+      - echo "=== Database Connection Test ==="
+      - python3 -c "import os; print('Host:', os.getenv('DB_HOST')); print('Database:', os.getenv('DB_DATABASE')); print('Username:', os.getenv('DB_USERNAME'))"
+      - echo "=== Testing Python Database Libraries ==="
+      - python3 -c "import pyodbc; print('pyodbc available:', pyodbc.version)"
+      - python3 -c "import pandas; print('pandas available:', pandas.__version__)"
+      - echo "=== Connection String Test ==="
+      - python3 -c "import os; conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={os.getenv(\"DB_HOST\")},{os.getenv(\"DB_PORT\")};DATABASE={os.getenv(\"DB_DATABASE\")};UID={os.getenv(\"DB_USERNAME\")};Encrypt={os.getenv(\"DB_ENCRYPT\")};TrustServerCertificate={os.getenv(\"DB_TRUST_CERT\")};'; print('Connection string ready (password not shown)')"

@@ -1,0 +1,57 @@
+id: last-one
+namespace: company.team
+description: "last"
+
+tasks:
+  - id: setup_and_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      🚀 Starting Workflow: {{ flow.id }}
+      📅 Timestamp: {{ now() }}
+      🏷️  Namespace: {{ flow.namespace }}
+      📝 Description: last
+      📁 Script Location: scripts/last_one/
+      🗄️  Database Connections: 1
+      
+  - id: execute_main_workflow
+    type: io.kestra.plugin.core.flow.WorkingDirectory
+    description: "Execute last-one main script with environment configuration"
+    namespaceFiles:
+      enabled: true
+      include:
+        - scripts/last_one/**
+        - config.yaml
+        - queries/last_one_*.sql
+    tasks:
+      - id: run_main_script
+        type: io.kestra.plugin.scripts.python.Commands
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+          pullPolicy: NEVER
+        containerImage: my-custom-kestra:latest
+        description: "Execute main workflow logic for last-one"
+        namespaceFiles:
+          enabled: true
+        env:
+          # Database configuration - actual values from config.yaml
+          # ORDERS Database
+          DB_ORDERS_HOST: "ross-db-srv-test.database.windows.net"
+          DB_ORDERS_PORT: "1433"
+          DB_ORDERS_DATABASE: "ORDERS"
+          DB_ORDERS_USERNAME: "admin_ross"
+          DB_ORDERS_PASSWORD: "Active@IT2023"
+          DB_ORDERS_ENCRYPT: "yes"
+          DB_ORDERS_TRUSTSERVERCERTIFICATE: "yes"
+        commands:
+          - echo "🚀 === last Starting ==="
+          - echo "📄 Executing main script..."
+          - python scripts/last_one/main.py
+          - echo "✅ === last Completed ==="
+          
+  - id: completion_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      ✅ Workflow completed successfully!
+      🎯 Workflow: last-one
+      📊 Results: Check task outputs above for detailed execution results
+      ⏰ Completed at: {{ now() }}
