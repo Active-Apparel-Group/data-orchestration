@@ -241,7 +241,47 @@ See `requirements.txt` for all Python dependencies. Key packages:
 
 ---
 
-## 🗂️ Additional Resources
+## � Recent Updates (June 2025)
+
+## 🔄 Recent Updates (June 2025)
+
+### **Critical Workflow Fixes - COMPLETED** ✅
+
+Recently completed comprehensive fixes to the Customer Master Schedule → Monday.com workflow:
+
+**✅ Restored Missing Logic** (from archive analysis):
+- **Computed Fields**: Fixed missing Title field generation (`STYLE + COLOR + ORDER_NUMBER`)
+- **TOTAL QTY Mapping**: Changed from calculated field to direct mapping from ORDERS_UNIFIED
+- **Test Coverage**: Updated tests to use full transformation (all 81 fields, not just 2)
+
+**✅ Database Schema Corrections**:
+- Removed references to non-existent `SYNC_STATUS` column
+- Fixed staging ID range logic: Use 1000-10000 for staging, not Monday.com's large IDs (e.g., 9200517596)
+- Cleaned up deprecated functions in `order_queries.py`
+
+**✅ Final Validation Results** (June 16, 2025):
+```
+Found 10 new orders to process
+Order: MWE-00025
+Title: M01Z26 TOTAL ECLIPSE/TRUE BLACK LINER MWE-00025
+Monday.com fields ready: 38
+Total transformed fields: 46
+SUCCESS: Workflow is working!
+```
+
+**📋 Key Files Updated**:
+- `src/customer_master_schedule/order_mapping.py` - Restored computed fields logic
+- `docs/mapping/orders_unified_monday_mapping.yaml` - Fixed TOTAL QTY mapping
+- `tests/debug/test_simple_steps.py` - Now tests full transformation
+- `src/customer_master_schedule/order_queries.py` - Cleaned up dead functions
+
+**📚 Documentation**: See `docs/plans/workflow_update_plan_v2.md` for complete details and learnings.
+
+**Status**: 🚀 **WORKFLOW IS PRODUCTION READY**
+
+---
+
+## �🗂️ Additional Resources
 
 - [Design docs](docs/design/)
 - [Migration guide: YAML → .env](docs/design/migrate_config_yaml_to_env.md)

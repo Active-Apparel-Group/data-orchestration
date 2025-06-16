@@ -90,7 +90,7 @@ def get_new_orders_from_unified(limit: Optional[int] = None) -> pd.DataFrame:
           Returns:
         DataFrame with new order records
     """
-    limit = 10
+    limit = 2
     limit_clause = f"TOP {limit}" if limit else ""
     
     query = f"""
@@ -102,7 +102,6 @@ def get_new_orders_from_unified(limit: Optional[int] = None) -> pd.DataFrame:
         AND ou.[CUSTOMER COLOUR DESCRIPTION] = cms.[COLOR]
     WHERE cms.[AAG ORDER NUMBER] IS NULL
         AND LEFT(ou.[CUSTOMER NAME], 3) <> 'LOR'
-        and left(ou.[CUSTOMER NAME], 3) = 'MAC'
         AND ou.[AAG ORDER NUMBER] IS NOT NULL
         AND ou.[CUSTOMER STYLE] IS NOT NULL
         AND ou.[CUSTOMER COLOUR DESCRIPTION] IS NOT NULL
@@ -124,42 +123,9 @@ def get_new_orders_from_unified(limit: Optional[int] = None) -> pd.DataFrame:
     finally:
         conn.close()
 
-def get_next_staging_id() -> int:
-    """
-    Get the next available staging ID starting from 1000
-    
-    Returns:
-        Next available staging ID
-    """
-    conn = get_database_connection()
-    if conn is None:
-        return 1000  # Default starting ID
-    
-    try:
-        cursor = conn.cursor()
-          # Get the highest staging ID that starts with 1000+ range - using BIGINT to handle large numbers
-        cursor.execute("""
-            SELECT ISNULL(MAX(TRY_CAST([Item ID] AS BIGINT)), 999) 
-            FROM [dbo].[MON_CustMasterSchedule] 
-            WHERE [Item ID] IS NOT NULL 
-            AND ISNUMERIC([Item ID]) = 1 
-            AND TRY_CAST([Item ID] AS BIGINT) >= 1000 
-            AND TRY_CAST([Item ID] AS BIGINT) < 10000
-        """)
-        
-        max_id = cursor.fetchone()[0]
-        return max_id + 1
-        
-    except Exception as e:
-        print(f"Error getting next staging ID: {e}")
-        return 1000  # Default starting ID
-    finally:
-        conn.close()
-
 def insert_orders_to_staging(orders_df: pd.DataFrame) -> bool:
     """
     Insert transformed orders into MON_CustMasterSchedule staging table
-    Uses our own ID sequence starting at 1000 to avoid conflicts with Monday.com IDs
     
     Args:
         orders_df: DataFrame with transformed order data
@@ -178,46 +144,20 @@ def insert_orders_to_staging(orders_df: pd.DataFrame) -> bool:
     try:
         print(f"Inserting {len(orders_df)} orders into MON_CustMasterSchedule...")
         
-        # Add staging IDs to the DataFrame
-        orders_df_copy = orders_df.copy()
-        next_id = get_next_staging_id()
+        # Insert using pandas to_sql method
+        orders_df.to_sql(
+            name='MON_CustMasterSchedule',
+            con=conn,
+            if_exists='append',
+            index=False,
+            method='multi'
+        )
         
-        # Assign sequential staging IDs starting from next_id
-        staging_ids = list(range(next_id, next_id + len(orders_df_copy)))
-        orders_df_copy['Item ID'] = staging_ids
-        
-        print(f"Assigned staging IDs: {min(staging_ids)} to {max(staging_ids)}")
-        
-        # Use manual insert instead of pandas to_sql for better SQL Server compatibility
-        cursor = conn.cursor()
-        
-        # Get column names from DataFrame
-        columns = list(orders_df_copy.columns)
-        
-        # Create placeholder string for VALUES clause
-        placeholders = ', '.join(['?' for _ in columns])
-        column_names = ', '.join([f'[{col}]' for col in columns])
-        
-        insert_query = f"""
-            INSERT INTO [dbo].[MON_CustMasterSchedule] ({column_names})
-            VALUES ({placeholders})
-        """
-        
-        # Insert each row
-        rows_inserted = 0
-        for _, row in orders_df_copy.iterrows():
-            values = [row[col] for col in columns]
-            cursor.execute(insert_query, values)
-            rows_inserted += 1
-        
-        conn.commit()
-        print(f"Successfully inserted {rows_inserted} orders into staging table")
+        print(f"Successfully inserted {len(orders_df)} orders into staging table")
         return True
         
     except Exception as e:
         print(f"Error inserting orders to staging: {e}")
-        import traceback
-        traceback.print_exc()
         return False
     finally:
         conn.close()
@@ -225,23 +165,22 @@ def insert_orders_to_staging(orders_df: pd.DataFrame) -> bool:
 def get_pending_monday_sync(limit: Optional[int] = None) -> pd.DataFrame:
     """
     Get orders from MON_CustMasterSchedule that need to be synced to Monday.com
-    Uses staging IDs (1000+) to identify records that haven't been updated with Monday.com IDs
     
     Args:
         limit: Optional limit on number of records to return
         
     Returns:
-        DataFrame with orders pending Monday.com sync    """
+        DataFrame with orders pending Monday.com sync
+    """
     limit_clause = f"TOP {limit}" if limit else ""
     
     query = f"""
     SELECT {limit_clause} *
     FROM [dbo].[MON_CustMasterSchedule]
-    WHERE [Item ID] IS NOT NULL 
-        AND ISNUMERIC([Item ID]) = 1 
-        AND TRY_CAST([Item ID] AS BIGINT) >= 1000 
-        AND TRY_CAST([Item ID] AS BIGINT) < 10000
-    ORDER BY TRY_CAST([Item ID] AS BIGINT) ASC
+    WHERE [MONDAY_ITEM_ID] IS NULL 
+        OR [MONDAY_ITEM_ID] = ''
+        OR [SYNC_STATUS] = 'PENDING'
+    ORDER BY [CREATED_DATE] ASC
     """
     
     conn = get_database_connection()
@@ -249,7 +188,7 @@ def get_pending_monday_sync(limit: Optional[int] = None) -> pd.DataFrame:
         return pd.DataFrame()
     
     try:
-        print(f"Querying orders pending Monday.com sync (staging IDs 1000+)...")
+        print(f"Querying orders pending Monday.com sync...")
         df = pd.read_sql(query, conn)
         print(f"Found {len(df)} orders pending sync")
         return df
@@ -259,13 +198,13 @@ def get_pending_monday_sync(limit: Optional[int] = None) -> pd.DataFrame:
     finally:
         conn.close()
 
-def update_monday_item_id(staging_id: str, monday_item_id: str, group_id: str = None) -> bool:
+def update_monday_item_id(order_key: Dict[str, str], item_id: str, group_id: str = None) -> bool:
     """
-    Update Monday.com item ID using staging ID for precise identification
+    Update Monday.com item ID in MON_CustMasterSchedule after successful creation
     
     Args:
-        staging_id: Our staging table ID (1000+)
-        monday_item_id: Monday.com item ID from API
+        order_key: Dictionary with AAG ORDER NUMBER, CUSTOMER STYLE, COLOR
+        item_id: Monday.com item ID
         group_id: Optional Monday.com group ID
         
     Returns:
@@ -280,21 +219,31 @@ def update_monday_item_id(staging_id: str, monday_item_id: str, group_id: str = 
         
         update_query = """
         UPDATE [dbo].[MON_CustMasterSchedule]
-        SET [Item ID] = ?,
-            [UpdateDate] = GETDATE()
-        WHERE [Item ID] = ?
+        SET [MONDAY_ITEM_ID] = ?,
+            [MONDAY_GROUP_ID] = ?,
+            [SYNC_STATUS] = 'SYNCED',
+            [UPDATED_DATE] = GETDATE()
+        WHERE [AAG ORDER NUMBER] = ? 
+            AND [CUSTOMER STYLE] = ?
+            AND [COLOR] = ?
         """
         
-        cursor.execute(update_query, (monday_item_id, staging_id))
+        cursor.execute(update_query, (
+            item_id,
+            group_id,
+            order_key['AAG ORDER NUMBER'],
+            order_key['CUSTOMER STYLE'], 
+            order_key['COLOR']
+        ))
         
         rows_affected = cursor.rowcount
         conn.commit()
         
         if rows_affected > 0:
-            print(f"Updated staging ID {staging_id} with Monday.com item ID {monday_item_id}")
+            print(f"Updated Monday.com item ID {item_id} for order {order_key['AAG ORDER NUMBER']}")
             return True
         else:
-            print(f"No rows updated for staging ID {staging_id}")
+            print(f"No rows updated for order {order_key['AAG ORDER NUMBER']}")
             return False
             
     except Exception as e:
@@ -305,10 +254,7 @@ def update_monday_item_id(staging_id: str, monday_item_id: str, group_id: str = 
 
 def mark_sync_status(order_key: Dict[str, str], status: str, error_message: str = None) -> bool:
     """
-    DEPRECATED: Mark sync status for an order (PENDING, SYNCED, ERROR)
-    
-    NOTE: This function references a non-existent SYNC_STATUS column and has been disabled.
-    The MON_CustMasterSchedule table doesn't have a SYNC_STATUS column.
+    Mark sync status for an order (PENDING, SYNCED, ERROR)
     
     Args:
         order_key: Dictionary with AAG ORDER NUMBER, CUSTOMER STYLE, COLOR
@@ -318,40 +264,122 @@ def mark_sync_status(order_key: Dict[str, str], status: str, error_message: str 
     Returns:
         True if successful, False otherwise
     """
-    print(f"⚠️ DEPRECATED: mark_sync_status called for order {order_key.get('AAG ORDER NUMBER', 'Unknown')}")
-    print("   This function is disabled because SYNC_STATUS column doesn't exist in the table")
-    return True  # Return True to avoid breaking existing code
+    conn = get_database_connection()
+    if conn is None:
+        return False
+    
+    try:
+        cursor = conn.cursor()
+        
+        update_query = """
+        UPDATE [dbo].[MON_CustMasterSchedule]
+        SET [SYNC_STATUS] = ?,
+            [ERROR_MESSAGE] = ?,
+            [UPDATED_DATE] = GETDATE()
+        WHERE [AAG ORDER NUMBER] = ? 
+            AND [CUSTOMER STYLE] = ?
+            AND [COLOR] = ?
+        """
+        
+        cursor.execute(update_query, (
+            status,
+            error_message,
+            order_key['AAG ORDER NUMBER'],
+            order_key['CUSTOMER STYLE'],
+            order_key['COLOR']
+        ))
+        
+        rows_affected = cursor.rowcount
+        conn.commit()
+        
+        if rows_affected > 0:
+            print(f"Updated sync status to {status} for order {order_key['AAG ORDER NUMBER']}")
+            return True
+        else:
+            print(f"No rows updated for order {order_key['AAG ORDER NUMBER']}")
+            return False
+            
+    except Exception as e:
+        print(f"Error updating sync status: {e}")
+        return False
+    finally:
+        conn.close()
 
 def get_sync_statistics() -> Dict[str, int]:
     """
-    DEPRECATED: Get sync statistics from MON_CustMasterSchedule
-    
-    NOTE: This function references a non-existent SYNC_STATUS column and has been disabled.
-    The MON_CustMasterSchedule table doesn't have a SYNC_STATUS column.
+    Get sync statistics from MON_CustMasterSchedule
     
     Returns:
-        Dictionary with sync status counts (empty since function is disabled)
+        Dictionary with sync status counts
     """
-    print("⚠️ DEPRECATED: get_sync_statistics called")
-    print("   This function is disabled because SYNC_STATUS column doesn't exist in the table")
-    return {"DISABLED": 0}  # Return placeholder to avoid breaking existing code
+    query = """
+    SELECT 
+        [SYNC_STATUS],
+        COUNT(*) as count
+    FROM [dbo].[MON_CustMasterSchedule]
+    GROUP BY [SYNC_STATUS]
+    
+    UNION ALL
+    
+    SELECT 
+        'TOTAL' as SYNC_STATUS,
+        COUNT(*) as count
+    FROM [dbo].[MON_CustMasterSchedule]
+    """
+    
+    conn = get_database_connection()
+    if conn is None:
+        return {}
+    
+    try:
+        df = pd.read_sql(query, conn)
+        return dict(zip(df['SYNC_STATUS'], df['count']))
+    except Exception as e:
+        print(f"Error getting sync statistics: {e}")
+        return {}
+    finally:
+        conn.close()
 
 def cleanup_old_pending_records(days_old: int = 7) -> int:
     """
-    DEPRECATED: Clean up old pending records that might be stuck
-    
-    NOTE: This function references a non-existent SYNC_STATUS column and has been disabled.
-    The MON_CustMasterSchedule table doesn't have a SYNC_STATUS column.
+    Clean up old pending records that might be stuck
     
     Args:
         days_old: Number of days old to consider for cleanup
         
     Returns:
-        Number of records cleaned up (always 0 since function is disabled)
+        Number of records cleaned up
     """
-    print("⚠️ DEPRECATED: cleanup_old_pending_records called")
-    print("   This function is disabled because SYNC_STATUS column doesn't exist in the table")
-    return 0  # Return 0 to indicate no records cleaned
+    conn = get_database_connection()
+    if conn is None:
+        return 0
+    
+    try:
+        cursor = conn.cursor()
+        
+        cleanup_query = """
+        UPDATE [dbo].[MON_CustMasterSchedule]
+        SET [SYNC_STATUS] = 'ERROR',            [ERROR_MESSAGE] = 'Cleanup: Record stuck in PENDING status',
+            [UPDATED_DATE] = GETDATE()
+        WHERE [SYNC_STATUS] = 'PENDING'
+            AND [CREATED_DATE] < DATEADD(day, -?, GETDATE())
+            AND ([MONDAY_ITEM_ID] IS NULL OR [MONDAY_ITEM_ID] = '')
+        """
+        
+        cursor.execute(cleanup_query, (days_old,))
+        rows_affected = cursor.rowcount
+        conn.commit()
+        
+        if rows_affected > 0:
+            print(f"Cleaned up {rows_affected} old pending records")
+        
+        return rows_affected
+        
+    except Exception as e:
+        print(f"Error cleaning up old records: {e}")
+        return 0
+    finally:
+        conn.close()
 
 # Compatibility functions for refactored add_order.py
 def get_new_orders_for_monday(limit: Optional[int] = None) -> pd.DataFrame:
@@ -360,7 +388,7 @@ def get_new_orders_for_monday(limit: Optional[int] = None) -> pd.DataFrame:
     """
     return get_new_orders_from_unified(limit)
 
-def insert_orders_to_staging_list(orders_list: List[Dict]) -> bool:
+def insert_orders_to_staging(orders_list: List[Dict]) -> bool:
     """
     Insert list of transformed order dictionaries into staging table
     
@@ -374,9 +402,33 @@ def insert_orders_to_staging_list(orders_list: List[Dict]) -> bool:
         print("No orders to insert into staging table")
         return True
     
-    # Convert list of dicts to DataFrame and call the main function
+    # Convert list of dicts to DataFrame
     orders_df = pd.DataFrame(orders_list)
-    return insert_orders_to_staging(orders_df)
+    
+    conn = get_database_connection()
+    if conn is None:
+        return False
+    
+    try:
+        print(f"Inserting {len(orders_df)} orders into MON_CustMasterSchedule...")
+        
+        # Insert using pandas to_sql method
+        orders_df.to_sql(
+            name='MON_CustMasterSchedule',
+            con=conn,
+            if_exists='append',
+            index=False,
+            method='multi'
+        )
+        
+        print(f"Successfully inserted {len(orders_df)} orders into staging table")
+        return True
+        
+    except Exception as e:
+        print(f"Error inserting orders to staging: {e}")
+        return False
+    finally:
+        conn.close()
 
 def get_orders_pending_monday_sync(limit: Optional[int] = None) -> pd.DataFrame:
     """
@@ -384,8 +436,61 @@ def get_orders_pending_monday_sync(limit: Optional[int] = None) -> pd.DataFrame:
     """
     return get_pending_monday_sync(limit)
 
-# REMOVED: Duplicate update_monday_item_id function with parameter mismatch bug
-# The correct function is above (line 262) that uses staging_id
+def update_monday_item_id(order_number: str, customer_style: str, color: str, item_id: str, group_id: str = None) -> bool:
+    """
+    Update Monday.com item ID - simplified interface for add_order.py
+    
+    Args:
+        order_number: AAG ORDER NUMBER
+        customer_style: CUSTOMER STYLE
+        color: COLOR
+        item_id: Monday.com item ID
+        group_id: Optional Monday.com group ID
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    conn = get_database_connection()
+    if conn is None:
+        return False
+    
+    try:
+        cursor = conn.cursor()
+        
+        update_query = """
+        UPDATE [dbo].[MON_CustMasterSchedule]
+        SET [MONDAY_ITEM_ID] = ?,
+            [MONDAY_GROUP_ID] = ?,
+            [SYNC_STATUS] = 'SYNCED',
+            [UPDATED_DATE] = GETDATE()
+        WHERE [AAG ORDER NUMBER] = ? 
+            AND [CUSTOMER STYLE] = ?
+            AND [COLOR] = ?
+        """
+        
+        cursor.execute(update_query, (
+            item_id,
+            group_id,
+            order_number,
+            customer_style, 
+            color
+        ))
+        
+        rows_affected = cursor.rowcount
+        conn.commit()
+        
+        if rows_affected > 0:
+            print(f"Updated Monday.com item ID {item_id} for order {order_number}")
+            return True
+        else:
+            print(f"No rows updated for order {order_number}")
+            return False
+            
+    except Exception as e:
+        print(f"Error updating Monday.com item ID: {e}")
+        return False
+    finally:
+        conn.close()
 
 # Test functions
 if __name__ == "__main__":

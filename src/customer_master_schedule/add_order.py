@@ -27,7 +27,9 @@ from tqdm import tqdm
 
 # Add project modules to path
 project_root = os.path.join(os.path.dirname(__file__), '..', '..')
-sys.path.append(project_root)
+src_path = os.path.join(project_root, 'src')
+sys.path.insert(0, src_path)
+sys.path.insert(0, project_root)
 
 # Import our new modular components
 from .order_queries import (
@@ -36,10 +38,12 @@ from .order_queries import (
     update_monday_item_id,
     get_orders_pending_monday_sync
 )
-from .order_mapping import (
+from customer_master_schedule.order_mapping import (
     load_mapping_config,
     transform_order_data,
-    format_monday_column_values
+    format_monday_column_values,
+    load_customer_mapping,  # ✅ ADDED: Import the missing function
+    create_staging_dataframe  # ✅ ADDED: Import the new function
 )
 from .monday_integration import (
     create_monday_item,
@@ -56,17 +60,50 @@ warnings.filterwarnings("ignore", category=UserWarning, module="pandas")
 CUSTOMER_MASTER_SCHEDULE_BOARD_ID = os.getenv('MONDAY_CUSTOMER_MASTER_SCHEDULE_BOARD_ID', '9200517329')
 
 def setup_application_logging():
-    """Setup logging for the application"""
-    setup_logging()
+    """Setup logging for the application with Unicode support"""
+    # Create logs directory if it doesn't exist
+    log_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'logs')
+    os.makedirs(log_dir, exist_ok=True)
     
-    # Add file handler for this specific module
+    # Setup basic logging - FIXED for Unicode
+    log_file = os.path.join(log_dir, 'add_order.log')
+    
+    # Custom formatter without emojis for console
+    class ConsoleFormatter(logging.Formatter):
+        def format(self, record):
+            # Remove emojis for console output
+            msg = super().format(record)            # Replace common emojis with text
+            replacements = {
+                '🔍': '[SEARCH]',
+                '🔄': '[SYNC]', 
+                'ℹ️': '[INFO]',
+                '✅': '[SUCCESS]',
+                '❌': '[ERROR]',
+                '⚠️': '[WARNING]',
+                '📊': '[STATS]',
+                '💾': '[SAVE]',
+                '📋': '[BOARD]',
+                '⏱️': '[TIME]'
+            }
+            for emoji, text in replacements.items():
+                msg = msg.replace(emoji, text)
+            return msg
+    
+    # File handler (can handle Unicode)
+    file_handler = logging.FileHandler(log_file, encoding='utf-8')
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    
+    # Console handler (Unicode-safe)
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(ConsoleFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    
+    # Setup logger
     logger = logging.getLogger(__name__)
-    if not any(isinstance(handler, logging.FileHandler) for handler in logger.handlers):
-        file_handler = logging.FileHandler('add_order.log')
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        ))
-        logger.addHandler(file_handler)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
     
     return logger
 
@@ -112,10 +149,17 @@ def process_new_orders(logger: logging.Logger) -> Dict[str, int]:
     
     logger.info(f"📊 Found {len(new_orders_df)} new orders to process")
     
-    # Load mapping configuration
+    # Load mapping configuration AND customer mapping - FIXED
     mapping_config = load_mapping_config()
+    customer_lookup = load_customer_mapping()  # ✅ ADDED: Load customer mapping
+    
     if not mapping_config:
         raise Exception("Failed to load mapping configuration")
+    
+    if not customer_lookup:  # ✅ ADDED: Check customer mapping
+        raise Exception("Failed to load customer mapping")
+    
+    logger.info(f"✅ Loaded configurations: {len(customer_lookup)} customer variants")  # ✅ ADDED: Log success
     
     # Transform and stage orders
     staged_orders = []
@@ -125,8 +169,8 @@ def process_new_orders(logger: logging.Logger) -> Dict[str, int]:
     
     for _, order_row in tqdm(new_orders_df.iterrows(), total=len(new_orders_df), desc="Transforming orders"):
         try:
-            # Transform order data using YAML mapping
-            transformed_data = transform_order_data(order_row, mapping_config)
+            # Transform order data using YAML mapping - FIXED: Added customer_lookup parameter
+            transformed_data = transform_order_data(order_row, mapping_config, customer_lookup)  # ✅ FIXED
             staged_orders.append(transformed_data)
             
         except Exception as e:
@@ -136,12 +180,13 @@ def process_new_orders(logger: logging.Logger) -> Dict[str, int]:
     if not staged_orders:
         logger.warning("⚠️ No orders successfully transformed")
         return {"new_orders_found": len(new_orders_df), "orders_staged": 0, "transform_errors": transform_errors}
-    
-    # Insert into staging table
+      # Insert into staging table
     logger.info(f"💾 Step 3: Inserting {len(staged_orders)} orders into MON_CustMasterSchedule...")
     
     try:
-        insert_result = insert_orders_to_staging(staged_orders)
+        # Convert transformed data to DataFrame with flattened scalar values
+        staging_df = create_staging_dataframe(staged_orders)
+        insert_result = insert_orders_to_staging(staging_df)
         logger.info(f"✅ Successfully staged {len(staged_orders)} orders")
         
         return {
@@ -219,11 +264,10 @@ def sync_orders_to_monday(logger: logging.Logger) -> Dict[str, int]:
                 item_name=item_name,
                 column_values=column_values
             )
-            
-            # Update database with Monday.com item ID
+              # Update database with Monday.com item ID
             update_success = update_monday_item_id(
                 order_row['AAG ORDER NUMBER'],
-                order_row['CUSTOMER STYLE'], 
+                order_row['STYLE'],  # Fixed: was 'CUSTOMER STYLE', now 'STYLE'
                 order_row['COLOR'],
                 item_id
             )

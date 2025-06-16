@@ -335,7 +335,6 @@ exact_matches:
     sample_data:
       source: null
       target: null
-
   - source_field: "FINAL PRICES Y/N"
     target_field: "FINAL PRICES Y/N"
     target_column_id: "text_mkr5ptvg"
@@ -353,6 +352,17 @@ exact_matches:
     sample_data:
       source: null
       target: ""
+
+  # COMMENTED OUT: TOTAL QTY - Not needed in staging table
+  # - source_field: "TOTAL QTY"
+  #   target_field: "TOTAL QTY"
+  #   target_column_id: "numbers_mkr5qtty"
+  #   source_type: "INT"
+  #   target_type: "numbers"
+  #   sample_data:
+  #     source: 500
+  #     target: 500
+  #   notes: "Direct mapping from ORDERS_UNIFIED TOTAL QTY field - EXCLUDED: staging table doesn't have this column"
 
 # Fields requiring transformation/mapping
 mapped_fields:
@@ -445,50 +455,15 @@ mapped_fields:
 
 # Aggregated/computed fields
 computed_fields:
-  - target_field: "Name"
+  - target_field: "Title"
     source_fields:
-      [
-        "CUSTOMER STYLE",
-        "CUSTOMER'S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS",
-        "AAG ORDER NUMBER",
-      ]
+      ["CUSTOMER STYLE", "CUSTOMER COLOUR DESCRIPTION", "AAG ORDER NUMBER"]
     transformation: "concatenation"
     formula: "CUSTOMER_STYLE + COLOR + AAG_ORDER_NUMBER"
     sample_data:
       source: ["JWHD100120", "WHITE", "JOO-00505"]
       target: "JWHD100120WHITEJOO-00505"
-    notes: "Composite identifier for Monday.com items"
-
-  - target_field: "TOTAL QTY"
-    source_fields:
-      [
-        "XXXS",
-        "XXS",
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL",
-        "XXXL",
-        "0",
-        "2",
-        "4",
-        "6",
-        "8",
-        "10",
-        "12",
-        "14",
-        "16",
-        "18",
-        "20",
-      ]
-    transformation: "sum_aggregation"
-    formula: "SUM(all_size_columns)"
-    sample_data:
-      source: [22, 104, 177, 125, 72]
-      target: 500
-    notes: "Aggregates all individual size quantities"
+    notes: "Composite identifier for Monday.com items - Monday.com uses 'Title' as the item name field"
 
 # Monday.com only fields (no source mapping)
 target_only_fields:

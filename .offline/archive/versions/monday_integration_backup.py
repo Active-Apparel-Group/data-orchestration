@@ -36,7 +36,7 @@ def get_monday_api_key() -> str:
     if not api_key:
         # Fallback to hardcoded key (should be moved to env)
         api_key = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE5NzM0MzUxMiwiYWFpIjoxMSwidWlkIjozMTk3MDg4OSwiaWFkIjoiMjAyMi0xMS0yMVQwNTo1MTowNi4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTI3NDEyODgsInJnbiI6InVzZTEifQ.K2zXiugzNiYW5xo0tuXpAuZexBdv5xaAXPxubwxhNAM"
-        # logging.warning("Using hardcoded API key. Consider setting MONDAY_API_KEY environment variable.")
+        logging.warning("Using hardcoded API key. Consider setting MONDAY_API_KEY environment variable.")
     return api_key
 
 # API Headers
@@ -342,14 +342,47 @@ def ensure_group_exists(board_id: str, group_name: str) -> str:
         group_name: Name of the group
         
     Returns:
-        Group ID
-    """
-    # Import here to avoid circular imports
-    import sys
-    sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'monday_boards'))
-    from monday_boards.add_board_groups import ensure_group_exists as _ensure_group_exists
-    
-    return _ensure_group_exists(board_id, group_name)
+        Group ID    """
+    # First check if group exists
+    try:
+        board_info = get_board_info(board_id)
+        
+        # Look for existing group
+        for group in board_info.get('groups', []):
+            if group['title'] == group_name:
+                logging.info(f"✅ Group '{group_name}' already exists with ID: {group['id']}")
+                return group['id']
+        
+        # Group doesn't exist, create it
+        logging.info(f"🔄 Creating new group: {group_name}")
+        
+        mutation = f'''
+        mutation {{
+            create_group(
+                board_id: {board_id},
+                group_name: "{group_name}"
+            ) {{
+                id
+                title
+            }}
+        }}
+        '''
+        
+        data = {'query': format_mutation_query(mutation)}
+        response = requests.post(API_URL, headers=get_api_headers(), json=data, verify=False)
+        result = validate_api_response(response, f"create group '{group_name}'")
+        
+        if 'create_group' in result['data'] and result['data']['create_group']:
+            group_id = result['data']['create_group']['id']
+            logging.info(f"✅ Created group '{group_name}' with ID: {group_id}")
+            return group_id
+        else:
+            raise Exception(f"Group creation returned no data: {result}")
+            
+    except Exception as e:
+        logging.error(f"❌ Failed to ensure group exists: {e}")
+        # Return a default group ID as fallback
+        return "new_group"
 
 def batch_create_items(
     board_id: str,
