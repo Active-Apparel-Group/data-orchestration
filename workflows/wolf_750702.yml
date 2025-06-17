@@ -1,6 +1,6 @@
-id: monday-boards
+id: wolf_750702
 namespace: company.team
-description: "sync monday boards with Azure SQL"
+description: "first working version of using helper function"
 
 tasks:
   - id: setup_and_log
@@ -9,17 +9,18 @@ tasks:
       🚀 Starting Workflow: {{ flow.id }}
       📅 Timestamp: {{ now() }}
       🏷️  Namespace: {{ flow.namespace }}
-      📝 Description: sync monday boards with Azure SQL
-      📁 Script Location: scripts/{{flow.id}}/
-      🗄️  Database Connections: 0
+      📝 Description: last
+      📁 Script Location: scripts/last_one/
+      🗄️  Database Connections: 1
       
   - id: execute_main_workflow
     type: io.kestra.plugin.core.flow.WorkingDirectory
-    description: "Execute {{flow.id}} main script with environment configuration"
+    description: "Execute last-one main script with environment configuration"
     namespaceFiles:
       enabled: true
       include:
-        - scripts/{{flow.id}}/**
+        - utils/**
+        - utils/config.yaml
     tasks:
       - id: run_main_script
         type: io.kestra.plugin.scripts.python.Commands
@@ -27,19 +28,19 @@ tasks:
           type: io.kestra.plugin.scripts.runner.docker.Docker
           pullPolicy: NEVER
         containerImage: my-custom-kestra:latest
-        description: "Execute main workflow logic for {{flow.id}}"
+        description: "Execute main workflow logic for last-one"
         namespaceFiles:
           enabled: true
         commands:
-          - echo "🚀 === sync monday boards with Azure SQL Starting ==="
-          - echo "📄 Executing main script for {{flow.id}}..."
-          - python scripts/{{flow.id}}/get_board_planning.py
-          - echo "✅ === sync monday boards with Azure SQL Completed ==="
+          - echo "🚀 === last Starting ==="
+          - echo "📄 Executing main script..."
+          - python utils/test_helper.py
+          - echo "✅ === last Completed ==="
           
   - id: completion_log
     type: io.kestra.plugin.core.log.Log
     message: |
       ✅ Workflow completed successfully!
-      🎯 Workflow: {{flow.id}}
+      🎯 Workflow: last-one
       📊 Results: Check task outputs above for detailed execution results
       ⏰ Completed at: {{ now() }}

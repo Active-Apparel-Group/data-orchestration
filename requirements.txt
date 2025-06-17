@@ -37,3 +37,11 @@ matplotlib>=3.7.0
 
 # Status reports
 tqdm>=4.66.1
+
+# Added by requirements scanner on 2025-06-16 22:13:18
+aiohttp
+fuzzywuzzy
+urllib3
+
+# Async
+asyncio

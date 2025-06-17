@@ -1,4 +1,4 @@
-id: test-enhanced-sql-script
+id: test-sql
 namespace: company.team
 description: "Test the enhanced SQL script v2.0 with improved logging and fallback handling"
 
@@ -42,7 +42,8 @@ tasks:
         commands:
           - echo "🚀 === Enhanced Database Test Starting ==="
           - echo "📄 Running enhanced script with v2.0 features..."
-          - python scripts/test_sql_enhanced.py
+          - python scripts/test-sql/test_sql_enhanced.py
+          - python scripts/test-sql/test_sql_with_env.py
           - echo "✅ === Enhanced Database Test Completed ==="
           
       - id: log_completion

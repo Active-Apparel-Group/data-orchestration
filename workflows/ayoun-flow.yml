@@ -1,6 +1,6 @@
-id: monday-boards
+id: ayoun-flow
 namespace: company.team
-description: "sync monday boards with Azure SQL"
+description: "flow about ayoun"
 
 tasks:
   - id: setup_and_log
@@ -9,7 +9,7 @@ tasks:
       🚀 Starting Workflow: {{ flow.id }}
       📅 Timestamp: {{ now() }}
       🏷️  Namespace: {{ flow.namespace }}
-      📝 Description: sync monday boards with Azure SQL
+      📝 Description: flow about ayoun
       📁 Script Location: scripts/{{flow.id}}/
       🗄️  Database Connections: 0
       
@@ -30,11 +30,12 @@ tasks:
         description: "Execute main workflow logic for {{flow.id}}"
         namespaceFiles:
           enabled: true
+
         commands:
-          - echo "🚀 === sync monday boards with Azure SQL Starting ==="
+          - echo "🚀 === flow about ayoun Starting ==="
           - echo "📄 Executing main script for {{flow.id}}..."
-          - python scripts/{{flow.id}}/get_board_planning.py
-          - echo "✅ === sync monday boards with Azure SQL Completed ==="
+          - python scripts/{{flow.id}}/main.py
+          - echo "✅ === flow about ayoun Completed ==="
           
   - id: completion_log
     type: io.kestra.plugin.core.log.Log
