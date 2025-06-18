@@ -1,9 +1,9 @@
-# Generated Kestra Workflow for Monday.com Board: Planning
-# Generated: 2025-06-18 16:57:16
+# Generated Kestra Workflow for Monday.com Board: Customer Master Schedule
+# Generated: 2025-06-18 18:22:14
 
-id: get_board_planning
+id: get_board_customer_master_schedule
 namespace: company.team
-description: "sync monday board Planning with Azure SQL"
+description: "sync monday board Customer Master Schedule with Azure SQL"
 
 tasks:
   - id: setup_and_log
@@ -12,10 +12,10 @@ tasks:
       🚀 Starting Workflow: {{ flow.id }}
       📅 Timestamp: {{ now() }}
       🏷️  Namespace: {{ flow.namespace }}
-      📝 Description: sync monday board Planning with Azure SQL
+      📝 Description: sync monday board Customer Master Schedule with Azure SQL
       📁 Script Location: scripts/{{ flow.id }}/
       🗄️  Database Connections: 1
-      📊 Target Table: orders.dbo.planning
+      📊 Target Table: orders.dbo.MON_Customer_Master_Schedule
       
   - id: execute_main_workflow
     type: io.kestra.plugin.core.flow.WorkingDirectory
@@ -35,10 +35,10 @@ tasks:
         namespaceFiles:
           enabled: true
         commands:
-          - echo "🚀 === sync monday board Planning with Azure SQL Starting ==="
+          - echo "🚀 === sync monday board Customer Master Schedule with Azure SQL Starting ==="
           - echo "📄 Executing main script for {{ flow.id }}..."
-          - python scripts/{{ flow.id }}/get_board_planning.py
-          - echo "✅ === sync monday board Planning with Azure SQL Completed ==="
+          - python scripts/{{ flow.id }}/get_board_customer_master_schedule.py
+          - echo "✅ === sync monday board Customer Master Schedule with Azure SQL Completed ==="
           
   - id: completion_log
     type: io.kestra.plugin.core.log.Log
@@ -47,15 +47,15 @@ tasks:
       🎯 Workflow: {{ flow.id }}
       📊 Results: Check task outputs above for detailed execution results
       ⏰ Completed at: {{ now() }}
-      🗄️  Target Table: orders.dbo.planning
+      🗄️  Target Table: orders.dbo.MON_Customer_Master_Schedule
 
 triggers:
   - id: schedule
     type: io.kestra.core.models.triggers.types.Schedule
     cron: "0 */6 * * *"
 labels:
-  board_id: "8709134353"
-  board_name: "Planning"
-  table_name: "planning"
+  board_id: "9200517329"
+  board_name: "Customer Master Schedule"
+  table_name: "MON_Customer_Master_Schedule"
   database: "orders"
   generated_by: "Dynamic Monday.com Board Template System"

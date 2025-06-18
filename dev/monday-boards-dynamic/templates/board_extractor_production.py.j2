@@ -108,7 +108,8 @@ def fetch_board_data_with_pagination():
     board_name = None
     
     while True:        # Build query with pagination cursor
-        cursor_arg = f', cursor: "{cursor}"' if cursor else ''        query = f'''{% raw %}
+        cursor_arg = f', cursor: "{cursor}"' if cursor else ''
+        query = f'''{% raw %}
         query GetBoardItems {{
           boards(ids: {% endraw %}{BOARD_ID}{% raw %}) {{
             name
@@ -223,7 +224,7 @@ def process_items(items):
             "StyleKey": item["name"],
             "UpdateDate": item["updated_at"],
             "Group": item["group"]["title"],
-            "Item ID": item["id"]
+            "Item ID": int(item["id"])  # Convert to integer for BIGINT compatibility
         }
         
         # Extract column values
@@ -355,22 +356,58 @@ def prepare_for_database(df):
                     if str(val) not in ['None', '', 'nan', 'null']:
                         logger.info(f"    Unexpected date conversion error for '{val}': {e}")
                     return None
-            
-            # Apply the conversion and show progress
+              # Apply the conversion and show progress
             original_count = df[col].notna().sum()
             df[col] = df[col].apply(safe_date_convert)
             converted_count = df[col].notna().sum()
             null_count = df[col].isna().sum()
             logger.info(f"    {col}: {original_count} -> {converted_count} valid dates, {null_count} nulls")
     
-    # Process numeric columns with robust NumPy NaN handling
-    numeric_columns = [
-        'BULK PO QTY', 'Fabric Lead Time', 'Precut Quantity', 'Item ID',
-        'QTY WIP', 'QTY FG', 'QTY INVOICED', 'QTY FCST',
-        'QTY WIP CUT', 'QTY WIP SEW', 'QTY WIP FIN', 'QTY SCRAP'
-    ]
+    # DYNAMIC NUMERIC COLUMN DETECTION: Find columns that should be numeric
+    # Look for columns with numeric-sounding names and/or numeric content
+    potential_numeric_columns = []
     
-    for col in numeric_columns:
+    # Keywords that suggest a column should be numeric
+    numeric_keywords = ['QTY', 'QUANTITY', 'COUNT', 'NUMBER', 'PRICE', 'COST', 'USD', 'FEE', 
+                       'RATE', 'DUTY', 'TARIFF', 'FREIGHT', 'ID', 'REVENUE', 'FCST', 'ORDERED',
+                       'SHIPPED', 'PACKED', 'INVOICED', 'WORKS', 'FOB', 'DDP', 'CHARGE']
+    
+    for col in df.columns:
+        # Skip date columns and already processed columns
+        if col in date_columns or col in json_metadata_columns:
+            continue
+            
+        # Check if column name suggests it should be numeric
+        col_upper = col.upper()
+        has_numeric_keyword = any(keyword in col_upper for keyword in numeric_keywords)
+        
+        # Check if the actual values look numeric (sample first few non-null values)
+        sample_values = df[col].dropna().head(10)
+        looks_numeric = False
+        
+        if len(sample_values) > 0:
+            # Count how many values can be converted to numbers
+            numeric_count = 0
+            for val in sample_values:
+                try:
+                    # Try to convert to float (handles both int and float strings)
+                    if pd.notna(val) and str(val).strip() not in ['', 'None', 'null']:
+                        float(str(val).strip())
+                        numeric_count += 1
+                except:
+                    pass
+            
+            # If more than 70% of sample values are numeric, consider it numeric
+            looks_numeric = (numeric_count / len(sample_values)) >= 0.7
+        
+        # Add to potential numeric if it matches criteria
+        if has_numeric_keyword or looks_numeric:
+            potential_numeric_columns.append(col)
+    
+    logger.info(f"Detected {len(potential_numeric_columns)} potential numeric columns: {potential_numeric_columns}")
+    
+    # Process detected numeric columns with robust NumPy NaN handling
+    for col in potential_numeric_columns:
         if col in df.columns:
             def safe_numeric_convert(val):
                 # Handle NumPy NaN specifically
@@ -410,10 +447,9 @@ def prepare_for_database(df):
             df[col] = df[col].apply(safe_numeric_convert)
             converted_count = df[col].notna().sum()
             logger.info(f"    {col}: {original_count} -> {converted_count} valid numbers")
-    
-    # Handle nulls and convert types for remaining columns
+      # Handle nulls and convert types for remaining columns
     for col in df.columns:
-        if col not in date_columns and col not in numeric_columns and col not in json_metadata_columns:
+        if col not in date_columns and col not in potential_numeric_columns and col not in json_metadata_columns:
             def safe_string_convert(val):
                 if pd.isna(val) or val is None:
                     return None
@@ -531,25 +567,25 @@ def record_schema_decision(column_name, column_type, approved, reason=""):
         # Load current mapping
         with open(mapping_file, 'r', encoding='utf-8') as f:
             mapping_data = yaml.safe_load(f)
-        
-        # Ensure structure exists
+          # Ensure structure exists
         if 'monday_boards' not in mapping_data:
-            mapping_data['monday_boards'] = {}        if BOARD_KEY not in mapping_data['monday_boards']:
+            mapping_data['monday_boards'] = {}
+        if BOARD_KEY not in mapping_data['monday_boards']:
             mapping_data['monday_boards'][BOARD_KEY] = {}
         if 'schema_decisions' not in mapping_data['monday_boards'][BOARD_KEY]:
             mapping_data['monday_boards'][BOARD_KEY]['schema_decisions'] = {
                 'approved_columns': [],
                 'rejected_columns': []
             }
-        
-        # Record decision
+          # Record decision
         decision_entry = {
             'name': column_name,
             'type': column_type,
             'decision_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'reason': reason
         }
-          if approved:
+        
+        if approved:
             mapping_data['monday_boards'][BOARD_KEY]['schema_decisions']['approved_columns'].append(decision_entry)
             logger.info(f"RECORDED APPROVAL: Column '{column_name}' approved for schema")
         else:

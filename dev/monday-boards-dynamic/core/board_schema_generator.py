@@ -341,13 +341,18 @@ class BoardSchemaGenerator:
             board_name = board["name"]
             
             logger.info(f"Found board: '{board_name}' (ID: {board_id})")
-            
-            # Process columns to create column definitions
+              # Process columns to create column definitions
             columns = self._process_board_columns(board["columns"])
             
-            # Add system fields that are always present
+            # Add system fields that are always present, but avoid duplicates
             system_columns = self._get_system_columns()
-            columns.extend(system_columns)
+            existing_column_names = {col.sql_column.lower() for col in columns}
+            
+            for sys_col in system_columns:
+                if sys_col.sql_column.lower() not in existing_column_names:
+                    columns.append(sys_col)
+                else:
+                    logger.debug(f"Skipping duplicate system column: {sys_col.sql_column}")
             
             # Create board schema
             schema = BoardSchema(

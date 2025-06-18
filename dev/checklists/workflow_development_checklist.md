@@ -7,6 +7,21 @@
 **Status**: ✅ **PRODUCTION READY** - June 18, 2025
 **Description**: Hybrid ETL script with zero-downtime refresh and dynamic schema handling
 
+### Customer Master Schedule Board ETL (DEPLOYED & RUNNING)
+**Location**: `scripts/monday-boards/get_board_customer_master_schedule.py`
+**Workflow**: `workflows/monday-board-customer_master_schedule.yml`
+**Status**: ✅ **DEPLOYED & RUNNING** - June 18, 2025
+**Description**: Customer Master Schedule board extraction with full production features
+
+#### Deployment Results:
+- ✅ **Script Deployed**: Successfully deployed to Kestra scripts directory
+- ✅ **Workflow Created**: YAML workflow validated and deployed
+- ✅ **Kestra Execution**: Workflow executed successfully in production
+- ✅ **Data Extraction**: Customer Master Schedule data extracted and loaded
+- ✅ **Zero Downtime**: Atomic staging swap completed without interruption
+- ✅ **Logging**: Clean ASCII logging confirmed in Kestra console
+- ✅ **Template Validation**: Jinja2 template successfully generated production script
+
 #### Completed Features:
 - ✅ **Repository Standards Compliance**: Uses centralized db_helper, config, mapping
 - ✅ **Zero-Downtime Architecture**: Atomic staging swap with <1 second downtime  

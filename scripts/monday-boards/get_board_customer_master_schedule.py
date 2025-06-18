@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-GENERATED ETL Script: Monday.com Board Planning to SQL Server
-Board ID: 8709134353
-Table: planning
+GENERATED ETL Script: Monday.com Board Customer Master Schedule to SQL Server
+Board ID: 9200517329
+Table: MON_Customer_Master_Schedule
 Database: orders
-Generated: 2025-06-18 16:57:16
+Generated: 2025-06-18 21:02:11
 
 PRODUCTION-READY: Zero-Downtime Staging with Dynamic Schema & HITL
 Features: Auto-retry, HITL approval, DataFrame filtering, Kestra-compatible logging
@@ -34,7 +34,7 @@ import db_helper as db
 
 # Import centralized logger helper for Kestra/VS Code compatibility
 import logger_helper
-logger = logger_helper.get_logger("planning_etl")
+logger = logger_helper.get_logger("customer_master_schedule_etl")
 
 # Load configuration from centralized config
 config = db.load_config()
@@ -44,11 +44,11 @@ import mapping_helper as mapping
 
 # Configuration - Monday.com API settings
 # Board-specific configuration (generated from template)
-BOARD_ID = 8709134353
-TABLE_NAME = "planning"
+BOARD_ID = 9200517329
+TABLE_NAME = "MON_Customer_Master_Schedule"
 DATABASE_NAME = "orders"
-BOARD_NAME = "Planning"
-BOARD_KEY = "planning"  # For data mapping YAML key
+BOARD_NAME = "Customer Master Schedule"
+BOARD_KEY = "MON_Customer_Master_Schedule"  # For data mapping YAML key
 MONDAY_TOKEN = os.getenv('MONDAY_API_KEY') or config.get('apis', {}).get('monday', {}).get('api_token')
 API_VER = "2025-04"
 API_URL = config.get('apis', {}).get('monday', {}).get('api_url', "https://api.monday.com/v2")
@@ -107,15 +107,13 @@ def fetch_board_data_with_pagination():
     page_num = 1
     board_name = None
     
-    while True:
-        # Build query with pagination cursor
+    while True:        # Build query with pagination cursor
         cursor_arg = f', cursor: "{cursor}"' if cursor else ''
-        
         query = f'''
         query GetBoardItems {{
           boards(ids: {BOARD_ID}) {{
             name
-            items_page(limit: 400{cursor_arg}) {{
+            items_page(limit: 250{cursor_arg}) {{
               cursor
               items {{
                 id
@@ -148,7 +146,8 @@ def fetch_board_data_with_pagination():
               }}
             }}
           }}
-        }}        '''
+        }}
+        '''
         
         data = gql(query)
         board = data["boards"][0]
@@ -225,7 +224,7 @@ def process_items(items):
             "StyleKey": item["name"],
             "UpdateDate": item["updated_at"],
             "Group": item["group"]["title"],
-            "Item ID": item["id"]
+            "Item ID": int(item["id"])  # Convert to integer for BIGINT compatibility
         }
         
         # Extract column values
@@ -357,22 +356,58 @@ def prepare_for_database(df):
                     if str(val) not in ['None', '', 'nan', 'null']:
                         logger.info(f"    Unexpected date conversion error for '{val}': {e}")
                     return None
-            
-            # Apply the conversion and show progress
+              # Apply the conversion and show progress
             original_count = df[col].notna().sum()
             df[col] = df[col].apply(safe_date_convert)
             converted_count = df[col].notna().sum()
             null_count = df[col].isna().sum()
             logger.info(f"    {col}: {original_count} -> {converted_count} valid dates, {null_count} nulls")
     
-    # Process numeric columns with robust NumPy NaN handling
-    numeric_columns = [
-        'BULK PO QTY', 'Fabric Lead Time', 'Precut Quantity', 'Item ID',
-        'QTY WIP', 'QTY FG', 'QTY INVOICED', 'QTY FCST',
-        'QTY WIP CUT', 'QTY WIP SEW', 'QTY WIP FIN', 'QTY SCRAP'
-    ]
+    # DYNAMIC NUMERIC COLUMN DETECTION: Find columns that should be numeric
+    # Look for columns with numeric-sounding names and/or numeric content
+    potential_numeric_columns = []
     
-    for col in numeric_columns:
+    # Keywords that suggest a column should be numeric
+    numeric_keywords = ['QTY', 'QUANTITY', 'COUNT', 'NUMBER', 'PRICE', 'COST', 'USD', 'FEE', 
+                       'RATE', 'DUTY', 'TARIFF', 'FREIGHT', 'ID', 'REVENUE', 'FCST', 'ORDERED',
+                       'SHIPPED', 'PACKED', 'INVOICED', 'WORKS', 'FOB', 'DDP', 'CHARGE']
+    
+    for col in df.columns:
+        # Skip date columns and already processed columns
+        if col in date_columns or col in json_metadata_columns:
+            continue
+            
+        # Check if column name suggests it should be numeric
+        col_upper = col.upper()
+        has_numeric_keyword = any(keyword in col_upper for keyword in numeric_keywords)
+        
+        # Check if the actual values look numeric (sample first few non-null values)
+        sample_values = df[col].dropna().head(10)
+        looks_numeric = False
+        
+        if len(sample_values) > 0:
+            # Count how many values can be converted to numbers
+            numeric_count = 0
+            for val in sample_values:
+                try:
+                    # Try to convert to float (handles both int and float strings)
+                    if pd.notna(val) and str(val).strip() not in ['', 'None', 'null']:
+                        float(str(val).strip())
+                        numeric_count += 1
+                except:
+                    pass
+            
+            # If more than 70% of sample values are numeric, consider it numeric
+            looks_numeric = (numeric_count / len(sample_values)) >= 0.7
+        
+        # Add to potential numeric if it matches criteria
+        if has_numeric_keyword or looks_numeric:
+            potential_numeric_columns.append(col)
+    
+    logger.info(f"Detected {len(potential_numeric_columns)} potential numeric columns: {potential_numeric_columns}")
+    
+    # Process detected numeric columns with robust NumPy NaN handling
+    for col in potential_numeric_columns:
         if col in df.columns:
             def safe_numeric_convert(val):
                 # Handle NumPy NaN specifically
@@ -412,10 +447,9 @@ def prepare_for_database(df):
             df[col] = df[col].apply(safe_numeric_convert)
             converted_count = df[col].notna().sum()
             logger.info(f"    {col}: {original_count} -> {converted_count} valid numbers")
-    
-    # Handle nulls and convert types for remaining columns
+      # Handle nulls and convert types for remaining columns
     for col in df.columns:
-        if col not in date_columns and col not in numeric_columns and col not in json_metadata_columns:
+        if col not in date_columns and col not in potential_numeric_columns and col not in json_metadata_columns:
             def safe_string_convert(val):
                 if pd.isna(val) or val is None:
                     return None
@@ -533,10 +567,9 @@ def record_schema_decision(column_name, column_type, approved, reason=""):
         # Load current mapping
         with open(mapping_file, 'r', encoding='utf-8') as f:
             mapping_data = yaml.safe_load(f)
-        
-        # Ensure structure exists
+          # Ensure structure exists
         if 'monday_boards' not in mapping_data:
-            mapping_data['monday_boards'] = {}        
+            mapping_data['monday_boards'] = {}
         if BOARD_KEY not in mapping_data['monday_boards']:
             mapping_data['monday_boards'][BOARD_KEY] = {}
         if 'schema_decisions' not in mapping_data['monday_boards'][BOARD_KEY]:
@@ -544,14 +577,14 @@ def record_schema_decision(column_name, column_type, approved, reason=""):
                 'approved_columns': [],
                 'rejected_columns': []
             }
-        
-        # Record decision
+          # Record decision
         decision_entry = {
             'name': column_name,
             'type': column_type,
             'decision_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'reason': reason
         }
+        
         if approved:
             mapping_data['monday_boards'][BOARD_KEY]['schema_decisions']['approved_columns'].append(decision_entry)
             logger.info(f"RECORDED APPROVAL: Column '{column_name}' approved for schema")

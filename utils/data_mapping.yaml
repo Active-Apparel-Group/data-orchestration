@@ -742,7 +742,11 @@ monday_boards:
     description: COO planning and manufacturing coordination board
     last_schema_update: '2025-06-17'
     schema_decisions:
-      approved_columns: []
+      approved_columns: 
+      - decision_date: '2025-06-18 14:02:27'
+        name: Pre Planned Production YY/MM
+        reason: needed for
+        type: mirror
       rejected_columns:
       - decision_date: '2025-06-18 14:02:27'
         name: CUST MASTER SCHEDULE

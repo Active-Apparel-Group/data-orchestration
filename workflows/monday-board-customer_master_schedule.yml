@@ -1,0 +1,75 @@
+id: monday-board-customer_master_schedule
+namespace: company.team
+description: "Extract Customer Master Schedule board data from Monday.com (Board ID: 9200517329)"
+
+tasks:
+  - id: setup_and_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      🚀 Starting Workflow: {{ flow.id }}
+      🔗 Timestamp: {{ now() }}
+      📋️ Namespace: {{ flow.namespace }}
+      📄 Description: Extract Customer Master Schedule board data from Monday.com (Board ID: 9200517329)
+      📂 Script Location: scripts/monday-boards/
+      🗄️ Database Connections: 1
+
+  - id: execute_main_workflow
+    type: io.kestra.plugin.core.flow.WorkingDirectory
+    description: "Execute {{flow.id}} main script with environment configuration"    
+    namespaceFiles:
+      enabled: true
+      include:
+        - scripts/monday-boards/**
+        - utils/**
+    tasks:
+      - id: run_main_script
+        type: io.kestra.plugin.scripts.python.Commands
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+          pullPolicy: NEVER
+        containerImage: my-custom-kestra:latest
+        description: "Execute Customer Master Schedule board extraction for {{flow.id}}"
+        namespaceFiles:
+          enabled: true
+        commands:
+          - echo "🚀 === Customer Master Schedule Board Extraction Starting ==="
+          - echo "📄 Executing board extraction script for {{flow.id}}..."
+          - python scripts/monday-boards/get_board_customer_master_schedule.py
+          - echo "✅ === Customer Master Schedule Board Extraction Completed ==="
+  - id: completion_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      ✅ Workflow completed successfully!
+      🎯 Workflow: {{flow.id}}
+      📊 Results: Check task outputs above for detailed execution results
+      ⏰ Completed at: {{ now() }}
+      
+  # Monitoring and alerting task
+  - id: performance_metrics
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      📊 === Performance Metrics ===
+      🎯 Workflow: {{flow.id}}
+      ⏱️ Execution Time: {{ taskrun.duration }}
+      📅 Execution Date: {{ now() }}
+      📋 Status: {{ taskrun.state.current }}
+      🔄 Run ID: {{ taskrun.id }}
+      📈 Namespace: {{ flow.namespace }}
+
+errors:
+  - id: error_notification
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      🚨 === ERROR ALERT ===
+      ❌ Workflow: {{flow.id}} FAILED
+      📅 Failed at: {{ now() }}
+      🔍 Error: {{ task.outputs }}
+      🔄 Run ID: {{ taskrun.id }}
+      📧 Alert: Development team notified
+      🎯 Action Required: Check Monday.com API connectivity and script logs
+
+triggers:
+  - id: daily_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 2 * * *"  # Daily at 2 AM
+    description: Daily extraction of Customer Master Schedule data

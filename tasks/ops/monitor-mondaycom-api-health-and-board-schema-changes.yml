@@ -1,0 +1,100 @@
+---
+# Unique identifier (auto-filled by scaffold tool)
+id: "monitor-mondaycom-api-health-and-board-schema-changes"
+
+# Metadata
+type: ops
+title: "Monitor Monday.com API health and board schema changes"
+description: >
+  Continuous monitoring of Monday.com API health, board schema changes, and ETL pipeline performance
+
+# Scheduling (cron format or manual trigger)
+schedule: "0 */6 * * *"  # e.g., "0 2 * * *" for nightly at 02:00, or "manual" for on-demand
+
+# Operation category (aligns with our existing tools)
+category: "monitoring"  # deployment, maintenance, monitoring, data-quality, backup
+
+# Context & references (respecting our current docs structure)
+context:
+  runbook: "docs/runbooks/monitor-mondaycom-api-health-and-board-schema-changes-runbook.md"
+  checklist: "dev/checklists/monitoring_checklist.md"
+  logs_location: "logs/monitor-mondaycom-api-health-and-board-schema-changes/"  # Where operation logs are stored
+
+# Checklist: marks completion status
+checklist:
+  - "[ ] Validate prerequisites and environment"
+  - "[ ] Execute primary operation steps"
+  - "[ ] Verify operation success"
+  - "[ ] Update monitoring/status"
+  - "[ ] Archive logs and cleanup"
+  - "[ ] Document any issues or improvements"
+
+# Operation steps (following our established patterns)
+jobs:
+  - name: Pre-flight checks
+    command: "echo Pre-checks passed"
+    working_directory: "."
+    timeout_minutes: 5
+    
+  - name: Execute main operation
+    command: "ops"
+    working_directory: "."
+    timeout_minutes: "30"
+    
+  - name: Post-operation validation
+    command: "echo Validation passed"
+    working_directory: "."
+    timeout_minutes: 5
+
+# Environment requirements (aligns with our .env pattern)
+environment:
+  required_vars:
+    - "EXAMPLE_VAR_1"
+    - "EXAMPLE_VAR_2"
+  optional_vars:
+    - "OPTIONAL_VAR_1"
+
+# Dependencies (respecting our current structure)
+dependencies:
+  tools:
+    - "python"  # e.g., docker, python, powershell
+  services:
+    - "kestra"  # e.g., kestra, sql-server
+  files:
+    - "requirements.txt"  # e.g., requirements.txt, config.yaml
+
+# Notifications (following our existing patterns)
+notifications:
+  on_failure:
+    - type: log
+      target: "logs/monitor-mondaycom-api-health-and-board-schema-changes/error.log"
+    - type: alert
+      target: "#ops-alerts"  # e.g., slack channel, email list
+  on_success:
+    - type: log
+      target: "logs/monitor-mondaycom-api-health-and-board-schema-changes/success.log"
+
+# Resource cleanup and archival (respecting our current organization)
+post_run:
+  archive:
+    logs: "archives/monitor-mondaycom-api-health-and-board-schema-changes/logs/"
+    outputs: "archives/monitor-mondaycom-api-health-and-board-schema-changes/outputs/"
+  cleanup:
+    temp_files: "tmp/monitor-mondaycom-api-health-and-board-schema-changes/*"
+  retention_days: "30"
+
+# Monitoring and metrics
+monitoring:
+  health_check: "echo Health_check_passed"
+  metrics:
+    - name: "operation_duration"
+      command: "echo 0"
+  alerts:
+    - condition: "failure_rate > 10%"
+      action: "send_notification"
+
+# Integration with our existing tools
+integration:
+  kestra_workflow: "workflows/monitor-mondaycom-api-health-and-board-schema-changes.yml"  # If this op has a Kestra counterpart
+  deployment_script: "tools/deploy-ops.ps1"   # If this uses our existing tools
+  makefile_target: "ops-monitor-mondaycom-api-health-and-board-schema-changes"             # If this can be run via make
