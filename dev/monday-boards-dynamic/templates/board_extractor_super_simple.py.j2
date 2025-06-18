@@ -1,0 +1,665 @@
+#!/usr/bin/env python3
+"""
+{{ board_config.board_name }} Board Extraction Script
+Generated on: {{ generation_timestamp }}
+Board ID: {{ board_config.board_id }}
+Target Table: {{ board_config.database }}.{{ board_config.table_name }}
+
+This script uses type-based extraction with centralized mapping.
+No custom per-column logic - everything is handled by type mappings.
+"""
+
+import os
+import sys
+import logging
+from datetime import datetime, timezone
+
+# Add the utils directory to the path for imports
+sys.path.append('/kestra/files/utils')
+sys.path.append('/kestra/files/scripts')
+
+from db_helper import DatabaseHelper
+import mapping_helper as mapping
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/kestra/files/monday_integration.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Board configuration
+BOARD_ID = {{ board_config.board_id }}
+BOARD_NAME = "{{ board_config.board_name }}"
+TARGET_DATABASE = "{{ board_config.database }}"
+TARGET_TABLE = "{{ board_config.table_name }}"
+
+# Get type mappings from centralized config
+TYPE_MAPPINGS = mapping.get_all_type_mappings('monday_to_sql')
+
+def extract_value_by_type(column_value, monday_type):
+    """
+    Extract and convert a Monday.com column value based on its type.
+    Uses centralized type mapping - no custom logic per column.
+    
+    Args:
+        column_value: Raw value from Monday.com API
+        monday_type: The Monday.com column type
+        
+    Returns:
+        Converted value ready for SQL insertion
+    """
+    if column_value is None:
+        return None
+    
+    try:
+        # Handle different Monday.com column types
+        if monday_type == 'item_id':
+            return int(column_value) if column_value else None
+            
+        elif monday_type in ['text', 'long_text', 'email', 'phone', 'link']:
+            return str(column_value).strip() if column_value else None
+            
+        elif monday_type in ['numbers', 'rating']:
+            if isinstance(column_value, (int, float)):
+                return int(column_value)
+            elif isinstance(column_value, str) and column_value.strip():
+                return int(float(column_value.strip()))
+            return None
+            
+        elif monday_type == 'numeric':
+            if isinstance(column_value, (int, float)):
+                return float(column_value)
+            elif isinstance(column_value, str) and column_value.strip():
+                return float(column_value.strip())
+            return None
+              elif monday_type == 'date':
+            # Monday.com dates come as {{"{"}} "date": "YYYY-MM-DD" {{"}"}}} or direct date string
+            if isinstance(column_value, dict) and 'date' in column_value:
+                date_str = column_value['date']
+                if date_str:
+                    return datetime.strptime(date_str, '%Y-%m-%d').date()
+            elif isinstance(column_value, str) and column_value.strip():
+                date_str = column_value.strip()
+                if date_str and date_str != '':
+                    try:
+                        return datetime.strptime(date_str, '%Y-%m-%d').date()
+                    except ValueError:
+                        # Try other common formats
+                        for fmt in ['%m/%d/%Y', '%d/%m/%Y', '%Y-%m-%d %H:%M:%S']:
+                            try:
+                                return datetime.strptime(date_str, fmt).date()
+                            except ValueError:
+                                continue
+            return None
+            
+        elif monday_type == 'datetime':
+            if isinstance(column_value, dict) and 'date' in column_value:
+                date_str = column_value['date']
+                if date_str:
+                    return datetime.strptime(date_str + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
+            elif isinstance(column_value, str) and column_value.strip():
+                # Handle various datetime formats
+                date_str = column_value.strip()
+                for fmt in ['%Y-%m-%d %H:%M:%S', '%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y']:
+                    try:
+                        return datetime.strptime(date_str, fmt)
+                    except ValueError:
+                        continue
+            return None
+            
+        elif monday_type in ['status', 'dropdown', 'color']:
+            # These come as {{"{"}}text: "value"{{"}"}}} or direct text
+            if isinstance(column_value, dict) and 'text' in column_value:
+                return column_value['text']
+            elif isinstance(column_value, str):
+                return column_value.strip() if column_value.strip() else None
+            return None
+            
+        elif monday_type == 'checkbox':
+            # Monday.com checkboxes: {{"{"}}checked: "true"{{"}"}}} or {{"{"}}checked: "false"{{"}"}}}
+            if isinstance(column_value, dict) and 'checked' in column_value:
+                return column_value['checked'] == 'true'
+            elif isinstance(column_value, bool):
+                return column_value
+            elif isinstance(column_value, str):
+                return column_value.lower() in ['true', 'yes', '1', 'checked']
+            return False
+            
+        elif monday_type in ['people', 'dependency', 'board_relation', 'mirror', 'formula', 'file', 'tags', 'timeline']:
+            # Complex types - store as JSON string
+            if isinstance(column_value, (dict, list)):
+                import json
+                return json.dumps(column_value)
+            elif isinstance(column_value, str):
+                return column_value.strip() if column_value.strip() else None
+            return None
+            
+        else:
+            # Fallback: convert to string
+            logger.warning(f"Unknown Monday.com type '{monday_type}', treating as text")
+            return str(column_value) if column_value else None
+            
+    except Exception as e:
+        logger.error(f"Error converting value '{column_value}' of type '{monday_type}': {e}")
+        return None
+
+
+def fetch_board_data():
+    """
+    Fetch data from Monday.com board using the API.
+    
+    Returns:
+        List of item dictionaries with column values
+    """
+    import requests
+    
+    # Get API key from environment
+    api_key = os.getenv('MONDAY_API_KEY')
+    if not api_key:
+        raise ValueError("MONDAY_API_KEY environment variable not set")
+    
+    # API endpoint and headers
+    url = "https://api.monday.com/v2"
+    headers = {
+        "Authorization": api_key,
+        "Content-Type": "application/json"
+    }
+    
+    # GraphQL query to get all items with column values
+    query = """
+    query {
+        boards(ids: [%s]) {
+            items {
+                id
+                name
+                group {
+                    title
+                }
+                created_at
+                updated_at
+                column_values {
+                    id
+                    title
+                    text
+                    value
+                    type
+                }
+            }
+        }
+    }
+    """ % BOARD_ID
+    
+    try:
+        response = requests.post(url, json={{"{"}}{"query": query{{"}"}}, headers=headers)
+        response.raise_for_status()
+        
+        data = response.json()
+        if 'errors' in data:
+            raise Exception(f"Monday.com API errors: {data['errors']}")
+        
+        board = data['data']['boards'][0]
+        items = board['items']
+        
+        logger.info(f"Fetched {len(items)} items from board {BOARD_ID}")
+        return items
+        
+    except Exception as e:
+        logger.error(f"Error fetching board data: {e}")
+        raise
+
+
+def transform_items(items):
+    """
+    Transform Monday.com items to database rows using type-based mapping.
+    
+    Args:
+        items: Raw items from Monday.com API
+        
+    Returns:
+        List of transformed rows ready for database insertion
+    """
+    transformed_rows = []
+    
+    # Get board column configuration
+    board_config = mapping.get_board_config('{{ board_config_key }}')
+    column_configs = {col['name']: col for col in board_config.get('columns', [])}
+    
+    for item in items:
+        try:
+            row = {}
+            
+            # Add standard fields
+            row['Item_ID'] = int(item['id'])
+            row['Name'] = item.get('name', '').strip() if item.get('name') else None
+            row['Group_Title'] = item['group']['title'] if item.get('group') else None
+            row['Created_At'] = datetime.fromisoformat(item['created_at'].replace('Z', '+00:00')) if item.get('created_at') else None
+            row['Updated_At'] = datetime.fromisoformat(item['updated_at'].replace('Z', '+00:00')) if item.get('updated_at') else None
+            
+            # Process column values using type-based extraction
+            for col_value in item.get('column_values', []):
+                col_name = col_value.get('title', '')
+                monday_type = col_value.get('type', 'text')
+                raw_value = col_value.get('value')
+                
+                # Get SQL column name from configuration
+                col_config = column_configs.get(col_name)
+                if col_config:
+                    sql_column = col_config['sql_column']
+                    configured_type = col_config.get('monday_type', monday_type)
+                    
+                    # Use type-based extraction
+                    converted_value = extract_value_by_type(raw_value, configured_type)
+                    row[sql_column] = converted_value
+                else:
+                    # Skip unmapped columns
+                    logger.debug(f"Skipping unmapped column: {col_name}")
+            
+            # Add processing metadata
+            row['ProcessedDate'] = datetime.now(timezone.utc)
+            row['SourceBoard'] = BOARD_NAME
+            
+            transformed_rows.append(row)
+            
+        except Exception as e:
+            logger.error(f"Error transforming item {item.get('id', 'unknown')}: {e}")
+            continue
+    
+    logger.info(f"Transformed {len(transformed_rows)} rows")
+    return transformed_rows
+
+
+def load_to_database(rows):
+    """
+    Load transformed data into the database.
+    
+    Args:
+        rows: Transformed rows to insert
+    """
+    if not rows:
+        logger.warning("No rows to load")
+        return
+    
+    db_helper = DatabaseHelper()
+    
+    try:
+        # Truncate and reload pattern (as used in existing scripts)
+        logger.info(f"Truncating table {TARGET_DATABASE}.dbo.{TARGET_TABLE}")
+        db_helper.execute_query(
+            f"TRUNCATE TABLE {TARGET_DATABASE}.dbo.{TARGET_TABLE}",
+            database=TARGET_DATABASE
+        )
+        
+        # Bulk insert
+        logger.info(f"Inserting {len(rows)} rows into {TARGET_DATABASE}.dbo.{TARGET_TABLE}")
+        db_helper.bulk_insert_rows(
+            table_name=f"dbo.{TARGET_TABLE}",
+            rows=rows,
+            database=TARGET_DATABASE
+        )
+        
+        logger.info("Data load completed successfully")
+        
+    except Exception as e:
+        logger.error(f"Error loading data to database: {e}")
+        raise
+    finally:
+        db_helper.close()
+
+
+def main():
+    """Main execution function"""
+    try:
+        logger.info(f"Starting {BOARD_NAME} board extraction")
+        logger.info(f"Board ID: {BOARD_ID}")
+        logger.info(f"Target: {TARGET_DATABASE}.dbo.{TARGET_TABLE}")
+        
+        # Extract data from Monday.com
+        items = fetch_board_data()
+        
+        # Transform using type-based mapping
+        rows = transform_items(items)
+        
+        # Load to database
+        load_to_database(rows)
+        
+        logger.info("Board extraction completed successfully")
+        
+    except Exception as e:
+        logger.error(f"Board extraction failed: {e}")
+        raise
+
+
+if __name__ == "__main__":
+    main()
+
+if not MONDAY_TOKEN or MONDAY_TOKEN == "YOUR_MONDAY_API_TOKEN_HERE":
+    raise ValueError("Monday.com API token not configured. Please set MONDAY_API_KEY environment variable or update utils/config.yaml")
+
+HEADERS = {
+    "Authorization": f"Bearer {MONDAY_TOKEN}",
+    "API-Version": API_VER,
+    "Content-Type": "application/json"
+}
+
+# Performance settings
+BATCH_SIZE = {{ batch_size or 100 }}
+MAX_WORKERS = {{ max_workers or 8 }}
+RATE_LIMIT_DELAY = {{ rate_limit_delay or 0.1 }}
+
+def gql(query_string):
+    """Execute GraphQL query against Monday.com API"""
+    response = requests.post(API_URL, headers=HEADERS, json={"query": query_string})
+    response.raise_for_status()
+    return response.json()["data"]
+
+def extract_value(column_value):
+    """
+    Extract the correct value from Monday.com column based on type.
+    Uses the EXACT same logic as the proven working get_board_planning.py
+    """
+    cv = column_value
+    column_type = cv["column"]["type"]
+    
+    # Handle different column types with proper value extraction
+    if column_type == "date":
+        # For date columns, prefer the text value which is already formatted
+        if cv.get("text") and cv.get("text").strip():
+            return cv["text"]
+        elif cv.get("value") and cv.get("value") != "None":
+            return cv["value"]
+        else:
+            return None
+    elif column_type == "dropdown" and cv.get("text"):
+        return cv["text"]
+    elif column_type == "status" and cv.get("label"):
+        return cv["label"]
+    elif column_type == "numbers" and cv.get("number") is not None:
+        return cv["number"]
+    elif column_type == "item_id" and cv.get("item_id"):
+        return cv["item_id"]
+    elif cv.get("display_value") and cv.get("display_value") != "":
+        return cv["display_value"]
+    elif cv.get("text"):
+        return cv["text"]
+    elif cv.get("value"):
+        return cv["value"]
+    
+    return None
+
+def fetch_board_data_with_pagination():
+    """Fetch ALL items from Monday.com board using cursor-based pagination"""
+    print(f"📡 Fetching data from Monday.com board {BOARD_ID} ({BOARD_NAME}) with pagination...")
+    
+    all_items = []
+    cursor = None
+    page_num = 1
+    board_name = None
+    
+    while True:
+        cursor_arg = f', cursor: "{cursor}"' if cursor else ''
+        
+        query = f'''
+        query GetBoardItems {{
+          boards(ids: {BOARD_ID}) {{
+            name
+            items_page(limit: 250{cursor_arg}) {{
+              cursor
+              items {{
+                id
+                name
+                updated_at
+                created_at
+                group {{
+                  id
+                  title
+                }}
+                column_values {{
+                  column {{
+                    title
+                    id
+                    type
+                  }}
+                  value
+                  text
+                  ... on DependencyValue {{ display_value }}
+                  ... on MirrorValue {{ display_value }}
+                  ... on BoardRelationValue {{ display_value }}
+                  ... on FormulaValue {{ display_value }}
+                  ... on TextValue {{ text }}
+                  ... on LongTextValue {{ text }}
+                  ... on StatusValue {{ label }}
+                  ... on PeopleValue {{ text }}
+                  ... on DropdownValue {{ text }}
+                  ... on ItemIdValue {{ item_id }}
+                  ... on NumbersValue {{ number }}
+                }}
+              }}
+            }}
+          }}
+        }}
+        '''
+        
+        data = gql(query)
+        board = data["boards"][0]
+        
+        if board_name is None:
+            board_name = board["name"]
+        
+        items_page = board["items_page"]
+        items = items_page["items"]
+        
+        all_items.extend(items)
+        print(f"   📄 Page {page_num}: Fetched {len(items)} items (Total: {len(all_items)})")
+        
+        cursor = items_page.get("cursor")
+        if not cursor or len(items) == 0:
+            break
+            
+        page_num += 1
+        time.sleep(RATE_LIMIT_DELAY)
+    
+    print(f"✅ Fetched {len(all_items)} total items from board '{board_name}' across {page_num} pages")
+    return all_items, board_name
+
+def truncate_table():
+    """Truncate the table before full refresh"""
+    print("🗑️ TRUNCATING table for full refresh...")
+    
+    try:
+        count_result = db.run_query(f"SELECT COUNT(*) as count FROM dbo.{TABLE_NAME}", DATABASE_NAME)
+        old_count = count_result.iloc[0]['count']
+        print(f"   📊 Current records in table: {old_count}")
+        
+        db.execute(f"TRUNCATE TABLE dbo.{TABLE_NAME}", DATABASE_NAME)
+        
+        verify_result = db.run_query(f"SELECT COUNT(*) as count FROM dbo.{TABLE_NAME}", DATABASE_NAME)
+        new_count = verify_result.iloc[0]['count']
+        
+        print(f"   ✅ Table truncated: {old_count} → {new_count} records")
+        
+    except Exception as e:
+        print(f"   ❌ Truncate failed: {e}")
+        raise
+
+def process_items(items):
+    """Convert Monday.com items to DataFrame using simple column mapping"""
+    print(f"🔄 Processing {len(items)} items...")
+    
+    records = []
+    for item in items:
+        # Start with system fields
+        record = {
+            "Item ID": item["id"],
+            "Item Name": item["name"],
+            "Updated At": item["updated_at"],
+            "Created At": item.get("created_at"),
+            "Group Title": item["group"]["title"]
+        }
+        
+        # Extract all column values - use actual Monday.com column names
+        for cv in item["column_values"]:
+            column_title = cv["column"]["title"]
+            # Use the column title directly as the record key
+            record[column_title] = extract_value(cv)
+        
+        records.append(record)
+    
+    df = pd.DataFrame(records)
+    print(f"✅ Created DataFrame with {len(df)} rows and {len(df.columns)} columns")
+    return df
+
+def prepare_for_database(df):
+    """Prepare DataFrame for database insert with type-based conversions"""
+    print("🔧 Preparing data for database insert...")
+    
+    # Get table schema to validate columns
+    columns_query = f"""
+        SELECT COLUMN_NAME, DATA_TYPE 
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = '{TABLE_NAME}' AND TABLE_SCHEMA = 'dbo'
+    """
+    schema_df = db.run_query(columns_query, DATABASE_NAME)
+    valid_columns = set(schema_df['COLUMN_NAME'].tolist())
+    
+    # Filter DataFrame to only include valid columns
+    df_columns = [col for col in df.columns if col in valid_columns]
+    df = df[df_columns]
+    print(f"   📋 Using {len(df_columns)} valid columns")
+    
+    # Apply type-based conversions based on SQL schema
+    for _, row in schema_df.iterrows():
+        col_name = row['COLUMN_NAME']
+        data_type = row['DATA_TYPE']
+        
+        if col_name in df.columns:
+            if data_type in ['date', 'datetime', 'datetime2']:
+                print(f"   🗓️ Converting {col_name} to {data_type}...")
+                df[col_name] = pd.to_datetime(df[col_name], errors='coerce').dt.strftime('%Y-%m-%d')
+            elif data_type in ['bigint', 'int', 'smallint']:
+                print(f"   🔢 Converting {col_name} to {data_type}...")
+                df[col_name] = pd.to_numeric(df[col_name], errors='coerce')
+            elif data_type in ['bit']:
+                print(f"   ☑️ Converting {col_name} to {data_type}...")
+                df[col_name] = df[col_name].map({'true': 1, 'false': 0, True: 1, False: 0}).fillna(0)
+    
+    # Replace pandas NaN with None for SQL compatibility
+    df = df.where(pd.notna(df), None)
+    
+    print(f"✅ Data preparation complete. Ready for database insert.")
+    return df
+
+def concurrent_insert_chunk(chunk_data, columns):
+    """Insert a chunk of data using db_helper"""
+    chunk_df, chunk_id = chunk_data
+    
+    try:
+        conn = db.get_connection(DATABASE_NAME)
+        cursor = conn.cursor()
+        
+        placeholders = ', '.join(['?' for _ in columns])
+        column_names = ', '.join([f'[{col}]' for col in columns])
+        insert_sql = f"INSERT INTO dbo.{TABLE_NAME} ({column_names}) VALUES ({placeholders})"
+        
+        values_list = []
+        for _, row in chunk_df.iterrows():
+            values = [row[col] if pd.notna(row[col]) else None for col in columns]
+            values_list.append(values)
+        
+        cursor.executemany(insert_sql, values_list)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return len(chunk_df), 0, chunk_id
+        
+    except Exception as e:
+        print(f"    ❌ {chunk_id}: Insert error: {e}")
+        return 0, len(chunk_df), chunk_id
+
+async def concurrent_insert(df, chunk_size=BATCH_SIZE, max_workers=MAX_WORKERS):
+    """Insert data using concurrent processing"""
+    print(f"💾 Inserting {len(df)} records in chunks of {chunk_size}...")
+    
+    columns = list(df.columns)
+    chunks = []
+    for i in range(0, len(df), chunk_size):
+        chunk = df.iloc[i:i + chunk_size]
+        chunks.append((chunk, f"chunk_{i//chunk_size + 1}"))
+    
+    print(f"📦 Split into {len(chunks)} chunks for concurrent processing")
+    
+    total_success = 0
+    total_failed = 0
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {
+            executor.submit(concurrent_insert_chunk, chunk_data, columns): chunk_data[1] 
+            for chunk_data in chunks
+        }
+        
+        for future in concurrent.futures.as_completed(futures):
+            chunk_name = futures[future]
+            try:
+                success_count, fail_count, chunk_id = future.result()
+                total_success += success_count
+                total_failed += fail_count
+                
+                if success_count > 0:
+                    print(f"   ✅ {chunk_name}: {success_count} records inserted")
+                if fail_count > 0:
+                    print(f"   ❌ {chunk_name}: {fail_count} records failed")
+                    
+            except Exception as e:
+                print(f"   ❌ {chunk_name}: Exception occurred: {e}")
+                total_failed += chunk_size
+    
+    print(f"🎯 Insert completed: {total_success} success, {total_failed} failed")
+    return total_success, total_failed
+
+async def main():
+    """Main ETL function"""
+    print(f"🚀 === Monday.com Board {BOARD_NAME} ETL ===")
+    print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    
+    try:
+        # Step 1: Truncate table
+        truncate_table()
+        
+        # Step 2: Fetch data from Monday.com
+        items, board_name = fetch_board_data_with_pagination()
+        
+        if not items:
+            print("ℹ️ No items found in board")
+            return
+        
+        # Step 3: Process items
+        df = process_items(items)
+        
+        # Step 4: Prepare for database
+        df = prepare_for_database(df)
+        
+        # Step 5: Insert to database
+        success_count, fail_count = await concurrent_insert(df)
+        
+        print(f"\n✅ ETL completed for board '{board_name}'")
+        print(f"📊 Total processed: {len(df)} items")
+        print(f"📊 Successfully inserted: {success_count}")
+        print(f"📊 Failed: {fail_count}")
+        print(f"⏰ Completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        if fail_count == 0:
+            print("🎯 DEPLOYMENT: READY ✅")
+        else:
+            print(f"⚠️ DEPLOYMENT: {fail_count} failures detected")
+        
+    except Exception as e:
+        print(f"❌ ETL process failed: {e}")
+        raise
+
+if __name__ == "__main__":
+    asyncio.run(main())

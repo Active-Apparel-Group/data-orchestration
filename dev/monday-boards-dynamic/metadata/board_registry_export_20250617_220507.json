@@ -1,0 +1,27 @@
+{
+  "export_timestamp": "2025-06-17T22:05:07.945346",
+  "total_boards": 1,
+  "registry": {
+    "8709134353": {
+      "board_id": 8709134353,
+      "board_name": "Planning",
+      "table_name": "MON_Planning",
+      "database": "orders",
+      "created_at": "2025-06-17T22:05:07.940814",
+      "updated_at": "2025-06-17T22:05:07.943348",
+      "schema_version": "1.0",
+      "deployment_status": {
+        "ddl_deployed": true,
+        "script_generated": true,
+        "workflow_created": false,
+        "last_successful_run": null,
+        "last_deployment": "2025-06-17T22:05:07.943348",
+        "deployment_errors": []
+      },
+      "metadata_path": null,
+      "script_path": null,
+      "workflow_path": null,
+      "configuration": {}
+    }
+  }
+}

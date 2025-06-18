@@ -1161,6 +1161,19 @@
                   "id": "color_mkrvzryf",
                   "label": null,
                   "index": null
+                },
+                {
+                  "column": {
+                    "title": "RANGE / COLLECTION",
+                    "id": "long_text_mks0vs1p",
+                    "type": "long_text",
+                    "__typename": "Column",
+                    "description": null
+                  },
+                  "value": null,
+                  "text": "",
+                  "__typename": "LongTextValue",
+                  "id": "long_text_mks0vs1p"
                 }
               ]
             }
@@ -1170,6 +1183,6 @@
     ]
   },
   "extensions": {
-    "request_id": "325de0f6-28bb-902d-983a-9285558d1172"
+    "request_id": "a7fc67e9-e99a-925e-81ba-f8e04b0a18ff"
   }
 }

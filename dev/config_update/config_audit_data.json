@@ -1,0 +1,4287 @@
+{
+  "generated_at": "2025-06-17T20:45:08.375437",
+  "summary": {
+    "total_files": 345,
+    "files_with_db": 129,
+    "files_with_yaml": 87,
+    "files_with_hardcoded": 131
+  },
+  "files": [
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\README.md",
+      "relative_path": "README.md",
+      "folder": ".",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "DATABASE\\s*=: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "\\.yml\\b: 6 matches",
+        "orders_unified_monday_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\DOCUMENTATION_STATUS.md",
+      "relative_path": "docs\\DOCUMENTATION_STATUS.md",
+      "folder": "docs",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "db_helper: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\order_sync_v2.py",
+      "relative_path": "scripts\\order_sync_v2.py",
+      "folder": "scripts",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 1 matches",
+        "DATABASE\\s*=: 3 matches",
+        "SERVER\\s*=: 2 matches",
+        "DRIVER\\s*=: 4 matches",
+        "connection_string: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\test_minimal_workflow.py",
+      "relative_path": "tests\\test_minimal_workflow.py",
+      "folder": "tests",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "connection_string: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tools\\deploy-scripts-clean.ps1",
+      "relative_path": "tools\\deploy-scripts-clean.ps1",
+      "folder": "tools",
+      "file_type": ".ps1",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tools\\deploy-workflows.ps1",
+      "relative_path": "tools\\deploy-workflows.ps1",
+      "folder": "tools",
+      "file_type": ".ps1",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 4 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tools\\extract_ddl.py",
+      "relative_path": "tools\\extract_ddl.py",
+      "folder": "tools",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "get_connection: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tools\\workflow_generator.py",
+      "relative_path": "tools\\workflow_generator.py",
+      "folder": "tools",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 3 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 12 matches",
+        "\\.yml\\b: 2 matches",
+        "yaml\\.safe_load: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\ui\\package.json",
+      "relative_path": "ui\\package.json",
+      "folder": "ui",
+      "file_type": ".json",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "customer_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\utils\\config.yaml",
+      "relative_path": "utils\\config.yaml",
+      "folder": "utils",
+      "file_type": ".yaml",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches",
+        "MONDAY_API_KEY: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\utils\\data_mapping.yaml",
+      "relative_path": "utils\\data_mapping.yaml",
+      "folder": "utils",
+      "file_type": ".yaml",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 11 matches",
+        "orders_unified_monday_mapping: 2 matches",
+        "field_mapping_matrix: 4 matches",
+        "customer_mapping: 5 matches",
+        "mapping_fields: 2 matches",
+        "monday_column_ids: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 8709134353', 'board_id: \"9200517329\"']",
+        "8709134353: ['8709134353']",
+        "9200517329: ['9200517329']",
+        "9218090006: ['9218090006']",
+        "MON_COO_Planning: ['MON_COO_Planning', 'MON_COO_Planning', 'mon_coo_planning']",
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'mon_custmasterschedule', 'MON_CustMasterSchedule', 'mon_custmasterschedule', 'MON_CustMasterSchedule', 'mon_custmasterschedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'mon_custmasterschedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'mon_custmasterschedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'mon_custmasterschedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_', 'STG_MON_', 'STG_MON_', 'stg_mon_', 'STG_MON_', 'stg_mon_']",
+        "ERR_MON_: ['ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'err_mon_', 'ERR_MON_', 'err_mon_']",
+        "v_mon_customer_ms: ['v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms']",
+        "v_packed_products: ['v_packed_products', 'v_packed_products', 'v_packed_products']",
+        "v_orders_shipped: ['v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped']",
+        "orders\\.: ['orders.']",
+        "text_mkr\\w+: ['text_mkr5wya6', 'text_mkrh94rx', 'text_mkr5ej2x', 'text_mkr5cz8m', 'text_mkr5p0cf']",
+        "dropdown_mkr\\w+: ['dropdown_mkr58de6', 'dropdown_mkr5rgs6', 'dropdown_mkr5w5e', 'dropdown_mkr5s5n3']",
+        "date_mkr\\w+: ['date_mkr5zp5']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Large (8+ hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\utils\\db_helper.py",
+      "relative_path": "utils\\db_helper.py",
+      "folder": "utils",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 1 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 4 matches",
+        "get_connection: 3 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 3 matches",
+        "yaml\\.safe_load: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\utils\\mapping_helper.py",
+      "relative_path": "utils\\mapping_helper.py",
+      "folder": "utils",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "yaml\\.safe_load: 1 matches",
+        "load_mapping_config: 13 matches",
+        "mapping_config: 13 matches",
+        "customer_mapping: 6 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\utils\\mapping_migration_helper.py",
+      "relative_path": "utils\\mapping_migration_helper.py",
+      "folder": "utils",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "DATABASE\\s*=: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 4 matches",
+        "yaml\\.safe_load: 3 matches",
+        "orders_unified_monday_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: ['BOARD_ID = 12345\"']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\utils\\test_helper.py",
+      "relative_path": "utils\\test_helper.py",
+      "folder": "utils",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "db_helper: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\utils\\test_mapping.py",
+      "relative_path": "utils\\test_mapping.py",
+      "folder": "utils",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "yaml\\.safe_load: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\workflows\\last-one.yml",
+      "relative_path": "workflows\\last-one.yml",
+      "folder": "workflows",
+      "file_type": ".yml",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\workflows\\test-this-out.yml",
+      "relative_path": "workflows\\test-this-out.yml",
+      "folder": "workflows",
+      "file_type": ".yml",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\workflows\\wolf_750702.yml",
+      "relative_path": "workflows\\wolf_750702.yml",
+      "folder": "workflows",
+      "file_type": ".yml",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\checklists\\workflow_development_checklist.md",
+      "relative_path": "dev\\checklists\\workflow_development_checklist.md",
+      "folder": "dev\\checklists",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "db_helper: 2 matches",
+        "get_connection: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\config_update\\README.md",
+      "relative_path": "dev\\config_update\\README.md",
+      "folder": "dev\\config_update",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "load_mapping_config: 1 matches",
+        "mapping_config: 1 matches",
+        "orders_unified_monday_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: ['BOARD_ID = \"8709134353\"']",
+        "8709134353: ['8709134353']",
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\config_update\\scan_codebase_config.py",
+      "relative_path": "dev\\config_update\\scan_codebase_config.py",
+      "folder": "dev\\config_update",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "connectionString: 1 matches",
+        "connection_string: 1 matches",
+        "db_helper: 1 matches",
+        "get_connection: 1 matches",
+        "execute_query: 1 matches",
+        "run_sql: 1 matches",
+        "load_sql_view: 1 matches",
+        "MONDAY_API_KEY: 1 matches",
+        "MONDAY_TOKEN: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 3 matches",
+        "\\.yml\\b: 2 matches",
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 1 matches",
+        "mapping_config: 3 matches",
+        "orders_unified_monday_mapping: 1 matches",
+        "field_mapping_matrix: 1 matches",
+        "customer_mapping: 2 matches",
+        "mapping_fields: 1 matches",
+        "monday_column_ids: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "8709134353: ['8709134353']",
+        "9200517329: ['9200517329']",
+        "9218090006: ['9218090006']",
+        "MON_COO_Planning: ['MON_COO_Planning']",
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_']",
+        "ERR_MON_: ['ERR_MON_']",
+        "v_mon_customer_ms: ['v_mon_customer_ms']",
+        "v_packed_products: ['v_packed_products']",
+        "v_orders_shipped: ['v_orders_shipped']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Large (8+ hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\monday-boards\\get_board_planning.py",
+      "relative_path": "dev\\monday-boards\\get_board_planning.py",
+      "folder": "dev\\monday-boards",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "db_helper: 5 matches",
+        "get_connection: 1 matches",
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches",
+        "MONDAY_API_KEY: 2 matches",
+        "MONDAY_TOKEN: 4 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "8709134353: ['8709134353']",
+        "MON_COO_Planning: ['MON_COO_Planning', 'MON_COO_Planning', 'MON_COO_Planning', 'MON_COO_Planning', 'MON_COO_Planning']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\shared\\test_framework.py",
+      "relative_path": "dev\\shared\\test_framework.py",
+      "folder": "dev\\shared",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "db_helper: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\shared\\test_repo_root_import.py",
+      "relative_path": "dev\\shared\\test_repo_root_import.py",
+      "folder": "dev\\shared",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "db_helper: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\audit-pipeline\\validation\\validate_env.py",
+      "relative_path": "dev\\audit-pipeline\\validation\\validate_env.py",
+      "folder": "dev\\audit-pipeline\\validation",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "get_connection: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\checklists\\workflow_plans\\customer_master_schedule_plan.md",
+      "relative_path": "dev\\checklists\\workflow_plans\\customer_master_schedule_plan.md",
+      "folder": "dev\\checklists\\workflow_plans",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "warehouse\\.: ['warehouse.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\checklists\\workflow_plans\\hello_import_test_plan.md",
+      "relative_path": "dev\\checklists\\workflow_plans\\hello_import_test_plan.md",
+      "folder": "dev\\checklists\\workflow_plans",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "db_helper: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\checklists\\workflow_plans\\monday_boards_plan.md",
+      "relative_path": "dev\\checklists\\workflow_plans\\monday_boards_plan.md",
+      "folder": "dev\\checklists\\workflow_plans",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "db_helper: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\order-staging\\validation\\milestone_2_customer_analysis.py",
+      "relative_path": "dev\\order-staging\\validation\\milestone_2_customer_analysis.py",
+      "folder": "dev\\order-staging\\validation",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 2 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 1 matches",
+        "connection_string: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\dev\\order-staging\\debugging\\logs\\deploy_staging.py",
+      "relative_path": "dev\\order-staging\\debugging\\logs\\deploy_staging.py",
+      "folder": "dev\\order-staging\\debugging\\logs",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 3 matches",
+        "SERVER\\s*=: 2 matches",
+        "DRIVER\\s*=: 4 matches",
+        "connection_string: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['mon_custmasterschedule', 'mon_custmasterschedule', 'mon_custmasterschedule', 'mon_custmasterschedule']",
+        "STG_MON_: ['stg_mon_', 'stg_mon_']",
+        "ERR_MON_: ['err_mon_', 'err_mon_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\deployment\\DEPLOYMENT-COMPLETE.md",
+      "relative_path": "docs\\deployment\\DEPLOYMENT-COMPLETE.md",
+      "folder": "docs\\deployment",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 5 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\deployment\\NAMESPACE-STRUCTURE-FIXED.md",
+      "relative_path": "docs\\deployment\\NAMESPACE-STRUCTURE-FIXED.md",
+      "folder": "docs\\deployment",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\deployment\\TOOLS-FINAL.md",
+      "relative_path": "docs\\deployment\\TOOLS-FINAL.md",
+      "folder": "docs\\deployment",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 2 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\adr-0001-kestra.md",
+      "relative_path": "docs\\design\\adr-0001-kestra.md",
+      "folder": "docs\\design",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\architecture.md",
+      "relative_path": "docs\\design\\architecture.md",
+      "folder": "docs\\design",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "v_packed_products: ['v_packed_products']",
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\customer_master_schedule_add_order_design.md",
+      "relative_path": "docs\\design\\customer_master_schedule_add_order_design.md",
+      "folder": "docs\\design",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 6 matches",
+        "load_mapping_config: 1 matches",
+        "mapping_config: 2 matches",
+        "orders_unified_monday_mapping: 4 matches",
+        "customer_mapping: 3 matches"
+      ],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 9200517329']",
+        "9200517329: ['9200517329']",
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "text_mkr\\w+: ['text_mkr5wya6', 'text_mkr5ej2x', 'text_mkr5wya6']",
+        "dropdown_mkr\\w+: ['dropdown_mkr58de6', 'dropdown_mkr542p2']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\dynamic_monday_board_implementation_plan.md",
+      "relative_path": "docs\\design\\dynamic_monday_board_implementation_plan.md",
+      "folder": "docs\\design",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "DATABASE\\s*=: 1 matches",
+        "db_helper: 2 matches",
+        "MONDAY_API_KEY: 1 matches",
+        "MONDAY_TOKEN: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "8709134353: ['8709134353', '8709134353']",
+        "MON_COO_Planning: ['MON_COO_Planning']",
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\dynamic_monday_board_template_system.md",
+      "relative_path": "docs\\design\\dynamic_monday_board_template_system.md",
+      "folder": "docs\\design",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "db_helper: 2 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "8709134353: ['8709134353']",
+        "MON_COO_Planning: ['MON_COO_Planning']",
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\dynamic_monday_board_template_system_diagrams.md",
+      "relative_path": "docs\\design\\dynamic_monday_board_template_system_diagrams.md",
+      "folder": "docs\\design",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "db_helper: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\master_mapping_developer_guide.md",
+      "relative_path": "docs\\design\\master_mapping_developer_guide.md",
+      "folder": "docs\\design",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "DATABASE\\s*=: 1 matches",
+        "db_helper: 3 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 4 matches",
+        "customer_mapping: 3 matches"
+      ],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: ['BOARD_ID = 8709134353']",
+        "8709134353: ['8709134353']",
+        "MON_COO_Planning: ['MON_COO_Planning']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\migrate_config_yaml_to_env.md",
+      "relative_path": "docs\\design\\migrate_config_yaml_to_env.md",
+      "folder": "docs\\design",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "DATABASE\\s*=: 5 matches",
+        "get_connection: 2 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 4 matches",
+        "\\.yml\\b: 1 matches",
+        "yaml\\.safe_load: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\development\\DEVELOPER_HANDOVER.md",
+      "relative_path": "docs\\development\\DEVELOPER_HANDOVER.md",
+      "folder": "docs\\development",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "DATABASE\\s*=: 1 matches",
+        "SERVER\\s*=: 1 matches",
+        "db_helper: 6 matches",
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 6 matches",
+        "\\.yml\\b: 4 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\development\\development_process_configuration.md",
+      "relative_path": "docs\\development\\development_process_configuration.md",
+      "folder": "docs\\development",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "db_helper: 11 matches",
+        "get_connection: 1 matches",
+        "execute_query: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\development\\framework_documentation.md",
+      "relative_path": "docs\\development\\framework_documentation.md",
+      "folder": "docs\\development",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "db_helper: 2 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\diagrams\\staging_data_flow.md",
+      "relative_path": "docs\\diagrams\\staging_data_flow.md",
+      "folder": "docs\\diagrams",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_', 'STG_MON_']",
+        "ERR_MON_: ['ERR_MON_', 'ERR_MON_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\diagrams\\staging_workflow_overview.md",
+      "relative_path": "docs\\diagrams\\staging_workflow_overview.md",
+      "folder": "docs\\diagrams",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_', 'STG_MON_']",
+        "ERR_MON_: ['ERR_MON_', 'ERR_MON_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\mapping\\field_mapping_matrix.yaml",
+      "relative_path": "docs\\mapping\\field_mapping_matrix.yaml",
+      "folder": "docs\\mapping",
+      "file_type": ".yaml",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "v_mon_customer_ms: ['v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms']",
+        "v_packed_products: ['v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products']",
+        "v_orders_shipped: ['v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped', 'v_orders_shipped']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\mapping\\IMPLEMENTATION_CHECKLIST.md",
+      "relative_path": "docs\\mapping\\IMPLEMENTATION_CHECKLIST.md",
+      "folder": "docs\\mapping",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "orders_unified_monday_mapping: 2 matches",
+        "monday_column_ids: 2 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\mapping\\mapping_fields.yaml",
+      "relative_path": "docs\\mapping\\mapping_fields.yaml",
+      "folder": "docs\\mapping",
+      "file_type": ".yaml",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\mapping\\monday_column_ids.json",
+      "relative_path": "docs\\mapping\\monday_column_ids.json",
+      "folder": "docs\\mapping",
+      "file_type": ".json",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "text_mkr\\w+: ['text_mkr5wya6', 'text_mkrh94rx', 'text_mkr5ej2x', 'text_mkr5cz8m', 'text_mkr5p0cf', 'text_mkr5kbc6', 'text_mkr5ps35', 'text_mkr5wcpw', 'text_mkr5hass', 'text_mkr5s3tm', 'text_mkr5kyf4', 'text_mkr5ptvg', 'text_mkr5znxn', 'text_mkrhra2c', 'text_mkr61hpz', 'text_mkr5wya6']",
+        "dropdown_mkr\\w+: ['dropdown_mkr58de6', 'dropdown_mkr5rgs6', 'dropdown_mkr5w5e', 'dropdown_mkr5s5n3', 'dropdown_mkr518fc', 'dropdown_mkr5kk5', 'dropdown_mkr5k8yn', 'dropdown_mkr542p2', 'dropdown_mkr5tgaa', 'dropdown_mkr5677f', 'dropdown_mkr542p2']",
+        "numeric_mkr\\w+: ['numeric_mkr5cact', 'numeric_mkr5yne4', 'numeric_mkr5erhv', 'numeric_mkr5k68', 'numeric_mkr5h612', 'numeric_mkr5gp6a', 'numeric_mkr57cem', 'numeric_mkr56xx8', 'numeric_mkr5nhr7', 'numeric_mkr5r6at', 'numeric_mkr5ev2q', 'numeric_mkr55zg1', 'numeric_mkr51ndy', 'numeric_mkr5js0x', 'numeric_mkr58nvp', 'numeric_mkrbty8b', 'numeric_mkrb56rj', 'numeric_mkr5cact']",
+        "date_mkr\\w+: ['date_mkr5zp5', 'date_mkr554yz', 'date_mkr57811', 'date_mkrvx550', 'date_mkrvpbcr', 'date_mkr5zp5']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\mapping\\orders_unified_monday_comparison.md",
+      "relative_path": "docs\\mapping\\orders_unified_monday_comparison.md",
+      "folder": "docs\\mapping",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: ['BOARD_ID = \"9218090006\"']",
+        "9218090006: ['9218090006']",
+        "text_mkr\\w+: ['text_mkr5wya6', 'text_mkrh94rx', 'text_mkr5ej2x', 'text_mkr5cz8m', 'text_mkr5p0cf', 'text_mkr5kbc6', 'text_mkr5ps35', 'text_mkr5wcpw', 'text_mkr5hass', 'text_mkr5s3tm', 'text_mkr5kyf4', 'text_mkr5ptvg', 'text_mkr5znxn', 'text_mkrhra2c', 'text_mkr61hpz', 'text_mkr5wya6', 'text_mkr5ej2x', 'text_mkr5p0cf', 'text_mkr5cz8m', 'text_mkr5kbc6', 'text_mkr5ps35', 'text_mkr5hass', 'text_mkr5znxn']",
+        "dropdown_mkr\\w+: ['dropdown_mkr58de6', 'dropdown_mkr5rgs6', 'dropdown_mkr5w5e', 'dropdown_mkr5s5n3', 'dropdown_mkr518fc', 'dropdown_mkr5kk5', 'dropdown_mkr5k8yn', 'dropdown_mkr542p2', 'dropdown_mkr5tgaa', 'dropdown_mkr5677f', 'dropdown_mkr542p2', 'dropdown_mkr58de6', 'dropdown_mkr5rgs6', 'dropdown_mkr5tgaa', 'dropdown_mkr5677f', 'dropdown_mkr5s5n3', 'dropdown_mkr5kk5', 'dropdown_mkr518fc', 'dropdown_mkr542p2', 'dropdown_mkr5tgaa', 'dropdown_mkr5677f']",
+        "numeric_mkr\\w+: ['numeric_mkr5cact', 'numeric_mkr5yne4', 'numeric_mkr5erhv', 'numeric_mkr5k68', 'numeric_mkr5h612', 'numeric_mkr5gp6a', 'numeric_mkr57cem', 'numeric_mkr56xx8', 'numeric_mkr5nhr7', 'numeric_mkr5r6at', 'numeric_mkr5ev2q', 'numeric_mkr55zg1', 'numeric_mkr51ndy', 'numeric_mkr5js0x', 'numeric_mkr58nvp', 'numeric_mkrbty8b', 'numeric_mkrb56rj', 'numeric_mkr5cact', 'numeric_mkr5yne4', 'numeric_mkr5erhv', 'numeric_mkr5nhr7']",
+        "date_mkr\\w+: ['date_mkr5zp5', 'date_mkr554yz', 'date_mkr57811', 'date_mkrvx550', 'date_mkrvpbcr', 'date_mkr5zp5', 'date_mkr554yz', 'date_mkr57811']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Large (8+ hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\mapping\\orders_unified_monday_mapping.yaml",
+      "relative_path": "docs\\mapping\\orders_unified_monday_mapping.yaml",
+      "folder": "docs\\mapping",
+      "file_type": ".yaml",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 3 matches",
+        "customer_mapping: 4 matches"
+      ],
+      "hardcoded_configs": [
+        "text_mkr\\w+: ['text_mkr5wya6', 'text_mkrh94rx', 'text_mkr5ej2x', 'text_mkr5cz8m', 'text_mkr5p0cf', 'text_mkr5kbc6', 'text_mkr5ps35', 'text_mkr5wcpw', 'text_mkr5hass', 'text_mkr5s3tm', 'text_mkr5kyf4', 'text_mkr5ptvg', 'text_mkr5znxn', 'text_mkrhra2c', 'text_mkr61hpz']",
+        "dropdown_mkr\\w+: ['dropdown_mkr58de6', 'dropdown_mkr5rgs6', 'dropdown_mkr5w5e', 'dropdown_mkr5s5n3', 'dropdown_mkr518fc', 'dropdown_mkr5kk5', 'dropdown_mkr5k8yn', 'dropdown_mkr542p2', 'dropdown_mkr5tgaa', 'dropdown_mkr5677f']",
+        "numeric_mkr\\w+: ['numeric_mkr5cact', 'numeric_mkr5yne4', 'numeric_mkr5erhv', 'numeric_mkr5k68', 'numeric_mkr5h612', 'numeric_mkr5gp6a', 'numeric_mkr57cem', 'numeric_mkr56xx8', 'numeric_mkr5nhr7', 'numeric_mkr5r6at', 'numeric_mkr5ev2q', 'numeric_mkr55zg1', 'numeric_mkr51ndy', 'numeric_mkr5js0x', 'numeric_mkr58nvp', 'numeric_mkrbty8b', 'numeric_mkrb56rj']",
+        "date_mkr\\w+: ['date_mkr5zp5', 'date_mkr554yz', 'date_mkr57811', 'date_mkrvx550', 'date_mkrvpbcr']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\plans\\db_helper_refactoring_plan.md",
+      "relative_path": "docs\\plans\\db_helper_refactoring_plan.md",
+      "folder": "docs\\plans",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "db_helper: 10 matches",
+        "get_connection: 2 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 5 matches",
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.', 'orders.', 'orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\plans\\master_mapping_implementation.md",
+      "relative_path": "docs\\plans\\master_mapping_implementation.md",
+      "folder": "docs\\plans",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "db_helper: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 11 matches",
+        "orders_unified_monday_mapping: 1 matches",
+        "field_mapping_matrix: 1 matches",
+        "customer_mapping: 1 matches",
+        "mapping_fields: 1 matches",
+        "monday_column_ids: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\plans\\master_mapping_implementation_complete.md",
+      "relative_path": "docs\\plans\\master_mapping_implementation_complete.md",
+      "folder": "docs\\plans",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 8 matches",
+        "orders_unified_monday_mapping: 1 matches",
+        "field_mapping_matrix: 2 matches",
+        "customer_mapping: 3 matches",
+        "mapping_fields: 2 matches",
+        "monday_column_ids: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "8709134353: ['8709134353', '8709134353', '8709134353']",
+        "9200517329: ['9200517329', '9200517329']",
+        "9218090006: ['9218090006']",
+        "MON_COO_Planning: ['MON_COO_Planning']",
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_']",
+        "ERR_MON_: ['ERR_MON_']",
+        "v_mon_customer_ms: ['v_mon_customer_ms']",
+        "v_packed_products: ['v_packed_products']",
+        "v_orders_shipped: ['v_orders_shipped']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Large (8+ hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\plans\\plan_phase01_mvp.md",
+      "relative_path": "docs\\plans\\plan_phase01_mvp.md",
+      "folder": "docs\\plans",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "\\.yml\\b: 2 matches",
+        "customer_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "v_packed_products: ['v_packed_products']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\plans\\staging_table_refactor_plan.md",
+      "relative_path": "docs\\plans\\staging_table_refactor_plan.md",
+      "folder": "docs\\plans",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_']",
+        "ERR_MON_: ['ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\plans\\workflow_update_plan_v2.md",
+      "relative_path": "docs\\plans\\workflow_update_plan_v2.md",
+      "folder": "docs\\plans",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "orders_unified_monday_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\project\\CLEANUP-COMPLETED.md",
+      "relative_path": "docs\\project\\CLEANUP-COMPLETED.md",
+      "folder": "docs\\project",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 8 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\project\\CLEANUP-FINAL.md",
+      "relative_path": "docs\\project\\CLEANUP-FINAL.md",
+      "folder": "docs\\project",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\project\\PROJECT-CLEANUP-PLAN.md",
+      "relative_path": "docs\\project\\PROJECT-CLEANUP-PLAN.md",
+      "folder": "docs\\project",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 11 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\project\\PROJECT-ORGANIZATION-RULES.md",
+      "relative_path": "docs\\project\\PROJECT-ORGANIZATION-RULES.md",
+      "folder": "docs\\project",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 7 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\runbooks\\audit_pipeline_filtering_logic.md",
+      "relative_path": "docs\\runbooks\\audit_pipeline_filtering_logic.md",
+      "folder": "docs\\runbooks",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "get_connection: 1 matches",
+        "run_sql: 10 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "customer_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "v_packed_products: ['v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products', 'v_packed_products']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\mapping\\customer-mapping-ui-checklist.md",
+      "relative_path": "docs\\design\\mapping\\customer-mapping-ui-checklist.md",
+      "folder": "docs\\design\\mapping",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "customer_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\mapping\\customer-mapping-ui-plan.md",
+      "relative_path": "docs\\design\\mapping\\customer-mapping-ui-plan.md",
+      "folder": "docs\\design\\mapping",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\design\\mapping\\customer-mapping-ui-technical-spec.md",
+      "relative_path": "docs\\design\\mapping\\customer-mapping-ui-technical-spec.md",
+      "folder": "docs\\design\\mapping",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "customer_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Account.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Account.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Activity_logs.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Activity_logs.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Assets_files.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Assets_files.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 5 matches",
+        "api\\.monday\\.com: 5 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Boards.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Boards.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 7 matches",
+        "api\\.monday\\.com: 7 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Board_views.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Board_views.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Checkbox.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Checkbox.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:9876543210', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Columns.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Columns.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 10 matches",
+        "api\\.monday\\.com: 10 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 9876543210', 'board_id: 9876543210', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Column_values.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Column_values.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Complexity.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Complexity.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 3 matches",
+        "api\\.monday\\.com: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id: 1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Connect_boards.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Connect_boards.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Country.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Country.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Date.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Date.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 4 matches",
+        "api\\.monday\\.com: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Dependency.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Dependency.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Docs.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Docs.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 3 matches",
+        "api\\.monday\\.com: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Document_blocks.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Document_blocks.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 4 matches",
+        "api\\.monday\\.com: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Dropdown.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Dropdown.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 5 matches",
+        "api\\.monday\\.com: 5 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890', 'board_id:9876543210', 'board_id:987654321', 'board_id:987654321']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Email.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Email.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 4 matches",
+        "api\\.monday\\.com: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Files_assets.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Files_assets.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Folders.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Folders.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 4 matches",
+        "api\\.monday\\.com: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Groups.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Groups.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 7 matches",
+        "api\\.monday\\.com: 7 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Hour.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Hour.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Items.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Items.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 8 matches",
+        "api\\.monday\\.com: 8 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id:1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Items_page.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Items_page.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Items_page_by_column_values.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Items_page_by_column_values.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Link.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Link.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 4 matches",
+        "api\\.monday\\.com: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Location.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Location.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 3 matches",
+        "api\\.monday\\.com: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Long_text.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Long_text.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 3 matches",
+        "api\\.monday\\.com: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Managed_columns.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Managed_columns.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 8 matches",
+        "api\\.monday\\.com: 8 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Me.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Me.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\monday_doc.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\monday_doc.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 3 matches",
+        "api\\.monday\\.com: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id: 1234567890', 'board_id:1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Name_first_column.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Name_first_column.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Notifications.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Notifications.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Numbers.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Numbers.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 3 matches",
+        "api\\.monday\\.com: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\People.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\People.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 4 matches",
+        "api\\.monday\\.com: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Person_deprecated.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Person_deprecated.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:22222']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Phone.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Phone.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 4 matches",
+        "api\\.monday\\.com: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Plan.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Plan.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Rating.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Rating.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:123456789']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Status.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Status.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 4 matches",
+        "api\\.monday\\.com: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Subitems.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Subitems.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Tags.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Tags.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Teams.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Teams.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 11 matches",
+        "api\\.monday\\.com: 11 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Team_deprecated.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Team_deprecated.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:22222']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Text.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Text.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 4 matches",
+        "api\\.monday\\.com: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Timeline.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Timeline.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Updates.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Updates.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 9 matches",
+        "api\\.monday\\.com: 9 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Users.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Users.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 9 matches",
+        "api\\.monday\\.com: 9 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id:1234567890', 'board_id: 1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Version.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Version.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Versions.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Versions.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Viewers.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Viewers.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Webhooks.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Webhooks.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 3 matches",
+        "api\\.monday\\.com: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id: 1234567890', 'board_id: 1234567890', 'board_id: 1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Week.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Week.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\Workspaces.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\Workspaces.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 9 matches",
+        "api\\.monday\\.com: 9 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\API_Reference\\World_clock.md",
+      "relative_path": "docs\\monday-com\\API_Reference\\World_clock.md",
+      "folder": "docs\\monday-com\\API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id:1234567890', 'board_id:1234567890']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\Emails__Activities_API_Reference\\Custom_activity.md",
+      "relative_path": "docs\\monday-com\\Emails__Activities_API_Reference\\Custom_activity.md",
+      "folder": "docs\\monday-com\\Emails__Activities_API_Reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 3 matches",
+        "api\\.monday\\.com: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\JSON\\monday.json",
+      "relative_path": "docs\\monday-com\\JSON\\monday.json",
+      "folder": "docs\\monday-com\\JSON",
+      "file_type": ".json",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "9218090006: ['9218090006', '9218090006', '9218090006', '9218090006']",
+        "text_mkr\\w+: ['text_mkr5wya6', 'text_mkr5wya6', 'text_mkr5ej2x', 'text_mkr5ej2x', 'text_mkrh94rx', 'text_mkrh94rx', 'text_mkr5cz8m', 'text_mkr5cz8m', 'text_mkrhra2c', 'text_mkrhra2c', 'text_mkr5p0cf', 'text_mkr5p0cf', 'text_mkr5kbc6', 'text_mkr5kbc6', 'text_mkr5ps35', 'text_mkr5ps35', 'text_mkr5wcpw', 'text_mkr5wcpw', 'text_mkr5hass', 'text_mkr5hass', 'text_mkr5s3tm', 'text_mkr5s3tm', 'text_mkr5kyf4', 'text_mkr5kyf4', 'text_mkr5ptvg', 'text_mkr5ptvg', 'text_mkr5znxn', 'text_mkr5znxn', 'text_mkr61hpz', 'text_mkr61hpz']",
+        "dropdown_mkr\\w+: ['dropdown_mkr542p2', 'dropdown_mkr542p2', 'dropdown_mkr58de6', 'dropdown_mkr58de6', 'dropdown_mkr5rgs6', 'dropdown_mkr5rgs6', 'dropdown_mkr5w5e', 'dropdown_mkr5w5e', 'dropdown_mkr5tgaa', 'dropdown_mkr5tgaa', 'dropdown_mkr5677f', 'dropdown_mkr5677f', 'dropdown_mkr5s5n3', 'dropdown_mkr5s5n3', 'dropdown_mkr518fc', 'dropdown_mkr518fc', 'dropdown_mkr5kk5', 'dropdown_mkr5kk5', 'dropdown_mkr5k8yn', 'dropdown_mkr5k8yn']",
+        "numeric_mkr\\w+: ['numeric_mkr5cact', 'numeric_mkr5cact', 'numeric_mkr5yne4', 'numeric_mkr5yne4', 'numeric_mkr5erhv', 'numeric_mkr5erhv', 'numeric_mkr5k68', 'numeric_mkr5k68', 'numeric_mkr5h612', 'numeric_mkr5h612', 'numeric_mkr5gp6a', 'numeric_mkr5gp6a', 'numeric_mkr57cem', 'numeric_mkr57cem', 'numeric_mkr56xx8', 'numeric_mkr56xx8', 'numeric_mkr5nhr7', 'numeric_mkr5nhr7', 'numeric_mkr5r6at', 'numeric_mkr5r6at', 'numeric_mkr5ev2q', 'numeric_mkr5ev2q', 'numeric_mkr55zg1', 'numeric_mkr55zg1', 'numeric_mkr51ndy', 'numeric_mkr51ndy', 'numeric_mkr5js0x', 'numeric_mkr5js0x', 'numeric_mkr58nvp', 'numeric_mkr58nvp', 'numeric_mkrb56rj', 'numeric_mkrb56rj', 'numeric_mkrbty8b', 'numeric_mkrbty8b']",
+        "date_mkr\\w+: ['date_mkr5zp5', 'date_mkr5zp5', 'date_mkr554yz', 'date_mkr554yz', 'date_mkr57811', 'date_mkr57811', 'date_mkrvx550', 'date_mkrvx550', 'date_mkrvpbcr', 'date_mkrvpbcr']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\Marketplace_API_reference\\Apps_monetization_info.md",
+      "relative_path": "docs\\monday-com\\Marketplace_API_reference\\Apps_monetization_info.md",
+      "folder": "docs\\monday-com\\Marketplace_API_reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\Marketplace_API_reference\\Apps_monetization_status.md",
+      "relative_path": "docs\\monday-com\\Marketplace_API_reference\\Apps_monetization_status.md",
+      "folder": "docs\\monday-com\\Marketplace_API_reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\Marketplace_API_reference\\App_installs.md",
+      "relative_path": "docs\\monday-com\\Marketplace_API_reference\\App_installs.md",
+      "folder": "docs\\monday-com\\Marketplace_API_reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\Marketplace_API_reference\\App_subscription.md",
+      "relative_path": "docs\\monday-com\\Marketplace_API_reference\\App_subscription.md",
+      "folder": "docs\\monday-com\\Marketplace_API_reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\Marketplace_API_reference\\App_subscriptions.md",
+      "relative_path": "docs\\monday-com\\Marketplace_API_reference\\App_subscriptions.md",
+      "folder": "docs\\monday-com\\Marketplace_API_reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\Marketplace_API_reference\\App_subscription_operations.md",
+      "relative_path": "docs\\monday-com\\Marketplace_API_reference\\App_subscription_operations.md",
+      "folder": "docs\\monday-com\\Marketplace_API_reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 2 matches",
+        "api\\.monday\\.com: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\monday-com\\Marketplace_API_reference\\Marketplace_app_discounts.md",
+      "relative_path": "docs\\monday-com\\Marketplace_API_reference\\Marketplace_app_discounts.md",
+      "folder": "docs\\monday-com\\Marketplace_API_reference",
+      "file_type": ".md",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 3 matches",
+        "api\\.monday\\.com: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\docs\\workflows\\monday_board_groups_sync\\PLAN.md",
+      "relative_path": "docs\\workflows\\monday_board_groups_sync\\PLAN.md",
+      "folder": "docs\\workflows\\monday_board_groups_sync",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\audit_pipeline\\config.py",
+      "relative_path": "scripts\\audit_pipeline\\config.py",
+      "folder": "scripts\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "pyodbc\\.connect: 3 matches",
+        "DATABASE\\s*=: 3 matches",
+        "SERVER\\s*=: 3 matches",
+        "DRIVER\\s*=: 6 matches",
+        "get_connection: 2 matches",
+        "run_sql: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "yaml\\.safe_load: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "customer_mapping: 4 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\audit_pipeline\\matching.py",
+      "relative_path": "scripts\\audit_pipeline\\matching.py",
+      "folder": "scripts\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\audit_pipeline\\report.py",
+      "relative_path": "scripts\\audit_pipeline\\report.py",
+      "folder": "scripts\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "ENGINE\\s*=: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\ayoun-flow\\README.md",
+      "relative_path": "scripts\\ayoun-flow\\README.md",
+      "folder": "scripts\\ayoun-flow",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule\\add_bulk_orders.py",
+      "relative_path": "scripts\\customer_master_schedule\\add_bulk_orders.py",
+      "folder": "scripts\\customer_master_schedule",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 3 matches",
+        "SERVER\\s*=: 2 matches",
+        "DRIVER\\s*=: 4 matches",
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches",
+        "MONDAY_API_KEY: 2 matches"
+      ],
+      "yaml_mapping_details": [
+        "load_mapping_config: 4 matches",
+        "load_customer_mapping: 3 matches",
+        "mapping_config: 16 matches",
+        "customer_mapping: 6 matches"
+      ],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: ['BOARD_ID = \"9200517329\"']",
+        "9200517329: ['9200517329']",
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule\\add_order.py",
+      "relative_path": "scripts\\customer_master_schedule\\add_order.py",
+      "folder": "scripts\\customer_master_schedule",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "load_mapping_config: 3 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 7 matches",
+        "orders_unified_monday_mapping: 1 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "9200517329: ['9200517329']",
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "orders\\.: ['orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule\\monday_integration.py",
+      "relative_path": "scripts\\customer_master_schedule\\monday_integration.py",
+      "folder": "scripts\\customer_master_schedule",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches",
+        "MONDAY_API_KEY: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule\\order_mapping.py",
+      "relative_path": "scripts\\customer_master_schedule\\order_mapping.py",
+      "folder": "scripts\\customer_master_schedule",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 5 matches",
+        "yaml\\.safe_load: 2 matches",
+        "load_mapping_config: 4 matches",
+        "load_customer_mapping: 3 matches",
+        "mapping_config: 28 matches",
+        "orders_unified_monday_mapping: 3 matches",
+        "customer_mapping: 13 matches"
+      ],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule']",
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule\\order_queries.py",
+      "relative_path": "scripts\\customer_master_schedule\\order_queries.py",
+      "folder": "scripts\\customer_master_schedule",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 2 matches",
+        "SERVER\\s*=: 2 matches",
+        "DRIVER\\s*=: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "orders\\.: ['orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule\\README.md",
+      "relative_path": "scripts\\customer_master_schedule\\README.md",
+      "folder": "scripts\\customer_master_schedule",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule_subitems\\monday_subitems_spec.md",
+      "relative_path": "scripts\\customer_master_schedule_subitems\\monday_subitems_spec.md",
+      "folder": "scripts\\customer_master_schedule_subitems",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 3 matches"
+      ],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "v_mon_customer_ms: ['v_mon_customer_ms', 'v_mon_customer_ms']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule_subitems\\mon_add_customer_ms_subitems.py",
+      "relative_path": "scripts\\customer_master_schedule_subitems\\mon_add_customer_ms_subitems.py",
+      "folder": "scripts\\customer_master_schedule_subitems",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "pyodbc\\.connect: 1 matches",
+        "DATABASE\\s*=: 1 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 1 matches",
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 3 matches",
+        "yaml\\.safe_load: 1 matches",
+        "customer_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "dropdown_mkr\\w+: ['dropdown_mkrak7qp']",
+        "numeric_mkr\\w+: ['numeric_mkra7j8e', 'numeric_mkraepx7', 'numeric_mkrapgwv']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule_subitems\\mon_get_subitems_async.py",
+      "relative_path": "scripts\\customer_master_schedule_subitems\\mon_get_subitems_async.py",
+      "folder": "scripts\\customer_master_schedule_subitems",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "pyodbc\\.connect: 5 matches",
+        "DATABASE\\s*=: 2 matches",
+        "SERVER\\s*=: 2 matches",
+        "DRIVER\\s*=: 2 matches",
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches",
+        "MONDAY_API_KEY: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "yaml\\.safe_load: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "v_mon_customer_ms: ['v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms', 'v_mon_customer_ms']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule_subitems\\mon_update_subitems_async.py",
+      "relative_path": "scripts\\customer_master_schedule_subitems\\mon_update_subitems_async.py",
+      "folder": "scripts\\customer_master_schedule_subitems",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "pyodbc\\.connect: 1 matches",
+        "DATABASE\\s*=: 1 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 1 matches",
+        "load_sql_view: 4 matches",
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches",
+        "MONDAY_API_KEY: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 5 matches",
+        "yaml\\.safe_load: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "customer_mapping: 4 matches"
+      ],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule']",
+        "v_mon_customer_ms: ['v_mon_customer_ms']",
+        "v_packed_products: ['v_packed_products']",
+        "dropdown_mkr\\w+: ['dropdown_mkrak7qp']",
+        "numeric_mkr\\w+: ['numeric_mkra7j8e', 'numeric_mkrapgwv', 'numeric_mkraepx7', 'numeric_mkrbgdat', 'numeric_mkrc5ryb', 'numeric_mkrc7jfj', 'numeric_mkrcq53k', 'numeric_mkrapgwv', 'numeric_mkraepx7']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Large (8+ hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\customer_master_schedule_subitems\\update_subitems_plan.md",
+      "relative_path": "scripts\\customer_master_schedule_subitems\\update_subitems_plan.md",
+      "folder": "scripts\\customer_master_schedule_subitems",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "field_mapping_matrix: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "v_mon_customer_ms: ['v_mon_customer_ms']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\jobs\\run_audit.py",
+      "relative_path": "scripts\\jobs\\run_audit.py",
+      "folder": "scripts\\jobs",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "run_sql: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "v_packed_products: ['v_packed_products']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\monday-boards\\add_board_groups.py",
+      "relative_path": "scripts\\monday-boards\\add_board_groups.py",
+      "folder": "scripts\\monday-boards",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 3 matches",
+        "DATABASE\\s*=: 4 matches",
+        "SERVER\\s*=: 4 matches",
+        "DRIVER\\s*=: 6 matches",
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "9200517329: ['9200517329', '9200517329']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\monday-boards\\get_board_planning.py",
+      "relative_path": "scripts\\monday-boards\\get_board_planning.py",
+      "folder": "scripts\\monday-boards",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "db_helper: 5 matches",
+        "get_connection: 1 matches",
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches",
+        "MONDAY_API_KEY: 2 matches",
+        "MONDAY_TOKEN: 4 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "8709134353: ['8709134353']",
+        "MON_COO_Planning: ['MON_COO_Planning', 'MON_COO_Planning', 'MON_COO_Planning', 'MON_COO_Planning', 'MON_COO_Planning']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\monday-boards\\README.md",
+      "relative_path": "scripts\\monday-boards\\README.md",
+      "folder": "scripts\\monday-boards",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\monday-boards\\sync_board_groups.py",
+      "relative_path": "scripts\\monday-boards\\sync_board_groups.py",
+      "folder": "scripts\\monday-boards",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 3 matches",
+        "DATABASE\\s*=: 3 matches",
+        "SERVER\\s*=: 3 matches",
+        "DRIVER\\s*=: 6 matches",
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "9200517329: ['9200517329', '9200517329', '9200517329', '9200517329', '9200517329']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\order_staging\\batch_processor.py",
+      "relative_path": "scripts\\order_staging\\batch_processor.py",
+      "folder": "scripts\\order_staging",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "connection_string: 5 matches",
+        "get_connection: 4 matches"
+      ],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 6 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "orders\\.: ['orders.', 'orders.', 'orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\order_staging\\error_handler.py",
+      "relative_path": "scripts\\order_staging\\error_handler.py",
+      "folder": "scripts\\order_staging",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 1 matches",
+        "connection_string: 4 matches",
+        "get_connection: 9 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "ERR_MON_: ['ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\order_staging\\staging_config.py",
+      "relative_path": "scripts\\order_staging\\staging_config.py",
+      "folder": "scripts\\order_staging",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "monday\\.com/v2: 1 matches",
+        "api\\.monday\\.com: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "board_id[\"\\']?\\s*:\\s*[\"\\']?[0-9]+[\"\\']?: [\"board_id': '9200517329'\"]",
+        "9200517329: ['9200517329']",
+        "STG_MON_: ['STG_MON_']",
+        "ERR_MON_: ['ERR_MON_']",
+        "dropdown_mkr\\w+: ['dropdown_mkrak7qp']",
+        "numeric_mkr\\w+: ['numeric_mkra7j8e', 'numeric_mkraepx7', 'numeric_mkrapgwv']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Large (8+ hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\order_staging\\staging_operations.py",
+      "relative_path": "scripts\\order_staging\\staging_operations.py",
+      "folder": "scripts\\order_staging",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "connection_string: 4 matches",
+        "get_connection: 14 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\test-sql\\test_sql_enhanced.py",
+      "relative_path": "scripts\\test-sql\\test_sql_enhanced.py",
+      "folder": "scripts\\test-sql",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 1 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\test-sql\\test_sql_with_env.py",
+      "relative_path": "scripts\\test-sql\\test_sql_with_env.py",
+      "folder": "scripts\\test-sql",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 1 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\test-this-out\\main.py",
+      "relative_path": "scripts\\test-this-out\\main.py",
+      "folder": "scripts\\test-this-out",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 1 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\scripts\\test-this-out\\README.md",
+      "relative_path": "scripts\\test-this-out\\README.md",
+      "folder": "scripts\\test-this-out",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "\\.yml\\b: 1 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\ddl\\deploy_staging_infrastructure.sql",
+      "relative_path": "sql\\ddl\\deploy_staging_infrastructure.sql",
+      "folder": "sql\\ddl",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_']",
+        "ERR_MON_: ['ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\ddl\\README.md",
+      "relative_path": "sql\\ddl\\README.md",
+      "folder": "sql\\ddl",
+      "file_type": ".md",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "v_packed_products: ['v_packed_products']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\staging\\v_mon_customer_ms.sql",
+      "relative_path": "sql\\staging\\v_mon_customer_ms.sql",
+      "folder": "sql\\staging",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule']",
+        "v_packed_products: ['v_packed_products']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\staging\\v_mon_customer_ms_itemIDs.sql",
+      "relative_path": "sql\\staging\\v_mon_customer_ms_itemIDs.sql",
+      "folder": "sql\\staging",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\staging\\v_mon_customer_ms_subitems.sql",
+      "relative_path": "sql\\staging\\v_mon_customer_ms_subitems.sql",
+      "folder": "sql\\staging",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\staging\\v_orders_shipped.sql",
+      "relative_path": "sql\\staging\\v_orders_shipped.sql",
+      "folder": "sql\\staging",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "v_orders_shipped: ['v_orders_shipped']",
+        "distribution\\.: ['Distribution.', 'Distribution.', 'Distribution.', 'Distribution.', 'Distribution.', 'Distribution.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\staging\\v_packed_barcode.sql",
+      "relative_path": "sql\\staging\\v_packed_barcode.sql",
+      "folder": "sql\\staging",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "distribution\\.: ['Distribution.', 'Distribution.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\staging\\v_packed_products.sql",
+      "relative_path": "sql\\staging\\v_packed_products.sql",
+      "folder": "sql\\staging",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "v_packed_products: ['v_packed_products']",
+        "distribution\\.: ['Distribution.', 'Distribution.', 'Distribution.', 'Distribution.', 'Distribution.', 'Distribution.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\staging\\v_shipped.sql",
+      "relative_path": "sql\\staging\\v_shipped.sql",
+      "folder": "sql\\staging",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "distribution\\.: ['Distribution.', 'Distribution.', 'Distribution.', 'Distribution.', 'Distribution.', 'Distribution.', 'Distribution.', 'Distribution.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\staging\\v_shipped_products.sql",
+      "relative_path": "sql\\staging\\v_shipped_products.sql",
+      "folder": "sql\\staging",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "distribution\\.: ['Distribution.', 'Distribution.', 'Distribution.', 'Distribution.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\tests\\test_order_selection.sql",
+      "relative_path": "sql\\tests\\test_order_selection.sql",
+      "folder": "sql\\tests",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\ddl\\tables\\orders\\dbo_mon_coo_planning.sql",
+      "relative_path": "sql\\ddl\\tables\\orders\\dbo_mon_coo_planning.sql",
+      "folder": "sql\\ddl\\tables\\orders",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_COO_Planning: ['MON_COO_Planning', 'MON_COO_Planning']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\ddl\\tables\\orders\\dbo_mon_custmasterschedule.sql",
+      "relative_path": "sql\\ddl\\tables\\orders\\dbo_mon_custmasterschedule.sql",
+      "folder": "sql\\ddl\\tables\\orders",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\ddl\\tables\\orders\\dbo_mon_custmasterschedule_subitems.sql",
+      "relative_path": "sql\\ddl\\tables\\orders\\dbo_mon_custmasterschedule_subitems.sql",
+      "folder": "sql\\ddl\\tables\\orders",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\ddl\\tables\\orders\\error\\err_mon_custmasterschedule.sql",
+      "relative_path": "sql\\ddl\\tables\\orders\\error\\err_mon_custmasterschedule.sql",
+      "folder": "sql\\ddl\\tables\\orders\\error",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_']",
+        "ERR_MON_: ['ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\ddl\\tables\\orders\\error\\err_mon_custmasterschedule_subitems.sql",
+      "relative_path": "sql\\ddl\\tables\\orders\\error\\err_mon_custmasterschedule_subitems.sql",
+      "folder": "sql\\ddl\\tables\\orders\\error",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_']",
+        "ERR_MON_: ['ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_', 'ERR_MON_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\ddl\\tables\\orders\\staging\\stg_mon_custmasterschedule.sql",
+      "relative_path": "sql\\ddl\\tables\\orders\\staging\\stg_mon_custmasterschedule.sql",
+      "folder": "sql\\ddl\\tables\\orders\\staging",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\sql\\ddl\\tables\\orders\\staging\\stg_mon_custmasterschedule_subitems.sql",
+      "relative_path": "sql\\ddl\\tables\\orders\\staging\\stg_mon_custmasterschedule_subitems.sql",
+      "folder": "sql\\ddl\\tables\\orders\\staging",
+      "file_type": ".sql",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "STG_MON_: ['STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_', 'STG_MON_']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\check_rhythm_data.py",
+      "relative_path": "tests\\audit_pipeline\\check_rhythm_data.py",
+      "folder": "tests\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "run_sql: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\check_rhythm_shipped.py",
+      "relative_path": "tests\\audit_pipeline\\check_rhythm_shipped.py",
+      "folder": "tests\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "run_sql: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\debug_config.py",
+      "relative_path": "tests\\audit_pipeline\\debug_config.py",
+      "folder": "tests\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "DATABASE\\s*=: 1 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\debug_rhythm_order_data.py",
+      "relative_path": "tests\\audit_pipeline\\debug_rhythm_order_data.py",
+      "folder": "tests\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "run_sql: 5 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\query_master_order_count.py",
+      "relative_path": "tests\\audit_pipeline\\query_master_order_count.py",
+      "folder": "tests\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 1 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 1 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\simple_rhythm_check.py",
+      "relative_path": "tests\\audit_pipeline\\simple_rhythm_check.py",
+      "folder": "tests\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "run_sql: 3 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\simple_rhythm_check_fixed.py",
+      "relative_path": "tests\\audit_pipeline\\simple_rhythm_check_fixed.py",
+      "folder": "tests\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "get_connection: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\test_global_customer_audit_fuzzy_match.py",
+      "relative_path": "tests\\audit_pipeline\\test_global_customer_audit_fuzzy_match.py",
+      "folder": "tests\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": true,
+      "db_connection_details": [
+        "pyodbc\\.connect: 1 matches",
+        "ENGINE\\s*=: 1 matches",
+        "DATABASE\\s*=: 1 matches",
+        "SERVER\\s*=: 1 matches",
+        "DRIVER\\s*=: 1 matches",
+        "get_connection: 2 matches",
+        "run_sql: 4 matches"
+      ],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 2 matches",
+        "yaml\\.safe_load: 2 matches",
+        "customer_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "v_packed_products: ['v_packed_products']",
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\test_query.py",
+      "relative_path": "tests\\audit_pipeline\\test_query.py",
+      "folder": "tests\\audit_pipeline",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "get_connection: 5 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "v_packed_products: ['v_packed_products', 'v_packed_products', 'v_packed_products']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\customer_master_schedule_tests\\final_validation.py",
+      "relative_path": "tests\\customer_master_schedule_tests\\final_validation.py",
+      "folder": "tests\\customer_master_schedule_tests",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 4 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\debug_column_mapping.py",
+      "relative_path": "tests\\debug\\debug_column_mapping.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 7 matches",
+        "customer_mapping: 5 matches"
+      ],
+      "hardcoded_configs": [
+        "text_mkr\\w+: ['text_mkr5ej2x', 'text_mkrh94rx']",
+        "dropdown_mkr\\w+: ['dropdown_mkr542p2', 'dropdown_mkr5tgaa', 'dropdown_mkr5677f']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\debug_title.py",
+      "relative_path": "tests\\debug\\debug_title.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 6 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.', 'orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\simple_db_test.py",
+      "relative_path": "tests\\debug\\simple_db_test.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\test_computed_fields.py",
+      "relative_path": "tests\\debug\\test_computed_fields.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 6 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\test_monday_api.py",
+      "relative_path": "tests\\debug\\test_monday_api.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 4 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "text_mkr\\w+: ['text_mkr5ej2x']",
+        "dropdown_mkr\\w+: ['dropdown_mkr542p2', 'dropdown_mkr5tgaa', 'dropdown_mkr5677f']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\test_simple_steps.py",
+      "relative_path": "tests\\debug\\test_simple_steps.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 5 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id = \"9200517329\"']",
+        "9200517329: ['9200517329']",
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "orders\\.: ['orders.', 'orders.', 'orders.', 'orders.']",
+        "text_mkr\\w+: ['text_mkr5wya6']",
+        "dropdown_mkr\\w+: ['dropdown_mkr542p2']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\test_sql_schema.py",
+      "relative_path": "tests\\debug\\test_sql_schema.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\test_staged_data_api.py",
+      "relative_path": "tests\\debug\\test_staged_data_api.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "text_mkr\\w+: ['text_mkr5ej2x', 'text_mkr5wya6']",
+        "dropdown_mkr\\w+: ['dropdown_mkr542p2', 'dropdown_mkr5tgaa', 'dropdown_mkr5677f']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\test_staging_insert.py",
+      "relative_path": "tests\\debug\\test_staging_insert.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_customer_mapping: 2 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "orders\\.: ['orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\test_staging_table_data.py",
+      "relative_path": "tests\\debug\\test_staging_table_data.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\test_step_by_step.py",
+      "relative_path": "tests\\debug\\test_step_by_step.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 5 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: ['BOARD_ID = \"9200517329\"']",
+        "9200517329: ['9200517329']",
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']",
+        "orders\\.: ['orders.', 'orders.', 'orders.', 'orders.', 'orders.', 'orders.', 'orders.', 'orders.', 'orders.']",
+        "text_mkr\\w+: ['text_mkr5wya6']",
+        "dropdown_mkr\\w+: ['dropdown_mkr5tgaa', 'dropdown_mkr5677f']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Medium (4-8 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\test_workflow_validation.py",
+      "relative_path": "tests\\debug\\test_workflow_validation.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 6 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\debug\\test_yaml_config.py",
+      "relative_path": "tests\\debug\\test_yaml_config.py",
+      "folder": "tests\\debug",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "mapping_config: 7 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\monday_boards\\test_add_board_groups.py",
+      "relative_path": "tests\\monday_boards\\test_add_board_groups.py",
+      "folder": "tests\\monday_boards",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 2 matches",
+        "DATABASE\\s*=: 2 matches",
+        "SERVER\\s*=: 2 matches",
+        "DRIVER\\s*=: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\monday_boards\\test_sync.py",
+      "relative_path": "tests\\monday_boards\\test_sync.py",
+      "folder": "tests\\monday_boards",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: [\"board_id='9200517329'\"]",
+        "9200517329: ['9200517329', '9200517329', '9200517329']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\cleanup_test_data.py",
+      "relative_path": "tests\\other\\cleanup_test_data.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\debug_column_values.py",
+      "relative_path": "tests\\other\\debug_column_values.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 4 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\debug_mapping.py",
+      "relative_path": "tests\\other\\debug_mapping.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 5 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\simple_db_test.py",
+      "relative_path": "tests\\other\\simple_db_test.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_complete_workflow.py",
+      "relative_path": "tests\\other\\test_complete_workflow.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 2 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.', 'orders.', 'orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_customer_master_schedule_db.py",
+      "relative_path": "tests\\other\\test_customer_master_schedule_db.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": false,
+      "db_connection_details": [],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Minimal (<1 hour)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_debug_actual_api_call.py",
+      "relative_path": "tests\\other\\test_debug_actual_api_call.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 2 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_debug_mapping.py",
+      "relative_path": "tests\\other\\test_debug_mapping.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "mapping_config: 2 matches"
+      ],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_debug_transform.py",
+      "relative_path": "tests\\other\\test_debug_transform.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 2 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_debug_why_mapping_fails.py",
+      "relative_path": "tests\\other\\test_debug_why_mapping_fails.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 2 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_end_to_end_complete.py",
+      "relative_path": "tests\\other\\test_end_to_end_complete.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 2 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: ['BOARD_ID = \"9200517329\"']",
+        "9200517329: ['9200517329']",
+        "orders\\.: ['orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_end_to_end_monday_integration.py",
+      "relative_path": "tests\\other\\test_end_to_end_monday_integration.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 2 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: ['board_id = \"9200517329\"']",
+        "9200517329: ['9200517329']",
+        "orders\\.: ['orders.', 'orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_find_active_input.py",
+      "relative_path": "tests\\other\\test_find_active_input.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "\\.yaml\\b: 1 matches",
+        "load_mapping_config: 2 matches",
+        "mapping_config: 2 matches",
+        "orders_unified_monday_mapping: 1 matches"
+      ],
+      "hardcoded_configs": [
+        "dropdown_mkr\\w+: ['dropdown_mkr518fc', 'dropdown_mkr518fc', 'dropdown_mkr518fc', 'dropdown_mkr518fc', 'dropdown_mkr518fc', 'dropdown_mkr518fc', 'dropdown_mkr518fc', 'dropdown_mkr518fc']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_monday_integration_complete.py",
+      "relative_path": "tests\\other\\test_monday_integration_complete.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 2 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "BOARD_ID\\s*=\\s*[\"\\']?[0-9]+[\"\\']?: ['BOARD_ID = \"9200517329\"']",
+        "9200517329: ['9200517329']",
+        "orders\\.: ['orders.', 'orders.', 'orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_order_type.py",
+      "relative_path": "tests\\other\\test_order_type.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": false,
+      "has_yaml_mapping": true,
+      "db_connection_details": [],
+      "yaml_mapping_details": [
+        "load_mapping_config: 2 matches",
+        "load_customer_mapping: 2 matches",
+        "mapping_config: 2 matches",
+        "customer_mapping: 2 matches"
+      ],
+      "hardcoded_configs": [
+        "orders\\.: ['orders.']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\other\\test_staging_debug_simple.py",
+      "relative_path": "tests\\other\\test_staging_debug_simple.py",
+      "folder": "tests\\other",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "pyodbc\\.connect: 1 matches",
+        "DATABASE\\s*=: 3 matches",
+        "SERVER\\s*=: 2 matches",
+        "DRIVER\\s*=: 1 matches",
+        "connection_string: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "MON_CustMasterSchedule: ['MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule', 'MON_CustMasterSchedule']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\performance\\test_performance.py",
+      "relative_path": "tests\\audit_pipeline\\performance\\test_performance.py",
+      "folder": "tests\\audit_pipeline\\performance",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "run_sql: 4 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [
+        "v_packed_products: ['v_packed_products']"
+      ],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\performance\\test_performance_fix.py",
+      "relative_path": "tests\\audit_pipeline\\performance\\test_performance_fix.py",
+      "folder": "tests\\audit_pipeline\\performance",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "run_sql: 1 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\unit\\test_config_connections.py",
+      "relative_path": "tests\\audit_pipeline\\unit\\test_config_connections.py",
+      "folder": "tests\\audit_pipeline\\unit",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "get_connection: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    },
+    {
+      "file_path": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\tests\\audit_pipeline\\unit\\test_config_connections_pytest.py",
+      "relative_path": "tests\\audit_pipeline\\unit\\test_config_connections_pytest.py",
+      "folder": "tests\\audit_pipeline\\unit",
+      "file_type": ".py",
+      "has_db_connection": true,
+      "has_yaml_mapping": false,
+      "db_connection_details": [
+        "get_connection: 2 matches"
+      ],
+      "yaml_mapping_details": [],
+      "hardcoded_configs": [],
+      "migration_priority": "Medium",
+      "estimated_effort": "Small (1-4 hours)",
+      "notes": ""
+    }
+  ]
+}

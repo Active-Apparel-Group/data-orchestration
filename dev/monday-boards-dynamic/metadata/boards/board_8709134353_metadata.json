@@ -1,0 +1,1902 @@
+{
+  "board_id": 8709134353,
+  "board_name": "Planning",
+  "table_name": "planning",
+  "database": "orders",
+  "discovered_at": "2025-06-18T09:39:44.240473",
+  "columns": [
+    {
+      "monday_id": "name",
+      "monday_title": "Name",
+      "monday_type": "name",
+      "sql_column": "Name",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "subtasks_mkp4ypys",
+      "monday_title": "Subitems",
+      "monday_type": "subtasks",
+      "sql_column": "Subitems",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp47g7m",
+      "monday_title": "SEASON",
+      "monday_type": "text",
+      "sql_column": "SEASON",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp4kmtp",
+      "monday_title": "CUSTOMER SEASON",
+      "monday_type": "dropdown",
+      "sql_column": "CUSTOMER SEASON",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkpcj4ev",
+      "monday_title": "DROP",
+      "monday_type": "dropdown",
+      "sql_column": "DROP",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp4ar5n",
+      "monday_title": "CUSTOMER",
+      "monday_type": "dropdown",
+      "sql_column": "CUSTOMER",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkpc44w5",
+      "monday_title": "CUSTOMER ALLOCATION",
+      "monday_type": "dropdown",
+      "sql_column": "CUSTOMER ALLOCATION",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "date_mkpcevxt",
+      "monday_title": "ORDER RECEIVED DATE",
+      "monday_type": "date",
+      "sql_column": "ORDER RECEIVED DATE",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "dropdown_mkpc7ey8",
+      "monday_title": "ORDER TYPE",
+      "monday_type": "dropdown",
+      "sql_column": "ORDER TYPE",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp43qv0",
+      "monday_title": "BULK PO",
+      "monday_type": "text",
+      "sql_column": "BULK PO",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp6sfqv",
+      "monday_title": "AAG ORDER NUMBER",
+      "monday_type": "text",
+      "sql_column": "AAG ORDER NUMBER",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "numeric_mkp4cb6t",
+      "monday_title": "BULK PO QTY",
+      "monday_type": "numbers",
+      "sql_column": "BULK PO QTY",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "text_mkp4w7tj",
+      "monday_title": "STYLE CODE",
+      "monday_type": "text",
+      "sql_column": "STYLE CODE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "long_text_mkpervye",
+      "monday_title": "STYLE DESCRIPTION",
+      "monday_type": "long_text",
+      "sql_column": "STYLE DESCRIPTION",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp41ze2",
+      "monday_title": "Color",
+      "monday_type": "text",
+      "sql_column": "Color",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp44k77",
+      "monday_title": "ACTIVE/WOVEN/SWIM/ACC/SEAMLESS",
+      "monday_type": "dropdown",
+      "sql_column": "ACTIVE/WOVEN/SWIM/ACC/SEAMLESS",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp4yr3v",
+      "monday_title": "STYLE CATEGORY",
+      "monday_type": "dropdown",
+      "sql_column": "STYLE CATEGORY",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkpb2q11",
+      "monday_title": "PRODUCT GROUP",
+      "monday_type": "dropdown",
+      "sql_column": "PRODUCT GROUP",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkpbbtkh",
+      "monday_title": "PRODUCT CAT",
+      "monday_type": "dropdown",
+      "sql_column": "PRODUCT CAT",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp41kzc",
+      "monday_title": "Fabric Code",
+      "monday_type": "dropdown",
+      "sql_column": "Fabric Code",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp4n679",
+      "monday_title": "Fabric Type",
+      "monday_type": "dropdown",
+      "sql_column": "Fabric Type",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp4vncc",
+      "monday_title": "Fabric Lead Time",
+      "monday_type": "text",
+      "sql_column": "Fabric Lead Time",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp4wp81",
+      "monday_title": "Fabric COO",
+      "monday_type": "text",
+      "sql_column": "Fabric COO",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "numeric_mkp46xhm",
+      "monday_title": "CMP LS",
+      "monday_type": "numbers",
+      "sql_column": "CMP LS",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkp6j2y1",
+      "monday_title": "CMP Partner",
+      "monday_type": "numbers",
+      "sql_column": "CMP Partner",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkp4y0pe",
+      "monday_title": "RM Freight Est.",
+      "monday_type": "numbers",
+      "sql_column": "RM Freight Est.",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkp4rfg6",
+      "monday_title": "FOB (Partner)",
+      "monday_type": "numbers",
+      "sql_column": "FOB (Partner)",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkp41wvv",
+      "monday_title": "PO Base (Partner)",
+      "monday_type": "numbers",
+      "sql_column": "PO Base (Partner)",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkp5kt4y",
+      "monday_title": "PO Other (Partner)",
+      "monday_type": "numbers",
+      "sql_column": "PO Other (Partner)",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkp5s76g",
+      "monday_title": "PO MOQ% (Partner)",
+      "monday_type": "numbers",
+      "sql_column": "PO MOQ% (Partner)",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "formula_mkp5pht0",
+      "monday_title": "PO Unit Total (Partner)",
+      "monday_type": "formula",
+      "sql_column": "PO Unit Total (Partner)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "formula_mkp5kcgh",
+      "monday_title": "PO Total Value (Partner)",
+      "monday_type": "formula",
+      "sql_column": "PO Total Value (Partner)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp4av7r",
+      "monday_title": "Landed Cost (Longson)",
+      "monday_type": "text",
+      "sql_column": "Landed Cost (Longson)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp4p395",
+      "monday_title": "Sell Price (AAGT - RMB)",
+      "monday_type": "text",
+      "sql_column": "Sell Price (AAGT - RMB)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp418eg",
+      "monday_title": "Fx (RMB -> USD)",
+      "monday_type": "text",
+      "sql_column": "Fx (RMB -> USD)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp4gmn6",
+      "monday_title": "Destination",
+      "monday_type": "dropdown",
+      "sql_column": "Destination",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "date_mkp4brfg",
+      "monday_title": "LS PLANNED APPROVAL DATE FOR PP SAMPLE",
+      "monday_type": "date",
+      "sql_column": "LS PLANNED APPROVAL DATE FOR PP SAMPLE",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "date_mkp4vtz2",
+      "monday_title": "FABRIC DUE INTO LONGSON",
+      "monday_type": "date",
+      "sql_column": "FABRIC DUE INTO LONGSON",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "date_mkp57jk5",
+      "monday_title": "Longson RM EX-FTY",
+      "monday_type": "date",
+      "sql_column": "Longson RM EX-FTY",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "date_mkp42e0n",
+      "monday_title": "TRIMS DUE INTO LONGSON",
+      "monday_type": "date",
+      "sql_column": "TRIMS DUE INTO LONGSON",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "date_mkrm3m0q",
+      "monday_title": "Longson Plan Cut Date",
+      "monday_type": "date",
+      "sql_column": "Longson Plan Cut Date",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "date_mkp44ntk",
+      "monday_title": "EX-FTY DATE (Original)",
+      "monday_type": "date",
+      "sql_column": "EX-FTY DATE (Original)",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "date_mkp4rbd7",
+      "monday_title": "EX-FTY (Revised LS)",
+      "monday_type": "date",
+      "sql_column": "EX-FTY (Revised LS)",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "date_mkp5qmw6",
+      "monday_title": "EX-FTY (Partner PO)",
+      "monday_type": "date",
+      "sql_column": "EX-FTY (Partner PO)",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "color_mkp4304j",
+      "monday_title": "PP Status",
+      "monday_type": "status",
+      "sql_column": "PP Status",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "color_mkp4apjg",
+      "monday_title": "Fabric Status",
+      "monday_type": "status",
+      "sql_column": "Fabric Status",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "color_mkp43peb",
+      "monday_title": "Trim Status",
+      "monday_type": "status",
+      "sql_column": "Trim Status",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "numeric_mkphcbs6",
+      "monday_title": "Precut Quantity",
+      "monday_type": "numbers",
+      "sql_column": "Precut Quantity",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "color_mkp4hmsy",
+      "monday_title": "IQC Status",
+      "monday_type": "status",
+      "sql_column": "IQC Status",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "color_mkp43y44",
+      "monday_title": "Translation Status",
+      "monday_type": "status",
+      "sql_column": "Translation Status",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "color_mkp46hv3",
+      "monday_title": "Label Check Production Returns",
+      "monday_type": "status",
+      "sql_column": "Label Check Production Returns",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "color_mkp4v363",
+      "monday_title": "Fabric Visual Identification",
+      "monday_type": "status",
+      "sql_column": "Fabric Visual Identification",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp4wx2p",
+      "monday_title": "PLANNED DELIVERY METHOD",
+      "monday_type": "dropdown",
+      "sql_column": "PLANNED DELIVERY METHOD",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp4e51p",
+      "monday_title": "Incoterms",
+      "monday_type": "dropdown",
+      "sql_column": "Incoterms",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "date_mkp44k3t",
+      "monday_title": "ETA CUSTOMER WAREHOUSE DATE",
+      "monday_type": "date",
+      "sql_column": "ETA CUSTOMER WAREHOUSE DATE",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "dropdown_mkp43md8",
+      "monday_title": "FACTORY",
+      "monday_type": "dropdown",
+      "sql_column": "FACTORY",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "color_mkp4xd64",
+      "monday_title": "ALLOCATION STATUS",
+      "monday_type": "status",
+      "sql_column": "ALLOCATION STATUS",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp4f6se",
+      "monday_title": "COUNTRY OF ORIGIN",
+      "monday_type": "dropdown",
+      "sql_column": "COUNTRY OF ORIGIN",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp4m83f",
+      "monday_title": "REMARK",
+      "monday_type": "text",
+      "sql_column": "REMARK",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "board_relation_mkp69zh3",
+      "monday_title": "Factory (linked)",
+      "monday_type": "board_relation",
+      "sql_column": "Factory (linked)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "lookup_mkr5pgwg",
+      "monday_title": "PRODUCTION TYPE",
+      "monday_type": "mirror",
+      "sql_column": "PRODUCTION TYPE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "lookup_mkp64c3y",
+      "monday_title": "Factory Location",
+      "monday_type": "mirror",
+      "sql_column": "Factory Location",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "lookup_mkp61hs",
+      "monday_title": "Factory Country",
+      "monday_type": "mirror",
+      "sql_column": "Factory Country",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "board_relation_mkp6dhn7",
+      "monday_title": "PARTNER PO",
+      "monday_type": "board_relation",
+      "sql_column": "PARTNER PO",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "lookup_mkp6ktnm",
+      "monday_title": "Partner Trading Entity",
+      "monday_type": "mirror",
+      "sql_column": "Partner Trading Entity",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "pulse_id_mkp5y5d9",
+      "monday_title": "Item ID",
+      "monday_type": "item_id",
+      "sql_column": "Item ID",
+      "sql_type": "BIGINT NOT NULL",
+      "extraction_field": "item_id",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "lookup_mkp6vk7m",
+      "monday_title": "PO APPROVAL STATUS",
+      "monday_type": "mirror",
+      "sql_column": "PO APPROVAL STATUS",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "lookup_mkp6pmdg",
+      "monday_title": "PO STATUS",
+      "monday_type": "mirror",
+      "sql_column": "PO STATUS",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7bkwm",
+      "monday_title": "VAP Fabric Print",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Fabric Print",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7g8xv",
+      "monday_title": "VAP Fabric Fuzing",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Fabric Fuzing",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7f18r",
+      "monday_title": "VAP Panel Print",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Panel Print",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7djxr",
+      "monday_title": "VAP Embroidery",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Embroidery",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7v8xk",
+      "monday_title": "VAP Heat Press",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Heat Press",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7y9jr",
+      "monday_title": "VAP Bonding",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Bonding",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7krsa",
+      "monday_title": "VAP Beading",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Beading",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7h3zp",
+      "monday_title": "VAP Lasercut",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Lasercut",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7jy06",
+      "monday_title": "VAP Quilting",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Quilting",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7xdwb",
+      "monday_title": "VAP Embossing",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Embossing",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7qe36",
+      "monday_title": "VAP Smocking Pleating",
+      "monday_type": "dropdown",
+      "sql_column": "VAP Smocking Pleating",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkp7h163",
+      "monday_title": "Washing",
+      "monday_type": "dropdown",
+      "sql_column": "Washing",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "color_mkp7a4mx",
+      "monday_title": "RM STATUS",
+      "monday_type": "status",
+      "sql_column": "RM STATUS",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "color_mkp79sec",
+      "monday_title": "CUSTOMER APPROVAL",
+      "monday_type": "status",
+      "sql_column": "CUSTOMER APPROVAL",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "formula_mkpd1585",
+      "monday_title": "CMP LS (Ext)",
+      "monday_type": "formula",
+      "sql_column": "CMP LS (Ext)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "formula_mkpdj275",
+      "monday_title": "CMP Partner (Ext)",
+      "monday_type": "formula",
+      "sql_column": "CMP Partner (Ext)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "numeric_mkphnwff",
+      "monday_title": "TARGET CMP COST (USD)",
+      "monday_type": "numbers",
+      "sql_column": "TARGET CMP COST (USD)",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "dropdown_mkpj1y9z",
+      "monday_title": "CUTTING METHOD",
+      "monday_type": "dropdown",
+      "sql_column": "CUTTING METHOD",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "numeric_mkpj7n50",
+      "monday_title": "GSD CUTTING",
+      "monday_type": "numbers",
+      "sql_column": "GSD CUTTING",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkpj9svk",
+      "monday_title": "GSD SEWING",
+      "monday_type": "numbers",
+      "sql_column": "GSD SEWING",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkpjnqqc",
+      "monday_title": "GSD FINISHING",
+      "monday_type": "numbers",
+      "sql_column": "GSD FINISHING",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkpjpk1z",
+      "monday_title": "GSD BONDING LASER",
+      "monday_type": "numbers",
+      "sql_column": "GSD BONDING LASER",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkpjnb88",
+      "monday_title": "GSD BEADING",
+      "monday_type": "numbers",
+      "sql_column": "GSD BEADING",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkpj7zy9",
+      "monday_title": "GSD TOTAL",
+      "monday_type": "numbers",
+      "sql_column": "GSD TOTAL",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkpjahmn",
+      "monday_title": "GSD ADJ FINANCE",
+      "monday_type": "numbers",
+      "sql_column": "GSD ADJ FINANCE",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "dropdown_mkpjrhj3",
+      "monday_title": "ORDER SIZE",
+      "monday_type": "dropdown",
+      "sql_column": "ORDER SIZE",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkpv68ar",
+      "monday_title": "Alias",
+      "monday_type": "text",
+      "sql_column": "Alias",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "date_mkpw2sy1",
+      "monday_title": "Fabric Ready to Ship",
+      "monday_type": "date",
+      "sql_column": "Fabric Ready to Ship",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "long_text_mkq0y66h",
+      "monday_title": "Partner Comments",
+      "monday_type": "long_text",
+      "sql_column": "Partner Comments",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "color_mkq0f90k",
+      "monday_title": "PRODUCTION STATUS",
+      "monday_type": "status",
+      "sql_column": "PRODUCTION STATUS",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "board_relation_mkq9bt3z",
+      "monday_title": "ALLOCATION REF",
+      "monday_type": "board_relation",
+      "sql_column": "ALLOCATION REF",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "multiple_person_mkqfm1ea",
+      "monday_title": "PLANNER",
+      "monday_type": "people",
+      "sql_column": "PLANNER",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "', '.join(extract_value(cv)) if isinstance(extract_value(cv), list) else extract_value(cv)"
+    },
+    {
+      "monday_id": "color_mkqgdxjq",
+      "monday_title": "FABRIC ORDERED",
+      "monday_type": "status",
+      "sql_column": "FABRIC ORDERED",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "board_relation_mkqjpfdw",
+      "monday_title": "Customers (linked)",
+      "monday_type": "board_relation",
+      "sql_column": "Customers (linked)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "lookup_mkqjmjft",
+      "monday_title": "AM (linked)",
+      "monday_type": "mirror",
+      "sql_column": "AM (linked)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "multiple_person_mkqj1tpr",
+      "monday_title": "Account Manager",
+      "monday_type": "people",
+      "sql_column": "Account Manager",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "', '.join(extract_value(cv)) if isinstance(extract_value(cv), list) else extract_value(cv)"
+    },
+    {
+      "monday_id": "dropdown_mkqjemz1",
+      "monday_title": "Essential Core Acc",
+      "monday_type": "dropdown",
+      "sql_column": "Essential Core Acc",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "date_mkqj2rs5",
+      "monday_title": "MO RELEASE DATE",
+      "monday_type": "date",
+      "sql_column": "MO RELEASE DATE",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "text_mkqjdxtf",
+      "monday_title": "MO NUMBER",
+      "monday_type": "text",
+      "sql_column": "MO NUMBER",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "date_mkqrkrzy",
+      "monday_title": "EX-FTY (Forecast)",
+      "monday_type": "date",
+      "sql_column": "EX-FTY (Forecast)",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkqxer6g",
+      "monday_title": "QTY WIP",
+      "monday_type": "numbers",
+      "sql_column": "QTY WIP",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkqx90j",
+      "monday_title": "QTY FG",
+      "monday_type": "numbers",
+      "sql_column": "QTY FG",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkqxhmp3",
+      "monday_title": "QTY INVOICED",
+      "monday_type": "numbers",
+      "sql_column": "QTY INVOICED",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkqxnxsm",
+      "monday_title": "QTY FCST",
+      "monday_type": "numbers",
+      "sql_column": "QTY FCST",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "date_mkr0pry6",
+      "monday_title": "EX-FTY (Change Request)",
+      "monday_type": "date",
+      "sql_column": "EX-FTY (Change Request)",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "color_mkr0kpy4",
+      "monday_title": "REQUESTED XFD STATUS",
+      "monday_type": "status",
+      "sql_column": "REQUESTED XFD STATUS",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "dropdown_mkr3pzja",
+      "monday_title": "AQL TYPE",
+      "monday_type": "dropdown",
+      "sql_column": "AQL TYPE",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "color_mkr3xnzv",
+      "monday_title": "AQL INSPECTION",
+      "monday_type": "status",
+      "sql_column": "AQL INSPECTION",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "date_mkr322m7",
+      "monday_title": "PLANNED CUT DATE",
+      "monday_type": "date",
+      "sql_column": "PLANNED CUT DATE",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_date_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkr3195y",
+      "monday_title": "QTY WIP CUT",
+      "monday_type": "numbers",
+      "sql_column": "QTY WIP CUT",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkr3jqzz",
+      "monday_title": "QTY WIP SEW",
+      "monday_type": "numbers",
+      "sql_column": "QTY WIP SEW",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkr3prdw",
+      "monday_title": "QTY WIP FIN",
+      "monday_type": "numbers",
+      "sql_column": "QTY WIP FIN",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mkr3gcg2",
+      "monday_title": "QTY SCRAP",
+      "monday_type": "numbers",
+      "sql_column": "QTY SCRAP",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "text_mkra6mkv",
+      "monday_title": "keyCustMastSch",
+      "monday_type": "text",
+      "sql_column": "keyCustMastSch",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "numeric_mkp4q1rv",
+      "monday_title": "Customer FOB (USD)",
+      "monday_type": "numbers",
+      "sql_column": "Customer FOB (USD)",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "text_mkp4dqeq",
+      "monday_title": "Sell Price to Partner (USD)",
+      "monday_type": "text",
+      "sql_column": "Sell Price to Partner (USD)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "text_mkp4h1rc",
+      "monday_title": "Files",
+      "monday_type": "text",
+      "sql_column": "Files",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "multiple_person_mkp484y7",
+      "monday_title": "People",
+      "monday_type": "people",
+      "sql_column": "People",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "', '.join(extract_value(cv)) if isinstance(extract_value(cv), list) else extract_value(cv)"
+    },
+    {
+      "monday_id": "board_relation_mkr58fs4",
+      "monday_title": "CUST MASTER SCHEDULE",
+      "monday_type": "board_relation",
+      "sql_column": "CUST MASTER SCHEDULE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "board_relation_mkp7rp13",
+      "monday_title": "Shipments (RM)",
+      "monday_type": "board_relation",
+      "sql_column": "Shipments (RM)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "lookup_mkp7tk6r",
+      "monday_title": "RM Shipment Status",
+      "monday_type": "mirror",
+      "sql_column": "RM Shipment Status",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "formula_mks07fe3",
+      "monday_title": "LS RM Plan Arrival Date",
+      "monday_type": "formula",
+      "sql_column": "LS RM Plan Arrival Date",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "__item_id",
+      "monday_title": "Item ID",
+      "monday_type": "item_id",
+      "sql_column": "Item ID",
+      "sql_type": "BIGINT",
+      "extraction_field": "item_id",
+      "nullable": false,
+      "is_system_field": true,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "__item_name",
+      "monday_title": "Item Name",
+      "monday_type": "text",
+      "sql_column": "Item Name",
+      "sql_type": "NVARCHAR(500)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": true,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "__group_title",
+      "monday_title": "Group Title",
+      "monday_type": "text",
+      "sql_column": "Group Title",
+      "sql_type": "NVARCHAR(200)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": true,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "__updated_at",
+      "monday_title": "Updated At",
+      "monday_type": "datetime",
+      "sql_column": "Updated At",
+      "sql_type": "DATETIME2",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": true,
+      "conversion_logic": null
+    },
+    {
+      "monday_id": "__created_at",
+      "monday_title": "Created At",
+      "monday_type": "datetime",
+      "sql_column": "Created At",
+      "sql_type": "DATETIME2",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": true,
+      "conversion_logic": null
+    }
+  ],
+  "metadata": {
+    "description": null,
+    "board_kind": "public",
+    "groups": [
+      {
+        "id": "group_mks07hrh",
+        "title": "PRO-0004 - Upload Planning Data - GREYSON 250617",
+        "color": "#fdab3d"
+      },
+      {
+        "id": "group_mks0xh4x",
+        "title": "PRO-0004 - Upload Planning Data - BAD BIRDIE-250616",
+        "color": "#579bfc"
+      },
+      {
+        "id": "group_mkrztmj9",
+        "title": "PRO-0004 - Upload Planning Data - WHITE FOX&GREYSON 250616",
+        "color": "#fdab3d"
+      },
+      {
+        "id": "group_mkryjvwb",
+        "title": "PRO-0004 - Upload Planning Data -MACK WELDON 250615",
+        "color": "#00c875"
+      },
+      {
+        "id": "group_mkrvt1z6",
+        "title": "PRO-0004 - Upload Planning Data -BOGGI - 2025.06.12",
+        "color": "#00c875"
+      },
+      {
+        "id": "group_mkrv2emv",
+        "title": "AESCAPE FORECAST",
+        "color": "#00c875"
+      },
+      {
+        "id": "group_mkrvyf7g",
+        "title": "AESCAPE 2024 Q4",
+        "color": "#784bd1"
+      },
+      {
+        "id": "group_mkrvxb17",
+        "title": "ALWRLD 2025 FALL",
+        "color": "#ff007f"
+      },
+      {
+        "id": "group_mkrvbww1",
+        "title": "AIME LEON DORE 2025 SPRING",
+        "color": "#ffcb00"
+      },
+      {
+        "id": "group_mkrv1dnd",
+        "title": "ASRV FORECAST",
+        "color": "#757575"
+      },
+      {
+        "id": "group_mkrnmp40",
+        "title": "ASRV 2025 SUMMER",
+        "color": "#ff5ac4"
+      },
+      {
+        "id": "group_mkrn6qpg",
+        "title": "ASRV 2025 FALL",
+        "color": "#757575"
+      },
+      {
+        "id": "group_mkrnjbkd",
+        "title": "ASRV 2025 WINTER",
+        "color": "#579bfc"
+      },
+      {
+        "id": "group_mkrvcjdv",
+        "title": "BAD BIRDIE FORECAST",
+        "color": "#784bd1"
+      },
+      {
+        "id": "group_mkrv4s4n",
+        "title": "BAD BIRDIE 2025 SPRING SUMMER",
+        "color": "#cab641"
+      },
+      {
+        "id": "group_mkrvj52m",
+        "title": "BAD BIRDIE 2025 FALL WINTER",
+        "color": "#784bd1"
+      },
+      {
+        "id": "group_mkrkr0z1",
+        "title": "BAD BIRDIE 2026 SPRING",
+        "color": "#037f4c"
+      },
+      {
+        "id": "group_mkrvtjyj",
+        "title": "BANDIT FORECAST",
+        "color": "#579bfc"
+      },
+      {
+        "id": "group_mkrv1808",
+        "title": "BANDIT 2025 Q3",
+        "color": "#9cd326"
+      },
+      {
+        "id": "group_mkrjs152",
+        "title": "BANDIT 2025 Q4",
+        "color": "#c4c4c4"
+      },
+      {
+        "id": "group_mkrvz956",
+        "title": "BOGGI FORECAST",
+        "color": "#037f4c"
+      },
+      {
+        "id": "group_mkrv460q",
+        "title": "BOGGI 2025 FALL WINTER",
+        "color": "#66ccff"
+      },
+      {
+        "id": "group_mkrs8t7j",
+        "title": "BOGGI 2026 SPRING SUMMER",
+        "color": "#fdab3d"
+      },
+      {
+        "id": "group_mkrv7fef",
+        "title": "BORN PRIMITIVE FORECAST",
+        "color": "#ff5ac4"
+      },
+      {
+        "id": "group_mkrvtrv3",
+        "title": "BORN PRIMITIVE 2025 FALL",
+        "color": "#007eb5"
+      },
+      {
+        "id": "group_mkrv91de",
+        "title": "BORN PRIMITIVE 2025 HOLIDAY",
+        "color": "#7f5347"
+      },
+      {
+        "id": "group_mkrvnwrp",
+        "title": "BORN PRIMITIVE 2025 SUMMER",
+        "color": "#df2f4a"
+      },
+      {
+        "id": "group_mkrv93e9",
+        "title": "BORN PRIMITIVE 2026 SPRING",
+        "color": "#ff642e"
+      },
+      {
+        "id": "group_mkrjcrdh",
+        "title": "CAMILLA 2025 Q3",
+        "color": "#a25ddc"
+      },
+      {
+        "id": "group_mkrvvrmv",
+        "title": "CUTS 2025 SUMMER",
+        "color": "#784bd1"
+      },
+      {
+        "id": "group_mkrkkc2e",
+        "title": "DSSLR 2024 Q4",
+        "color": "#a25ddc"
+      },
+      {
+        "id": "group_mkrv8bvn",
+        "title": "DSSLR 2025 SPRING SUMMER",
+        "color": "#037f4c"
+      },
+      {
+        "id": "group_mkrvbc5p",
+        "title": "FEETURES FORECAST",
+        "color": "#c4c4c4"
+      },
+      {
+        "id": "group_mkrm18c5",
+        "title": "FEETURES 2025 Q3",
+        "color": "#579bfc"
+      },
+      {
+        "id": "group_mkqjhkkw",
+        "title": "GREYSON FORECAST",
+        "color": "#037f4c"
+      },
+      {
+        "id": "group_mkqxm1f8",
+        "title": "GREYSON 2025 SUMMER",
+        "color": "#579bfc"
+      },
+      {
+        "id": "group_mkrv1f97",
+        "title": "GREYSON 2025 FALL",
+        "color": "#bb3354"
+      },
+      {
+        "id": "group_mkrjbtw2",
+        "title": "GREYSON 2025 HOLIDAY",
+        "color": "#e2445c"
+      },
+      {
+        "id": "group_mkra5vp1",
+        "title": "GREYSON 2026 SPRING",
+        "color": "#00c875"
+      },
+      {
+        "id": "group_mkrs9y8q",
+        "title": "RYDERWEAR 2025 Q4",
+        "color": "#fdab3d"
+      },
+      {
+        "id": "group_mkrvxax0",
+        "title": "JOHNNIE O FORECAST",
+        "color": "#ff007f"
+      },
+      {
+        "id": "group_mkqxdnay",
+        "title": "JOHNNIE O 2025 FALL",
+        "color": "#00c875"
+      },
+      {
+        "id": "group_mkra5z01",
+        "title": "JOHNNIE O 2026 SPRING SUMMER",
+        "color": "#fdab3d"
+      },
+      {
+        "id": "group_mkrvsskb",
+        "title": "JOHNNY WAS 2025 SUMMER",
+        "color": "#579bfc"
+      },
+      {
+        "id": "group_mkrvxgmb",
+        "title": "LAMBS 2025 Q2",
+        "color": "#ff642e"
+      },
+      {
+        "id": "group_mkrvczv9",
+        "title": "MACK WELDON FORECAST",
+        "color": "#784bd1"
+      },
+      {
+        "id": "group_mkrv5tym",
+        "title": "MACK WELDON 2025 FALL",
+        "color": "#ffcb00"
+      },
+      {
+        "id": "group_mkrve099",
+        "title": "PELOTON FORECAST",
+        "color": "#ffcb00"
+      },
+      {
+        "id": "group_mkpc86sh",
+        "title": "PELOTON 2025 HOLIDAY",
+        "color": "#fdab3d"
+      },
+      {
+        "id": "group_mkrvxtj4",
+        "title": "PELOTON 2025 FALL",
+        "color": "#fdab3d"
+      },
+      {
+        "id": "group_mkrvygmz",
+        "title": "PELOTON 2025 SUMMER",
+        "color": "#df2f4a"
+      },
+      {
+        "id": "group_mkrvf6n",
+        "title": "RHONE 2025 SUMMER",
+        "color": "#9cd326"
+      },
+      {
+        "id": "group_mkrv9pkz",
+        "title": "RHONE 2025 FALL",
+        "color": "#037f4c"
+      },
+      {
+        "id": "group_mkrjd899",
+        "title": "RYDERWEAR 2025 SEASON 3",
+        "color": "#fdab3d"
+      },
+      {
+        "id": "group_mkrv3g3m",
+        "title": "SEISSENSE 2025 Q3",
+        "color": "#9cd326"
+      },
+      {
+        "id": "group_mkragrwj",
+        "title": "SEISSENSE 2025 Q4",
+        "color": "#c4c4c4"
+      },
+      {
+        "id": "group_mkrve0ec",
+        "title": "SOULCYCLE 2025 Q3",
+        "color": "#ff642e"
+      },
+      {
+        "id": "group_mkrvrer6",
+        "title": "SPIRITUAL GANGSTER FORECAST",
+        "color": "#037f4c"
+      },
+      {
+        "id": "group_mkrvac1y",
+        "title": "SPIRITUAL GANGSTER 2025 HOLIDAY",
+        "color": "#9cd326"
+      },
+      {
+        "id": "group_mkrvsn5r",
+        "title": "SPIRITUAL GANGSTER 2025 FALL",
+        "color": "#9d50dd"
+      },
+      {
+        "id": "group_mkrv2ywm",
+        "title": "SPIRITUAL GANGSTER 2025 SUMMER",
+        "color": "#cab641"
+      },
+      {
+        "id": "group_mkrvv872",
+        "title": "SUN DAY RED FORECAST",
+        "color": "#c4c4c4"
+      },
+      {
+        "id": "group_mkrvqvqg",
+        "title": "SUN DAY RED 2025 FALL",
+        "color": "#9d50dd"
+      },
+      {
+        "id": "group_mkrvc88k",
+        "title": "SUN DAY RED 2025 SPRING SUMMER",
+        "color": "#007eb5"
+      },
+      {
+        "id": "group_mkrmwy1m",
+        "title": "SUN DAY RED 2026 SPRING",
+        "color": "#579bfc"
+      },
+      {
+        "id": "group_mkrvy8jj",
+        "title": "TAYLORMADE FORECAST",
+        "color": "#df2f4a"
+      },
+      {
+        "id": "group_mkrjkfek",
+        "title": "RHYTHM 2025 Q3",
+        "color": "#e2445c"
+      },
+      {
+        "id": "group_mkrv9v98",
+        "title": "TAYLORMADE 2025 SPRING",
+        "color": "#ff007f"
+      },
+      {
+        "id": "group_mkrjge2q",
+        "title": "TAYLORMADE 2025 FALL WINTER",
+        "color": "#e2445c"
+      },
+      {
+        "id": "group_mkrvt72h",
+        "title": "TITLE NINE FORECAST",
+        "color": "#66ccff"
+      },
+      {
+        "id": "group_mkra706k",
+        "title": "TITLE NINE 2025 SPRING",
+        "color": "#fdab3d"
+      },
+      {
+        "id": "group_mkrvwf44",
+        "title": "TRACKSMITH FORECAST",
+        "color": "#ff642e"
+      },
+      {
+        "id": "group_mkrvpxgd",
+        "title": "TRACKSMITH 2025 FALL WINTER Q2",
+        "color": "#757575"
+      },
+      {
+        "id": "group_mkrva8ge",
+        "title": "UNEPIECE FORECAST",
+        "color": "#ff5ac4"
+      },
+      {
+        "id": "group_mkrv8x98",
+        "title": "UNE PIECE 2024 SPRING SUMMER",
+        "color": "#037f4c"
+      },
+      {
+        "id": "group_mkrvm638",
+        "title": "WHITE FOX 2025 Q1",
+        "color": "#579bfc"
+      },
+      {
+        "id": "group_mkrv4qbq",
+        "title": "WHITE FOX 2025 Q2",
+        "color": "#9d50dd"
+      },
+      {
+        "id": "group_mkrj5m91",
+        "title": "WHITE FOX 2025 Q3",
+        "color": "#a25ddc"
+      },
+      {
+        "id": "group_mkrvy2ge",
+        "title": "WHITE FOX 2025 Q4",
+        "color": "#ff642e"
+      },
+      {
+        "id": "group_mkraaxam",
+        "title": "UNE PIECE 2025",
+        "color": "#fdab3d"
+      }
+    ],
+    "total_columns": 135,
+    "discovery_version": "1.0"
+  }
+}

@@ -1,0 +1,1166 @@
+customer_mappings:
+  normalized_customers:
+    ACTIVELY_BLACK:
+      aliases:
+      - ACTIVELY BLACK
+      canonical: ACTIVELY BLACK
+      status: review
+      systems:
+        master_order_list: ACTIVELY BLACK
+        mon_customer_ms: ''
+        packed_products: ''
+        shipped: ACTIVELY BLACK
+    AESCAPE:
+      aliases:
+      - AESCAPE
+      canonical: AESCAPE
+      status: approved
+      systems:
+        master_order_list: AESCAPE
+        mon_customer_ms: ''
+        packed_products: AESCAPE
+        shipped: AESCAPE
+    AIME_LEON_DORE:
+      aliases:
+      - AIME LEON DORE
+      canonical: AIME LEON DORE
+      status: review
+      systems:
+        master_order_list: AIME LEON DORE
+        mon_customer_ms: ''
+        packed_products: ''
+        shipped: AIME LEON DORE
+    AJE:
+      aliases:
+      - AJE
+      - AJE ATHLETICA (AU)
+      canonical: AJE
+      status: approved
+      systems:
+        master_order_list: AJE ATHLETICA (AU)
+        mon_customer_ms: ''
+        packed_products: ''
+        shipped: AJE
+data_validation:
+  business_rules:
+    board_naming:
+      description: Board names should follow naming conventions
+      rules:
+      - Use snake_case for board keys
+      - Use descriptive names for board_name field
+      - Database and table names should follow SQL naming conventions
+    data_consistency:
+      description: Data consistency across mapping definitions
+      rules:
+      - Standardized field names must be consistent across all views
+      - Customer mappings must align with customer_mapping.yaml
+      - Type conversions must be bidirectional where possible
+    field_mapping:
+      description: Field mappings should be consistent
+      rules:
+      - All mappable fields must have monday_id when applicable
+      - SQL column names should use proper SQL naming conventions
+      - Required fields cannot be nullable unless explicitly allowed
+  required_fields:
+    database_objects:
+    - database
+    - description
+    - source_ddl
+    field_mappings:
+    - name
+    - sql_type
+    - monday_type
+    monday_boards:
+    - board_id
+    - board_name
+    - table_name
+    - database
+  type_validation:
+    column_ids:
+      description: Monday.com column IDs must be alphanumeric with underscores
+      pattern: ^[a-zA-Z0-9_]+$
+    monday_board_ids:
+      description: Monday.com board IDs must be numeric strings
+      pattern: ^[0-9]+$
+    monday_types:
+      allowed_values:
+      - text
+      - long_text
+      - numbers
+      - date
+      - datetime
+      - dropdown
+      - status
+      - checkbox
+      - email
+      - phone
+      - link
+      - people
+      - timeline
+      - dependency
+      - board_relation
+      - mirror
+      - formula
+      - file
+      - tags
+      - color
+      - rating
+      - item_id
+      - subtasks
+      - numeric
+    sql_types:
+      allowed_values:
+      - NVARCHAR(MAX)
+      - NVARCHAR(500)
+      - NVARCHAR(255)
+      - NVARCHAR(200)
+      - NVARCHAR(100)
+      - NVARCHAR(50)
+      - DATE
+      - DATETIME2
+      - BIGINT
+      - INT
+      - DECIMAL(18,2)
+      - BIT
+      - FLOAT
+database_schemas:
+  error_tables:
+    customer_master_schedule:
+      database: orders
+      description: Error table for customer master schedule
+      related_table: dbo.MON_CustMasterSchedule
+      source_ddl: sql/ddl/tables/orders/error/err_mon_custmasterschedule.sql
+      table: dbo.ERR_MON_CustMasterSchedule
+    customer_master_schedule_subitems:
+      database: orders
+      description: Error table for customer master schedule subitems
+      related_table: dbo.MON_CustMasterSchedule_Subitems
+      source_ddl: sql/ddl/tables/orders/error/err_mon_custmasterschedule_subitems.sql
+      table: dbo.ERR_MON_CustMasterSchedule_Subitems
+  mon_tables:
+    coo_planning:
+      database: orders
+      description: COO planning board data
+      source_board: coo_planning
+      source_ddl: sql/ddl/tables/orders/dbo_mon_coo_planning.sql
+      table: dbo.MON_COO_Planning
+    customer_master_schedule:
+      database: orders
+      description: Customer master schedule board data
+      source_board: customer_master_schedule
+      source_ddl: sql/ddl/tables/orders/dbo_mon_custmasterschedule.sql
+      table: dbo.MON_CustMasterSchedule
+    customer_master_schedule_subitems:
+      database: orders
+      description: Customer master schedule subitems board data
+      source_board: customer_master_schedule_subitems
+      source_ddl: sql/ddl/tables/orders/dbo_mon_custmasterschedule_subitems.sql
+      table: dbo.MON_CustMasterSchedule_Subitems
+  monitoring_views:
+    active_batches:
+      base_table: dbo.MON_BatchProcessing
+      database: orders
+      description: Active and recent Monday.com batch processing monitoring
+      purpose: Monitor ETL batch operations
+      source_ddl: sql/ddl/views/orders/vw_mon_activebatches.sql
+      view: dbo.VW_MON_ActiveBatches
+    board_groups:
+      base_table: dbo.mon_boards_groups
+      database: orders
+      description: Comprehensive view of all board groups with metadata
+      purpose: Board group structure reporting
+      source_ddl: sql/ddl/views/v_MON_Board_Groups.sql
+      view: dbo.v_mon_boards_groups
+    board_groups_simple:
+      base_table: dbo.mon_boards_groups
+      database: orders
+      description: Simplified view of board groups
+      purpose: Simple board group lookups
+      source_ddl: sql/ddl/views/v_MON_Board_Groups_Simple.sql
+      view: dbo.v_mon_boards_groups_Simple
+    board_groups_summary:
+      base_table: dbo.mon_boards_groups
+      database: orders
+      description: Summary statistics for board groups
+      purpose: Board group metrics and counts
+      source_ddl: sql/ddl/views/v_MON_Board_Groups_Summary.sql
+      view: dbo.v_mon_boards_groups_Summary
+  orders_unified:
+    database: orders
+    description: Unified orders table containing all order information
+    field_categories:
+      customer_info:
+      - CUSTOMER
+      - CUSTOMER SEASON
+      - CUSTOMER ALT PO
+      delivery_info:
+      - DESTINATION
+      - DESTINATION WAREHOUSE
+      - DELIVERY TERMS
+      financial_info:
+      - CUSTOMER PRICE
+      - EX WORKS (USD)
+      - ADMINISTRATION FEE
+      order_info:
+      - AAG ORDER NUMBER
+      - PO NUMBER
+      - ORDER DATE PO RECEIVED
+      - ORDER TYPE
+      product_info:
+      - STYLE DESCRIPTION
+      - CATEGORY
+      - PATTERN ID
+    key_fields:
+    - AAG ORDER NUMBER
+    - PO NUMBER
+    - STYLE DESCRIPTION
+    - CUSTOMER
+    - ORDER DATE PO RECEIVED
+    source_ddl: sql/ddl/tables/orders/dbo_ORDERS_UNIFIED_ddl.sql
+    table: dbo.ORDERS_UNIFIED
+    total_fields: 183
+  staging_tables:
+    customer_master_schedule:
+      database: orders
+      description: Staging table for customer master schedule
+      source_ddl: sql/ddl/tables/orders/staging/stg_mon_custmasterschedule.sql
+      table: dbo.STG_MON_CustMasterSchedule
+      target_table: dbo.MON_CustMasterSchedule
+    customer_master_schedule_subitems:
+      database: orders
+      description: Staging table for customer master schedule subitems
+      source_ddl: sql/ddl/tables/orders/staging/stg_mon_custmasterschedule_subitems.sql
+      table: dbo.STG_MON_CustMasterSchedule_Subitems
+      target_table: dbo.MON_CustMasterSchedule_Subitems
+  staging_views:
+    master_order_list:
+      database: orders
+      description: Master order list view
+      purpose: Comprehensive order tracking
+      source_ddl: sql/staging/v_master_order_list.sql
+      view: v_master_order_list
+    mon_customer_ms:
+      base_table: dbo.MON_CustMasterSchedule
+      database: orders
+      description: Customer master schedule standardized view
+      purpose: Standardized field mapping source
+      source_ddl: sql/staging/v_mon_customer_ms.sql
+      standardized_fields:
+      - Customer
+      - Order_Number
+      - Customer_PO
+      - Season
+      - MO_Number
+      - Style
+      - Color
+      - Qty
+      - Incoterms
+      - Shipping_Method
+      - QTY_PACKED_NOT_SHIPPED
+      - QTY_SHIPPED
+      - ORDER_TYPE
+      - DESTINATION
+      - DESTINATION_WAREHOUSE
+      view: v_mon_customer_ms
+    mon_customer_ms_item_ids:
+      base_table: dbo.MON_CustMasterSchedule
+      database: orders
+      description: Customer master schedule item IDs for Monday.com sync
+      purpose: Monday.com API item ID management
+      source_ddl: sql/staging/v_mon_customer_ms_itemIDs.sql
+      view: v_mon_customer_ms_itemIDs
+    mon_customer_ms_subitems:
+      database: orders
+      description: Customer master schedule subitems standardized view
+      purpose: Standardized subitem field mapping source
+      source_ddl: sql/staging/v_mon_customer_ms_subitems.sql
+      standardized_fields:
+      - parent_item_id
+      - subitem_id
+      - subitem_board_id
+      - Order Qty
+      - Cut Qty
+      - Sew Qty
+      - Finishing Qty
+      - Received not Shipped Qty
+      - Packed Qty
+      - Shipped Qty
+      - ORDER LINE STATUS
+      - Item ID
+      view: v_mon_customer_ms_subitems
+    orders_shipped:
+      database: distribution
+      description: Shipped orders view
+      purpose: Fulfillment tracking
+      source_ddl: sql/staging/v_orders_shipped.sql
+      standardized_fields:
+      - CartonID
+      - Customer_PO
+      - Season
+      - Shipped_Date
+      - QTY_SHIPPED
+      view: v_orders_shipped
+    packed_barcode:
+      database: distribution
+      description: Packed items with barcode data
+      purpose: Barcode and packing integration
+      source_ddl: sql/staging/v_packed_barcode.sql
+      view: v_packed_barcode
+    packed_products:
+      database: distribution
+      description: Packed products view
+      purpose: Packing tracking
+      source_ddl: sql/staging/v_packed_products.sql
+      standardized_fields:
+      - CartonID
+      - Customer_PO
+      - Season
+      - QTY_PACKED_NOT_SHIPPED
+      view: v_packed_products
+    received_products:
+      database: distribution
+      description: Received products view
+      purpose: Receipt tracking
+      source_ddl: sql/staging/v_received_products.sql
+      standardized_fields:
+      - MO_Number
+      view: v_received_products
+    scanned_not_delivered:
+      database: distribution
+      description: Scanned but not delivered products
+      purpose: Delivery exception tracking
+      source_ddl: sql/staging/v_scanned_not_delivered.sql
+      standardized_fields:
+      - MO_Number
+      view: v_scanned_not_delivered
+    shipped:
+      database: distribution
+      description: Core shipped data view
+      purpose: Primary shipment data source
+      source_ddl: sql/staging/v_shipped.sql
+      standardized_fields:
+      - CartonID
+      - Customer_PO
+      - Season
+      view: v_shipped
+    shipped_non_lorna_jane:
+      database: distribution
+      description: Shipped products excluding Lorna Jane
+      purpose: Customer-specific exclusion logic
+      source_ddl: sql/staging/v_shipped_non_lorna_jane.sql
+      view: v_shipped_non_lorna_jane
+    shipped_products:
+      database: distribution
+      description: All shipped products view
+      purpose: Complete shipment tracking
+      source_ddl: sql/staging/v_shipped_products.sql
+      view: v_shipped_products
+  tracking_tables:
+    batch_processing:
+      database: orders
+      description: Batch processing tracking table
+      purpose: Track ETL batch operations
+      source_ddl: sql/ddl/tables/orders/tracking/mon_batchprocessing.sql
+      table: dbo.MON_BatchProcessing
+    board_groups:
+      database: orders
+      description: Monday.com board groups tracking table
+      purpose: Track Monday.com board group structure
+      source_ddl: sql/ddl/tables/MON_Board_Groups.sql
+      table: dbo.mon_boards_groups
+  warehouse_objects:
+    dim_customer:
+      database: warehouse
+      description: Customer dimension table
+      purpose: Customer master data for reporting
+      source_ddl: sql/warehouse/dim_customer.sql
+      table: dim_customer
+extraction_helpers:
+  json_to_text_convert:
+    description: Convert Monday.com complex types to JSON text
+    handles_null: true
+    preserves_json_structure: true
+  safe_boolean_convert:
+    description: Safely convert Monday.com checkbox to SQL bit
+    handles_null: true
+    parses_json_format: true
+  safe_date_convert:
+    description: Safely convert Monday.com date JSON to SQL date
+    fallback_formats:
+    - YYYY-MM-DD
+    - MM/DD/YYYY
+    - DD/MM/YYYY
+    handles_null: true
+    parses_json_format: true
+  safe_numeric_convert:
+    description: Safely convert Monday.com numbers to SQL integer/bigint
+    handles_null: true
+    handles_string_numbers: true
+  safe_text_convert:
+    description: Safely convert Monday.com text to SQL string
+    handles_null: true
+    trims_whitespace: true
+field_types:
+  conversion_functions:
+    date:
+      description: 'Handle Monday.com JSON date format: {"date":"YYYY-MM-DD"}'
+      monday_to_sql: safe_date_convert
+      sql_to_monday: format_monday_date
+    json_metadata:
+      description: Handle Monday.com JSON metadata columns
+      monday_to_sql: extract_from_json_metadata
+      sql_to_monday: format_json_metadata
+    numbers:
+      description: Handle numeric conversions with null safety
+      monday_to_sql: safe_numeric_convert
+      sql_to_monday: format_monday_number
+    text:
+      description: Handle text with null safety and trimming
+      monday_to_sql: safe_string_convert
+      sql_to_monday: format_monday_text
+  extraction_patterns:
+    board_relation:
+      api_response_format: Complex JSON object with board relationships
+      extraction_method: Store as JSON string
+      null_handling: Return NULL for empty relations
+      sql_target: NVARCHAR(MAX)
+    checkbox:
+      api_response_format: '{"checked": "true"} or {"checked": "false"}'
+      conversion_logic: "if isinstance(value, dict) and 'checked' in value:\n    return\
+        \ value['checked'] == 'true'\nreturn bool(value) if value else False\n"
+      extraction_method: column_value.get('checked') == 'true'
+      null_handling: Default to FALSE for NULL values
+      sql_target: BIT
+    date:
+      api_response_format: '{"date": "YYYY-MM-DD"} or direct date string'
+      conversion_logic: "if isinstance(value, dict) and 'date' in value:\n    return\
+        \ datetime.strptime(value['date'], '%Y-%m-%d').date()\nelif isinstance(value,\
+        \ str) and value.strip():\n    return datetime.strptime(value.strip(), '%Y-%m-%d').date()\n\
+        return None\n"
+      extraction_method: Parse JSON date object or direct string
+      null_handling: Return NULL for empty/invalid dates
+      sql_target: DATE
+    dependency:
+      api_response_format: Complex JSON object with linked items
+      extraction_method: Store as JSON string
+      null_handling: Return NULL for empty dependencies
+      sql_target: NVARCHAR(MAX)
+    dropdown:
+      api_response_format: '{"text": "selected_option"} or direct string'
+      extraction_method: column_value.get('text') or str(column_value)
+      null_handling: Convert empty strings to NULL
+      sql_target: NVARCHAR(100)
+    formula:
+      api_response_format: Calculated formula result
+      extraction_method: Extract display_value or computed result
+      null_handling: Return NULL for empty formula results
+      sql_target: NVARCHAR(MAX)
+    long_text:
+      api_response_format: 'Direct string or {"text": "value"}'
+      extraction_method: column_value.get('text') or str(column_value)
+      null_handling: Convert empty strings to NULL
+      sql_target: NVARCHAR(MAX)
+    mirror:
+      api_response_format: Mirrored values from other boards
+      extraction_method: Extract display_value or store as JSON
+      null_handling: Return NULL for empty mirror values
+      sql_target: NVARCHAR(MAX)
+    numbers:
+      api_response_format: Direct number or string representation
+      conversion_logic: "if isinstance(value, (int, float)):\n    return int(value)\n\
+        elif isinstance(value, str) and value.strip():\n    return int(float(value.strip()))\n\
+        return None\n"
+      extraction_method: int(float(value)) with null safety
+      null_handling: Return NULL for empty/invalid numbers
+      sql_target: BIGINT
+    people:
+      api_response_format: '[{"id": 123, "name": "John Doe"}, ...]'
+      conversion_logic: "if isinstance(value, list):\n    names = [person.get('name',\
+        \ '') for person in value if person.get('name')]\n    return ', '.join(names)\
+        \ if names else None\nreturn str(value) if value else None\n"
+      extraction_method: Extract names and join with commas
+      null_handling: Return NULL for empty people lists
+      sql_target: NVARCHAR(MAX)
+    status:
+      api_response_format: '{"text": "status_label"} or direct string'
+      extraction_method: column_value.get('text') or str(column_value)
+      null_handling: Convert empty strings to NULL
+      sql_target: NVARCHAR(100)
+    text:
+      api_response_format: 'Direct string or {"text": "value"}'
+      extraction_method: column_value.get('text') or str(column_value)
+      null_handling: Convert empty strings to NULL
+      sql_target: NVARCHAR(MAX)
+  monday_to_sql:
+    board_relation: NVARCHAR(MAX)
+    checkbox: BIT
+    color: NVARCHAR(100)
+    created_at: DATETIME2
+    date: DATE
+    datetime: DATETIME2
+    dependency: NVARCHAR(MAX)
+    dropdown: NVARCHAR(100)
+    email: NVARCHAR(255)
+    file: NVARCHAR(MAX)
+    formula: NVARCHAR(MAX)
+    group_title: NVARCHAR(200)
+    item_id: BIGINT NOT NULL
+    item_name: NVARCHAR(500)
+    link: NVARCHAR(500)
+    long_text: NVARCHAR(MAX)
+    mirror: NVARCHAR(MAX)
+    numbers: BIGINT
+    numeric: DECIMAL(18,2)
+    people: NVARCHAR(MAX)
+    phone: NVARCHAR(50)
+    rating: INT
+    status: NVARCHAR(100)
+    tags: NVARCHAR(MAX)
+    text: NVARCHAR(MAX)
+    timeline: NVARCHAR(MAX)
+    updated_at: DATETIME2
+  simple_type_extraction:
+    default_logic: "def extract_value_by_type(column_value, monday_type):\n    if\
+      \ column_value is None:\n        return None\n    \n    type_handlers = {\n\
+      \        'text': lambda v: str(v).strip() if v else None,\n        'long_text':\
+      \ lambda v: str(v).strip() if v else None,\n        'numbers': lambda v: int(float(v))\
+      \ if v and str(v).strip() else None,\n        'date': lambda v: parse_monday_date(v),\n\
+      \        'status': lambda v: v.get('text') if isinstance(v, dict) else str(v),\n\
+      \        'dropdown': lambda v: v.get('text') if isinstance(v, dict) else str(v),\n\
+      \        'checkbox': lambda v: v.get('checked') == 'true' if isinstance(v, dict)\
+      \ else bool(v),\n        'people': lambda v: ', '.join([p.get('name', '') for\
+      \ p in v]) if isinstance(v, list) else str(v),\n        'default': lambda v:\
+      \ json.dumps(v) if isinstance(v, (dict, list)) else str(v)\n    }\n    \n  \
+      \  handler = type_handlers.get(monday_type, type_handlers['default'])\n    return\
+      \ handler(column_value)\n"
+    description: Use this simple mapping instead of custom per-column logic
+  sql_to_monday:
+    BIGINT: numbers
+    BIT: checkbox
+    DATE: date
+    DATETIME2: datetime
+    DECIMAL(18,2): numbers
+    INT: numbers
+    NVARCHAR(100): text
+    NVARCHAR(200): text
+    NVARCHAR(255): text
+    NVARCHAR(50): text
+    NVARCHAR(500): text
+    NVARCHAR(MAX): text
+future_integrations:
+  external_systems:
+    ecommerce_platforms:
+      data_types:
+      - online_orders
+      - customer_accounts
+      - product_catalogs
+      - inventory_sync
+      description: Future e-commerce platform integrations
+      status: planned
+      system_name: TBD
+    erp_integration:
+      data_types:
+      - financial_data
+      - purchase_orders
+      - vendor_information
+      - cost_accounting
+      description: Future ERP system integration
+      status: planned
+      system_name: TBD
+    shipping_carriers:
+      data_types:
+      - tracking_numbers
+      - delivery_confirmations
+      - shipping_rates
+      - service_levels
+      description: Future shipping carrier API integrations
+      status: planned
+      system_name: TBD
+    warehouse_management:
+      data_types:
+      - pick_lists
+      - put_away_instructions
+      - cycle_counts
+      - location_management
+      description: Future WMS integration
+      status: planned
+      system_name: TBD
+  placeholder_boards:
+    inventory_management:
+      description: Future inventory management board integration
+      estimated_implementation: TBD
+      required_mappings:
+      - stock_levels
+      - reorder_points
+      - inventory_movements
+      status: planned
+    production_planning:
+      description: Future production planning board integration
+      estimated_implementation: TBD
+      required_mappings:
+      - manufacturing_order_data
+      - production_schedules
+      - factory_assignments
+      status: planned
+    quality_control:
+      description: Future quality control board integration
+      estimated_implementation: TBD
+      required_mappings:
+      - inspection_results
+      - defect_tracking
+      - quality_metrics
+      status: planned
+maintenance:
+  backup_strategy: All changes tracked in Git with clear commit messages
+  change_process:
+    1: Identify new mapping requirements
+    2: Update this central mapping file
+    3: Test mapping_helper functions
+    4: Update related documentation
+    5: Deploy to dev environment
+    6: Run validation tests
+    7: Deploy to production
+    8: Monitor for issues
+  known_issues:
+  - Some legacy scripts still reference hardcoded values - migration in progress
+  - Alternative board IDs may exist for testing vs production environments
+  - Type conversion edge cases need additional testing
+  migration_status:
+    completion_target: TBD based on development priorities
+    gradual_migration: In progress
+    legacy_files_preserved: true
+    new_system_active: true
+  responsibility: Data Engineering Team with AI Agent assistance
+  review_schedule: Monthly review of mappings for accuracy and completeness
+  testing_requirements:
+  - Validate YAML syntax
+  - Test mapping_helper functions with new mappings
+  - Verify DDL generation for new table structures
+  - Run integration tests with Monday.com API
+  - Validate data type conversions
+  update_frequency: As needed when new boards, fields, or data sources are added
+  versioning: Increment version number for major structural changes
+mapping_patterns:
+  audit_fields:
+    description: Standard audit fields for tracking data lineage
+    fields:
+    - default: GETDATE()
+      name: created_at
+      sql_type: DATETIME2
+    - default: GETDATE()
+      name: updated_at
+      sql_type: DATETIME2
+    - default: '''Monday.com'''
+      name: source_system
+      sql_type: NVARCHAR(100)
+    - name: batch_id
+      sql_type: UNIQUEIDENTIFIER
+  relationship_fields:
+    description: Common relationship field patterns
+    parent_child:
+    - name: parent_item_id
+      references: parent_table._item_id
+      sql_type: BIGINT
+    - name: child_item_id
+      references: child_table._item_id
+      sql_type: BIGINT
+  standard_monday_fields:
+    description: Standard fields present in all Monday.com boards
+    fields:
+    - monday_type: item_id
+      name: Item ID
+      required: true
+      sql_column: _item_id
+      sql_type: BIGINT NOT NULL
+    - monday_type: text
+      name: Name
+      required: true
+      sql_column: _item_name
+      sql_type: NVARCHAR(500)
+    - monday_type: group
+      name: Group
+      required: true
+      sql_column: _group_title
+      sql_type: NVARCHAR(200)
+    - monday_type: datetime
+      name: Last Updated
+      required: true
+      sql_column: _updated_at
+      sql_type: DATETIME2
+metadata:
+  created: '2025-06-17'
+  description: Master data mapping registry for entire data orchestration system
+  last_updated: '2025-06-18'
+  maintainers:
+  - Data Engineering Team
+  - AI Agents
+  - Developers
+  migration_status: active
+  schema_version: '1.0'
+  source_files:
+  - docs/mapping/orders_unified_monday_mapping.yaml
+  - docs/mapping/field_mapping_matrix.yaml
+  - docs/mapping/customer_mapping.yaml
+  - docs/mapping/mapping_fields.yaml
+  - docs/mapping/monday_column_ids.json
+  - Various scripts and DDL files
+  version: '1.0'
+monday_boards:
+  coo_planning:
+    board_id: 8709134353
+    board_name: COO Planning
+    columns:
+    - description: Monday.com item identifier
+      monday_id: item_id
+      monday_type: item_id
+      name: Item ID
+      required: true
+      sql_column: Item_ID
+      sql_type: BIGINT
+    - description: Item name/style key
+      monday_id: name
+      monday_type: text
+      name: Name
+      required: true
+      sql_column: StyleKey
+      sql_type: NVARCHAR(MAX)
+    - description: Board group title
+      monday_id: group
+      monday_type: group
+      name: Group
+      required: true
+      sql_column: Group
+      sql_type: NVARCHAR(MAX)
+    - description: Last update timestamp
+      monday_id: updated_at
+      monday_type: datetime
+      name: Last Updated
+      required: true
+      sql_column: UpdateDate
+      sql_type: DATE
+    database: orders
+    description: COO planning and manufacturing coordination board
+    last_schema_update: '2025-06-17'
+    schema_decisions:
+      approved_columns: []
+      rejected_columns:
+      - decision_date: '2025-06-18 14:02:27'
+        name: CUST MASTER SCHEDULE
+        reason: not required, has 100s of linked records, we can join to this field
+          from MON_CustMasterSchedule table
+        type: board_relation
+    source_script: scripts/monday-boards/get_board_planning.py
+    status: production
+    table_name: MON_COO_Planning
+  customer_master_schedule:
+    alternate_board_ids:
+    - '9218090006'
+    board_id: '9200517329'
+    board_name: Customer Master Schedule
+    columns:
+    - mapping_source: ORDERS_UNIFIED
+      monday_id: text_mkr5wya6
+      monday_type: text
+      name: AAG ORDER NUMBER
+      sample_data: JOO-00505
+      sql_column: AAG_ORDER_NUMBER
+      sql_type: NVARCHAR(MAX)
+    - mapping_source: ORDERS_UNIFIED
+      monday_id: dropdown_mkr58de6
+      monday_type: dropdown
+      name: AAG SEASON
+      sample_data: 2026 SPRING
+      sql_column: AAG_SEASON
+      sql_type: NVARCHAR(MAX)
+    - mapping_source: ORDERS_UNIFIED
+      monday_id: text_mkrh94rx
+      monday_type: text
+      name: CUSTOMER ALT PO
+      nullable: true
+      sql_column: CUSTOMER_ALT_PO
+      sql_type: NVARCHAR(MAX)
+    - mapping_source: ORDERS_UNIFIED
+      monday_id: dropdown_mkr5rgs6
+      monday_type: dropdown
+      name: CUSTOMER SEASON
+      sample_data: SPRING SUMMER 2026
+      sql_column: CUSTOMER_SEASON
+      sql_type: NVARCHAR(MAX)
+    - conversion_logic: safe_date_convert
+      mapping_source: ORDERS_UNIFIED
+      monday_id: date_mkr5zp5
+      monday_type: date
+      name: ORDER DATE PO RECEIVED
+      sample_data: '2025-05-20'
+      sql_column: ORDER_DATE_PO_RECEIVED
+      sql_type: DATE
+    - mapping_source: ORDERS_UNIFIED
+      monday_id: dropdown_mkr5w5e
+      monday_type: dropdown
+      name: DROP
+      nullable: true
+      sql_column: DROP
+      sql_type: NVARCHAR(MAX)
+    - mapping_source: ORDERS_UNIFIED
+      monday_id: text_mkr5ej2x
+      monday_type: text
+      name: PO NUMBER
+      sample_data: 8148-00
+      sql_column: PO_NUMBER
+      sql_type: NVARCHAR(MAX)
+    - mapping_source: ORDERS_UNIFIED
+      monday_id: text_mkr5cz8m
+      monday_type: text
+      name: PATTERN ID
+      nullable: true
+      sql_column: PATTERN_ID
+      sql_type: NVARCHAR(MAX)
+    - mapping_source: ORDERS_UNIFIED
+      monday_id: long_text_mkr5p0cf
+      monday_type: long_text
+      name: STYLE DESCRIPTION
+      sample_data: NALLA
+      sql_column: STYLE_DESCRIPTION
+      sql_type: NVARCHAR(MAX)
+    - mapping_source: ORDERS_UNIFIED
+      monday_id: dropdown_mkr5s5n3
+      monday_type: dropdown
+      name: CATEGORY
+      sql_column: CATEGORY
+      sql_type: NVARCHAR(MAX)
+    database: orders
+    description: Customer master schedule tracking board
+    error_table: ERR_MON_CustMasterSchedule
+    staging_table: STG_MON_CustMasterSchedule
+    status: production
+    table_name: MON_CustMasterSchedule
+  customer_master_schedule_subitems:
+    board_id: TBD
+    board_name: Customer Master Schedule Subitems
+    columns:
+    - description: Parent item identifier
+      monday_type: item_id
+      name: parent_item_id
+      sql_column: parent_item_id
+      sql_type: BIGINT
+    - description: Subitem identifier
+      monday_type: item_id
+      name: subitem_id
+      sql_column: subitem_id
+      sql_type: BIGINT
+    - description: Quantity ordered
+      monday_type: numbers
+      name: Order Qty
+      sql_column: QTY_ORDERED
+      sql_type: BIGINT
+    - description: Quantity cut
+      monday_type: numbers
+      name: Cut Qty
+      sql_column: Cut_Qty
+      sql_type: BIGINT
+    - description: Quantity sewn
+      monday_type: numbers
+      name: Sew Qty
+      sql_column: Sew_Qty
+      sql_type: BIGINT
+    - description: Quantity finished
+      monday_type: numbers
+      name: Finishing Qty
+      sql_column: Finishing_Qty
+      sql_type: BIGINT
+    - description: Quantity received but not shipped
+      monday_type: numbers
+      name: Received not Shipped Qty
+      sql_column: QTY_RECEIVED_NOT_SHIPPED
+      sql_type: BIGINT
+    - description: Quantity packed
+      monday_type: numbers
+      name: Packed Qty
+      sql_column: Packed_Qty
+      sql_type: BIGINT
+    - description: Quantity shipped
+      monday_type: numbers
+      name: Shipped Qty
+      sql_column: Shipped_Qty
+      sql_type: BIGINT
+    - description: Order line status
+      monday_type: status
+      name: ORDER LINE STATUS
+      sql_column: ORDER_LINE_STATUS
+      sql_type: NVARCHAR(100)
+    database: orders
+    description: Customer master schedule subitems tracking board
+    error_table: ERR_MON_CustMasterSchedule_Subitems
+    parent_board: customer_master_schedule
+    staging_table: STG_MON_CustMasterSchedule_Subitems
+    status: production
+    table_name: MON_CustMasterSchedule_Subitems
+monday_extraction_mappings:
+  board_relation:
+    converter_function: json_to_text_convert
+    description: Board relations - store as JSON text
+    fallback_field: value
+    monday_response_field: display_value
+    sql_type: NVARCHAR(MAX)
+  checkbox:
+    converter_function: safe_boolean_convert
+    description: Checkbox fields
+    monday_response_field: value
+    monday_response_format: '{"checked": "true|false"}'
+    sql_type: BIT
+  date:
+    converter_function: safe_date_convert
+    description: Date fields - comes as JSON object
+    fallback_field: text
+    monday_response_field: value
+    monday_response_format: '{"date": "YYYY-MM-DD"}'
+    sql_type: DATE
+  dependency:
+    converter_function: json_to_text_convert
+    description: Dependencies - store as JSON text
+    fallback_field: value
+    monday_response_field: display_value
+    sql_type: NVARCHAR(MAX)
+  dropdown:
+    converter_function: safe_text_convert
+    description: Dropdown selections
+    fallback_field: value
+    monday_response_field: text
+    sql_type: NVARCHAR(100)
+  formula:
+    converter_function: safe_text_convert
+    description: Formula columns
+    fallback_field: text
+    monday_response_field: display_value
+    sql_type: NVARCHAR(MAX)
+  item_id:
+    converter_function: safe_numeric_convert
+    description: Item ID references
+    fallback_field: value
+    monday_response_field: item_id
+    sql_type: BIGINT
+  long_text:
+    converter_function: safe_text_convert
+    description: Long text areas
+    fallback_field: value
+    monday_response_field: text
+    sql_type: NVARCHAR(MAX)
+  mirror:
+    converter_function: json_to_text_convert
+    description: Mirror columns - store as JSON text
+    fallback_field: value
+    monday_response_field: display_value
+    sql_type: NVARCHAR(MAX)
+  numbers:
+    converter_function: safe_numeric_convert
+    description: Numeric fields
+    fallback_field: text
+    monday_response_field: number
+    sql_type: BIGINT
+  people:
+    converter_function: safe_text_convert
+    description: People assignments
+    fallback_field: value
+    monday_response_field: text
+    sql_type: NVARCHAR(MAX)
+  status:
+    converter_function: safe_text_convert
+    description: Status labels
+    fallback_field: value
+    monday_response_field: text
+    sql_type: NVARCHAR(100)
+  text:
+    converter_function: safe_text_convert
+    description: Simple text fields
+    fallback_field: value
+    monday_response_field: text
+    sql_type: NVARCHAR(MAX)
+standardized_fields:
+  delivery:
+    incoterms:
+      aliases:
+      - DELIVERY TERMS
+      - Incoterms
+      description: Delivery terms (Incoterms)
+      name: Incoterms
+      sql_type: NVARCHAR(100)
+      type: string
+    shipping_method:
+      aliases:
+      - PLANNED DELIVERY METHOD
+      - Shipping_Method
+      description: Planned shipping/delivery method
+      name: Shipping_Method
+      sql_type: NVARCHAR(200)
+      type: string
+  manufacturing:
+    mo_number:
+      aliases:
+      - MO_NUMBER
+      - MO Number
+      - MO_NUMBER
+      - MO_Number
+      description: Manufacturing order number
+      name: MO_Number
+      sql_type: NVARCHAR(100)
+      type: string
+  orders:
+    destination:
+      aliases:
+      - DESTINATION
+      - Destination
+      description: Destination
+      name: DESTINATION
+      sql_type: NVARCHAR(200)
+      type: string
+    destination_warehouse:
+      aliases:
+      - DESTINATION WAREHOUSE
+      - Destination_Warehouse
+      description: Destination warehouse
+      name: DESTINATION_WAREHOUSE
+      sql_type: NVARCHAR(200)
+      type: string
+    order_type:
+      aliases:
+      - ORDER TYPE
+      - Order_Type
+      description: Order type
+      name: ORDER_TYPE
+      sql_type: NVARCHAR(100)
+      type: string
+  products:
+    color:
+      aliases:
+      - color
+      description: Product color
+      name: Color
+      sql_type: NVARCHAR(100)
+      type: string
+    customer:
+      aliases:
+      - Customer_name
+      - Belongs_Customer
+      - belongs_customer
+      description: Customer name (standardized, uppercase)
+      name: Customer
+      sql_type: NVARCHAR(200)
+      type: string
+    size:
+      aliases:
+      - size
+      description: Product size
+      name: Size
+      sql_type: NVARCHAR(50)
+      type: string
+    style:
+      aliases:
+      - style
+      - style_number
+      description: Product style code
+      name: Style
+      sql_type: NVARCHAR(100)
+      type: string
+  quantities:
+    qty_packed_not_shipped:
+      aliases:
+      - QTY PACKED NOT SHIPPED
+      - Qty_Packed_Not_Shipped
+      description: Quantity packed but not shipped
+      name: QTY_PACKED_NOT_SHIPPED
+      sql_type: BIGINT
+      type: integer
+    qty_shipped:
+      aliases:
+      - QTY SHIPPED
+      - Qty_Shipped
+      description: Quantity shipped
+      name: QTY_SHIPPED
+      sql_type: BIGINT
+      type: integer
+usage_instructions:
+  for_ai_agents:
+    code_generation:
+    - Always reference this mapping file for board IDs, table names, field types
+    - Use mapping_helper functions in generated code
+    - Include proper error handling for missing mappings
+    - Generate code that is mapping-aware and future-proof
+    - Include validation using mapping metadata
+    context_loading:
+    - 'Load full mapping context: `mapping_stats = mapping.get_mapping_stats()`'
+    - 'Search mappings: `results = mapping.search_mappings(query, category)`'
+    - 'Get comprehensive field info: `field_info = mapping.get_standardized_field(field_name)`'
+    - 'Access customer data: `customers = mapping.get_customer_mappings()`'
+    maintenance_tasks:
+    - Suggest mapping updates when encountering new fields or boards
+    - Identify inconsistencies in existing mappings
+    - Recommend standardization opportunities
+    - Flag deprecated or unused mappings
+  for_developers:
+    best_practices:
+    - Never hardcode board IDs, column IDs, or field names
+    - Always use mapping_helper functions for data access
+    - Update this file when adding new boards or data sources
+    - Use standardized field names for cross-system compatibility
+    - Follow established naming conventions
+    getting_started:
+    - 'Import mapping_helper module: `import mapping_helper as mapping`'
+    - 'Get board config: `board_config = mapping.get_board_config(''board_key'')`'
+    - 'Get field mappings: `columns = mapping.get_board_columns(''board_key'')`'
+    - 'Get type conversions: `sql_type = mapping.get_sql_type(''monday_type'')`'
+    - 'Generate DDL: `ddl = mapping.generate_create_table_ddl(table_name, columns)`'
+    migration_guidance:
+    - Use mapping_migration_helper for gradual transition from legacy files
+    - Test changes in dev environment before production deployment
+    - Update documentation when making mapping changes
+    - Coordinate with team when changing shared mappings
+view_mappings:
+  v_mon_customer_ms:
+    description: Monday customer master schedule view
+    field_mappings:
+      DESTINATION: DESTINATION
+      DESTINATION_WAREHOUSE: DESTINATION_WAREHOUSE
+      Incoterms: Incoterms
+      MO_Number: MO_Number
+      ORDER_TYPE: ORDER_TYPE
+      QTY_PACKED_NOT_SHIPPED: QTY_PACKED_NOT_SHIPPED
+      QTY_SHIPPED: QTY_SHIPPED
+      Shipping_Method: Shipping_Method
+  v_mon_customer_ms_subitems:
+    description: Customer master schedule subitems view
+    field_mappings:
+      Cut_Qty: Cut Qty
+      Finishing_Qty: Finishing Qty
+      Item_ID: Item ID
+      ORDER_LINE_STATUS: ORDER LINE STATUS
+      Packed_Qty: Packed Qty
+      QTY_ORDERED: Order Qty
+      QTY_RECEIVED_NOT_SHIPPED: Received not Shipped Qty
+      Sew_Qty: Sew Qty
+      Shipped_Qty: Shipped Qty
+      parent_item_id: parent_item_id
+      subitem_board_id: subitem_board_id
+      subitem_id: subitem_id
+  v_orders_shipped:
+    description: Orders shipped view
+    field_mappings:
+      CartonID: cartonid
+      Customer_PO: Customer_PO
+      QTY_SHIPPED: Qty
+      Season: Season
+      Shipped_Date: Shipped_Date
+  v_packed_products:
+    description: Packed products view
+    field_mappings:
+      CartonID: cartonid
+      Customer_PO: Customer_PO
+      QTY_PACKED_NOT_SHIPPED: Qty
+      Season: Season
+  v_received_products:
+    description: Received products view
+    field_mappings:
+      MO_Number: MO_Number
+  v_scanned_not_delivered:
+    description: Scanned not delivered view
+    field_mappings:
+      MO_Number: MO_Number

@@ -20,12 +20,32 @@ import math
 import yaml
 from datetime import datetime
 import urllib3
+from pathlib import Path
 
-# Add src to Python path for imports
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+# NEW STANDARD: Find repository root, then find utils (Option 2)
+def find_repo_root():
+    """Find the repository root by looking for utils folder"""
+    current_path = Path(__file__).resolve()
+    while current_path.parent != current_path:  # Not at filesystem root
+        utils_path = current_path / "utils"
+        if utils_path.exists() and (utils_path / "db_helper.py").exists():
+            return current_path
+        current_path = current_path.parent
+    raise RuntimeError("Could not find repository root with utils folder")
+
+# Add utils to path using repository root method
+repo_root = find_repo_root()
+sys.path.insert(0, str(repo_root / "utils"))
+import db_helper as db
+
+# Load configuration from centralized config
+config = db.load_config()
+
+# Import centralized mapping system
+import mapping_helper as mapping
 
 # Import the complete mapping transformation system
-from customer_master_schedule.order_mapping import (
+from order_mapping import (
     transform_orders_batch,
     create_staging_dataframe,
     get_monday_column_values_dict,
@@ -183,7 +203,8 @@ def map_to_monday_values(data_row, mapping_df, customer_lookup):
 # Configuration
 MONDAY_API_URL = "https://api.monday.com/v2"
 MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE5NzM0MzUxMiwiYWFpIjoxMSwidWlkIjozMTk3MDg4OSwiaWFkIjoiMjAyMi0xMS0yMVQwNTo1MTowNi4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTI3NDEyODgsInJnbiI6InVzZTEifQ.K2zXiugzNiYW5xo0tuXpAuZexBdv5xaAXPxubwxhNAM"
-BOARD_ID = "9200517329"
+# Use centralized mapping system for board configuration
+BOARD_ID = mapping.get_board_config('customer_master_schedule')['board_id']
 
 # Database connection
 def get_db_connection():
