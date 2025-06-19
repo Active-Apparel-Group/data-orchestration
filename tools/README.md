@@ -173,6 +173,7 @@ docker ps
 
 ## 📚 Additional Resources
 
+- **[VS Code Tasks Quick Guide](../docs/VSCODE_TASKS_GUIDE.md)** - Complete guide to all available VS Code tasks
 - [Kestra Documentation](https://kestra.io/docs)
 - [PowerShell Documentation](https://docs.microsoft.com/en-us/powershell/)
 - [Docker Documentation](https://docs.docker.com/)

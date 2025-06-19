@@ -117,6 +117,19 @@ make logs          # View Kestra logs
 make clean         # Remove venv, .pyc, outputs
 ```
 
+### 🎯 VS Code Tasks (Recommended)
+
+**Quick Access:** Press `Ctrl+Shift+P` → "Tasks: Run Task"
+
+For VS Code users, we provide comprehensive task automation:
+- **📊 Data Pipeline Tasks** - Run ETL workflows and data processing
+- **🧪 Testing & Validation** - Code quality and functionality testing  
+- **🚀 Operations & Deployment** - Production deployment and infrastructure
+- **🔧 Development Tools** - Project management and automation utilities
+- **📋 Audit & Reporting** - Data quality assurance and reporting
+
+**[📖 Complete VS Code Tasks Guide →](docs/VSCODE_TASKS_GUIDE.md)**
+
 ### Environment Variables
 
 All secrets/configs are loaded from `.env` (see `.env.example`).

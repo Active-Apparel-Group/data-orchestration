@@ -5,42 +5,21 @@ Orchestrates the complete customer batch processing pipeline
 
 import pandas as pd
 import json
-import sys
-import os
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
-from pathlib import Path
+import logging
+import sys
+import os
 
-# NEW STANDARD: Find repository root, then find utils (Option 2)
-def find_repo_root():
-    """Find the repository root by looking for utils folder"""
-    current_path = Path(__file__).resolve()
-    while current_path.parent != current_path:  # Not at filesystem root
-        utils_path = current_path / "utils"
-        if utils_path.exists() and (utils_path / "db_helper.py").exists():
-            return current_path
-        current_path = current_path.parent
-    raise RuntimeError("Could not find repository root with utils folder")
+# Add src to path for imports
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-# Add utils to path using repository root method
-repo_root = find_repo_root()
-sys.path.insert(0, str(repo_root / "utils"))
-
-# Import centralized modules
-import db_helper as db
-import logger_helper
-
-# Initialize logger with script-specific name
-logger = logger_helper.get_logger("batch_processor")
-
-# Import local modules
 from .staging_operations import StagingOperations
 from .monday_api_client import MondayApiClient
 from .error_handler import ErrorHandler
 from .staging_config import get_config
 
-# Import existing transformation functions from scripts directory
-sys.path.insert(0, str(repo_root / "scripts"))
+# Import existing transformation functions
 from customer_master_schedule.order_mapping import (
     transform_orders_batch,
     create_staging_dataframe,
@@ -49,6 +28,8 @@ from customer_master_schedule.order_mapping import (
     load_mapping_config,
     load_customer_mapping
 )
+
+logger = logging.getLogger(__name__)
 
 class BatchProcessor:
     """Main orchestrator for customer batch processing"""

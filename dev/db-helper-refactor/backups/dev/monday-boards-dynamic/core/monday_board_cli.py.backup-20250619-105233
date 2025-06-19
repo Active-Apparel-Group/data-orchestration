@@ -26,24 +26,7 @@ import sys
 import os
 from datetime import datetime
 from pathlib import Path
-
-# Standard repository root finding pattern
-def find_repo_root() -> Path:
-    """Find repository root by looking for marker files"""
-    current = Path(__file__).resolve()
-    for parent in [current] + list(current.parents):
-        if any((parent / marker).exists() for marker in ['.git', 'pyproject.toml', 'requirements.txt']):
-            return parent
-    return current.parent
-
-# Add utils to path for consistent imports
-repo_root = find_repo_root()
-sys.path.insert(0, str(repo_root / "utils"))
-
-import logger_helper
-
-# Initialize logger
-logger = logger_helper.get_logger("monday_board_cli")
+import logging
 
 # Add core modules to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -53,9 +36,13 @@ try:
     from script_template_generator import ScriptTemplateGenerator, generate_script_from_schema
     from board_registry import BoardRegistry, BoardConfig
 except ImportError as e:
-    logger.error(f"❌ Failed to import core modules: {e}")
-    logger.error("Please ensure all core modules are available in the same directory.")
+    print(f"❌ Failed to import core modules: {e}")
+    print("Please ensure all core modules are available in the same directory.")
     sys.exit(1)
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 
 class MondayBoardCLI:

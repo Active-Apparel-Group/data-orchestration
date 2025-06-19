@@ -7,35 +7,13 @@ import pandas as pd
 import pyodbc
 import json
 import uuid
-import sys
-import os
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
-from pathlib import Path
-
-# NEW STANDARD: Find repository root, then find utils (Option 2)
-def find_repo_root():
-    """Find the repository root by looking for utils folder"""
-    current_path = Path(__file__).resolve()
-    while current_path.parent != current_path:  # Not at filesystem root
-        utils_path = current_path / "utils"
-        if utils_path.exists() and (utils_path / "db_helper.py").exists():
-            return current_path
-        current_path = current_path.parent
-    raise RuntimeError("Could not find repository root with utils folder")
-
-# Add utils to path using repository root method
-repo_root = find_repo_root()
-sys.path.insert(0, str(repo_root / "utils"))
-
-# Import centralized modules
-import db_helper as db
-import logger_helper
-
-# Initialize logger with script-specific name
-logger = logger_helper.get_logger("staging_operations")
+import logging
 
 from .staging_config import get_config, DATABASE_CONFIG
+
+logger = logging.getLogger(__name__)
 
 class StagingOperations:
     """Handles all staging table operations"""

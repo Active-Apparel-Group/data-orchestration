@@ -18,6 +18,7 @@ Example:
 import os
 import sys
 import json
+import logging
 import requests
 import argparse
 import yaml
@@ -27,33 +28,6 @@ import warnings
 import urllib3
 from datetime import datetime
 from typing import Dict, List, Optional, Any
-from pathlib import Path
-
-# NEW STANDARD: Find repository root, then find utils (Option 2)
-def find_repo_root():
-    """Find the repository root by looking for utils folder"""
-    current_path = Path(__file__).resolve()
-    while current_path.parent != current_path:  # Not at filesystem root
-        utils_path = current_path / "utils"
-        if utils_path.exists() and (utils_path / "db_helper.py").exists():
-            return current_path
-        current_path = current_path.parent
-    raise RuntimeError("Could not find repository root with utils folder")
-
-# Add utils to path using repository root method
-repo_root = find_repo_root()
-sys.path.insert(0, str(repo_root / "utils"))
-
-# Import centralized modules
-import db_helper as db
-import logger_helper
-import mapping_helper as mapping
-
-# Initialize logger with script-specific name
-logger = logger_helper.get_logger("sync_board_groups")
-
-# Load configuration from centralized config
-config = db.load_config()
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 warnings.filterwarnings("ignore", category=UserWarning, module="pandas")
@@ -113,31 +87,27 @@ class MondayBoardGroupsSync:
     """Handles syncing board groups from Monday.com to ORDERS database"""
     
     def __init__(self, board_id: str):
-        # Use the centralized logger instead of creating a new one
-        self.logger = logger
+        self.logger = self._setup_logging()
         self.board_id = board_id
         
         if not AUTH_KEY:
             raise ValueError("Monday.com API key is not configured")
     
-    def _setup_logging(self):
-        """Setup logging configuration - DEPRECATED: Use logger_helper instead"""
-        # This method is kept for backward compatibility but should not be used
-        # New code should use: logger = logger_helper.get_logger("script_name")
-        import logging
-        logger_old = logging.getLogger(__name__)
+    def _setup_logging(self) -> logging.Logger:
+        """Setup logging configuration"""
+        logger = logging.getLogger(__name__)
         if LOGGING_ENABLED:
-            logger_old.setLevel(logging.INFO)
+            logger.setLevel(logging.INFO)
             
-            if not logger_old.handlers:
+            if not logger.handlers:
                 handler = logging.StreamHandler()
                 formatter = logging.Formatter(
                     '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
                 )
                 handler.setFormatter(formatter)
-                logger_old.addHandler(handler)
+                logger.addHandler(handler)
         
-        return logger_old
+        return logger
     
     def _get_db_connection(self):
         """Create database connection using environment variables"""
@@ -431,6 +401,7 @@ Examples:
 def main():
     """Main entry point"""
     args = parse_arguments()
+    
     if not AUTH_KEY or AUTH_KEY == 'YOUR_API_KEY_HERE':
         print("[ERROR] Monday.com API key is missing or not set. Please configure AUTH_KEY.")
         sys.exit(1)
@@ -443,7 +414,8 @@ def main():
         
     except Exception as e:
         print(f"[ERROR] Script execution failed: {e}")
-        logger.error(f"Script execution failed: {e}")
+        if LOGGING_ENABLED:
+            logging.error(f"Script execution failed: {e}")
         sys.exit(1)
 
 

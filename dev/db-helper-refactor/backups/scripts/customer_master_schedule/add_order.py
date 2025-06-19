@@ -19,33 +19,17 @@ Dependencies:
 
 import os
 import sys
+import logging
 import warnings
 from datetime import datetime
 from typing import Dict, List, Optional
 from tqdm import tqdm
-from pathlib import Path
 
-# NEW STANDARD: Find repository root, then find utils (Option 2)
-def find_repo_root():
-    """Find the repository root by looking for utils folder"""
-    current_path = Path(__file__).resolve()
-    while current_path.parent != current_path:  # Not at filesystem root
-        utils_path = current_path / "utils"
-        if utils_path.exists() and (utils_path / "db_helper.py").exists():
-            return current_path
-        current_path = current_path.parent
-    raise RuntimeError("Could not find repository root with utils folder")
-
-# Add utils to path using repository root method
-repo_root = find_repo_root()
-sys.path.insert(0, str(repo_root / "utils"))
-
-# Import centralized modules
-import db_helper as db
-import logger_helper
-
-# Initialize logger with script-specific name
-logger = logger_helper.get_logger("add_order")
+# Add project modules to path
+project_root = os.path.join(os.path.dirname(__file__), '..', '..')
+src_path = os.path.join(project_root, 'src')
+sys.path.insert(0, src_path)
+sys.path.insert(0, project_root)
 
 # Import our new modular components
 from .order_queries import (
@@ -147,7 +131,7 @@ def determine_group_name(order_data: Dict) -> str:
     # Group name format: CUSTOMER NAME + space + CUSTOMER SEASON
     return f"{customer_name} {customer_season}"
 
-def process_new_orders(logger_instance) -> Dict[str, int]:
+def process_new_orders(logger: logging.Logger) -> Dict[str, int]:
     """
     Step 1: Process new orders from ORDERS_UNIFIED to staging table
     
@@ -216,7 +200,7 @@ def process_new_orders(logger_instance) -> Dict[str, int]:
         logger.error(f"❌ Failed to insert orders to staging table: {e}")
         raise
 
-def sync_orders_to_monday(logger_instance) -> Dict[str, int]:
+def sync_orders_to_monday(logger: logging.Logger) -> Dict[str, int]:
     """
     Step 4: Sync staged orders to Monday.com and update item IDs
     
@@ -309,7 +293,7 @@ def main():
     """
     Main execution function implementing the complete modular workflow
     """
-    # Use the centralized logger instead of creating a new one
+    logger = setup_application_logging()
     
     print("=" * 80)
     print("🚀 Customer Master Schedule - Add Orders Workflow")

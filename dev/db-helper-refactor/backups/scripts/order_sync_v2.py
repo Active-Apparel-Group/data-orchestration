@@ -15,46 +15,20 @@ This replaces the original order_sync.py with a robust staging-based approach.
 
 import os
 import sys
+import logging
 from datetime import datetime
 from typing import List, Dict, Optional
 import base64
-from pathlib import Path
 
-# NEW STANDARD: Find repository root, then find utils (Option 2)
-def find_repo_root():
-    """Find the repository root by looking for utils folder"""
-    current_path = Path(__file__).resolve()
-    while current_path.parent != current_path:  # Not at filesystem root
-        utils_path = current_path / "utils"
-        if utils_path.exists() and (utils_path / "db_helper.py").exists():
-            return current_path
-        current_path = current_path.parent
-    raise RuntimeError("Could not find repository root with utils folder")
+# Add src to Python path for imports
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-# Add utils to path using repository root method
-repo_root = find_repo_root()
-sys.path.insert(0, str(repo_root / "utils"))
-
-# Import centralized modules
-import db_helper as db
-import logger_helper
-
-# Import local modules
 from order_staging.batch_processor import BatchProcessor
 from order_staging.staging_config import get_config
 
-# Initialize logger with script-specific name
-logger = logger_helper.get_logger("order_sync_v2")
-
-# Load configuration from centralized config
-config = db.load_config()
-
-# Configure logging (deprecated - now using logger_helper)
+# Configure logging
 def setup_logging():
-    """Set up logging configuration - DEPRECATED: Use logger_helper instead"""
-    # This function is kept for backward compatibility but should not be used
-    # New code should use: logger = logger_helper.get_logger("script_name")
-    import logging
+    """Set up logging configuration"""
     config = get_config()
     log_config = config['logging']
     
@@ -123,7 +97,7 @@ def get_db_connection_string() -> str:
 
 def process_single_customer(processor: BatchProcessor, customer_name: str) -> Dict:
     """Process a single customer batch"""
-    # Use the centralized logger instead of creating a new one
+    logger = logging.getLogger(__name__)
     
     try:
         logger.info(f"Processing customer: {customer_name}")
@@ -152,7 +126,7 @@ def process_single_customer(processor: BatchProcessor, customer_name: str) -> Di
 
 def process_all_customers(processor: BatchProcessor) -> List[Dict]:
     """Process all customers with new orders"""
-    # Use the centralized logger instead of creating a new one
+    logger = logging.getLogger(__name__)
     
     # Get customers with new orders
     customers = processor.get_customers_with_new_orders()
@@ -172,7 +146,7 @@ def process_all_customers(processor: BatchProcessor) -> List[Dict]:
 
 def process_specific_customers(processor: BatchProcessor, customer_list: List[str]) -> List[Dict]:
     """Process specific customers"""
-    # Use the centralized logger instead of creating a new one
+    logger = logging.getLogger(__name__)
     
     logger.info(f"Processing specific customers: {customer_list}")
     
@@ -227,14 +201,13 @@ def print_final_summary(results: List[Dict]):
 
 def main():
     """Main entry point"""
-    # Use the centralized logger (already initialized at module level)
+    # Set up logging
+    logger = setup_logging()
     
     print("=" * 60)
     print("Order Sync V2 - Monday.com Integration")
     print("Enterprise Staging Workflow")
     print("=" * 60)
-    
-    logger.info("Starting Order Sync V2 workflow")
     
     try:
         # Get database connection

@@ -6,38 +6,16 @@ import requests
 import json
 import time
 import math
-import sys
-import os
 from typing import Dict, Any, Optional, Tuple
+import logging
 import urllib3
-from pathlib import Path
-
-# NEW STANDARD: Find repository root, then find utils (Option 2)
-def find_repo_root():
-    """Find the repository root by looking for utils folder"""
-    current_path = Path(__file__).resolve()
-    while current_path.parent != current_path:  # Not at filesystem root
-        utils_path = current_path / "utils"
-        if utils_path.exists() and (utils_path / "db_helper.py").exists():
-            return current_path
-        current_path = current_path.parent
-    raise RuntimeError("Could not find repository root with utils folder")
-
-# Add utils to path using repository root method
-repo_root = find_repo_root()
-sys.path.insert(0, str(repo_root / "utils"))
-
-# Import centralized modules
-import db_helper as db
-import logger_helper
-
-# Initialize logger with script-specific name
-logger = logger_helper.get_logger("monday_api_client")
 
 from .staging_config import get_config, get_monday_headers, MONDAY_CONFIG
 
 # Suppress SSL warnings for corporate networks
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+logger = logging.getLogger(__name__)
 
 class MondayApiClient:
     """Monday.com API client with comprehensive error handling and retry logic"""
