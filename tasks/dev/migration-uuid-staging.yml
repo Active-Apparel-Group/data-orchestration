@@ -1,0 +1,33 @@
+# DB Migration: Add UUID Columns to Staging Tables
+
+name: "migration-uuid-staging"
+description: "Add UUID tracking columns to staging tables (source_uuid, parent_source_uuid, stg_size_label)"
+category: "migration"
+type: "dev"
+
+task:
+  label: "DB: Run Migration - Add UUID Columns to Staging"
+  type: "shell"
+  command: "python"
+  args:
+    - "tools/run-migration.py"
+    - "--file"
+    - "sql/migrations/001_add_uuid_columns_staging.sql"
+    - "--db"
+    - "orders"
+  group: "build"
+  options:
+    cwd: "${workspaceFolder}"
+  detail: "Add UUID tracking columns (source_uuid, parent_source_uuid, stg_size_label) to staging tables"
+  presentation:
+    echo: true
+    reveal: "always"
+    focus: false
+    panel: "shared"
+  problemMatcher: []
+  tags:
+    - "database"
+    - "migration"
+    - "schema"
+    - "uuid"
+    - "staging"

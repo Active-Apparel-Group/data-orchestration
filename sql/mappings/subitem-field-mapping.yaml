@@ -1,0 +1,260 @@
+# Subitem Field Mapping Configuration
+# Source: scripts/customer_master_schedule_subitems/mon_add_customer_ms_subitems.py
+# Purpose: Size-based subitem creation for garment orders (276+ size columns → individual subitems)
+
+metadata:
+  version: "1.0"
+  created: "2025-06-24"
+  description: "Dedicated subitem field mappings extracted from working implementation"
+  reference_implementation: "scripts/customer_master_schedule_subitems/mon_add_customer_ms_subitems.py"
+  monday_board_id: "9200517329"
+  workflow: "Size melting/unpivoting → Monday.com subitem creation"
+
+# 🔢 MONDAY.COM FIELD MAPPINGS (From Working API Calls)
+monday_fields:
+  size_dropdown:
+    column_id: "dropdown_mkrak7qp"
+    type: "dropdown"
+    source: "Size (from melted size columns)"
+    description: "Size designation (XS, S, M, L, XL, 2XL, 32DD, etc.)"
+    api_options:
+      create_labels_if_missing: true
+    json_format: |
+      "dropdown_mkrak7qp": {"labels": [str(size_name)]}
+      
+  order_quantity:
+    column_id: "numeric_mkra7j8e"
+    type: "numeric"
+    source: "Order_Qty (from melted size column values)"
+    description: "Quantity ordered for this specific size"
+    validation: "must be positive (> 0)"
+    json_format: |
+      "numeric_mkra7j8e": str(order_qty)
+      
+  received_quantity:
+    column_id: "numeric_mkraepx7"
+    type: "numeric"
+    source: "Received_Qty (future use)"
+    description: "Quantity received for this size"
+    default_value: 0
+    json_format: |
+      "numeric_mkraepx7": 0
+      
+  shipped_quantity:
+    column_id: "numeric_mkrapgwv"
+    type: "numeric"
+    source: "Shipped_Qty (future use)"
+    description: "Quantity shipped for this size"
+    default_value: 0
+    json_format: |
+      "numeric_mkrapgwv": 0
+
+# 📏 SIZE COLUMN DETECTION (From Working Script Lines 87-93)
+size_detection:
+  method: "column_position_based"
+  description: "Detect size columns between specific markers in ORDERS_UNIFIED table"
+  
+  markers:
+    start_column: "UNIT OF MEASURE"
+    end_column: "TOTAL QTY"
+    
+  algorithm: |
+    def detect_size_columns(df):
+        """Detect size columns between UNIT OF MEASURE and TOTAL QTY"""
+        try:
+            start = df.columns.get_loc('UNIT OF MEASURE')
+            end = df.columns.get_loc('TOTAL QTY')
+            return df.columns[start+1:end]
+        except KeyError:
+            logger.warning("Could not detect size columns - missing markers")
+            return []
+            
+  expected_size_examples:
+    - "XS"
+    - "S" 
+    - "M"
+    - "L"
+    - "XL"
+    - "2XL"
+    - "32DD"
+    - "EU 38"
+    - "UK 10"
+    
+  total_size_columns: "276+"
+
+# 🔄 SIZE MELTING PROCESS (From Working Script Lines 95-104)
+size_melting:
+  method: "pandas_melt"
+  description: "Transform wide size columns into tall subitem records"
+  
+  melt_configuration:
+    id_vars:
+      - "Item ID"           # Links to parent item
+      - "STYLE"            # Product style
+      - "COLOR"            # Product color
+      - "AAG ORDER NUMBER" # Order reference
+      - "CUSTOMER"         # Customer name
+      
+    value_vars: "detected_size_columns"  # Dynamic based on detection
+    var_name: "Size"                     # Column name for size
+    value_name: "Order_Qty"              # Column name for quantity
+    
+  filtering:
+    condition: "Order_Qty > 0"
+    description: "Only create subitems for sizes with positive quantities"
+    
+  implementation: |
+    # From working script
+    melted_df = df.melt(
+        id_vars=['Item ID', 'STYLE', 'COLOR', 'AAG ORDER NUMBER', 'CUSTOMER'],
+        value_vars=size_columns,
+        var_name='Size',
+        value_name='Order_Qty'
+    ).query('Order_Qty > 0')
+
+# 🚀 MONDAY.COM API INTEGRATION (From Working Script Lines 140-160)
+api_integration:
+  mutation: "create_subitem"
+  endpoint: "https://api.monday.com/v2"
+  
+  graphql_mutation: |
+    mutation AddSubitemsMasterSchedule {
+      create_subitem(
+        parent_item_id: {parent_item_id},
+        item_name: "{item_name}",
+        column_values: "{column_values}",
+        create_labels_if_missing: true
+      ) {
+        id
+        name
+        board {
+          id
+        }
+      }
+    }
+    
+  item_naming:
+    format: "Size {size_name}"
+    examples:
+      - "Size XS"
+      - "Size M"
+      - "Size 2XL"
+      - "Size 32DD"
+      
+  column_values_template: |
+    {
+      "dropdown_mkrak7qp": {"labels": ["{size_name}"]},
+      "numeric_mkra7j8e": "{order_qty}",
+      "numeric_mkraepx7": 0,
+      "numeric_mkrapgwv": 0
+    }
+
+# 💾 DATABASE TRACKING (From sql/migrations/002_add_subitem_board_id.sql)
+database_schema:
+  staging_table: "STG_MON_CustMasterSchedule_Subitems"
+  production_table: "MON_CustMasterSchedule_Subitems"
+  error_table: "ERR_MON_CustMasterSchedule_Subitems"
+  
+  key_fields:
+    stg_monday_subitem_id:
+      type: "BIGINT"
+      description: "Monday.com subitem ID after creation"
+      source: "API response"
+      
+    stg_monday_subitem_board_id:
+      type: "BIGINT"
+      description: "Monday.com board ID (from migration 002)"
+      source: "API response board.id"
+      
+    stg_batch_id:
+      type: "UNIQUEIDENTIFIER"
+      description: "Processing batch reference"
+      source: "Batch processor"
+      
+    stg_parent_monday_item_id:
+      type: "BIGINT"
+      description: "Parent item Monday.com ID"
+      source: "Master item creation result"
+      
+    size_name:
+      type: "NVARCHAR(50)"
+      description: "Size designation (XS, M, 2XL, etc.)"
+      source: "Melted size column name"
+      
+    order_qty:
+      type: "INT"
+      description: "Quantity for this size"
+      source: "Melted size column value"
+
+# ⚡ PERFORMANCE & ERROR HANDLING
+performance_settings:
+  rate_limiting:
+    delay_between_calls: "0.1 seconds"
+    reason: "Monday.com API rate limits"
+    
+  batch_processing:
+    method: "Per parent item"
+    description: "Create all subitems for one master item before proceeding"
+    
+  retry_logic:
+    max_attempts: 3
+    backoff_strategy: "exponential"
+    retry_conditions:
+      - "Network timeout"
+      - "API rate limit exceeded"
+      - "Temporary server error (5xx)"
+      
+error_handling:
+  error_collection:
+    group_by: "error_type"
+    tracking: "Record index, timestamp, error message"
+    
+  recovery_mechanism:
+    approach: "Resume from last successful record"
+    state_tracking: "Batch processing table"
+    
+  error_reporting:
+    summary_format: "Error type → count"
+    detailed_logging: "Full error details for debugging"
+
+# 🔗 INTEGRATION DEPENDENCIES
+integration_requirements:
+  prerequisites:
+    - "Master item must exist (parent_item_id required)"
+    - "Size columns detected and melted"
+    - "Monday.com API credentials configured"
+    - "Database tables with tracking columns"
+    
+  workflow_sequence:
+    1: "Detect size columns in ORDERS_UNIFIED"
+    2: "Melt size columns to subitem records"
+    3: "Filter for positive quantities only"
+    4: "Create parent master item in Monday.com"
+    5: "Create subitems under parent item"
+    6: "Track all IDs in database tables"
+    
+  validation_points:
+    - "Size column detection successful"
+    - "Melt process produces expected records"
+    - "Parent item creation successful"
+    - "Subitem creation successful"
+    - "Database tracking complete"
+
+# 📋 IMPLEMENTATION CHECKLIST
+implementation_status:
+  ✅ completed:
+    - "Working reference implementation exists"
+    - "Monday.com column IDs identified"
+    - "Size detection algorithm proven"
+    - "Melt process validated"
+    - "API integration working"
+    
+  🚧 in_progress:
+    - "Integration with main workflow"
+    - "Error handling enhancement"
+    - "Performance optimization"
+    
+  📋 planned:
+    - "Comprehensive testing"
+    - "Production deployment"
+    - "Monitoring setup"

@@ -94,12 +94,17 @@ class LoggerWrapper:
             msg = msg % args
         self._logger.critical(msg)
 
+
+
 class KestralLoggerWrapper(LoggerWrapper):
     """Wrapper for Kestra logger"""
     pass
 
 class StandardLoggerWrapper(LoggerWrapper):
     """Wrapper for standard Python logger"""
+    def exception(self, msg="", *args, **kwargs):
+        """Pass-through so wrapper behaves like logging.Logger"""
+        self._logger.exception(msg, *args, **kwargs)
     pass
 
 # Convenience functions for direct import

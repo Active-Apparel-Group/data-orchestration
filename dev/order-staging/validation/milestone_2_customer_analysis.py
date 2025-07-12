@@ -6,31 +6,37 @@ This script analyzes customers with new orders ready for staging.
 Provides detailed review before proceeding with actual staging.
 
 Usage:
-    python scripts/milestone_2_customer_analysis.py
+    python dev/order-staging/validation/milestone_2_customer_analysis.py
 """
 
+import sys
+from pathlib import Path
 import pandas as pd
-import pyodbc
-import os
-import base64
 from datetime import datetime
 
-def get_db_connection_string():
-    """Get database connection string"""
-    password = base64.b64decode(os.getenv('SECRET_ORDERS_PWD')).decode()
-    host = os.getenv('DB_ORDERS_HOST')
-    port = int(os.getenv('DB_ORDERS_PORT', 1433))
-    database = os.getenv('DB_ORDERS_DATABASE')
-    username = os.getenv('DB_ORDERS_USERNAME')
-    
-    return f"DRIVER={{SQL Server}};SERVER={host},{port};DATABASE={database};UID={username};PWD={password};"
+# Standard import pattern
+def find_repo_root():
+    current = Path(__file__).parent
+    while current != current.parent:
+        if (current / "utils").exists():
+            return current
+        current = current.parent
+    raise FileNotFoundError("Could not find repository root")
+
+repo_root = find_repo_root()
+sys.path.insert(0, str(repo_root / "utils"))
+
+# Import from utils/ - PRODUCTION PATTERN
+import db_helper as db
+import logger_helper
 
 def analyze_customers_with_new_orders():
     """Analyze customers that have new orders ready for staging"""
+    logger = logger_helper.get_logger(__name__)
+    logger.info("Starting customer analysis for staging workflow")
+    
     print("📊 MILESTONE 2: Customer Analysis for Staging")
     print("=" * 60)
-    
-    conn_str = get_db_connection_string()
     
     # Query to find customers with new orders (not yet in Monday.com)
     # Using correct column names from ORDERS_UNIFIED table structure
@@ -69,8 +75,16 @@ def analyze_customers_with_new_orders():
     ORDER BY total_orders DESC;
     """
     
-    with pyodbc.connect(conn_str) as conn:
-        df = pd.read_sql(analysis_query, conn)
+    try:
+        with db.get_connection('dms') as conn:
+            df = pd.read_sql(analysis_query, conn)
+        
+        logger.info(f"Retrieved {len(df)} customers with new orders")
+        
+    except Exception as e:
+        logger.error(f"Database query failed: {e}")
+        print(f"❌ Database error: {e}")
+        return pd.DataFrame()
     
     if df.empty:
         print("ℹ️  No customers with new orders found.")
@@ -125,6 +139,8 @@ def get_customer_detail(customer_name=None, po_number=None, customer_season=None
         aag_season (str, optional): Filter by AAG season
     """
     
+    logger = logger_helper.get_logger(__name__)
+    
     # Build filter description
     filters = []
     if customer_name:
@@ -140,8 +156,7 @@ def get_customer_detail(customer_name=None, po_number=None, customer_season=None
     print(f"🔍 Detailed Analysis - Filters: {filter_desc}")
     print("=" * 80)
     
-    conn_str = get_db_connection_string()
-      # Query to get detailed orders with optional filters
+    # Query to get detailed orders with optional filters
     # Using correct column names from ORDERS_UNIFIED table structure
     # Fixed: Added table aliases to resolve ambiguous column names
     base_query = """
@@ -167,33 +182,42 @@ def get_customer_detail(customer_name=None, po_number=None, customer_season=None
     
     # Build WHERE conditions dynamically
     where_conditions = []
-    params = []
+    params = {}
     
     if customer_name:
-        where_conditions.append("AND ou.[CUSTOMER NAME] = ?")
-        params.append(customer_name)
+        where_conditions.append("AND ou.[CUSTOMER NAME] = %(customer_name)s")
+        params['customer_name'] = customer_name
     
     if po_number:
-        where_conditions.append("AND ou.[PO NUMBER] = ?")
-        params.append(po_number)
+        where_conditions.append("AND ou.[PO NUMBER] = %(po_number)s")
+        params['po_number'] = po_number
         
     if customer_season:
-        where_conditions.append("AND ou.[CUSTOMER SEASON] = ?")
-        params.append(customer_season)
+        where_conditions.append("AND ou.[CUSTOMER SEASON] = %(customer_season)s")
+        params['customer_season'] = customer_season
         
     if aag_season:
-        where_conditions.append("AND ou.[AAG SEASON] = ?")
-        params.append(aag_season)
+        where_conditions.append("AND ou.[AAG SEASON] = %(aag_season)s")
+        params['aag_season'] = aag_season
     
     # If no filters provided, limit results to prevent overwhelming output
     if not any([customer_name, po_number, customer_season, aag_season]):
         where_conditions.append("AND ou.[CUSTOMER NAME] IS NOT NULL")
-      # Combine query with table aliases in ORDER BY clause
+    
+    # Combine query with table aliases in ORDER BY clause
     where_clause = " ".join(where_conditions)
     detail_query = f"{base_query} {where_clause} ORDER BY ou.[ORDER DATE PO RECEIVED] DESC, ou.[AAG ORDER NUMBER];"
     
-    with pyodbc.connect(conn_str) as conn:
-        df = pd.read_sql(detail_query, conn, params=params)
+    try:
+        with db.get_connection('dms') as conn:
+            df = pd.read_sql(detail_query, conn, params=params)
+        
+        logger.info(f"Retrieved {len(df)} detailed orders")
+        
+    except Exception as e:
+        logger.error(f"Database query failed: {e}")
+        print(f"❌ Database error: {e}")
+        return pd.DataFrame()
     
     if df.empty:
         print(f"❌ No new orders found with the specified filters")

@@ -1,0 +1,58 @@
+id: load_order_list
+namespace: aag.prod
+description: "ORDER_LIST Complete Pipeline - SharePoint to SQL Server (4-stage ETL)"
+
+triggers:
+  - id: upstream_dependancy
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: flow_trigger
+      flows:
+        - namespace: aag.prod
+          flowId: load_tables
+          states: [SUCCESS]
+
+tasks:
+  - id: setup_and_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      🚀 Starting Workflow: {{ flow.id }}
+      📅 Timestamp: {{ now() }}
+      🏗️  Namespace: {{ flow.namespace }}
+      📁 Script Location: pipelines/scripts/load_order_list/
+      🗄️  Target Database: ORDER_LIST → SQL Server
+      
+  - id: execute_main_workflow
+    type: io.kestra.plugin.core.flow.WorkingDirectory
+    description: "Execute ORDER_LIST pipeline with environment configuration and database-only authentication"
+    namespaceFiles:
+      enabled: true
+      include:
+        - pipelines/**
+        - configs/**
+        - utils/**
+    tasks:
+      - id: load_order_list
+        type: io.kestra.plugin.scripts.python.Commands
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+          pullPolicy: NEVER
+        containerImage: my-custom-kestra:latest
+        description: "Execute ORDER_LIST complete pipeline: SharePoint → Blob → Extract → Transform → Load"
+        namespaceFiles:
+          enabled: true
+
+        commands:
+          - echo "🚀 === ORDER_LIST Pipeline Starting ==="
+          - echo "📊 Executing complete SharePoint → SQL workflow..."
+          - python pipelines/scripts/load_order_list/order_list_pipeline.py
+          - echo "✅ === ORDER_LIST Pipeline Completed ==="
+
+          
+  - id: completion_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      ✅ ORDER_LIST Pipeline completed successfully!
+      📊 Workflow: {{flow.id}}
+      📈 Results: SharePoint files processed → SQL Server ORDER_LIST table updated
+      ⏰ Completed at: {{ now() }}

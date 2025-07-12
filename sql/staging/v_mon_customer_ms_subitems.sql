@@ -20,4 +20,4 @@ SELECT
 FROM dbo.MON_CustMasterSchedule_Subitems si
 JOIN dbo.MON_CustMasterSchedule ms
     ON ms.[Item ID] = si.[parent_item_id]
-where CUSTOMER = 'TRACKSMITH' and ms.[AAG ORDER NUMBER] <= 'TRA-00241'
+where CUSTOMER = 'UNE PIECE' and ms.[PO NUMBER] = 'F1SS2501'

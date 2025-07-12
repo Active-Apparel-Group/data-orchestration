@@ -1,0 +1,113 @@
+# OPUS_mon_etl.yaml
+# Monday.com ETL System Improvement Tasks
+
+project:
+  name: Monday ETL System Optimization
+  version: 1.0.0
+  owner: Data Engineering Team
+  start_date: 2025-06-28
+  estimated_duration: 2 weeks # Reduced due to column fix completion
+
+phases:
+  - phase_1_critical_fixes:
+      name: "Critical Fixes"
+      priority: HIGH
+      duration: 3 days # Reduced timeline
+      tasks:
+        - fix_column_filtering:
+            name: "Fix Column Loss Issue"
+            description: "Debug and fix the column filtering logic that causes only 4 columns to appear"
+            assignee: COMPLETED
+            estimated_hours: 4
+            priority: CRITICAL
+            status: COMPLETE # ✅ DONE
+            completion_date: 2025-06-28
+            acceptance_criteria:
+              - ✅ All non-excluded columns appear in database
+              - ✅ Column count logging implemented
+              - ✅ Unit tests pass
+            subtasks:
+              - ✅ Add logging at each filtering stage
+              - ✅ Remove duplicate exclusion logic
+              - ✅ Test with multiple board configurations
+              - ✅ Document column flow
+
+        - optimize_performance:
+            name: "Fix Performance Issues"
+            description: "Resolve hanging on 3700 record inserts"
+            assignee: IN_PROGRESS
+            estimated_hours: 3
+            priority: CRITICAL
+            status: ACTIVE # 🔥 CURRENT FOCUS
+            acceptance_criteria:
+              - 10K records process in < 30 seconds
+              - No timeouts on large boards
+              - Memory usage < 1GB
+            subtasks:
+              - 🟡 Increase batch size to 1000
+              - 🟡 Implement connection pooling
+              - 🟡 Add performance logging
+              - 🟡 Test with various board sizes
+
+  - phase_2_features:
+      name: "Feature Implementation"
+      priority: HIGH
+      duration: 1 week
+      tasks:
+        - implement_toml_templates:
+            name: "TOML Template Auto-Creation"
+            description: "Implement automatic TOML template generation for new boards"
+            assignee: QUEUED
+            estimated_hours: 4 # Reduced due to good foundation
+            priority: HIGH
+            status: PLANNED
+            acceptance_criteria:
+              - Template created on first run
+              - User guidance displayed
+              - Sensible defaults generated
+              - Board metadata included
+            subtasks:
+              - Create discover_board_info function
+              - Implement template generator
+              - Add first-run detection
+              - Create user messaging
+              - Test end-to-end workflow
+
+        - enhance_monitoring:
+            name: "Add Performance Monitoring"
+            description: "Implement comprehensive logging and monitoring"
+            assignee: QUEUED
+            estimated_hours: 2
+            priority: MEDIUM
+            status: PLANNED
+            acceptance_criteria:
+              - ETL duration tracked
+              - Row counts logged
+              - Performance metrics available
+            subtasks:
+              - Add timing decorators
+              - Implement metric collection
+              - Create performance dashboard
+              - Document metrics
+
+progress_summary:
+  completed_tasks: 1
+  active_tasks: 1
+  planned_tasks: 3
+  completion_percentage: 20%
+
+current_blockers:
+  - Performance hanging on large inserts (3700+ records)
+  - Need batch size optimization
+  - Connection pooling implementation required
+
+next_actions:
+  immediate:
+    - Increase batch size from 50 to 500-1000
+    - Add connection pooling to db_helper
+    - Implement performance logging
+
+  this_week:
+    - Test optimizations with large boards
+    - Implement TOML template auto-creation
+    - Add comprehensive monitoring

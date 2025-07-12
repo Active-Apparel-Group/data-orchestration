@@ -1,0 +1,832 @@
+---
+# Development Task: Customer-Orders Pipeline - Test-Driven Development & File Organization
+# Clean task tracking focused on development activities only
+
+# Unique identifier (matches filename)
+id: "dev-customer-orders"
+
+# Metadata
+type: dev
+project: "customer_orders_pipeline"
+title: "Customer-Orders Pipeline - Test-Driven Development with GREYSON PO 4755"
+created: "2025-06-19"
+updated: "2025-06-22"
+assigned_to: "Development Team"
+priority: "critical"
+
+# � DOCUMENTATION LINKS
+documentation:
+  architecture: "docs/project/customer-orders-architecture.md"
+  guidelines: "docs/development/customer-orders-guidelines.md"
+  workflow: "docs/workflows/customer-orders-processing.md"
+
+# 🔥 CURRENT STATUS (2025-06-22)
+current_status: "🚨 CRITICAL ISSUES - Method signature and testing gaps identified"
+
+validation_status:
+  completed_validations:
+    - "✅ Mapping schema file exists: sql/mappings/orders-unified-comprehensive-mapping.yaml"
+    - "✅ Hash generation working: change_detector.py creates SHA256 hashes on-the-fly"
+    - "✅ Database connection patterns: all using get_connection() correctly"
+    - "✅ File structure: dev/customer-orders/ package properly organized"
+    
+  critical_issues_found:
+    - "❌ Method signature mismatch: process_customer_batch(customer, changes, batch_id) vs def process_customer_batch(customer_name, limit=None)"
+    - "❌ Unicode logging error: 🔄 emoji causing UnicodeEncodeError in cp1252 encoding"
+    - "❌ Missing PO filter: Need [PO NUMBER] = '4755' for targeted Greyson testing"
+    - "❌ Import path validation: some modules may need sys.path fixes"
+
+next_immediate_steps:
+  - "🔧 FIX: Method signature alignment in customer_batch_processor.py"
+  - "🔧 FIX: Replace emoji with plain text in logging"
+  - "� FIX: Add PO NUMBER filter for Greyson 4755 testing (5 records max)"
+  - "🧪 TEST: Run limited Greyson PO 4755 validation workflow"
+  - "📊 VALIDATE: End-to-end hash-based change detection"
+  
+overview: |
+  🎯 **TEST-DRIVEN DEVELOPMENT APPROACH**: Use GREYSON PO 4755 as the primary test case 
+  to validate, enhance, and organize the customer-orders pipeline implementation.
+  
+  **STRATEGY**: As we test, we'll assess dependencies and create/duplicate mapping files 
+  in their proper locations, building a clean, production-ready file structure.
+  
+  **KEY INNOVATION**: UUID primary key + row hashing + staging-first approach + customer batching
+  **TEST FOCUS**: GREYSON PO 4755 end-to-end API integration validation
+
+business_requirements:
+  primary_goals:
+    - "✅ Detect and sync new orders from ORDERS_UNIFIED to Monday.com"
+    - "✅ Identify and handle changed order records (qty, dates, status updates)" 
+    - "🔄 Support deleted order detection (future phase)"
+    - "✅ Maintain referential integrity between master orders and subitems"
+    - "✅ Provide complete audit trail and rollback capability"
+    
+  success_criteria:
+    - "Process 1000+ orders efficiently in customer batches"
+    - "< 5% error rate with automatic retry logic"
+    - "Complete order->subitem workflow in < 30 minutes"
+    - "Zero data loss with staging table protection"
+    - "Clear status tracking and error reporting"
+
+technical_architecture:
+  approach: "UUID-based delta detection with staging tables and customer batching"
+  
+  core_components:
+    uuid_system:
+      - "Add UUID primary key to ORDERS_UNIFIED (non-breaking change)"
+      - "Use UUID for all joins between master schedule and subitems"
+      - "Eliminate complex multi-column joins"
+      
+    hash_detection:
+      - "Generate row hash for each ORDERS_UNIFIED record"
+      - "Compare hashes to detect changed records efficiently" 
+      - "Support both full hash and field-specific change detection"
+      
+    staging_workflow:
+      - "Stage all changes before Monday.com API calls"
+      - "Customer-by-customer processing with clear checkpoints"
+      - "Status tracking: NEW, UNCHANGED, CHANGED, DELETED"
+      - "Rollback capability if batch fails"
+      
+    size_melting:
+      - "Melt/pivot size columns during staging load"
+      - "Use UUID join to link master records with size subitems"
+      - "Simplify downstream processing"
+
+implementation_phases:
+  phase_1_foundation:
+    title: "Database Schema & UUID Implementation"
+    status: "✅ COMPLETED"
+    completed_items:
+      - "✅ Added UUID columns to staging tables (source_uuid, parent_source_uuid)"
+      - "✅ Added Monday.com board ID tracking (stg_monday_subitem_board_id)"
+      - "✅ Created migration scripts with automated execution tool"
+      - "✅ Updated staging table schemas with complete UUID tracking"
+    deliverables:
+      - "Add UUID column to ORDERS_UNIFIED (with migration script)"
+      - "Update staging table schemas with UUID and hash columns"
+      - "Create delta detection stored procedures"
+      - "Update all DDL scripts and deployment automation"
+    estimated_days: 1.5
+    
+  phase_2_delta_engine:
+    title: "Delta Detection Engine"
+    status: "✅ COMPLETED"
+    completed_items:
+      - "✅ Implemented customer batching with change detection"
+      - "✅ Created staging processor with UUID-based workflow"
+      - "✅ Built comprehensive field mapping system (JSON schema)"
+      - "✅ Validated staging-only workflow (no API calls)"
+    deliverables:
+      - "Implement hash-based change detection (Methods 1 & 2)"
+      - "Create ORDERS_UNIFIED delta comparison module"
+      - "Build staging load procedures with status classification"
+      - "Customer canonical mapping integration"
+    estimated_days: 2
+    
+  phase_3_staging_workflow:
+    title: "Staging-Based Workflow Engine"
+    status: "✅ COMPLETED"
+    completed_items:
+      - "✅ Staging tables validated with UUID tracking"
+      - "✅ Customer batch processing working"
+      - "✅ Status tracking and error handling implemented"
+      - "✅ Schema alignment validated (ORDERS_UNIFIED → staging)"
+    deliverables:
+      - "Refactor order_sync_v2.py with new delta approach"
+      - "Customer batch processing with UUID joins"
+      - "Size melting/pivoting during staging"
+      - "Status tracking and error handling"
+    estimated_days: 2
+     
+  phase_4_monday_integration:
+    title: "Monday.com API Integration"
+    status: "🔄 IN PROGRESS - READY FOR API TESTING"
+    completed_items:
+      - "✅ Updated API adapter to capture board ID"
+      - "✅ Created comprehensive mapping schema (utils/subitems_mapping_schema.json)"
+      - "✅ Documented complete API workflow (create + update mutations)"
+      - "✅ Added missing Monday.com columns to staging table"
+      - "✅ Fixed data type conversion issues (bigint/string conversions)"
+      - "✅ Created master field mapping JSON (utils/master_field_mapping.json)"
+      - "✅ Schema alignment and staging tests working (100% success rate)"
+      - "✅ Fixed critical UUID/bigint parent ID bug in staging processor"
+      - "✅ Staging workflow validated - ready for API integration"
+    critical_fixes:
+      - "CRITICAL: Fixed bigint conversion - stg_parent_stg_id now uses actual_stg_id (database IDENTITY)"
+      - "CRITICAL: Fixed Monday.com API field names - exact column names with brackets"
+      - "CRITICAL: Data type pattern documented in utils/master_field_mapping.json"
+      - "CRITICAL: Fixed UUID string vs database ID issue in subitem parent references"
+    target_test_case:
+      customer: "GREYSON"
+      po_number: "4755"
+      approach: "Single PO test with comprehensive API validation"
+    next_steps:
+      - "🎯 Test Monday.com API integration with GREYSON PO 4755"
+      - "Validate master schedule item creation"
+      - "Validate subitem creation with proper parent links"
+      - "Confirm board ID capture and storage"
+    deliverables:
+      - "Update Monday.com modules for UUID-based processing"
+      - "Master schedule item creation with UUID tracking"
+      - "Subitem creation using UUID parent relationships"
+      - "Retry logic and error recovery"
+    estimated_days: 1.5
+    
+  phase_5_testing:
+    title: "Testing & Production Deployment"
+    deliverables:
+      - "Comprehensive test suite with sample data"
+      - "Performance testing with large datasets"
+      - "Production deployment with GREYSON PO 4755 pilot"
+      - "Documentation and runbooks"
+    estimated_days: 1
+
+technical_specifications:
+  
+  database_changes:
+    orders_unified_updates:
+      - "ALTER TABLE ORDERS_UNIFIED ADD [record_uuid] UNIQUEIDENTIFIER DEFAULT NEWID()"
+      - "ALTER TABLE ORDERS_UNIFIED ADD [record_hash] NVARCHAR(64) NULL"
+      - "CREATE INDEX IX_ORDERS_UNIFIED_uuid ON ORDERS_UNIFIED ([record_uuid])"
+      - "CREATE INDEX IX_ORDERS_UNIFIED_hash ON ORDERS_UNIFIED ([record_hash])"
+      
+    staging_table_updates:
+      - "Add [source_uuid] UNIQUEIDENTIFIER to STG_MON_CustMasterSchedule"
+      - "Add [source_hash] NVARCHAR(64) to staging tables"
+      - "Add [change_type] NVARCHAR(20) -- NEW, UNCHANGED, CHANGED, DELETED"
+      - "Add [hash_comparison] NVARCHAR(MAX) -- JSON change details"
+      
+  delta_detection_logic:
+    method_1_outer_join: |
+      -- Full classification using outer join with _merge indicator
+      WITH source_with_hash AS (
+        SELECT *, 
+               HASHBYTES('SHA2_256', 
+                 CONCAT([AAG ORDER NUMBER], '|', 
+                        [CUSTOMER NAME], '|',
+                        [TOTAL QTY], '|', 
+                        [ORDER DATE PO RECEIVED])) as record_hash
+        FROM ORDERS_UNIFIED
+      ),
+      target_records AS (
+        SELECT [source_uuid], [source_hash] 
+        FROM STG_MON_CustMasterSchedule 
+        WHERE stg_status = 'PROMOTED'
+      )
+      SELECT 
+        s.*,
+        CASE 
+          WHEN t.source_uuid IS NULL THEN 'NEW'
+          WHEN s.record_hash != t.source_hash THEN 'CHANGED'
+          ELSE 'UNCHANGED'
+        END as change_type
+      FROM source_with_hash s
+      LEFT JOIN target_records t ON s.record_uuid = t.source_uuid
+      WHERE s.record_uuid IS NOT NULL
+
+    method_2_hash_comparison: |
+      -- Quick hash-only comparison for large datasets
+      SELECT COUNT(*) as changed_records
+      FROM ORDERS_UNIFIED ou
+      LEFT JOIN MON_CustMasterSchedule ms ON ou.record_uuid = ms.source_uuid
+      WHERE ou.record_hash != ms.source_hash
+      
+  customer_batching:
+    batch_size: "Process one canonical customer at a time"
+    customer_mapping: "Apply canonical customer mapping during staging"
+    checkpoint_logic: "Complete one customer fully before moving to next"
+    
+  size_melting_approach: |
+    -- Melt size columns during staging load (not in source)
+    UNPIVOT (
+      order_qty FOR size_column IN ([XS], [S], [M], [L], [XL], [XXL])
+    ) AS unpivoted_sizes
+    WHERE order_qty > 0
+    -- Join back to master using UUID
+
+  monday_api_workflow:
+    master_schedule:
+      - "Create Monday.com item using existing API modules"
+      - "Store returned item_id with source_uuid in staging"
+      - "Update staging record status to 'API_SUCCESS'"
+      
+    subitems:
+      - "Query staging subitems by source_uuid"
+      - "Create Monday.com subitems using parent item_id"
+      - "Update subitem staging records with Monday subitem_id"
+
+reference_files:
+  existing_schemas:
+    - "sql/ddl/tables/orders/dbo_ORDERS_UNIFIED_ddl.sql"
+    - "sql/ddl/deploy_staging_infrastructure.sql"
+    - "✅ sql/migrations/001_add_uuid_columns_staging.sql"
+    - "✅ sql/migrations/002_add_subitem_board_id.sql"
+    
+  existing_scripts:
+    - "scripts/order_sync_v2.py" # Will be refactored
+    - "scripts/customer_master_schedule/monday_integration.py" # Reuse API calls
+    - "✅ dev/orders_unified_delta_sync_v3/staging_processor.py"
+    - "✅ dev/orders_unified_delta_sync_v3/customer_batcher.py"
+    - "✅ dev/orders_unified_delta_sync_v3/monday_api_adapter.py"
+    
+  mapping_files:
+    - "docs/mapping/orders_unified_monday_mapping.yaml"
+    - "utils/data_mapping.yaml"
+    - "✅ utils/subitems_mapping_schema.json"  # NEW: Comprehensive API mapping
+    - "✅ docs/mapping/subitems_monday_api_mapping.md"  # NEW: Complete documentation
+    
+  workflow_docs:
+    - "docs/diagrams/staging_data_flow.md"
+    - "docs/design/customer_master_schedule_add_order_design.md"
+
+development_strategy:
+  
+  new_modules_to_create:
+    delta_engine:
+      location: "utils/delta_detection.py"
+      purpose: "Core delta detection using hash comparison methods"
+      functions:
+        - "generate_record_hash(order_row) -> str"
+        - "classify_record_changes(source_df, target_df) -> DataFrame"
+        - "detect_customer_changes(customer_name) -> Dict"
+        
+    uuid_migration:
+      location: "sql/migrations/add_uuid_to_orders_unified.sql"
+      purpose: "Non-breaking migration to add UUID to ORDERS_UNIFIED"
+      includes:
+        - "UUID column addition with default values"
+        - "Backfill existing records with UUIDs"
+        - "Index creation for performance"
+        
+    size_processor:
+      location: "utils/size_melting.py" 
+      purpose: "Handle size column melting with UUID relationships"
+      functions:
+        - "melt_sizes_for_customer(customer_df, uuid_column) -> DataFrame"
+        - "create_subitem_staging_records(melted_df) -> DataFrame"
+        
+  modules_to_refactor:
+    order_sync_v2:
+      current: "scripts/order_sync_v2.py"
+      changes:
+        - "Replace complex joins with UUID-based relationships"
+        - "Add delta detection before staging load"
+        - "Implement customer batching with change classification"
+        - "Add comprehensive error handling and rollback"
+        
+    staging_operations:
+      current: "scripts/order_staging/"
+      changes:
+        - "Update staging load to include UUID and hash columns"
+        - "Add change_type classification logic"
+        - "Implement size melting during staging"
+        
+  modules_to_reuse:
+    monday_integration: "scripts/customer_master_schedule/monday_integration.py"
+    order_mapping: "scripts/customer_master_schedule/order_mapping.py"
+    db_helper: "utils/db_helper.py"
+    logger_helper: "utils/logger_helper.py"
+
+testing_strategy:
+  unit_tests:
+    - "test_delta_detection.py - Hash generation and change classification"
+    - "test_uuid_migration.py - Database migration scripts"
+    - "test_size_melting.py - Size column transformation"
+    
+  integration_tests:
+    - "test_customer_batch_processing.py - End-to-end customer workflow"
+    - "test_monday_api_integration.py - API calls with UUID tracking"
+    - "test_staging_rollback.py - Error recovery and rollback"
+    
+  pilot_deployment:
+    target: "GREYSON customer, PO Number 4755"
+    approach: "Single customer test with comprehensive logging"
+    validation: "Manual verification in Monday.com and database"
+
+deployment_checklist:
+  database_migration:
+    - "[ ] Execute UUID migration on ORDERS_UNIFIED"
+    - "[ ] Update all staging table schemas"
+    - "[ ] Deploy new stored procedures"
+    - "[ ] Validate indexes and performance"
+    
+  code_deployment:
+    - "[ ] Deploy new delta detection modules"
+    - "[ ] Update order_sync_v2 with new workflow"
+    - "[ ] Deploy size melting utilities"
+    - "[ ] Update configuration files"
+    
+  testing_validation:
+    - "[ ] Run full test suite"
+    - "[ ] Execute pilot with GREYSON data"
+    - "[ ] Validate Monday.com synchronization"
+    - "[ ] Performance testing with large datasets"
+    
+  production_readiness:
+    - "[ ] Documentation updates"
+    - "[ ] Monitoring and alerting setup"
+    - "[ ] Runbook creation"
+    - "[ ] Team training and handover"
+
+success_metrics:
+  performance:
+    - "Process 1000+ orders in < 30 minutes"
+    - "< 5% API error rate with retry logic"
+    - "Database operations complete in < 5 minutes per customer"
+    
+  reliability:
+    - "Zero data loss with staging protection"
+    - "100% audit trail for all changes"
+    - "Successful rollback capability on errors"
+    
+  maintainability:
+    - "Clear separation of concerns between modules"
+    - "Comprehensive test coverage (>80%)"
+    - "Documentation for all major functions"
+
+next_steps:
+  immediate:
+    - "Review and approve this development plan"
+    - "Set up development environment and feature branch"
+    - "Begin Phase 1: Database schema updates"
+    
+  week_1:
+    - "Complete UUID migration and delta detection engine"
+    - "Update staging table schemas"
+    - "Begin refactoring order_sync_v2"
+    
+  week_2:
+    - "Complete staging workflow and Monday.com integration"
+    - "Comprehensive testing with sample data"
+    - "Pilot deployment with GREYSON"
+
+notes: |
+  This approach addresses all the current pain points:
+  
+  1. **Complex Joins**: UUID eliminates multi-column matching complexity
+  2. **Change Detection**: Hash comparison provides efficient delta identification  
+  3. **Error Recovery**: Staging-first approach enables rollback and retry
+  4. **Scalability**: Customer batching prevents memory issues
+  5. **Maintainability**: Clear separation of concerns and comprehensive testing
+  
+  The foundation laid here will make future enhancements (handling deletes, 
+  real-time sync, etc.) much easier to implement.
+
+# 🔥 CRITICAL LESSONS LEARNED & FIXES IMPLEMENTED
+# =====================================================
+# Updated: 2025-06-20 - STAGING WORKFLOW COMPLETE
+
+lessons_learned:
+  schema_validation:
+    - "❌ CRITICAL: Always use exact DDL table names in SQL queries"
+    - "✅ FIXED: Updated all queries to use [dbo].[STG_MON_CustMasterSchedule]"
+    - "✅ FIXED: Updated all queries to use [dbo].[STG_MON_CustMasterSchedule_Subitems]"
+    - "❌ CRITICAL: Validation queries must match actual tables being inserted into"
+    - "✅ FIXED: All test scripts now use correct db.run_query(query, database) signature"
+    
+  data_type_conversions:
+    - "❌ CRITICAL: SQL Server requires robust data type handling for staging inserts"
+    - "✅ FIXED: Implemented comprehensive _clean_data_types_for_insert() method"
+    - "✅ PATTERN: Convert empty strings to None for NULL columns"
+    - "✅ PATTERN: Use pd.to_numeric() with errors='coerce' for FLOAT columns"
+    - "✅ PATTERN: Convert NaN to 0.0 for SQL Server float columns (prevents empty string issues)"
+    - "✅ PATTERN: Convert to int() for BIGINT columns, None for NaN values"
+    - "✅ PATTERN: Use proper datetime conversion with None fallback for DATE columns"
+    
+  database_identity_columns:
+    - "❌ CRITICAL: Never use UUID strings as foreign key references to IDENTITY columns"
+    - "✅ FIXED: Use actual database-generated stg_id (bigint) for subitem parent references"
+    - "✅ PATTERN: Insert orders first, capture generated IDs, then use for subitems"
+    - "✅ PATTERN: Maintain UUID for business logic, IDENTITY for database relationships"
+    
+  staging_table_schema:
+    - "✅ COMPLETED: Added source_uuid and parent_source_uuid columns via migration"
+    - "✅ COMPLETED: Added stg_monday_subitem_board_id for Monday.com update tracking"
+    - "✅ COMPLETED: Cleaned up deprecated columns (CUSTOMER_STYLE, GROUP_NAME, ITEM_NAME)"
+    - "✅ COMPLETED: All required Monday.com update fields present in schema"
+    
+  field_mapping_consistency:
+    - "✅ COMPLETED: Created master_field_mapping.json as single source of truth"
+    - "✅ COMPLETED: Implemented master_mapping_helper.py for programmatic access"
+    - "✅ PATTERN: Always use master mapping for field lookups and transformations"
+    - "✅ PATTERN: Document data type conversion rules in mapping file"
+    - "✅ PATTERN: Include API payload templates in mapping for consistency"
+    
+  ddl_schema_compliance:
+    - "✅ PATTERN: Always read DDL files to get exact column order and names"
+    - "✅ PATTERN: Use dynamic DataFrame column mapping to match DDL schema"
+    - "✅ PATTERN: Exclude internal tracking columns from database inserts"
+    - "✅ PATTERN: Apply robust data type cleaning before any database operation"
+    
+  group_logic_placement:
+    - "✅ FIXED: Implemented group name logic in staging processor, not API adapter"
+    - "✅ PATTERN: Customer CUSTOMER_SEASON → CUSTOMER AAG_SEASON → CUSTOMER [fallback]"
+    - "✅ PATTERN: Business logic belongs in staging, API layer just consumes data"
+    
+  test_validation_accuracy:
+    - "✅ FIXED: All validation queries use exact table and column names from DDL"
+    - "✅ PATTERN: Never use made-up or mismatched table/column names in queries"
+    - "✅ PATTERN: Test scripts should validate the actual data being inserted"
+    - "✅ PATTERN: Use proper function signatures for database operations"
+
+progress_status:
+  completed_phases:
+    - "✅ Phase 1: UUID and staging table migrations executed successfully"
+    - "✅ Phase 2: Customer batching and change detection working correctly"
+    - "✅ Phase 3: Staging processor with robust data type handling completed"
+    - "✅ Phase 4: Schema compliance and validation query fixes completed"
+    - "✅ Phase 5: Master field mapping and helper system implemented"
+    
+  current_status: "🚨 CRITICAL GAPS IDENTIFIED - Architecture complete but testing/schema deployment not done"
+  
+  validated_components:    - "❌ CRITICAL: Architecture complete but NO END-TO-END TESTING performed"
+    - "❌ CRITICAL: Main orchestrator returns 0 records due to table name mismatch"
+    - "❌ CRITICAL: UNIFIED_SNAPSHOT vs ORDERS_UNIFIED_SNAPSHOT inconsistency"
+    - "❌ CRITICAL: Test files have import errors and haven't been executed"
+    - "❌ CRITICAL: GREYSON PO 4755 never actually tested end-to-end"
+    - "❌ CRITICAL: Unknown if database schema (UUID columns) actually deployed"
+    - "❌ CRITICAL: Monday.com API integration never validated"
+      test_results:
+    - "✅ GREYSON: 10 orders → 6 subitems staged successfully"
+    - "✅ ACTIVELY BLACK: 10 orders → 45 subitems staged successfully"
+    - "✅ Validation queries: All execute correctly with proper results"
+    - "✅ Data types: All float/bigint/string conversions working correctly"
+    - "✅ Success rate: 100% staging success (2/2 customer batches)"
+
+# NOTE: Current immediate steps moved to top of file under validation_status section for clarity
+
+reviewers: ["Technical Lead", "Database Team"]
+
+# Context & references (adapted to our current docs structure)
+context:
+  description: |
+    This task implements the UUID + hash-based delta sync approach outlined above.
+    Takes a fresh lens while leveraging existing staging infrastructure and scripts for reference.
+    
+    Background:
+    We have existing staging infrastructure, DDL scripts, and customer master schedule scripts,
+    but need to implement a first-principles approach that uses UUID primary keys and hash-based 
+    change detection for robust, production-ready order synchronization.
+    
+    Acceptance Criteria:
+    ✅ Process new orders from ORDERS_UNIFIED to Monday.com (start with GREYSON, PO 4755)
+    ✅ UUID-based joins between master schedule and subitems 
+    ✅ Hash-based change detection with clear status classification
+    ✅ Staging-first workflow with customer batching
+    ✅ Complete audit trail and rollback capability
+    
+  docs:
+    design: "docs/design/customer_master_schedule_add_order_design.md"
+    development: "docs/plans/staging_table_refactor_plan.md" 
+    deployment: "docs/deployment/customer_master_schedule_deployment.md"
+    mapping: "docs/mapping/orders_unified_monday_mapping.yaml"
+  
+  checklists:
+    development: "dev/checklists/workflow_development_checklist.md"
+    deployment: "dev/checklists/WORKFLOW_DEPLOYMENT_PROCESS.md"
+    testing: "dev/checklists/testing_checklist.md"
+    references:
+    related_files:
+      staging_ddl: "sql/ddl/deploy_staging_infrastructure.sql"
+      existing_scripts: "scripts/customer_master_schedule/"
+      existing_staging: "scripts/order_staging/"
+      subitems_scripts: "scripts/customer_master_schedule_subitems/"
+      diagrams: "docs/diagrams/"
+      existing_plans: "docs/plans/staging_table_refactor_plan.md"
+      documentation_plan: "docs/plans/monday-api-documentation-consolidation-plan.md"
+    jira: "N/A"
+    slack: "N/A"
+    related_tasks: 
+      - "ops-monday-api-documentation-consolidation.yml"
+
+# Dependencies (tracks task relationships)
+dependencies:
+  requires: 
+    - "Database schema access for ORDERS_UNIFIED UUID column addition"
+    - "Staging tables deployed via deploy_staging_infrastructure.sql"
+    - "Monday.com API access and credentials"
+  blocks: 
+    - "Change record detection implementation (Phase 2)"
+    - "Deleted record handling implementation (future)"
+  external:
+    - "Monday.com API access"
+    - "ORDERS_UNIFIED table access"
+    - "MON_CustMasterSchedule table access"
+
+# Environment configuration (respecting our .env pattern)
+environments:
+  dev:
+    database: "ORDERS"
+    api_endpoints: "Monday.com API"
+    working_directory: "dev/orders_unified_delta_sync_v3/"
+  staging:
+    database: "ORDERS"
+    api_endpoints: "Monday.com API"
+    working_directory: "scripts/orders_unified_delta_sync_v3/"
+  production:
+    database: "ORDERS"
+    api_endpoints: "Monday.com API"
+    working_directory: "workflows/"
+
+# File structure (following our established patterns)
+file_structure:
+  dev_location: "dev/orders_unified_delta_sync_v3/"
+  scripts_location: "scripts/orders_unified_delta_sync_v3/"
+  workflow_location: "workflows/orders_unified_delta_sync_v3.yml"
+  test_location: "tests/orders_unified_delta_sync_v3/"
+  utils_dependencies:
+    - "utils/db_helper.py"
+    - "utils/logger_helper.py"
+    - "utils/config.yaml"
+    - "utils/data_mapping.yaml"
+
+# Main development checklist
+checklist:
+  planning:
+    - "[ ] Requirements analysis complete"
+    - "[ ] Technical design documented in this task file"
+    - "[ ] Dependencies identified (UUID column, staging tables, API access)"
+    - "[ ] Create workflow plan in dev/checklists/workflow_plans/"
+    - "[ ] Review existing staging infrastructure and scripts for reference"
+    - "[ ] Analyze Methods 1 & 2 from change detection options"
+  
+  development:
+    - "[✅] Create feature branch: git checkout -b feat/dev-orders_unified_delta_sync_v3"
+    - "[✅] Create dev folder: dev/orders_unified_delta_sync_v3/"
+    - "[✅] Phase 1: Implement UUID system for ORDERS_UNIFIED"
+    - "[✅] Phase 2: Implement hash-based change detection (Methods 1 & 2)"
+    - "[✅] Phase 2: Implement delta comparison logic (new/unchanged/changed/deleted)"
+    - "[✅] Phase 3: Implement staging workflow with customer batching"
+    - "[🔄] Phase 3: Create master schedule processing (STAGING ONLY - NO API CALLS YET)"
+    - "[🔄] Phase 3: Create subitems processing with UUID joins (STAGING ONLY)"
+    - "[ ] Phase 3: Validate staging tables completely before API integration"
+    - "[ ] Phase 3: Implement canonical customer matching"
+    - "[ ] Phase 4: Monday.com API integration with UUID tracking (AFTER STAGING VALIDATION)"
+    - "[ ] Phase 4: Master schedule and subitems creation (AFTER STAGING VALIDATION)"
+    - "[ ] Add comprehensive error handling and retry logic"
+    - "[ ] Add TEST_MODE support for development testing"
+    - "[ ] Phase 5: Write unit tests in tests/orders_unified_delta_sync_v3/"
+    - "[ ] Update documentation following our standards"
+  
+  validation:
+    - "[ ] Run tests using pytest"
+    - "[ ] Test with GREYSON PO 4755 as pilot case"
+    - "[ ] Code review completed"
+    - "[ ] Follow workflow_development_checklist.md requirements"
+    - "[ ] Test with limited data in TEST_MODE"
+    - "[ ] Validate staging table workflow end-to-end"
+    - "[ ] Validate UUID-based joins working correctly"
+    - "[ ] Validate hash-based change detection accuracy"
+    - "[ ] Performance testing with larger datasets"
+  
+  deployment:
+    - "[ ] Deploy to scripts/orders_unified_delta_sync_v3/ using tools/deploy-scripts-clean.ps1"
+    - "[ ] Create Kestra workflow in workflows/orders_unified_delta_sync_v3.yml"
+    - "[ ] Deploy workflow using tools/deploy-workflows.ps1"
+    - "[ ] Test end-to-end in Kestra environment"
+    - "[ ] Follow WORKFLOW_DEPLOYMENT_PROCESS.md"
+  
+  closure:
+    - "[ ] Update workflow_development_checklist.md with completion"
+    - "[ ] Update DOCUMENTATION_STATUS.md"
+    - "[ ] Archive development files appropriately"
+    - "[ ] Document lessons learned and best practices"
+
+# Integration with our existing tools
+integration:
+  tools:
+    deployment: "tools/deploy-scripts-clean.ps1, tools/deploy-workflows.ps1"
+    testing: "pytest, manual validation scripts"
+    monitoring: "Kestra UI, workflow logs"
+  
+  dependencies:
+    utils:
+      - "utils/db_helper.py"
+      - "utils/logger_helper.py" 
+      - "utils/config.yaml"
+      - "utils/data_mapping.yaml"
+    
+    existing_scripts_reference:
+      - "scripts/customer_master_schedule/ (reference only)"
+      - "scripts/order_staging/ (reference only)"
+      - "scripts/customer_master_schedule_subitems/ (reference only)"
+    
+    existing_ddl:
+      - "sql/ddl/deploy_staging_infrastructure.sql"
+      - "sql/ddl/tables/orders/staging/stg_mon_custmasterschedule.sql"
+      - "sql/ddl/tables/orders/staging/stg_mon_custmasterschedule_subitems.sql"
+
+# Success criteria (adapted to our current standards)
+success_criteria:
+  functional:
+    - "UUID system implemented on ORDERS_UNIFIED"
+    - "Hash-based change detection working (Methods 1 & 2)"
+    - "Delta comparison correctly classifies records (new/unchanged/changed/deleted)"
+    - "Staging workflow processes customers in batches"
+    - "UUID-based joins eliminate complex multi-column joins"
+    - "GREYSON PO 4755 pilot case processes successfully"
+    - "Master schedule -> subitems workflow complete"
+    - "Performance targets met: 1000+ orders, < 5% error rate, < 30 min completion"
+  
+  technical:
+    - "Follows established patterns (db_helper, logger_helper, config)"
+    - "Uses existing staging infrastructure effectively"
+    - "Production-grade error handling and retry logic"
+    - "Comprehensive logging for Kestra monitoring"
+    - "TEST_MODE support for development"
+    - "Canonical customer matching implemented"
+  
+  operational:
+    - "Successfully deployed to Kestra"
+    - "Workflow monitoring configured"
+    - "Documentation updated per standards"
+    - "Follows WORKFLOW_DEPLOYMENT_PROCESS.md"
+    - "Staging table cleanup working correctly"
+
+# File locations for current implementation (UPDATED 2025-06-22)
+current_file_structure:
+  main_implementation: "dev/customer-orders/"
+  core_modules:
+    main_orchestrator: "dev/customer-orders/main_customer_orders.py"
+    batch_processor: "dev/customer-orders/customer_batch_processor.py"
+    change_detector: "dev/customer-orders/change_detector.py"
+    data_mapper: "dev/customer-orders/customer_mapper.py"
+    monday_integration: "dev/customer-orders/integration_monday.py"
+    staging_processor: "dev/customer-orders/staging_processor.py"
+    api_adapter: "dev/customer-orders/monday_api_adapter.py"
+  
+  supporting_infrastructure:
+    mapping_file: "sql/mappings/orders-unified-comprehensive-mapping.yaml"
+    database_schemas: "sql/ddl/tables/orders/"
+    database_helper: "utils/db_helper.py"
+    logging_helper: "utils/logger_helper.py"
+    
+  testing_validation:
+    test_files: "dev/customer-orders/testing/"
+    validation_scripts: "dev/customer-orders/validation/"
+    debug_utilities: "dev/customer-orders/debugging/"
+    
+  vscode_integration:
+    task_definition: ".vscode/tasks.json - 'Dev: Test Customer Orders Orchestrator'"
+
+# HASH PIPELINE WORKFLOW (VALIDATED 2025-06-22)
+hash_pipeline_workflow:
+  step_1_source: "ORDERS_UNIFIED table (no hash column stored)"
+  step_2_generation: "change_detector.py → _generate_row_hash()"
+  step_3_method: "SHA256 hash of concatenated field values"
+  step_4_exclusions: "Excludes system fields (record_uuid, snapshot_date, row_hash, customer_filter)"
+  step_5_usage: "Change detection by comparing current vs snapshot hashes"
+  step_6_storage: "Hash stored in ORDERS_UNIFIED_SNAPSHOT for comparison"
+  
+  change_detection_process: |
+    ORDERS_UNIFIED → ChangeDetector → Hash Generation → Compare with Snapshot → Detect Changes
+    
+    Methods implemented:
+    - Method 1: Outer Join with _merge indicator (comprehensive classification)
+    - Method 2: Hash Comparison (quick detection with field-level analysis)
+
+# Risk management
+risks:
+  - risk: "ORDERS_UNIFIED schema change impact"
+    impact: "high"
+    probability: "medium"
+    mitigation: "Coordinate UUID column addition with DBA, test non-breaking approach"
+  
+  - risk: "Complex change detection logic errors"
+    impact: "high"
+    probability: "medium"
+    mitigation: "Start with Methods 1 & 2, extensive testing with known data sets"
+  
+  - risk: "Staging workflow performance issues"
+    impact: "medium"
+    probability: "medium"
+    mitigation: "Customer batching approach, monitor batch sizes, tune as needed"
+    
+  - risk: "Monday.com API Rate Limits"
+    impact: "medium"
+    probability: "high"
+    mitigation: "Implement throttling logic and retry mechanisms with exponential backoff"
+    
+  - risk: "Field Mapping Issues"
+    impact: "high"
+    probability: "medium"
+    mitigation: "Validate API field names against Monday.com schema, maintain mapping documentation"
+    
+  - risk: "Parent-Child Relationships"
+    impact: "high"
+    probability: "medium"
+    mitigation: "Test UUID vs Monday.com item ID linking thoroughly, ensure proper foreign key handling"
+    
+  - risk: "Board ID Retrieval"
+    impact: "medium"
+    probability: "medium"
+    mitigation: "Validate board ID capture and storage in staging tables, test subitem board tracking"
+
+# Metadata for tracking (UPDATED 2025-06-22)
+tracking:
+  estimated_hours: "40-64"  # 5-8 days as specified
+  actual_hours: "38"  # Updated as of 2025-06-22
+  start_date: "2025-06-19"
+  current_date: "2025-06-22"
+  end_date: "2025-06-23 (estimated)"
+  status: "validation_testing"  # not_started, in_progress, blocked, validation_testing, completed, cancelled
+  completion_percentage: "75%"  # Architecture complete, validation in progress, 3 critical fixes needed
+  
+  milestone_progress:
+    architecture_design: "✅ 100% - Complete"
+    code_implementation: "✅ 95% - Near complete, 3 critical fixes needed"
+    validation_testing: "🔄 40% - In progress, method signatures and unicode issues found"
+    end_to_end_testing: "⏳ 0% - Pending fixes"
+    production_deployment: "⏳ 0% - Future phase"
+
+# SHOULD WE BREAK INTO MILESTONE TASKS?
+milestone_analysis:
+  current_file_size: "747 lines - LARGE but manageable"
+  complexity_assessment: "High - covers architecture, implementation, validation, deployment"
+  
+  recommendation: "KEEP AS SINGLE TASK"
+  reasoning:
+    - "Single cohesive feature development"
+    - "Validation phase requires all components working together"
+    - "Breaking into milestones would fragment context"
+    - "Current structure provides complete picture"
+    
+  alternative_approach: |
+    If file becomes >1000 lines, consider:    - Move detailed implementation notes to separate docs/
+    - Keep high-level status and immediate actions in main YAML
+    - Link to detailed milestone tracking documents
+
+# ===========================================
+# CONSOLIDATED TASK SUMMARY (2025-06-22)
+# ===========================================
+task_summary:
+  overall_status: "75% complete - Architecture done, 3 critical fixes needed for testing"
+  
+  what_works:
+    - "✅ Complete dev/customer-orders/ package structure"
+    - "✅ Hash-based change detection implementation"
+    - "✅ Database connection patterns using get_connection()"
+    - "✅ Comprehensive mapping file (orders-unified-comprehensive-mapping.yaml)"
+    - "✅ VS Code task integration"
+  
+  blocking_issues:
+    - "❌ Method signature mismatch in process_customer_batch"
+    - "❌ Unicode emoji logging errors"
+    - "❌ Missing PO NUMBER filter for targeted testing"
+  
+  next_24_hours:
+    - "Fix 3 blocking issues (estimated 45 minutes)"
+    - "Test with 5 Greyson PO 4755 records"
+    - "Validate end-to-end hash workflow"
+    - "Complete testing phase"
+  
+  file_organization_decision: |
+    KEEP AS SINGLE TASK FILE:
+    - 794 lines is large but manageable
+    - Single cohesive feature requiring all components
+    - Breaking apart would fragment critical context
+    - Current structure provides complete development picture
+
+# Version for template evolution
+version: "2.0"  # Updated with validation findings and consolidation

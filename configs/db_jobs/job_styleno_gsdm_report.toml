@@ -1,0 +1,71 @@
+# Database-to-Database ETL Job Configuration
+# Job: Style Number GSDM Report via Stored Procedure
+# Created: 2025-07-01
+# 
+# This job calls the rpt_styleno_gsdm_forIE stored procedure with parameterized dates
+
+[meta]
+job_name = "styleno_gsdm_report"
+description = "Extract data from rpt_styleno_gsdm_forIE stored procedure"
+created_date = "2025-07-01"
+created_by = "system"
+
+[source]
+db_name = "quickdata"
+
+# Stored procedure configuration - automatically builds EXEC query
+[source.stored_procedure]
+procedure_name = "rpt_styleno_gsdm_forIE"
+
+# Date parameters - CHOOSE ONE APPROACH:
+
+# Option 1: Fixed dates
+start_date = "2025-01-01"
+end_date = "2025-12-31"
+
+# Option 2: Dynamic dates (uncomment to use)
+# start_date = "DATEADD(day, -30, GETDATE())"    # 30 days ago
+# end_date = "GETDATE()"                          # Today
+
+# Option 3: Current month (uncomment to use)
+# start_date = "DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1)"  # First day of current month
+# end_date = "EOMONTH(GETDATE())"                                      # Last day of current month
+
+# Option 4: Previous month (uncomment to use)
+# start_date = "DATEFROMPARTS(YEAR(DATEADD(month, -1, GETDATE())), MONTH(DATEADD(month, -1, GETDATE())), 1)"
+# end_date = "EOMONTH(DATEADD(month, -1, GETDATE()))"
+
+# Other stored procedure parameters - use empty string for NULL
+style_no = ""
+order_no = ""  
+factory_name = ""
+report_code = ""
+content = ""
+
+[target]
+db_name = "orders"
+table = "GSDM_Report_Data"
+load_mode = "replace"
+
+[options]
+# ETL options
+use_staging_table = true
+atomic_swap = true
+chunk_size = 1000
+timeout = 600
+validate_schema = false
+log_sample_data = true
+drop_target_first = true
+retain_float = true  # Keep large numeric values as SQL FLOAT
+
+[exclude]
+# Columns to exclude from source (optional)
+columns = []
+
+# [mapping]
+# Uncomment to map source columns to different target column names
+# source_column = "target_column"
+
+# [transform]  
+# Uncomment to apply transformations to specific columns
+# column_name = "lambda x: x.upper()"

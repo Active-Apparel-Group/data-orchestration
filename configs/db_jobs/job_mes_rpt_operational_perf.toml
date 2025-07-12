@@ -1,0 +1,102 @@
+# Database-to-Database ETL Job Configuration
+# Job: QuickData to Orders Test
+# Created: 2025-06-29
+# 
+# This is a test job configuration for extracting data from quickdata database
+# and loading it into the orders database. Update the queries and mappings below.
+
+[meta]
+board_id = 8709134353
+board_name = "Planning"
+table_name = "MON_COO_Planning"
+job_name = "quickdata_to_orders"
+description = "Copy data from quickdata to orders database"
+created_date = "2025-06-29"
+created_by = "system"
+
+[source]
+db_name = "quickdata"
+table = "rpt_operational_performance"
+# Override with your specific query:
+query = """
+;WITH distinct_records AS (
+    SELECT *, 0 as rn
+    FROM QuickData.dbo.rpt_operational_performance
+    WHERE order_no NOT IN (
+        SELECT order_no
+        FROM QuickData.dbo.rpt_operational_performance
+        GROUP BY order_no
+        HAVING COUNT(*) > 1
+    )
+),
+deduped_records AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (
+            PARTITION BY order_no
+            ORDER BY
+                (CASE 
+                    WHEN cut_number    <> 0 
+                      OR sew_number    <> 0 
+                      OR finish_number <> 0 
+                      OR remain_number <> 0 
+                      OR [Cutting WIP] <> 0 
+                      OR [Sewing WIP]  <> 0 
+                      OR [Finishing WIP]<> 0 
+                    THEN 1 
+                    ELSE 0 
+                 END) DESC,
+                (CASE WHEN state LIKE '%Closed%' THEN 1 ELSE 0 END) DESC,
+                TRY_CAST(closed_time AS DATETIME) DESC
+        ) AS rn
+    FROM QuickData.dbo.rpt_operational_performance
+    WHERE order_no IN (
+        SELECT order_no
+        FROM QuickData.dbo.rpt_operational_performance
+        GROUP BY order_no
+        HAVING COUNT(*) > 1
+    )
+),
+final_staged AS (
+    SELECT * FROM distinct_records
+    UNION ALL
+    SELECT * FROM deduped_records WHERE rn = 1
+)
+SELECT
+    order_no        AS [MO Number],
+    [Package scan]  AS Package_scan,
+    [Bucket Scan]   AS Bucket_Scan,
+    [PNP Receive]   AS PNP_Receive,
+    [Cutting WIP]   AS WIP_Cut,
+    [Sewing WIP]    AS WIP_Sew,
+    [Finishing WIP] AS WIP_Fin,
+    [PNP Receive]   AS FG_Qty,
+    *
+FROM final_staged
+ORDER BY [MO Number];
+
+"""
+
+
+[target]
+db_name = "orders"
+table = "MES_operational_performance"
+# Options: "replace", "append", "truncate_insert"
+load_mode = "replace"
+
+
+[options]
+# ETL options
+use_staging_table = true
+atomic_swap = true
+chunk_size = 1000
+timeout = 300
+validate_schema = false
+log_sample_data = true
+drop_target_first = true
+retain_float = true  # or false (default)
+
+[exclude]
+# Columns to exclude from source (optional)
+columns = []
+

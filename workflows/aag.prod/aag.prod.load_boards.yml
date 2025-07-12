@@ -1,0 +1,78 @@
+id: load_boards
+namespace: aag.prod
+description: "Load Monday.com Boards via provided board IDs"
+
+triggers:
+  - id: upstream_dependancy
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: flow_trigger
+      flows:
+        - namespace: aag.prod
+          flowId: update_boards
+          states: [SUCCESS]
+
+inputs:
+  - id: board_ids
+    type: ARRAY
+    itemType: STRING
+    defaults:
+      - "8685586257"
+      - "8446553051"
+      - "8709134353"
+      - "8738178586"
+      - "8983946335"
+      - "9200517329"
+
+tasks:
+  - id: setup_and_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      🚀 Starting Workflow: {{ flow.id }}
+      ⏰ Timestamp: {{ now() }}
+      🗂️ Namespace: {{ flow.namespace }}
+      📝 Description: Refreshing Monday.com Boards
+      📁 Script Location: pipelines/scripts/{{ flow.id }}/
+      🔌 Database Connections: 0
+
+  - id: load_all_boards
+    type: io.kestra.plugin.core.flow.ForEach
+    values: "{{ inputs.board_ids }}"
+    concurrencyLimit: 1
+    description: "Iterate through each board ID"
+    tasks:
+      - id: execute_main_workflow
+        type: io.kestra.plugin.core.flow.WorkingDirectory
+        description: "Run main script for board {{ taskrun.value }}"
+        namespaceFiles:
+          enabled: true
+          include:
+            - pipelines/**
+            - configs/**
+            - utils/**
+        tasks:
+          - id: copy_configs
+            type: io.kestra.plugin.scripts.shell.Commands
+            description: "Copy configs to writable area"
+            commands:
+              - mkdir -p writable-configs
+              - cp -R configs/* writable-configs/
+
+          - id: load_board
+            type: io.kestra.plugin.scripts.python.Commands
+            taskRunner:
+              type: io.kestra.plugin.scripts.runner.docker.Docker
+              pullPolicy: NEVER
+            containerImage: my-custom-kestra:latest
+            description: "Execute load for board {{ taskrun.value }}"
+            commands:
+              - echo "🚀 Loading board {{ taskrun.value }}…"
+              - python pipelines/scripts/ingestion/load_boards.py --board-id {{ taskrun.value }}
+              - echo "✅ Board {{ taskrun.value }} loaded"
+
+  - id: completion_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      🎉 Workflow {{ flow.id }} completed successfully!
+      ⏰ Completed at: {{ now() }}
+

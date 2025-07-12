@@ -1,0 +1,111 @@
+-- ---------------------------------------------------------------------------
+--  Hybrid transformation procedure for {{ source_table }}
+--  VERSION       : {{ version }}
+--  GENERATED AT  : {{ generated_at }}
+--  SOURCE TABLE  : {{ source_table }}
+--  RAW TABLES    : {{ raw_tables | join(', ') }}
+-- ---------------------------------------------------------------------------
+CREATE OR ALTER PROCEDURE dbo.sp_Transform_{{ source_table }}_Hybrid
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Staging table (truncate/reload every run)
+    IF OBJECT_ID('dbo.swp_{{ source_table }}', 'U') IS NULL
+        SELECT * INTO dbo.swp_{{ source_table }}
+        FROM dbo.{{ source_table }} WHERE 1 = 0;
+    ELSE
+        TRUNCATE TABLE dbo.swp_{{ source_table }};
+
+    -- Log table for per-raw stats
+    IF OBJECT_ID('dbo.etl_{{ source_table }}_stats', 'U') IS NULL
+        CREATE TABLE dbo.etl_{{ source_table }}_stats (
+            run_id        INT          IDENTITY(1,1) PRIMARY KEY,
+            table_name    NVARCHAR(128),
+            rows_loaded   INT,
+            load_time     DATETIME2,
+            error_msg     NVARCHAR(4000)
+        );
+
+    DECLARE @t NVARCHAR(128), @rc INT, @start DATETIME2, @err NVARCHAR(4000);
+    DECLARE @sql NVARCHAR(MAX);
+
+    DECLARE raw_tables CURSOR FOR
+        SELECT t.name
+        FROM sys.tables t
+        WHERE t.name LIKE '{{ raw_tables[0].replace("*", "%") }}'
+        ORDER BY t.name;
+
+    OPEN raw_tables;
+    FETCH NEXT FROM raw_tables INTO @t;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        SET @start = SYSDATETIME();
+        SET @err = NULL;
+        BEGIN TRY
+            -- Build SQL for dynamic execution
+            SET @sql = N'
+                INSERT INTO dbo.swp_{{ source_table }} (
+                    {%- for col in columns -%}
+                        {{ col.name | replace("'", "''") | sql_identifier }}{% if not loop.last %}, {% endif %}
+                    {%- endfor -%}
+                )
+                SELECT
+                    {%- for col in columns %}
+                        {%- if col.select_name %}
+                            {%- set src = col.select_name | replace("'", "''") %}
+                            {%- if col.type == 'string' and 'trim' in col.rules -%}
+                                NULLIF(TRIM(' + QUOTENAME('{{ src }}') + '), '''')
+                            {%- elif col.type.startswith('datetime') -%}
+                                COALESCE(
+                                    TRY_CONVERT(date, ' + QUOTENAME('{{ src }}') + ', 101),
+                                    TRY_CONVERT(date, ' + QUOTENAME('{{ src }}') + ', 103),
+                                    TRY_CONVERT(date, ' + QUOTENAME('{{ src }}') + ', 120)
+                                )
+                            {%- elif col.type in ['decimal','numeric','float'] -%}
+                                TRY_CAST(' + QUOTENAME('{{ src }}') + ' AS DECIMAL(17,6))
+                            {%- else -%}
+                                ' + QUOTENAME('{{ src }}') + '
+                            {%- endif %}
+                        {%- else %}
+                            NULL
+                        {%- endif %}
+                        {% if not loop.last %}, {% endif %}
+                    {%- endfor %}
+                FROM ' + QUOTENAME(@t) + ';
+            ';
+
+            EXEC sp_executesql @sql;
+            SET @rc = @@ROWCOUNT;
+        END TRY
+        BEGIN CATCH
+            SET @err = ERROR_MESSAGE();
+            SET @rc = 0;
+        END CATCH
+
+        INSERT INTO dbo.etl_{{ source_table }}_stats (table_name, rows_loaded, load_time, error_msg)
+        VALUES (@t, @rc, SYSDATETIME(), @err);
+
+        FETCH NEXT FROM raw_tables INTO @t;
+    END
+
+    CLOSE raw_tables;
+    DEALLOCATE raw_tables;
+
+    -- Atomic swap (truncate and reload main table)
+    BEGIN TRANSACTION;
+        TRUNCATE TABLE dbo.{{ source_table }};
+        INSERT INTO dbo.{{ source_table }} (
+            {%- for col in columns -%}
+                {{ col.name | replace("'", "''") | sql_identifier }}{% if not loop.last %}, {% endif %}
+            {%- endfor -%}
+        )
+        SELECT
+            {%- for col in columns -%}
+                {{ col.name | replace("'", "''") | sql_identifier }}{% if not loop.last %}, {% endif %}
+            {%- endfor -%}
+        FROM dbo.swp_{{ source_table }};
+    COMMIT TRANSACTION;
+END
+GO

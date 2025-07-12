@@ -1,0 +1,52 @@
+# OPUS Universal Monday.com Update Configuration
+# Purpose: TOML-based configuration for subitem updates
+# Board: Customer Master Schedule (8709134353)
+
+[metadata]
+board_id = 8709134353
+board_name = "Customer Master Schedule"
+update_type = "batch_subitem_updates"
+description = "Update customer master schedule subitems with size-specific data"
+
+[query_config]
+# SQL query to get subitem update data
+query = """
+SELECT 
+    cmss.monday_item_id,
+    cmss.monday_subitem_id,
+    cmss.board_id,
+    cmss.size_code,
+    cmss.quantity as current_quantity,
+    CASE 
+        WHEN cmss.quantity > 0 THEN 'In Production'
+        ELSE 'Pending'
+    END as new_status,
+    cmss.quantity as new_quantity
+FROM STG_MON_CustMasterSchedule_Subitems cmss
+WHERE cmss.board_id = 8709134353
+  AND cmss.monday_item_id IS NOT NULL
+  AND cmss.monday_subitem_id IS NOT NULL
+  AND cmss.update_operation = 'update_subitem'
+  AND cmss.validation_status = 'VALID'
+"""
+
+# Column mapping configuration
+board_id_column = "board_id"
+item_id_column = "monday_item_id"
+subitem_id_column = "monday_subitem_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+"size" = "size_code"
+"quantity" = "new_quantity"
+"status" = "new_status"
+
+[validation]
+required_fields = ["monday_item_id", "monday_subitem_id", "board_id"]
+max_batch_size = 50  # Smaller batches for subitems
+timeout_seconds = 600
+
+[retry_config]
+max_retries = 3
+retry_delay_seconds = 2
+backoff_multiplier = 1.5

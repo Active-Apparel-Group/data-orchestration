@@ -690,7 +690,7 @@ mapping_patterns:
 metadata:
   created: '2025-06-17'
   description: Master data mapping registry for entire data orchestration system
-  last_updated: '2025-06-18'
+  last_updated: '2025-06-27'
   maintainers:
   - Data Engineering Team
   - AI Agents
@@ -706,6 +706,26 @@ metadata:
   - Various scripts and DDL files
   version: '1.0'
 monday_boards:
+  MON_CustMasterSchedule:
+    schema_decisions:
+      approved_columns:
+      - decision_date: '2025-06-27 09:27:34'
+        name: QTY ORDERED
+        reason: total quantity orderes on customer order
+        type: mirror
+      - decision_date: '2025-06-27 09:27:34'
+        name: Last updated
+        reason: 'Auto-approved: simple type'
+        type: last_updated
+      - decision_date: '2025-06-27 09:27:45'
+        name: QTY PACKED
+        reason: total quantity packed from filemaker
+        type: mirror
+      - decision_date: '2025-06-27 09:27:58'
+        name: QTY SHIPPED
+        reason: total quantity shipped from filemkaer - or from GSS partner
+        type: mirror
+      rejected_columns: []
   coo_planning:
     board_id: 8709134353
     board_name: COO Planning
@@ -742,7 +762,7 @@ monday_boards:
     description: COO planning and manufacturing coordination board
     last_schema_update: '2025-06-17'
     schema_decisions:
-      approved_columns: 
+      approved_columns:
       - decision_date: '2025-06-18 14:02:27'
         name: Pre Planned Production YY/MM
         reason: needed for
@@ -759,7 +779,7 @@ monday_boards:
   customer_master_schedule:
     alternate_board_ids:
     - '9218090006'
-    board_id: '9200517329'
+    board_id: 9200517329
     board_name: Customer Master Schedule
     columns:
     - mapping_source: ORDERS_UNIFIED
@@ -833,6 +853,24 @@ monday_boards:
       sql_column: CATEGORY
       sql_type: NVARCHAR(MAX)
     database: orders
+    schema_decisions:
+      approved_columns:
+      - decision_date: '2025-06-27 09:27:34'
+        name: QTY ORDERED
+        reason: total quantity orderes on customer order
+        type: mirror
+      - decision_date: '2025-06-27 09:27:34'
+        name: Last updated
+        reason: 'Auto-approved: simple type'
+        type: last_updated
+      - decision_date: '2025-06-27 09:27:45'
+        name: QTY PACKED
+        reason: total quantity packed from filemaker
+        type: mirror
+      - decision_date: '2025-06-27 09:27:58'
+        name: QTY SHIPPED
+        reason: total quantity shipped from filemkaer - or from GSS partner
+        type: mirror
     description: Customer master schedule tracking board
     error_table: ERR_MON_CustMasterSchedule
     staging_table: STG_MON_CustMasterSchedule

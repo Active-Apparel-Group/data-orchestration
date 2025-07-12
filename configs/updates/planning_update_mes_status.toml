@@ -1,0 +1,254 @@
+# OPUS Universal Monday.com Update Configuration
+# Purpose = TOML-based configuration for metadata-driven updates
+# Board = Planning (8709134353)
+
+[metadata]
+board_id = 8709134353
+board_name = "Planning"
+update_type = "batch_item_updates"
+description = "Update planning items with latest production status"
+
+[query_config]
+# SQL query to get update data
+query = """
+WITH status_cte AS (
+    SELECT
+        [MO Number] as MO_Number,
+        state,
+        closed_time_t,
+        cut_number,
+        sew_number,
+        finish_number,
+        PNP_Receive,
+        coalesce([Cutting WIP], 0) as "QTY WIP CUT",
+        coalesce([Sewing WIP], 0) as "QTY WIP SEW",
+        coalesce([Finishing WIP], 0) as "QTY WIP FIN",
+        coalesce([defect_number], 0) as "QTY SCRAP",
+        CASE
+            WHEN LOWER(state) LIKE '%closed%' THEN 6
+            WHEN cut_number > 0 AND sew_number = 0 THEN 5
+            WHEN sew_number > 0 AND finish_number = 0 THEN 4
+            WHEN finish_number > 0 AND PNP_Receive < finish_number THEN 3
+            WHEN PNP_Receive > 0
+                 AND finish_number > 0
+                 AND PNP_Receive >= finish_number THEN 2
+            ELSE 1
+        END AS status_rank,
+        CASE
+            WHEN LOWER(state) LIKE '%closed%' THEN 'COMPLETE'
+            WHEN cut_number > 0 AND sew_number = 0 THEN 'CUTTING'
+            WHEN sew_number > 0 AND finish_number = 0 THEN 'SEWING'
+            WHEN finish_number > 0 AND PNP_Receive < finish_number THEN 'FINISHING'
+            WHEN PNP_Receive > 0
+                 AND finish_number > 0
+                 AND PNP_Receive >= finish_number THEN 'PNP RECEIVED'
+            ELSE 'NOT STARTED'
+        END AS computed_status
+    FROM dbo.MES_operational_performance
+),
+ranked AS (
+    SELECT
+        MO_Number,
+        state,
+        closed_time_t,
+        computed_status,
+        cut_number,
+        sew_number,
+        finish_number,
+        PNP_Receive,
+        [QTY WIP CUT],
+        [QTY WIP SEW],
+        [QTY WIP FIN],
+        [QTY SCRAP],
+        ROW_NUMBER() OVER (
+            PARTITION BY MO_Number
+            ORDER BY status_rank DESC
+        ) AS rn
+    FROM status_cte
+)
+SELECT
+    [Item ID] AS [monday_item_id],
+    r.MO_Number,
+    r.state as [MES MO Status],
+    r.closed_time_t,
+    r.computed_status as [PRODUCTION STATUS],
+    r.cut_number,
+    r.sew_number,
+    r.finish_number,
+    r.PNP_Receive,
+    r.[QTY WIP CUT],
+    r.[QTY WIP SEW],
+    r.[QTY WIP FIN],
+    r.[QTY SCRAP],
+    p.[PRODUCTION STATUS] AS existing_status
+FROM ranked r
+JOIN dbo.MON_COO_Planning p
+  ON p.[MO NUMBER] = r.MO_Number
+ AND p.[ORDER TYPE] <> 'CANCELLED'
+ AND p.[Factory Country] = 'China'
+WHERE r.rn = 1
+  AND (p.[PRODUCTION STATUS] IS NULL or p.[QTY WIP CUT] IS NULL OR p.[QTY WIP SEW] IS NULL or p.[QTY WIP FIN] IS NULL or p.[QTY SCRAP] IS NULL
+       OR p.[PRODUCTION STATUS] <> r.computed_status
+       OR r.[QTY WIP CUT] <> p.[QTY WIP CUT]
+       or r.[QTY WIP SEW] <> p.[QTY WIP SEW]
+       or r.[QTY WIP FIN] <> p.[QTY WIP FIN]
+       or r.[QTY SCRAP] <> p.[QTY SCRAP])
+ORDER BY r.MO_Number;
+
+"""
+
+# Column mapping configuration
+item_id_column = "monday_item_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+"name" = "Name"
+"subtasks_mkp4ypys" = "Subitems"
+"text_mkp47g7m" = "SEASON"
+"dropdown_mkp4kmtp" = "CUSTOMER SEASON"
+"dropdown_mkpcj4ev" = "DROP"
+"dropdown_mkp4ar5n" = "CUSTOMER"
+"dropdown_mkpc44w5" = "CUSTOMER ALLOCATION"
+"date_mkpcevxt" = "ORDER RECEIVED DATE"
+"dropdown_mkpc7ey8" = "ORDER TYPE"
+"text_mkp43qv0" = "BULK PO"
+"text_mkp6sfqv" = "AAG ORDER NUMBER"
+"numeric_mkp4cb6t" = "BULK PO QTY"
+"text_mkp4w7tj" = "STYLE CODE"
+"long_text_mkpervye" = "STYLE DESCRIPTION"
+"text_mkp41ze2" = "Color"
+"dropdown_mkp44k77" = "ACTIVE/WOVEN/SWIM/ACC/SEAMLESS"
+"dropdown_mkp4yr3v" = "STYLE CATEGORY"
+"dropdown_mkpbbtkh" = "PRODUCT CAT"
+"dropdown_mkp41kzc" = "Fabric Code"
+"dropdown_mkp4n679" = "Fabric Type"
+"text_mkp4vncc" = "Fabric Lead Time"
+"text_mkp4wp81" = "Fabric COO"
+"numeric_mkp46xhm" = "CMP LS"
+"numeric_mkp6j2y1" = "CMP Partner"
+"numeric_mkp4y0pe" = "RM Freight Est."
+"numeric_mkp4rfg6" = "FOB (Partner)"
+"numeric_mkp41wvv" = "PO Base (Partner)"
+"numeric_mkp5kt4y" = "PO Other (Partner)"
+"numeric_mkp5s76g" = "PO MOQ% (Partner)"
+"formula_mkp5pht0" = "PO Unit Total (Partner)"
+"formula_mkp5kcgh" = "PO Total Value (Partner)"
+"text_mkp4av7r" = "Landed Cost (Longson)"
+"text_mkp4p395" = "Sell Price (AAGT - RMB)"
+"text_mkp418eg" = "Fx (RMB -> USD)"
+"dropdown_mkp4gmn6" = "Destination"
+"date_mkp4brfg" = "LS PLANNED APPROVAL DATE FOR PP SAMPLE"
+"date_mkp4vtz2" = "FABRIC DUE INTO LONGSON"
+"date_mkp57jk5" = "PC RM Ex-Factory Date"
+"date_mkp42e0n" = "TRIMS DUE INTO LONGSON"
+"date_mkrm3m0q" = "Longson Plan Cut Date"
+"date_mkp44ntk" = "EX-FTY DATE (Original)"
+"date_mkp4rbd7" = "EX-FTY (Revised LS)"
+"date_mkp5qmw6" = "EX-FTY (Partner PO)"
+"color_mkp4304j" = "PP Status"
+"color_mkp4apjg" = "Fabric Status"
+"color_mkp43peb" = "Trim Status"
+"numeric_mkphcbs6" = "Precut Quantity"
+"color_mkp4hmsy" = "IQC Status"
+"color_mkp43y44" = "Translation Status"
+"color_mkp46hv3" = "Label Check Production Returns"
+"color_mkp4v363" = "Fabric Visual Identification"
+"dropdown_mkp4wx2p" = "PLANNED DELIVERY METHOD"
+"dropdown_mkp4e51p" = "Incoterms"
+"date_mkp44k3t" = "ETA CUSTOMER WAREHOUSE DATE"
+"dropdown_mkp43md8" = "FACTORY"
+"color_mkp4xd64" = "ALLOCATION STATUS"
+"dropdown_mkp4f6se" = "COUNTRY OF ORIGIN"
+"text_mkp4m83f" = "REMARK"
+"board_relation_mkp69zh3" = "Factory (linked)"
+"lookup_mkr5pgwg" = "PRODUCTION TYPE"
+"lookup_mkp64c3y" = "Factory Location"
+"lookup_mkp61hs" = "Factory Country"
+"board_relation_mkp6dhn7" = "PARTNER PO"
+"lookup_mkp6ktnm" = "Partner Trading Entity"
+"pulse_id_mkp5y5d9" = "Item ID"
+"lookup_mkp6vk7m" = "PO APPROVAL STATUS"
+"lookup_mkp6pmdg" = "PO STATUS"
+"dropdown_mkp7bkwm" = "VAP Fabric Print"
+"dropdown_mkp7g8xv" = "VAP Fabric Fuzing"
+"dropdown_mkp7f18r" = "VAP Panel Print"
+"dropdown_mkp7djxr" = "VAP Embroidery"
+"dropdown_mkp7v8xk" = "VAP Heat Press"
+"dropdown_mkp7y9jr" = "VAP Bonding"
+"dropdown_mkp7krsa" = "VAP Beading"
+"dropdown_mkp7h3zp" = "VAP Lasercut"
+"dropdown_mkp7jy06" = "VAP Quilting"
+"dropdown_mkp7xdwb" = "VAP Embossing"
+"dropdown_mkp7qe36" = "VAP Smocking Pleating"
+"dropdown_mkp7h163" = "Washing"
+"color_mkp7a4mx" = "RM STATUS"
+"color_mkp79sec" = "CUSTOMER APPROVAL"
+"formula_mkpd1585" = "CMP LS (Ext)"
+"formula_mkpdj275" = "CMP Partner (Ext)"
+"numeric_mkphnwff" = "TARGET CMP COST (USD)"
+"dropdown_mkpj1y9z" = "CUTTING METHOD"
+"numeric_mkpj7n50" = "GSD CUTTING"
+"numeric_mkpj9svk" = "GSD SEWING"
+"numeric_mkpjnqqc" = "GSD FINISHING"
+"numeric_mkpjpk1z" = "GSD BONDING LASER"
+"numeric_mkpjnb88" = "GSD BEADING"
+"numeric_mkpj7zy9" = "GSD TOTAL"
+"numeric_mkpjahmn" = "GSD ADJ FINANCE"
+"dropdown_mkpjrhj3" = "ORDER SIZE"
+"text_mkpv68ar" = "Alias"
+"date_mkpw2sy1" = "Fabric Ready to Ship"
+"long_text_mkq0y66h" = "Partner Comments"
+"color_mkq0f90k" = "PRODUCTION STATUS"
+"board_relation_mkq9bt3z" = "ALLOCATION REF"
+"multiple_person_mkqfm1ea" = "PLANNER"
+"color_mkqgdxjq" = "FABRIC ORDERED"
+"board_relation_mkqjpfdw" = "Customers (linked)"
+"lookup_mkqjmjft" = "AM (linked)"
+"multiple_person_mkqj1tpr" = "Account Manager"
+"dropdown_mkqjemz1" = "Essential Core Acc"
+"date_mkqj2rs5" = "MO RELEASE DATE"
+"text_mkqjdxtf" = "MO NUMBER"
+"date_mks65vyr" = "EX-FTY (Planned Longson)"
+"date_mks6wv4g" = "EX-FTY (Planned Partner)"
+"date_mkqrkrzy" = "EX-FTY (Forecast)"
+"numeric_mkqxer6g" = "QTY WIP"
+"numeric_mkqx90j" = "QTY FG"
+"numeric_mkqxhmp3" = "QTY INVOICED"
+"numeric_mkqxnxsm" = "QTY FCST"
+"date_mkr0pry6" = "EX-FTY (Change Request)"
+"color_mkr0kpy4" = "REQUESTED XFD STATUS"
+"dropdown_mkr3pzja" = "AQL TYPE"
+"color_mkr3xnzv" = "AQL INSPECTION"
+"date_mkr322m7" = "PLANNED CUT DATE"
+"numeric_mkr3195y" = "QTY WIP CUT"
+"numeric_mkr3jqzz" = "QTY WIP SEW"
+"numeric_mkr3prdw" = "QTY WIP FIN"
+"numeric_mkr3gcg2" = "QTY SCRAP"
+"text_mkra6mkv" = "keyCustMastSch"
+"numeric_mkp4q1rv" = "Customer FOB (USD)"
+"text_mkp4dqeq" = "Sell Price to Partner (USD)"
+"text_mkp4h1rc" = "Files"
+"multiple_person_mkp484y7" = "People"
+"board_relation_mkr58fs4" = "CUST MASTER SCHEDULE"
+"board_relation_mkp7rp13" = "Shipments (RM)"
+"lookup_mkp7tk6r" = "RM Shipment Status"
+"formula_mks07fe3" = "LS RM Plan Arrival Date"
+"formula_mks1qwr" = "Pre Planned Production YY/MM"
+"text_mks1kjcg" = "Plan Print Month"
+"text_mks1jv2x" = "Plan Sewing Month"
+"text_mks1mnf4" = "Sewing Finished Month"
+"text_mks11g7a" = "Plan Scan Month"
+"text_mks1v729" = "SCAN Finished Month"
+"dropdown_mks113q1" = "MES MO Status"
+"dropdown_mks1ny7b" = "GSD Source"
+
+
+[validation]
+required_fields = ["monday_item_id", "board_id"]
+max_batch_size = 20 # Process 15 records per API call
+timeout_seconds = 300
+
+[retry_config]
+max_retries = 3
+retry_delay_seconds = 5
+backoff_multiplier = 2
