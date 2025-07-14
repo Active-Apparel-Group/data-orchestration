@@ -416,29 +416,29 @@ if __name__ == "__main__":
     # Test schema validation
     try:
         validation = helper.validate_staging_schema('ORDER_LIST', 'orders')
-        print("📊 Current ORDER_LIST schema validation:")
-        print(f"   Valid: {validation['valid']}")
-        print(f"   INT columns: {validation['int_columns']}")
-        print(f"   DECIMAL columns: {validation['decimal_columns']}")
-        print(f"   NVARCHAR columns: {validation['nvarchar_columns']}")
-        print(f"   Total columns: {validation['total_columns']}")
+        self.logger.info("📊 Current ORDER_LIST schema validation:")
+        self.logger.info(f"   Valid: {validation['valid']}")
+        self.logger.info(f"   INT columns: {validation['int_columns']}")
+        self.logger.info(f"   DECIMAL columns: {validation['decimal_columns']}")
+        self.logger.info(f"   NVARCHAR columns: {validation['nvarchar_columns']}")
+        self.logger.info(f"   Total columns: {validation['total_columns']}")
         
         if not validation['valid']:
-            print("❌ Current ORDER_LIST has broken schema (too much NVARCHAR)")
-            print("✅ Schema-aware staging helper will fix this on next deploy")
+            self.logger.info("❌ Current ORDER_LIST has broken schema (too much NVARCHAR)")
+            self.logger.info("✅ Schema-aware staging helper will fix this on next deploy")
         
     except Exception as e:
-        print(f"Error validating schema: {e}")
+        self.logger.info(f"Error validating schema: {e}")
     
     # Test the new StagingTableManager
-    print("\n🔧 Testing StagingTableManager interface:")
+    self.logger.info("\n🔧 Testing StagingTableManager interface:")
     try:
         manager = StagingTableManager()
-        print("✅ StagingTableManager created successfully")
-        print("   Available methods:")
-        print("   - create_staging_table_from_ddl()")
-        print("   - atomic_swap_tables()")
-        print("   - load_to_staging_table_enhanced()")
+        self.logger.info("✅ StagingTableManager created successfully")
+        self.logger.info("   Available methods:")
+        self.logger.info("   - create_staging_table_from_ddl()")
+        self.logger.info("   - atomic_swap_tables()")
+        self.logger.info("   - load_to_staging_table_enhanced()")
         
     except Exception as e:
-        print(f"❌ StagingTableManager test failed: {e}")
+        self.logger.info(f"❌ StagingTableManager test failed: {e}")

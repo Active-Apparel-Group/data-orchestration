@@ -588,7 +588,7 @@ def main():
         board_id = updater.update_config['metadata'].get('board_id')
     
     if not board_id:
-        print("ERROR: board_id required either as argument or in config file")
+        self.logger.info("ERROR: board_id required either as argument or in config file")
         parser.print_help()
         return
     
@@ -601,33 +601,33 @@ def main():
         else:
             result = updater.update_item(board_id, args.item_id, column_updates, dry_run)
             
-        print(json.dumps(result, indent=2))
+        self.logger.info(json.dumps(result, indent=2))
         
     elif args.config:
         # Batch update from TOML config
         if 'query_config' in updater.update_config and 'query' in updater.update_config['query_config']:
             query = updater.update_config['query_config']['query']
             result = updater.batch_update_from_query(query, updater.update_config, dry_run)
-            print(json.dumps(result, indent=2))
+            self.logger.info(json.dumps(result, indent=2))
         else:
-            print("ERROR: No query found in TOML config file")
+            self.logger.info("ERROR: No query found in TOML config file")
             
     elif args.query and args.config:
         # Batch update from query parameter
         result = updater.batch_update_from_query(args.query, updater.update_config, dry_run)
-        print(json.dumps(result, indent=2))
+        self.logger.info(json.dumps(result, indent=2))
         
     else:
         parser.print_help()
-        print("\nExamples:")
-        print('  # Single item update (dry run)')
-        print('  python scripts/universal_monday_update.py --board_id 8709134353 --item_id 123456 --column_updates \'{"status": "Done"}\'')
-        print('')
-        print('  # Execute single item update')
-        print('  python scripts/universal_monday_update.py --board_id 8709134353 --item_id 123456 --column_updates \'{"status": "Done"}\' --execute')
-        print('')
-        print('  # Batch update from config')
-        print('  python scripts/universal_monday_update.py --config planning_update_fob.toml --execute')
+        self.logger.info("\nExamples:")
+        self.logger.info("  # Single item update (dry run)")
+        self.logger.info('  python scripts/universal_monday_update.py --board_id 8709134353 --item_id 123456 --column_updates \'{"status": "Done"}\'')
+        self.logger.info('')
+        self.logger.info("  # Execute single item update")
+        self.logger.info('  python scripts/universal_monday_update.py --board_id 8709134353 --item_id 123456 --column_updates \'{"status": "Done"}\' --execute')
+        self.logger.info('')
+        self.logger.info("  # Batch update from config")
+        self.logger.info("  python scripts/universal_monday_update.py --config planning_update_fob.toml --execute")
 
 if __name__ == "__main__":
     main()

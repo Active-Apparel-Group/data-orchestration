@@ -60,7 +60,7 @@ def render_template(template_path: Path, context: Dict[str, Any]) -> str:
 def write_output(sql: str, out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(sql, encoding="utf-8")
-    print(f"✅  Wrote {out_path.relative_to(ROOT_DIR)} ({len(sql.splitlines())} lines)")
+    self.logger.info(f"✅  Wrote {out_path.relative_to(ROOT_DIR)} ({len(sql.splitlines())} lines)")
 
 def set_select_names(columns: List[Dict[str, Any]], raw_column_list: List[str]) -> None:
     """
@@ -70,7 +70,7 @@ def set_select_names(columns: List[Dict[str, Any]], raw_column_list: List[str]) 
     3. Else, None (for NULL) and print warning
     """
     raw_lower = {c.lower(): c for c in raw_column_list}
-    print(f"\nRAW columns available: {list(raw_lower.values())}\n")
+    self.logger.info(f"\nRAW columns available: {list(raw_lower.values())}\n")
 
     for col in columns:
         canon = col["name"]
@@ -87,7 +87,7 @@ def set_select_names(columns: List[Dict[str, Any]], raw_column_list: List[str]) 
                     found = True
                     break
         if not found:
-            print(f"⚠️  WARNING: No match found for {canon} (aliases: {col.get('aliases', [])}), inserting NULL")
+            self.logger.info(f"⚠️  WARNING: No match found for {canon} (aliases: {col.get('aliases', [])}), inserting NULL")
             col["select_name"] = None  # Jinja template should use NULL when select_name is None
 
 # ---------------------------------------------------------------------------

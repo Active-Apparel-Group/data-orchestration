@@ -61,4 +61,4 @@ mo_status = (
     })
 )
 
-print(mo_status)
+self.logger.info(mo_status)

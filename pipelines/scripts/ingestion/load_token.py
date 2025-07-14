@@ -50,17 +50,15 @@ def get_oauth_config() -> Dict[str, str]:
     return {
         "url": "https://login.microsoftonline.com/95d7583a-1925-44b1-b78b-3483e00c5b46/oauth2/v2.0/token",
         "grant_type": "client_credentials",
-        # PA_CLIENT_ID
-        "client_id": client_id,
-        # PA_CLIENT_SECRET
-        "client_secret": client_secret,
+        "client_id":        client_id,         # PA_CLIENT_ID
+        "client_secret":    client_secret,     # PA_CLIENT_SECRET
         "scope": "https://management.azure.com/.default"  # Azure Resource Manager for Logic Apps
     }
 
 def get_bearer_token():
     """Retrieve bearer token from Microsoft OAuth endpoint"""
     try:
-        print("🔐 Retrieving bearer token from Microsoft OAuth...")
+        self.logger.info("🔐 Retrieving bearer token from Microsoft OAuth...")
         
         oauth_config = get_oauth_config()
         url = oauth_config.pop("url")
@@ -77,20 +75,20 @@ def get_bearer_token():
         if not token:
             raise RuntimeError("Failed to get access_token from Azure AD response")
         
-        print("Successfully retrieved bearer token!")
-        print(f"Token preview: {token[:50]}...")
-        print(f"Expires in: {expires} seconds ({expires/3600:.1f} hours)")
+        self.logger.info("Successfully retrieved bearer token!")
+        self.logger.info(f"Token preview: {token[:50]}...")
+        self.logger.info(f"Expires in: {expires} seconds ({expires/3600:.1f} hours)")
         
         return token, expires
         
     except Exception as e:
-        print(f"Failed to retrieve token: {e}")
+        self.logger.info(f"Failed to retrieve token: {e}")
         raise
 
 def store_token_in_database(token, expires):
     """Store bearer token in database using db_helper"""
     try:
-        print("Storing bearer token in database...")
+        self.logger.info("Storing bearer token in database...")
         
         # Use stored procedure with db_helper
         store_sql = """
@@ -106,26 +104,26 @@ def store_token_in_database(token, expires):
             params=(token, expires)
         )
         
-        print("Bearer token stored successfully!")
-        print(f"Database rows affected: {rows_affected}")
+        self.logger.info("Bearer token stored successfully!")
+        self.logger.info(f"Database rows affected: {rows_affected}")
         
         # Verify storage
         verify_sql = "SELECT COUNT(*) as token_count FROM log.BearerTokens"
         result = db.run_query(verify_sql, "orders")
         token_count = result.iloc[0]['token_count']
-        print(f"Total tokens in database: {token_count}")
+        self.logger.info(f"Total tokens in database: {token_count}")
         
         return True
         
     except Exception as e:
-        print(f"❌ Failed to store token in database: {e}")
+        self.logger.info(f"❌ Failed to store token in database: {e}")
         raise
 
 def main():
     """Main execution flow for Power Automate token retrieval"""
-    print("=" * 60)
-    print("POWER AUTOMATE BEARER TOKEN RETRIEVAL")
-    print("=" * 60)
+    self.logger.info("=" * 60)
+    self.logger.info("POWER AUTOMATE BEARER TOKEN RETRIEVAL")
+    self.logger.info("=" * 60)
     
     try:
         # Step 1: Setup db_helper
@@ -133,32 +131,32 @@ def main():
         
         # Step 2: Verify database connection
         db_config = db.get_database_config()
-        print("Available database configurations:")
+        self.logger.info("Available database configurations:")
         for db_key, db_info in db_config.items():
             host = db_info.get("host", "N/A")
             database = db_info.get("database", "N/A")
-            print(f"  • {db_key.upper()}: {host} → {database}")
+            self.logger.info(f"  • {db_key.upper()}: {host} → {database}")
 
         if "orders" in db_config:
             test_query = "SELECT 1 AS connection_test"
             test_result = db.run_query(test_query, "orders")
-            print("Database connection test successful!")
+            self.logger.info("Database connection test successful!")
         else:
-            print("'orders' database configuration not found")
+            self.logger.info("'orders' database configuration not found")
             return
         
         # Step 3: Get token
         token, expires = get_bearer_token()
-        print("Access Token Retrieved:")
-        print(token)
+        self.logger.info("Access Token Retrieved:")
+        self.logger.info(token)
         
         # Step 4: Store in database
         store_token_in_database(token, expires)
         
-        print("\nSUCCESS! Token retrieved and stored using db_helper")
+        self.logger.info("\nSUCCESS! Token retrieved and stored using db_helper")
         
     except Exception as e:
-        print(f"Error: {e}")
+        self.logger.info(f"Error: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

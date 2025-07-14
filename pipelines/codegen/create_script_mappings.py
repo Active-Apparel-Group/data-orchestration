@@ -55,7 +55,7 @@ def transform_config(input_file: Path, output_file: Path):
     
     # 4) Write out
     output_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    print(f"✅ Enhanced JSON config written to {output_file}")
+    self.logger.info(f"✅ Enhanced JSON config written to {output_file}")
 
 def generate_column_mapping_toml(columns: list) -> str:
     """
@@ -151,8 +151,8 @@ def transform_to_toml(input_file: Path, output_file: Path):
     final_content = "\n".join(toml_content)
     output_file.write_text(final_content, encoding="utf-8")
     
-    print(f"✅ TOML configuration written to {output_file}")
-    print(f"📊 Generated mapping for {len([c for c in columns if not c.get('exclude', False)])} columns")
+    self.logger.info(f"✅ TOML configuration written to {output_file}")
+    self.logger.info(f"📊 Generated mapping for {len([c for c in columns if not c.get('exclude', False)])} columns")
 
 def main():
     parser = argparse.ArgumentParser(

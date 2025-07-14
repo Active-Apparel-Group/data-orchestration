@@ -3,14 +3,13 @@ namespace: aag.prod
 description: "ORDER_LIST Complete Pipeline - SharePoint to SQL Server (4-stage ETL)"
 
 triggers:
-  - id: upstream_dependancy
-    type: io.kestra.plugin.core.trigger.Flow
-    preconditions:
-      id: flow_trigger
-      flows:
-        - namespace: aag.prod
-          flowId: load_tables
-          states: [SUCCESS]
+  - id: ev_hour
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 * * * *"
+
+variables:
+  tenantID: "{{ kv('AZ_TENANT_ID') }}"
+
 
 tasks:
   - id: setup_and_log
@@ -31,6 +30,7 @@ tasks:
         - pipelines/**
         - configs/**
         - utils/**
+        - db/**
     tasks:
       - id: load_order_list
         type: io.kestra.plugin.scripts.python.Commands
@@ -41,7 +41,14 @@ tasks:
         description: "Execute ORDER_LIST complete pipeline: SharePoint → Blob → Extract → Transform → Load"
         namespaceFiles:
           enabled: true
-
+        env:
+          AZ_TENANT_ID: "{{ secret('AZ_TENANT_ID') }}"
+          BLOB_CLIENT_ID: "{{ secret('BLOB_CLIENT_ID') }}"
+          BLOB_CLIENT_SECRET: "{{ secret('BLOB_CLIENT_SECRET') }}"
+          BLOB_ACCOUNT_NAME: "{{ secret('BLOB_ACCOUNT_NAME') }}"
+          BLOB_ACCOUNT_KEY: "{{ secret('BLOB_ACCOUNT_KEY') }}" 
+          
+        
         commands:
           - echo "🚀 === ORDER_LIST Pipeline Starting ==="
           - echo "📊 Executing complete SharePoint → SQL workflow..."

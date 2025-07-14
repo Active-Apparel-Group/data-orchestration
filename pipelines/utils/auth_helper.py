@@ -198,7 +198,7 @@ def get_token(cache_key: str = "msal_default", db_key: str = "dms") -> str:
     if not result:
         logging.info("🔐 Interactive authentication required...")
         flow = app.initiate_device_flow(scopes=SCOPES)
-        print(flow["message"])
+        self.logger.info(flow["message"])
         input("Press Enter once you have completed login in the browser...")
         result = app.acquire_token_by_device_flow(flow)
 
@@ -255,17 +255,17 @@ def list_token_caches(db_key: str = "dms"):
             
             rows = cursor.fetchall()
             if rows:
-                print("\n📋 MSAL Token Cache Status:")
-                print("-" * 80)
+                self.logger.info("\n📋 MSAL Token Cache Status:")
+                self.logger.info("-" * 80)
                 for row in rows:
                     cache_key, user_info, created, updated, expires, status = row
-                    print(f"Key: {cache_key}")
-                    print(f"User: {user_info}")
-                    print(f"Status: {status}")
-                    print(f"Updated: {updated}")
-                    print("-" * 40)
+                    self.logger.info(f"Key: {cache_key}")
+                    self.logger.info(f"User: {user_info}")
+                    self.logger.info(f"Status: {status}")
+                    self.logger.info(f"Updated: {updated}")
+                    self.logger.info("-" * 40)
             else:
-                print("📭 No token caches found in database")
+                self.logger.info("📭 No token caches found in database")
                 
     except Exception as e:
         logging.error(f"❌ Failed to list token caches: {e}")
@@ -275,5 +275,5 @@ def list_token_caches(db_key: str = "dms"):
 # Backward compatibility - keep the original interface
 if __name__ == "__main__":
     token = get_token()
-    print(f"Token acquired successfully: {token[:50]}...")
+    self.logger.info(f"Token acquired successfully: {token[:50]}...")
     

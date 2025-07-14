@@ -2,6 +2,7 @@
 """
 Logger Helper for Monday.com Data Integration
 Provides unified logging interface for both VS Code/local development and Kestra orchestration
+
 """
 
 import os
@@ -20,7 +21,7 @@ def get_logger(name="monday_integration"):
         from kestra import Kestra
         logger = Kestra.logger()
         logger.info(f"Using Kestra logger for {name}")
-        return KestralLoggerWrapper(logger)
+        return KestraLoggerWrapper(logger)
     except ImportError:
         # Option 2: Fall back to standard Python logging for local development
         import logging
@@ -94,9 +95,19 @@ class LoggerWrapper:
             msg = msg % args
         self._logger.critical(msg)
 
-class KestralLoggerWrapper(LoggerWrapper):
+class KestraLoggerWrapper(LoggerWrapper):
     """Wrapper for Kestra logger"""
-    pass
+    def exception(self, msg="", *args, **kwargs):
+        """Handle exception logging for Kestra logger"""
+        # Kestra logger may not have exception method, so use error with stack trace
+        if hasattr(self._logger, 'exception'):
+            self._logger.exception(msg, *args, **kwargs)
+        else:
+            # Fall back to error logging with traceback info
+            import traceback
+            stack_trace = traceback.format_exc()
+            error_msg = f"{msg}\n{stack_trace}" if msg else stack_trace
+            self._logger.error(error_msg)
 
 class StandardLoggerWrapper(LoggerWrapper):
     """Wrapper for standard Python logger"""

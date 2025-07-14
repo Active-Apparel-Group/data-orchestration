@@ -1,0 +1,78 @@
+id: global-failure-alert
+namespace: system.alerts
+
+triggers:
+  - id: on_fail
+    type: io.kestra.plugin.core.trigger.Flow
+    states: [ FAILED ]        # react to any failure
+    # Optionally scope it:
+    # namespaces:
+    #    - aag.prod
+    #   - aag.mes
+
+    preconditions:
+      id: prod
+      where:
+        # OR-clause 1 → any flow whose namespace starts with aag.prod
+        - id: prod_ns
+          filters:
+            - field: NAMESPACE
+              type: STARTS_WITH
+              value: aag.prod
+      # (optional) If you ever want an AND-logic instead,
+      # wrap everything in a single `where:` block with multiple filters.
+
+tasks:
+  - id: notify_teams
+    type: io.kestra.plugin.notifications.teams.TeamsIncomingWebhook
+    url: "https://prod-29.australiasoutheast.logic.azure.com:443/workflows/50ab2a662c9e4b688d926e1d59479440/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bzOwkchRz4a7uJT-7p6Xebnb5bINHsbyn4aXFJymINs"
+    payload: |
+      {
+        "@type": "MessageCard",
+        "@context": "http://schema.org/extensions",
+        "summary": "Kestra flow {{ trigger.state }}",
+        "title": "❌ Flow {{ trigger.namespace }}.{{ trigger.flowId }} failed",
+        "themeColor": "C50F1F",
+        "sections": [
+          {
+            "text": "**Execution ID:** {{ trigger.executionId }}\n**Started:** {{ trigger.executionLabels }}",
+            "markdown": true
+          }
+        ],
+        "attachments": [
+          {
+            "contentType": "application/vnd.microsoft.card.adaptive",
+            "contentUrl": null,
+            "content": {
+              "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+              "type": "AdaptiveCard",
+              "version": "1.5",
+              "body": [
+                {
+                  "type": "TextBlock",
+                  "size": "Large",
+                  "weight": "Bolder",
+                  "color": "Attention",
+                  "text": "Flow Alert - {{ trigger.state }}"
+                },
+                {
+                  "type": "FactSet",
+                  "facts": [
+                    { "title": "Flow",      "value": "{{ trigger.flowId }}" },
+                    { "title": "Namespace", "value": "{{ trigger.namespace }}" },
+                    { "title": "Failure",   "value": "{{ trigger.state }}" },
+                    { "title": "TaskID",    "value": "{{ trigger.executionId }}" }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": "Action.OpenUrl",
+                  "title": "Open execution",
+                  "url": "{{ kestra.url }}/ui/executions/{{ trigger.executionId }}"
+                }
+              ]
+            }
+          }
+        ]
+      }

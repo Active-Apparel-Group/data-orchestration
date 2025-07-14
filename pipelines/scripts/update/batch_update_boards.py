@@ -444,9 +444,9 @@ def main():
     if 'query_config' in updater.update_config and 'query' in updater.update_config['query_config']:
         query = updater.update_config['query_config']['query']
         result = updater.batch_update_from_query(query, updater.update_config, dry_run)
-        print(json.dumps(result, indent=2))
+        self.logger.info(json.dumps(result, indent=2))
     else:
-        print("ERROR: No query found in TOML config file")
+        self.logger.info("ERROR: No query found in TOML config file")
 
 if __name__ == "__main__":
     main()

@@ -390,12 +390,12 @@ tasks:
       ], capture_output=True, text=True, cwd="/app")
       
       if result.returncode != 0:
-          print(f"Script failed with return code {{result.returncode}}")
-          print(f"STDERR: {{result.stderr}}")
+          self.logger.info(f"Script failed with return code {{result.returncode}}")
+          self.logger.info(f"STDERR: {{result.stderr}}")
           raise Exception(f"Extraction script failed: {{result.stderr}}")
       
-      print(f"STDOUT: {{result.stdout}}")
-      print("✅ Board extraction completed successfully")
+      self.logger.info(f"STDOUT: {{result.stdout}}")
+      self.logger.info("✅ Board extraction completed successfully")
 
 labels:
   board_id: "{vars['board_id']}"
@@ -487,7 +487,7 @@ if __name__ == "__main__":
         
         # Generate script
         script_path = generate_script_from_schema(board_schema)
-        print(f"\n✅ Generated script: {script_path}")        
+        self.logger.info(f"\n✅ Generated script: {script_path}")        
         # Generate workflow
         generator = ScriptTemplateGenerator()
         workflow_content = generator.generate_workflow_config(board_schema)
@@ -496,8 +496,8 @@ if __name__ == "__main__":
         with open(workflow_path, 'w', encoding='utf-8') as f:
             f.write(workflow_content)
         
-        print(f"✅ Generated workflow: {workflow_path}")
+        self.logger.info(f"✅ Generated workflow: {workflow_path}")
         
     else:
         logger.error(f"Metadata file not found: {metadata_file}")
-        print("Please run board_schema_generator.py first to generate metadata.")
+        self.logger.info("Please run board_schema_generator.py first to generate metadata.")

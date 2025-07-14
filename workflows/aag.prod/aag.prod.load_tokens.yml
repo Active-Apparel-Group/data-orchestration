@@ -41,6 +41,14 @@ tasks:
         description: "Execute main workflow logic for {{flow.id}}"
         namespaceFiles:
           enabled: true
+        env:
+          AZ_TENANT_ID: "{{ secret('AZ_TENANT_ID') }}"
+          BLOB_CLIENT_ID: "{{ secret('BLOB_CLIENT_ID') }}"
+          BLOB_CLIENT_SECRET: "{{ secret('BLOB_CLIENT_SECRET') }}"
+          BLOB_ACCOUNT_NAME: "{{ secret('BLOB_ACCOUNT_NAME') }}"
+          BLOB_ACCOUNT_KEY: "{{ secret('BLOB_ACCOUNT_KEY') }}" 
+          PA_CLIENT_ID: "{{ secret('PA_CLIENT_ID') }}"
+          PA_CLIENT_SECRET: "{{ secret('PA_CLIENT_SECRET') }}"
 
         commands:
           - echo "�Ys? === flow about ayoun Starting ==="

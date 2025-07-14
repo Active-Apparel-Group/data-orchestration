@@ -3,9 +3,14 @@ namespace: aag.prod
 description: "Load database tables"
 
 triggers:
-  - id: ev_45_mins
-    type: io.kestra.plugin.core.trigger.Schedule
-    cron: "*/45 * * * *"
+  - id: upstream_dependancy
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: flow_trigger
+      flows:
+        - namespace: aag.prod
+          flowId: load_order_list
+          states: [SUCCESS]
 
 tasks:
   - id: setup_and_log
@@ -27,6 +32,14 @@ tasks:
         - pipelines/**
         - configs/**
         - utils/**
+    env:
+      AZ_TENANT_ID: "{{ secret('AZ_TENANT_ID') }}"
+      BLOB_CLIENT_ID: "{{ secret('BLOB_CLIENT_ID') }}"
+      BLOB_CLIENT_SECRET: "{{ secret('BLOB_CLIENT_SECRET') }}"
+      BLOB_ACCOUNT_NAME: "{{ secret('BLOB_ACCOUNT_NAME') }}"
+      BLOB_ACCOUNT_KEY: "{{ secret('BLOB_ACCOUNT_KEY') }}" 
+      PA_CLIENT_ID: "{{ secret('PA_CLIENT_ID') }}"
+      PA_CLIENT_SECRET: "{{ secret('PA_CLIENT_SECRET') }}"
     tasks:
       - id: load_mes_tables
         type: io.kestra.plugin.scripts.python.Commands

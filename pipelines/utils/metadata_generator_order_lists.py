@@ -73,7 +73,7 @@ def fetch_dataframe(sql: str, cnxn: pyodbc.Connection) -> pd.DataFrame:
     try:
         return pd.read_sql(sql, cnxn)
     except Exception as exc:  # pylint: disable=broad-except
-        print(f"! Skipped query because {exc}", file=sys.stderr)
+        self.logger.info(f"! Skipped query because {exc}", file=sys.stderr)
         return pd.DataFrame()
 
 
@@ -185,7 +185,7 @@ def write_yaml_file(yaml_data: Dict, out_path: Path) -> None:
             width=120,
             allow_unicode=True,
         )
-    print(f"\n✅  Wrote {out_path} with {len(yaml_data['columns'])} columns.")
+    self.logger.info(f"\n✅  Wrote {out_path} with {len(yaml_data['columns'])} columns.")
 
 
 
@@ -205,4 +205,4 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\nInterrupted – no file written.", file=sys.stderr)
+        self.logger.info("\nInterrupted – no file written.", file=sys.stderr)

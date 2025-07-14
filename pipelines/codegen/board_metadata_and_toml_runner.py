@@ -30,7 +30,7 @@ metadata_path = BOARDS_DIR / f"board_{args.board_id}_metadata.json"
 
 # --- Step 1: Extract board metadata if not already present ---
 if metadata_path.exists():
-    print(f"✅ Metadata file already exists: {metadata_path}\n  Skipping extraction.")
+    self.logger.info(f"✅ Metadata file already exists: {metadata_path}\n  Skipping extraction.")
 else:
     extractor_cmd = [
         sys.executable,
@@ -43,12 +43,12 @@ else:
         extractor_cmd += ["--table-name", args.table_name]
     if args.database:
         extractor_cmd += ["--database", args.database]
-    print(f"🔍 Extracting board metadata: {' '.join(extractor_cmd)}")
+    self.logger.info(f"🔍 Extracting board metadata: {' '.join(extractor_cmd)}")
     result = subprocess.run(extractor_cmd)
     if result.returncode != 0:
-        print("❌ Board extraction failed. Aborting.")
+        self.logger.info("❌ Board extraction failed. Aborting.")
         sys.exit(result.returncode)
-    print(f"✅ Metadata file created: {metadata_path}")
+    self.logger.info(f"✅ Metadata file created: {metadata_path}")
 
 # --- Step 2: Generate TOML config ---
 toml_cmd = [
@@ -57,9 +57,9 @@ toml_cmd = [
     str(metadata_path),
     "--toml"
 ]
-print(f"📝 Generating TOML config: {' '.join(toml_cmd)}")
+self.logger.info(f"📝 Generating TOML config: {' '.join(toml_cmd)}")
 result = subprocess.run(toml_cmd)
 if result.returncode != 0:
-    print("❌ TOML generation failed.")
+    self.logger.info("❌ TOML generation failed.")
     sys.exit(result.returncode)
-print("✅ TOML config generated.")
+self.logger.info("✅ TOML config generated.")

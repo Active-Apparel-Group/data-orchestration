@@ -173,8 +173,8 @@ def run_migration(
             raise FileNotFoundError(f"Migration file not found: {migration_path}")
         
         if verbose:
-            print(f"🔄 Running migration: {migration_path.name}")
-            print(f"📊 Database: {db_key}")
+            self.logger.info(f"🔄 Running migration: {migration_path.name}")
+            self.logger.info(f"📊 Database: {db_key}")
         
         # Read the migration script
         with open(migration_path, 'r', encoding='utf-8') as f:
@@ -191,14 +191,14 @@ def run_migration(
             cursor.close()
         
         if verbose:
-            print(f"✅ Migration completed successfully: {migration_path.name}")
+            self.logger.info(f"✅ Migration completed successfully: {migration_path.name}")
         
         return True
         
     except Exception as e:
         if verbose:
-            print(f"❌ Migration failed: {migration_path.name if 'migration_path' in locals() else migration_path}")
-            print(f"🔥 Error: {str(e)}")
+            self.logger.info(f"❌ Migration failed: {migration_path.name if 'migration_path' in locals() else migration_path}")
+            self.logger.info(f"🔥 Error: {str(e)}")
         return False
 
 def run_migrations_directory(
@@ -229,12 +229,12 @@ def run_migrations_directory(
     
     if not migration_files:
         if verbose:
-            print(f"⚠️  No migration files found in: {migrations_dir}")
+            self.logger.info(f"⚠️  No migration files found in: {migrations_dir}")
         return {'successful': 0, 'failed': 0, 'details': []}
     
     if verbose:
-        print(f"🚀 Running {len(migration_files)} migrations from: {migrations_dir}")
-        print("=" * 60)
+        self.logger.info(f"🚀 Running {len(migration_files)} migrations from: {migrations_dir}")
+        self.logger.info("=" * 60)
     
     results = {'successful': 0, 'failed': 0, 'details': []}
     
@@ -255,12 +255,12 @@ def run_migrations_directory(
         results['details'].append(result_detail)
         
         if verbose:
-            print("-" * 60)
+            self.logger.info("-" * 60)
     
     if verbose:
-        print(f"\n📊 Migration Summary:")
-        print(f"   ✅ Successful: {results['successful']}")
-        print(f"   ❌ Failed: {results['failed']}")
-        print(f"   📁 Total: {len(migration_files)}")
+        self.logger.info(f"\n📊 Migration Summary:")
+        self.logger.info(f"   ✅ Successful: {results['successful']}")
+        self.logger.info(f"   ❌ Failed: {results['failed']}")
+        self.logger.info(f"   📁 Total: {len(migration_files)}")
     
     return results

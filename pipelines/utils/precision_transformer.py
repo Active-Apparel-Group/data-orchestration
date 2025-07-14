@@ -146,16 +146,16 @@ if __name__ == "__main__":
     # Test columns (including DATE columns)
     test_columns = ['[XS]', '[S]', '[FINAL FOB (USD)]', '[CUSTOMER NAME]', '[ETA CUSTOMER WAREHOUSE DATE]', '[EX FACTORY DATE]']
     
-    print("Testing precision transforms:")
+    self.logger.info("Testing precision transforms:")
     for col in test_columns:
         transform = transformer.get_precision_transform(col.strip('[]'))
         if transform:
-            print(f"  {col} → {transform}")
+            self.logger.info(f"  {col} → {transform}")
         else:
-            print(f"  {col} → No transform needed")
+            self.logger.info(f"  {col} → No transform needed")
     
-    print(f"\nTotal schema columns loaded: {len(transformer.schema_types)}")
-    print("INT columns:", [col for col, dtype in transformer.schema_types.items() if dtype in ('INT', 'SMALLINT', 'TINYINT')])
-    print("DECIMAL columns:", [col for col, dtype in transformer.schema_types.items() if dtype.startswith('DECIMAL')])
-    print("DATE columns:", [col for col, dtype in transformer.schema_types.items() if dtype in ('DATE', 'DATETIME', 'DATETIME2')])
+    self.logger.info(f"\nTotal schema columns loaded: {len(transformer.schema_types)}")
+    self.logger.info("INT columns:", [col for col, dtype in transformer.schema_types.items() if dtype in ('INT', 'SMALLINT', 'TINYINT')])
+    self.logger.info("DECIMAL columns:", [col for col, dtype in transformer.schema_types.items() if dtype.startswith('DECIMAL')])
+    self.logger.info("DATE columns:", [col for col, dtype in transformer.schema_types.items() if dtype in ('DATE', 'DATETIME', 'DATETIME2')])
 

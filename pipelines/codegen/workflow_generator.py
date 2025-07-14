@@ -64,15 +64,15 @@ result = subprocess.run([
     "--board-id", "{board_id}"
 ], capture_output=True, text=True, cwd="/app")
 
-print(f"Exit code: {{result.returncode}}")
-print(f"STDOUT: {{result.stdout}}")
+self.logger.info(f"Exit code: {{result.returncode}}")
+self.logger.info(f"STDOUT: {{result.stdout}}")
 if result.stderr:
-    print(f"STDERR: {{result.stderr}}")
+    self.logger.info(f"STDERR: {{result.stderr}}")
 
 if result.returncode != 0:
     raise Exception(f"Board extraction failed with exit code {{result.returncode}}")
 
-print("✅ Board extraction completed successfully")
+self.logger.info("✅ Board extraction completed successfully")
                 """.strip(),
                 "env": {
                     "MONDAY_API_KEY": "{{ secret('MONDAY_API_KEY') }}",
@@ -107,6 +107,6 @@ if __name__ == "__main__":
         workflows_dir.mkdir(exist_ok=True)
         
         workflow_path = save_workflow(9200517329, config, workflows_dir)
-        print(f"✅ Generated workflow: {workflow_path}")
+        self.logger.info(f"✅ Generated workflow: {workflow_path}")
     else:
-        print("❌ Config file not found")
+        self.logger.info("❌ Config file not found")

@@ -105,15 +105,15 @@ def process_single_customer(processor: BatchProcessor, customer_name: str) -> Di
         result = processor.process_customer_batch(customer_name)
         
         # Print summary
-        print(f"\n{'='*60}")
-        print(f"Customer: {customer_name}")
-        print(f"Batch ID: {result['batch_id']}")
-        print(f"Status: {result['status']}")
-        print(f"Orders Loaded: {result['orders_loaded']}")
-        print(f"Items Created: {result['items_created']} (Errors: {result.get('items_errors', 0)})")
-        print(f"Subitems Created: {result['subitems_created']} (Errors: {result.get('subitems_errors', 0)})")
-        print(f"Records Promoted: {result.get('orders_promoted', 0)} orders, {result.get('subitems_promoted', 0)} subitems")
-        print(f"{'='*60}\n")
+        self.logger.info(f"\n{'='*60}")
+        self.logger.info(f"Customer: {customer_name}")
+        self.logger.info(f"Batch ID: {result['batch_id']}")
+        self.logger.info(f"Status: {result['status']}")
+        self.logger.info(f"Orders Loaded: {result['orders_loaded']}")
+        self.logger.info(f"Items Created: {result['items_created']} (Errors: {result.get('items_errors', 0)})")
+        self.logger.info(f"Subitems Created: {result['subitems_created']} (Errors: {result.get('subitems_errors', 0)})")
+        self.logger.info(f"Records Promoted: {result.get('orders_promoted', 0)} orders, {result.get('subitems_promoted', 0)} subitems")
+        self.logger.info(f"{'='*60}\n")
         
         return result
         
@@ -175,7 +175,7 @@ def process_specific_customer_po(processor: BatchProcessor, customer_name: str, 
         # Generate comprehensive batch summary
         if result['success']:
             summary_report = generate_batch_summary(result, customer_name, po_number)
-            print(summary_report)
+            self.logger.info(summary_report)
 
             # Save to file
             save_batch_summary(summary_report, result['batch_id'], customer_name, po_number)
@@ -380,12 +380,12 @@ def generate_overall_summary(results: List[Dict]) -> str:
 def print_final_summary(results: List[Dict]):
     """Print final processing summary"""
     if not results:
-        print("No customers processed.")
+        self.logger.info("No customers processed.")
         return
     
-    print(f"\n{'='*80}")
-    print("FINAL PROCESSING SUMMARY")
-    print(f"{'='*80}")
+    self.logger.info(f"\n{'='*80}")
+    self.logger.info("FINAL PROCESSING SUMMARY")
+    self.logger.info(f"{'='*80}")
     
     total_customers = len(results)
     successful_customers = len([r for r in results if r.get('status') not in ['FAILED']])
@@ -395,29 +395,29 @@ def print_final_summary(results: List[Dict]):
     total_items = sum(r.get('items_created', 0) for r in results)
     total_subitems = sum(r.get('subitems_created', 0) for r in results)
     
-    print(f"Customers Processed: {total_customers}")
-    print(f"Successful: {successful_customers}")
-    print(f"Failed: {failed_customers}")
-    print(f"Total Orders Loaded: {total_orders}")
-    print(f"Total Items Created: {total_items}")
-    print(f"Total Subitems Created: {total_subitems}")
+    self.logger.info(f"Customers Processed: {total_customers}")
+    self.logger.info(f"Successful: {successful_customers}")
+    self.logger.info(f"Failed: {failed_customers}")
+    self.logger.info(f"Total Orders Loaded: {total_orders}")
+    self.logger.info(f"Total Items Created: {total_items}")
+    self.logger.info(f"Total Subitems Created: {total_subitems}")
     
     # Show customer-by-customer results
-    print(f"\nCustomer Results:")
-    print("-" * 80)
+    self.logger.info(f"\nCustomer Results:")
+    self.logger.info("-" * 80)
     for result in results:
         status_icon = "✓" if result.get('status') not in ['FAILED'] else "✗"
-        print(f"{status_icon} {result['customer_name']:<30} {result.get('status', 'UNKNOWN'):<20} "
+        self.logger.info(f"{status_icon} {result['customer_name']:<30} {result.get('status', 'UNKNOWN'):<20} "
               f"Orders: {result.get('orders_loaded', 0):<3} Items: {result.get('items_created', 0):<3}")
     
     if failed_customers > 0:
-        print(f"\nFailed Customers:")
-        print("-" * 80)
+        self.logger.info(f"\nFailed Customers:")
+        self.logger.info("-" * 80)
         for result in results:
             if result.get('status') == 'FAILED':
-                print(f"✗ {result['customer_name']}: {result.get('error', 'Unknown error')}")
+                self.logger.info(f"✗ {result['customer_name']}: {result.get('error', 'Unknown error')}")
     
-    print(f"{'='*80}")
+    self.logger.info(f"{'='*80}")
 
 def main():
     """Main entry point with support for customer/PO specific processing"""
