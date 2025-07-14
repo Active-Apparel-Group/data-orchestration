@@ -1,0 +1,27 @@
+-- Table: dbo.ORDERS_UNIFIED_SNAPSHOT
+-- Database: ORDERS
+-- Purpose: [Add description of table purpose]
+-- Dependencies: [List any dependent tables/views]
+
+CREATE TABLE [dbo].[ORDERS_UNIFIED_SNAPSHOT] (
+    [record_uuid] UNIQUEIDENTIFIER NOT NULL,
+    [row_hash] NVARCHAR(64) NOT NULL,
+    [AAG ORDER NUMBER] NVARCHAR(255) NOT NULL,
+    [CUSTOMER NAME] NVARCHAR(255) NULL,
+    [CUSTOMER STYLE] NVARCHAR(255) NULL,
+    [CUSTOMER COLOUR DESCRIPTION] NVARCHAR(255) NULL,
+    [PO NUMBER] NVARCHAR(255) NULL,
+    [CUSTOMER ALT PO] NVARCHAR(255) NULL,
+    [ACTIVE] NVARCHAR(10) NULL,
+    [snapshot_date] DATETIME2 NOT NULL DEFAULT (getdate()),
+    [customer_filter] NVARCHAR(255) NOT NULL DEFAULT ('ALL'),
+    [batch_id] UNIQUEIDENTIFIER NULL,
+    [records_count] INT NULL,
+    [parquet_archive_id] BIGINT NULL,
+    CONSTRAINT [PK_ORDERS_UNIFIED_SNAPSHOT] PRIMARY KEY ([record_uuid])
+);
+
+-- Indexes
+CREATE INDEX [IX_SNAPSHOT_AAG_ORDER] ON [dbo].[ORDERS_UNIFIED_SNAPSHOT] ([row_hash], [AAG ORDER NUMBER]);
+CREATE INDEX [IX_SNAPSHOT_CUSTOMER_DATE] ON [dbo].[ORDERS_UNIFIED_SNAPSHOT] ([customer_filter], [snapshot_date]);
+CREATE INDEX [IX_SNAPSHOT_HASH_LOOKUP] ON [dbo].[ORDERS_UNIFIED_SNAPSHOT] ([AAG ORDER NUMBER], [row_hash]);

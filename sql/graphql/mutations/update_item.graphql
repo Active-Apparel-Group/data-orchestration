@@ -1,0 +1,17 @@
+mutation UpdateItem($board_id: ID!, $item_id: ID!, $column_values: JSON!) {
+  change_multiple_column_values(
+    board_id: $board_id
+    item_id: $item_id
+    column_values: $column_values
+    create_labels_if_missing: false
+  ) {
+    id
+    name
+    column_values {
+      id
+      text
+      value
+    }
+    updated_at
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "validation_timestamp": "2025-06-30T17:04:31.624918",
+  "overall_success": false,
+  "success_rate": 80.0,
+  "validation_results": {
+    "database_schema": {
+      "success": false,
+      "staging_tables": [
+        {
+          "TABLE_NAME": "STG_MON_CustMasterSchedule",
+          "update_columns_count": 8
+        },
+        {
+          "TABLE_NAME": "STG_MON_CustMasterSchedule_Subitems",
+          "update_columns_count": 8
+        }
+      ],
+      "audit_infrastructure": {
+        "audit_table_exists": 1,
+        "rollback_proc_exists": 1,
+        "summary_view_exists": 1
+      }
+    },
+    "update_operations": {
+      "success": true,
+      "board_id": 8709134353,
+      "metadata_keys": []
+    },
+    "board_metadata": {
+      "success": true,
+      "metadata_directory": "C:\\Users\\AUKALATC01\\GitHub\\data-orchestration\\data-orchestration\\configs\\boards",
+      "metadata_files_count": 6
+    },
+    "database_connectivity": {
+      "success": true,
+      "databases_configured": 11,
+      "dms_connection": "successful"
+    },
+    "audit_trail": {
+      "success": true,
+      "audit_table_accessible": true,
+      "existing_records": 1
+    }
+  }
+}

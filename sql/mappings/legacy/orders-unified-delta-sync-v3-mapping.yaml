@@ -1,0 +1,196 @@
+# Orders Unified Delta Sync V3 - Comprehensive Mapping Documentation
+# Purpose: Single source of truth for schema relationships and field mappings
+# Project: 75% complete delta sync implementation
+# Last Updated: 2025-06-21
+# Status: TEMPLATE - Review before finalizing
+
+metadata:
+  version: "3.0"
+  project: "orders_unified_delta_sync_v3" 
+  status: "template_for_review"
+  description: "Comprehensive mapping for Monday.com Orders Delta Sync V3"
+  working_implementation_path: "dev/orders_unified_delta_sync_v3/"
+  
+# Source database schema (actual working schema)
+source_schema:
+  database: "dms"
+  table: "ORDERS_UNIFIED"
+  key_fields:
+    - field: "[AAG ORDER NUMBER]"
+      type: "NVARCHAR"
+      description: "Primary identifier for orders"
+      example: "JOO-00505"
+    - field: "[CUSTOMER]" 
+      type: "NVARCHAR"
+      description: "Customer name/identifier"
+      example: "greyson"
+  
+  # CRITICAL: Document actual working field names with spaces/brackets
+  data_fields:
+    - field: "[Order Qty]"  # CONFIRMED: Working implementation uses this format
+      type: "NVARCHAR"      # CONFIRMED: From staging_processor.py
+      monday_field: "numbers"
+      description: "Order quantity - confirmed working format"
+      validation: "Must be numeric, converted to int for Monday.com"
+      
+    - field: "[DUE DATE]"
+      type: "DATETIME"
+      monday_field: "date"
+      description: "Order due date"
+      
+    - field: "[Style]"
+      type: "NVARCHAR"
+      monday_field: "text"
+      description: "Product style information"
+
+# Staging tables (current working versions)
+staging_schema:
+  master_items:
+    table: "stg_mon_custmasterschedule"
+    description: "Main order items staging table"
+    # NOTE: Using working schema, not the deleted "ENHANCED" version
+    key_mapping:
+      source_key: "[AAG ORDER NUMBER]"
+      staging_key: "aag_order_number" 
+      monday_key: "name"
+      
+  subitems:
+    table: "stg_mon_custmasterschedule_subitems" 
+    description: "Order subitems staging table"
+    # NOTE: Using working schema, not the deleted "FIXED" version
+    parent_relationship:
+      field: "parent_item_id"
+      references: "stg_mon_custmasterschedule.id"
+
+# Monday.com API integration
+monday_integration:
+  board_id: "4755559751"  # GREYSON PO 4755 board
+  api_endpoint: "https://api.monday.com/v2"
+  
+  # GraphQL operations (reference sql/graphql/ folder)
+  operations:
+    create_item:
+      template_file: "sql/graphql/mutations/create-master-item.graphql"
+      description: "Create new master item on Monday.com board"
+      
+    update_item:
+      template_file: "sql/graphql/mutations/update-master-item.graphql" 
+      description: "Update existing master item"
+      
+    create_subitem:
+      template_file: "sql/graphql/mutations/create-subitem.graphql"
+      description: "Create subitem under master item"
+
+# Field mappings (simple approach - not complex 798-line files)
+field_mappings:
+  master_item:
+    # Core identification
+    name:
+      source: "[AAG ORDER NUMBER]"
+      type: "text"
+      required: true
+      description: "Primary item identifier"
+      
+    # Numeric fields
+    numbers:
+      source: "[Order Qty]"  # CRITICAL: Actual working field name
+      type: "numeric" 
+      required: true
+      transformation: "convert_to_int"
+      validation: "must_be_positive_number"
+      
+    # Date fields  
+    date:
+      source: "[DUE DATE]"
+      type: "date"
+      required: false
+      format: "YYYY-MM-DD"
+      
+    # Text fields
+    text:
+      source: "[Style]"
+      type: "text" 
+      required: false
+      max_length: 255
+
+  subitem:
+    name:
+      source: "[AAG ORDER NUMBER]"  # Subitem inherits parent naming
+      type: "text"
+      suffix: "_subitem"
+      
+# Validation rules
+validation:
+  data_quality:
+    - rule: "aag_order_number_not_null"
+      description: "AAG ORDER NUMBER must not be null"
+      severity: "error"
+      
+    - rule: "order_qty_numeric" 
+      description: "Order Qty must be convertible to integer"
+      severity: "error"
+      
+    - rule: "customer_not_empty"
+      description: "Customer field should not be empty"
+      severity: "warning"
+
+  api_constraints:
+    - rule: "monday_rate_limit"
+      description: "Respect Monday.com API rate limits" 
+      implementation: "0.1 second delay between calls"
+      
+    - rule: "field_length_limits"
+      description: "Monday.com text fields have length limits"
+      max_text_length: 255
+
+# Testing approach
+testing:
+  unit_tests:
+    - test: "test_field_mapping_transformations"
+      location: "tests/debug/test_simple_mapping.py"
+      description: "Test individual field transformations"
+      
+    - test: "test_graphql_template_loading"
+      location: "tests/debug/test_graphql_templates.py" 
+      description: "Test GraphQL template loading and parsing"
+      
+  integration_tests:
+    - test: "test_end_to_end_sync"
+      location: "tests/debug/test_delta_sync_flow.py"
+      description: "Test complete sync workflow"
+      
+    - test: "test_monday_api_integration" 
+      location: "tests/debug/test_monday_api.py"
+      description: "Test actual Monday.com API calls"
+
+# Implementation references  
+implementation_files:
+  core_processor: "dev/orders_unified_delta_sync_v3/staging_processor.py"
+  api_adapter: "dev/orders_unified_delta_sync_v3/monday_api_adapter.py"
+  mapper_class: "utils/simple_mapper.py"  # Following project structure rules
+  
+# Configuration references
+config_files:
+  main_config: "utils/config.yaml"
+  simple_mapping: "sql/mappings/simple-orders-mapping.yaml"
+  
+# Notes and decisions
+notes:
+  schema_decisions:
+    - decision: "Use [Order Qty] field name with spaces and brackets"
+      rationale: "This is the actual working format in 75% complete implementation"
+      date: "2025-06-21"
+      
+    - decision: "Removed ENHANCED and FIXED schema files"
+      rationale: "These were not referenced by working code and caused confusion"
+      date: "2025-06-21"
+      
+  mapping_approach:
+    - decision: "Simple field mappings, not complex 798-line YAML"
+      rationale: "Easier to maintain and understand"
+      date: "2025-06-21"
+      
+  api_integration:
+    - decision: "Store GraphQL templates in sql/graphql/ folder"
+      rationale: "Follows project structure rules - templates not Python code"
+      date: "2025-06-21"

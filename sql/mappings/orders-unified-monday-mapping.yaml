@@ -1,0 +1,573 @@
+# ORDERS_UNIFIED to Monday.com Field Mapping Configuration
+# Generated: June 15, 2025
+# Purpose: Complete mapping specification for data transformation between ORDERS_UNIFIED and Monday.com
+
+metadata:
+  version: "1.1"
+  description: "Field mapping configuration for ORDERS_UNIFIED to Monday.com transformation"
+  source_system: "ORDERS_UNIFIED (SQL Server)"
+  target_system: "Monday.com via GraphQL API"
+  total_source_fields: 183
+  total_target_fields: 72
+  mappable_fields: 51
+
+# Direct 1:1 mappings - fields with identical names and compatible types
+exact_matches:
+  - source_field: "AAG ORDER NUMBER"
+    target_field: "AAG ORDER NUMBER"
+    target_column_id: "text_mkr5wya6"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: "JOO-00505"
+      target: "JOO-00505"
+
+  - source_field: "AAG SEASON"
+    target_field: "AAG SEASON"
+    target_column_id: "dropdown_mkr58de6"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    sample_data:
+      source: "2026 SPRING"
+      target: "2026 SPRING"
+
+  - source_field: "CUSTOMER ALT PO"
+    target_field: "CUSTOMER ALT PO"
+    target_column_id: "text_mkrh94rx"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: null
+      target: ""
+
+  - source_field: "CUSTOMER SEASON"
+    target_field: "CUSTOMER SEASON"
+    target_column_id: "dropdown_mkr5rgs6"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    sample_data:
+      source: "SPRING SUMMER 2026"
+      target: "SPRING SUMMER 2026"
+
+  - source_field: "ORDER DATE PO RECEIVED"
+    target_field: "ORDER DATE PO RECEIVED"
+    target_column_id: "date_mkr5zp5"
+    source_type: "DATE"
+    target_type: "date"
+    sample_data:
+      source: "2025-05-20"
+      target: "2025-05-20"
+
+  - source_field: "DROP"
+    target_field: "DROP"
+    target_column_id: "dropdown_mkr5w5e"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "PO NUMBER"
+    target_field: "PO NUMBER"
+    target_column_id: "text_mkr5ej2x"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: "8148-00"
+      target: "8148-00"
+
+  - source_field: "PATTERN ID"
+    target_field: "PATTERN ID"
+    target_column_id: "text_mkr5cz8m"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: null
+      target: ""
+
+  - source_field: "STYLE DESCRIPTION"
+    target_field: "STYLE DESCRIPTION"
+    target_column_id: "long_text_mkr5p0cf"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "long_text"
+    sample_data:
+      source: "NALLA"
+      target: "NALLA"
+
+  - source_field: "CATEGORY"
+    target_field: "CATEGORY"
+    target_column_id: "dropdown_mkr5s5n3"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    sample_data:
+      source: "WOMENS"
+      target: "WOMENS"
+
+  - source_field: "UNIT OF MEASURE"
+    target_field: "UNIT OF MEASURE"
+    target_column_id: "color_mkr5yf27"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "status"
+    sample_data:
+      source: "PCE"
+      target: "PCE"
+
+  - source_field: "ORDER TYPE"
+    target_field: "ORDER TYPE"
+    target_column_id: "dropdown_mkr518fc"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    transformation: "value_mapping"
+    mapping_rules:
+      - source_value: "ACTIVE"
+        target_value: "RECEIVED"
+      - source_value: "CANCELLED"
+        target_value: "CANCELLED"
+    sample_data:
+      source: "ACTIVE"
+      target: "RECEIVED"
+    notes: "Status value transformation required"
+
+  - source_field: "DESTINATION"
+    target_field: "DESTINATION"
+    target_column_id: "text_mkr5kbc6"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: "MISSISSIPPI"
+      target: "MISSISSIPPI"
+
+  - source_field: "DESTINATION WAREHOUSE"
+    target_field: "DESTINATION WAREHOUSE"
+    target_column_id: "text_mkr5ps35"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: null
+      target: ""
+
+  - source_field: "DELIVERY TERMS"
+    target_field: "DELIVERY TERMS"
+    target_column_id: "dropdown_mkr5kk5"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    sample_data:
+      source: "FOB"
+      target: "FOB"
+
+  - source_field: "PLANNED DELIVERY METHOD"
+    target_field: "PLANNED DELIVERY METHOD"
+    target_column_id: "text_mkr5wcpw"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: null
+      target: ""
+
+  - source_field: "NOTES"
+    target_field: "NOTES"
+    target_column_id: "long_text_mkr5hass"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "long_text"
+    sample_data:
+      source: "ADDED 20.5.25"
+      target: "ADDED 20.5.25"
+
+  - source_field: "CUSTOMER PRICE"
+    target_field: "CUSTOMER PRICE"
+    target_column_id: "numeric_mkr5cact"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: "28.86"
+      target: 28.86
+
+  - source_field: "USA ONLY LSTP 75% EX WORKS"
+    target_field: "USA ONLY LSTP 75% EX WORKS"
+    target_column_id: "numeric_mkr5yne4"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: "0"
+      target: 0
+
+  - source_field: "EX WORKS (USD)"
+    target_field: "EX WORKS (USD)"
+    target_column_id: "numeric_mkr5erhv"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "ADMINISTRATION FEE"
+    target_field: "ADMINISTRATION FEE"
+    target_column_id: "numeric_mkr5k68"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "DESIGN FEE"
+    target_field: "DESIGN FEE"
+    target_column_id: "numeric_mkr5h612"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "FX CHARGE"
+    target_field: "FX CHARGE"
+    target_column_id: "numeric_mkr5gp6a"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "HANDLING"
+    target_field: "HANDLING"
+    target_column_id: "text_mkr5s3tm"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: null
+      target: ""
+
+  - source_field: "SURCHARGE FEE"
+    target_field: "SURCHARGE FEE"
+    target_column_id: "numeric_mkr57cem"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "DISCOUNT"
+    target_field: "DISCOUNT"
+    target_column_id: "numeric_mkr56xx8"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "FINAL FOB (USD)"
+    target_field: "FINAL FOB (USD)"
+    target_column_id: "numeric_mkr5nhr7"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: "0"
+      target: 0
+
+  - source_field: "HS CODE"
+    target_field: "HS CODE"
+    target_column_id: "dropdown_mkr5k8yn"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "US DUTY RATE"
+    target_field: "US DUTY RATE"
+    target_column_id: "numeric_mkr5r6at"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "US DUTY"
+    target_field: "US DUTY"
+    target_column_id: "numeric_mkr5ev2q"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: "0"
+      target: 0
+
+  - source_field: "FREIGHT"
+    target_field: "FREIGHT"
+    target_column_id: "text_mkr5kyf4"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: null
+      target: ""
+
+  - source_field: "US TARIFF RATE"
+    target_field: "US TARIFF RATE"
+    target_column_id: "numeric_mkr55zg1"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: "TRUE"
+      target: null
+    notes: "Requires preprocessing: Replace 'TRUE' with '0' before conversion"
+
+  - source_field: "US TARIFF"
+    target_field: "US TARIFF"
+    target_column_id: "numeric_mkr51ndy"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "DDP US (USD)"
+    target_field: "DDP US (USD)"
+    target_column_id: "numeric_mkr5js0x"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "SMS PRICE USD"
+    target_field: "SMS PRICE USD"
+    target_column_id: "numeric_mkr58nvp"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "numbers"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "FINAL PRICES Y/N"
+    target_field: "FINAL PRICES Y/N"
+    target_column_id: "text_mkr5ptvg"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: null
+      target: null
+
+  - source_field: "NOTES FOR PRICE"
+    target_field: "NOTES FOR PRICE"
+    target_column_id: "long_text_mkr5znxn"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "long_text"
+    sample_data:
+      source: null
+      target: ""
+
+# Fields requiring transformation/mapping
+mapped_fields:
+  - source_field: "CUSTOMER NAME"
+    target_field: "CUSTOMER"
+    target_column_id: "dropdown_mkr542p2"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    transformation: "customer_mapping_lookup"
+    mapping_source: "customer_mapping.yaml"
+    mapping_logic: |
+      1. Match ORDERS_UNIFIED.CUSTOMER_NAME against customer_mapping.yaml master_order_list values
+      2. Return corresponding canonical customer name
+      3. Handle multiple master_order_list entries per customer (arrays)
+      4. Fall back to original value if no mapping found
+    mapping_examples:
+      - source_value: "RHYTHM (AU)"
+        canonical: "RHYTHM"
+      - source_value: "RHYTHM (US)"
+        canonical: "RHYTHM"
+      - source_value: "TITLE 9"
+        canonical: "TITLE NINE"
+      - source_value: "JOHNNIE O"
+        canonical: "JOHNNIE O"
+      - source_value: "LORNA JANE (AU)"
+        canonical: "LORNA JANE"
+      - source_value: "LORNA JANE (NZ)"
+        canonical: "LORNA JANE"
+      - source_value: "UNE PIECE (AU)"
+        canonical: "UNE PIECE"
+    sample_data:
+      source: "JOHNNIE O"
+      target: "JOHNNIE O"
+    notes: "Uses customer_mapping.yaml lookup table to map master_order_list values to canonical customer names. Handles regional variations and multiple aliases per customer."
+
+  - source_field: "CUSTOMER STYLE"
+    target_field: "STYLE"
+    target_column_id: "dropdown_mkr5tgaa"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    transformation: "direct_mapping"
+    sample_data:
+      source: "JWHD100120"
+      target: "JWHD100120"
+    notes: "Style code mapping to dropdown selection"
+
+  - source_field: "ALIAS/RELATED ITEM"
+    target_field: "ALIAS RELATED ITEM"
+    target_column_id: "text_mkrhra2c"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    transformation: "direct_mapping"
+    sample_data:
+      source: null
+      target: ""
+    notes: "Minor naming difference only"
+
+  - source_field: "CUSTOMER COLOUR DESCRIPTION"
+    target_field: "COLOR"
+    target_column_id: "dropdown_mkr5677f"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    transformation: "color_mapping"
+    sample_data:
+      source: "WHITE"
+      target: "WHITE"
+    notes: "Color code to color name dropdown mapping"
+
+  - source_field: "ETA CUSTOMER WAREHOUSE DATE"
+    target_field: "CUSTOMER REQ IN DC DATE"
+    target_column_id: "date_mkr554yz"
+    source_type: "DATE"
+    target_type: "date"
+    transformation: "direct_mapping"
+    sample_data:
+      source: null
+      target: null
+    notes: "Conceptually similar delivery dates"
+
+  - source_field: "EX FACTORY DATE"
+    target_field: "CUSTOMER EX FACTORY DATE"
+    target_column_id: "date_mkr57811"
+    source_type: "DATE"
+    target_type: "date"
+    transformation: "direct_mapping"
+    sample_data:
+      source: "2025-09-26"
+      target: "2025-09-26"
+    notes: "Same concept, slight naming difference"
+
+# Aggregated/computed fields
+computed_fields:
+  - target_field: "Title"
+    source_fields:
+      ["CUSTOMER STYLE", "CUSTOMER COLOUR DESCRIPTION", "AAG ORDER NUMBER"]
+    transformation: "concatenation"
+    formula: "CUSTOMER_STYLE + COLOR + AAG_ORDER_NUMBER"
+    sample_data:
+      source: ["JWHD100120", "WHITE", "JOO-00505"]
+      target: "JWHD100120WHITEJOO-00505"
+    notes: "Composite identifier for Monday.com items - Monday.com uses 'Title' as the item name field"
+
+# Subitem configuration for size-level data
+subitem_fields:
+  - source_field: "XS"
+    target_field: "Size"
+    target_column_id: "dropdown_mkrak7qp"
+    target_type: "dropdown"
+    size_value: "XS"
+    quantity_field: "Order Quantity"
+    quantity_column_id: "numeric_mkra7j8e"
+  
+  - source_field: "S"
+    target_field: "Size"
+    target_column_id: "dropdown_mkrak7qp"
+    target_type: "dropdown"
+    size_value: "S"
+    quantity_field: "Order Quantity"
+    quantity_column_id: "numeric_mkra7j8e"
+  
+  - source_field: "M"
+    target_field: "Size"
+    target_column_id: "dropdown_mkrak7qp"
+    target_type: "dropdown"
+    size_value: "M"
+    quantity_field: "Order Quantity"
+    quantity_column_id: "numeric_mkra7j8e"
+  
+  - source_field: "L"
+    target_field: "Size"
+    target_column_id: "dropdown_mkrak7qp"
+    target_type: "dropdown"
+    size_value: "L"
+    quantity_field: "Order Quantity"
+    quantity_column_id: "numeric_mkra7j8e"
+  
+  - source_field: "XL"
+    target_field: "Size"
+    target_column_id: "dropdown_mkrak7qp"
+    target_type: "dropdown"
+    size_value: "XL"
+    quantity_field: "Order Quantity"
+    quantity_column_id: "numeric_mkra7j8e"
+
+# Monday.com only fields (no source mapping)
+target_only_fields:
+  - field: "Subitems"
+    column_id: "subtasks_mkr5c0kp"
+    type: "subtasks"
+    notes: "Monday.com specific subitems functionality"
+
+  - field: "ADD TO PLANNING"
+    column_id: "color_mkrerxrs"
+    type: "status"
+    notes: "Monday.com workflow flag"
+
+  - field: "FCST CONSUMED QTY"
+    column_id: "numeric_mkrbty8b"
+    type: "numbers"
+    notes: "Forecasting field not in source"
+
+  - field: "FCST QTY"
+    column_id: "numeric_mkrb56rj"
+    type: "numbers"
+    notes: "Forecasting field not in source"
+
+  - field: "Item ID"
+    column_id: "pulse_id_mkr5pb5q"
+    type: "item_id"
+    notes: "Monday.com internal identifier"
+
+  - field: "matchAlias"
+    column_id: "text_mkr61hpz"
+    type: "text"
+    notes: "Monday.com matching logic"
+
+# Data preprocessing requirements
+preprocessing:
+  data_cleaning:
+    - field: "US TARIFF RATE"
+      operation: "replace_value"
+      find: "TRUE"
+      replace: "0"
+      notes: "Clean invalid boolean in numeric field"
+
+    - field: "CUSTOMER STYLE"
+      operation: "trim_and_clean"
+      notes: "Remove leading/trailing spaces and control characters"
+
+# Transformation summary
+transformation_summary:
+  total_mappings: 51
+  direct_mappings: 37
+  transformed_mappings: 7
+  computed_fields: 2
+  subitem_fields: 5
+  target_only_fields: 9
+
+# GraphQL implementation
+api_implementation:
+  column_value_formats:
+    text: '"string_value"'
+    dropdown: '{"ids":[id_number]}'
+    numbers: "numeric_value"
+    date: '{"date":"YYYY-MM-DD","icon":""}'
+    status: '{"index":index_number,"post_id":null}'
+    long_text: '"long_string_value"'
+
+  mutation_templates:
+    create_item: "sql/graphql/mutations/create-master-item.graphql"
+    create_subitem: "sql/graphql/mutations/create-subitem.graphql"
+
+notes:
+  - "This mapping is based on preferred structure with detailed transformation logic"
+  - "Includes subitem_fields section for size-level data processing"
+  - "Customer mapping requires lookup table for name standardization"
+  - "Value mappings required for ORDER TYPE → ORDER STATUS transformation"
+  - "Compatible with existing customer-orders pipeline architecture"

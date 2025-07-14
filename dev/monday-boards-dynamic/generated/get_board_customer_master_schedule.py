@@ -368,7 +368,7 @@ def prepare_for_database(df):
     potential_numeric_columns = []
     
     # Keywords that suggest a column should be numeric
-    numeric_keywords = ['QTY', 'QUANTITY', 'COUNT', 'NUMBER', 'PRICE', 'COST', 'USD', 'FEE', 
+    numeric_keywords = ['QTY', 'QUANTITY', 'COUNT', 'PRICE', 'COST', 'USD', 'FEE', 
                        'RATE', 'DUTY', 'TARIFF', 'FREIGHT', 'ID', 'REVENUE', 'FCST', 'ORDERED',
                        'SHIPPED', 'PACKED', 'INVOICED', 'WORKS', 'FOB', 'DDP', 'CHARGE']
     
@@ -447,7 +447,7 @@ def prepare_for_database(df):
             df[col] = df[col].apply(safe_numeric_convert)
             converted_count = df[col].notna().sum()
             logger.info(f"    {col}: {original_count} -> {converted_count} valid numbers")
-      # Handle nulls and convert types for remaining columns
+    # Handle nulls and convert types for remaining columns
     for col in df.columns:
         if col not in date_columns and col not in potential_numeric_columns and col not in json_metadata_columns:
             def safe_string_convert(val):

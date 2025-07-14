@@ -4,7 +4,7 @@
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start Guide
 
 ### Prerequisites
 - Python 3.8+ 

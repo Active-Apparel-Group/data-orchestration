@@ -6,9 +6,10 @@ DEVELOPMENT VERSION - Testing hybrid approach
 """
 
 import os, requests, pandas as pd, pyodbc, asyncio, concurrent.futures, logging, yaml
-from datetime import datetime
+from datetime import datetime, date
 import time
 import sys
+import re
 from pathlib import Path
 
 # NEW STANDARD: Find repository root, then find utils (Option 2)
@@ -108,7 +109,7 @@ def fetch_board_data_with_pagination():
         query GetBoardItems {{
           boards(ids: {BOARD_ID}) {{
             name
-            items_page(limit: 250{cursor_arg}) {{
+            items_page(limit: 100{cursor_arg}) {{
               cursor
               items {{
                 id
@@ -256,23 +257,26 @@ def prepare_for_database(df):
                     val_str = str(val).strip()
                     
                     # Handle JSON metadata: {"changed_at":"2025-04-15T23:46:22.133Z"}
+                    # {"changed_at":"2025-04-15T23:46:22.133Z"}
                     if val_str.startswith('{"changed_at":"') and val_str.endswith('"}'):
                         import json
-                        metadata_obj = json.loads(val_str)
-                        if 'changed_at' in metadata_obj:
-                            # Extract just the date part (YYYY-MM-DD)
-                            timestamp = metadata_obj['changed_at']
-                            if timestamp and 'T' in timestamp:
-                                date_part = timestamp.split('T')[0]
-                                # Validate the date
-                                parsed = pd.to_datetime(date_part, format='%Y-%m-%d', errors='raise')
-                                if pd.notna(parsed) and 1753 <= parsed.year <= 9999:
-                                    return date_part
-                    
-                    return None  # If not valid JSON metadata, return None
+                        ts = json.loads(val_str).get('changed_at')
+                        if ts and 'T' in ts:
+                            date_part = ts.split('T')[0]
+                            parsed = pd.to_datetime(date_part, format='%Y-%m-%d', errors='raise')
+                            return parsed.date() if pd.notna(parsed) else None       # ← string → datetime.date
+
+                    # {"date":"2025-06-13","icon":""}
+                    if val_str.startswith('{"date":"') and val_str.endswith('"}'):
+                        import json
+                        date_part = json.loads(val_str).get('date')
+                        parsed = pd.to_datetime(date_part, format='%Y-%m-%d', errors='raise')
+                        return parsed.date() if pd.notna(parsed) else None           # ← string → datetime.date
                     
                 except Exception:
-                    return None  # If any error, return None
+                    pass
+
+                return None  # If any error, return None
             
             # Apply the conversion
             original_count = df[col].notna().sum()
@@ -282,12 +286,46 @@ def prepare_for_database(df):
             logger.info(f"    {col}: {original_count} -> {converted_count} valid dates extracted from JSON, {null_count} nulls")
     
     # Process date columns with robust handling for Monday.com date formats
-    exclude_from_date_processing = ['FABRIC DUE INTO LONGSON', 'TRIMS DUE INTO LONGSON']
+    exclude_from_date_processing = []  # Let all date-like columns be processed
+    
+    # Define explicit date columns - both auto-detected and hardcoded
     date_columns = [
         col for col in df.columns 
         if ('DATE' in col.upper() or col in ['UpdateDate']) 
         and col not in exclude_from_date_processing
     ]
+    
+    # Add hardcoded date fields that aren't auto-detected
+    hardcoded_date_fields = [
+        'EX-FTY (Partner PO)',
+        'EX-FTY (Change Request)',
+        'FABRIC DUE INTO LONGSON',
+        'TRIMS DUE INTO LONGSON'
+    ]
+    
+    for field in hardcoded_date_fields:
+        if field in df.columns and field not in date_columns:
+            date_columns.append(field)
+            logger.info(f"Added hardcoded date field: {field}")
+
+    # ------------------------------------------------------------------
+    # AUTO-DETECT columns that *look* like YYYY-MM-DD but weren’t
+    # labelled “…DATE” in Monday.com
+    # ------------------------------------------------------------------
+    date_like_regex = r'^\d{4}[-/]\d{2}[-/]\d{2}$'   # accept dashes *or* slashes
+    for col in df.columns:
+        if (
+            col not in date_columns            # not already handled
+            and col not in json_metadata_columns  # skip JSON metadata columns (already processed)
+            and df[col].notna().any()          # has data
+            and df[col].astype(str)
+                .str.match(date_like_regex)
+                .mean() > 0.8                # ≥80 % of non-null rows look like dates
+        ):
+            date_columns.append(col)
+            logger.info(f"Auto-detected date-like column: {col}")
+    # ------------------------------------------------------------------
+
     
     for col in date_columns:
         if col in df.columns:
@@ -298,6 +336,11 @@ def prepare_for_database(df):
                 if (pd.isna(val) or val is None or 
                     str(val).strip() in ['', 'None', 'nan', 'null', 'NaT']):
                     return None
+                
+                # If already a date object (from JSON metadata processing), return as-is
+                import datetime
+                if isinstance(val, datetime.date):
+                    return val
                 
                 try:
                     val_str = str(val).strip()
@@ -316,7 +359,8 @@ def prepare_for_database(df):
                                 # Validate the extracted date
                                 parsed = pd.to_datetime(date_str, format='%Y-%m-%d', errors='raise')
                                 if pd.notna(parsed) and 1753 <= parsed.year <= 9999:
-                                    return date_str
+                                    return parsed.date()
+                            
                         except:
                             pass
                     
@@ -326,26 +370,35 @@ def prepare_for_database(df):
                         try:
                             parsed = pd.to_datetime(clean_date, format='%Y-%m-%d', errors='raise')
                             if pd.notna(parsed) and 1753 <= parsed.year <= 9999:
-                                return clean_date
+                                return parsed.date()
                         except:
                             pass
                     
-                    # Handle simple date strings (YYYY-MM-DD)
+                    # Handle ISO date strings (YYYY-MM-DD) - most common case
+                    import re
+                    if re.match(r'^\d{4}-\d{2}-\d{2}$', val_str):
+                        try:
+                            parsed = pd.to_datetime(val_str, format='%Y-%m-%d', errors='raise')
+                            if pd.notna(parsed) and 1753 <= parsed.year <= 9999:
+                                return parsed.date()
+                        except:
+                            pass
+
+                    # Handle simple date strings (YYYY-MM-DD) - backup check
                     if len(val_str) == 10 and val_str.count('-') == 2:
                         try:
                             parsed = pd.to_datetime(val_str, format='%Y-%m-%d', errors='raise')
                             if pd.notna(parsed) and 1753 <= parsed.year <= 9999:
-                                return val_str
+                                return parsed.date()
                         except:
                             pass
                     
                     # Last resort: try pandas general conversion
-                    parsed = pd.to_datetime(val, errors='coerce')
+                    parsed = pd.to_datetime(val, errors="coerce")
                     if pd.notna(parsed) and 1753 <= parsed.year <= 9999:
-                        return parsed.strftime('%Y-%m-%d')
-                    
+                        return parsed.date()
                     return None
-                    
+
                 except Exception as e:
                     # Only log unexpected errors (not the common "None" strings)
                     if str(val) not in ['None', '', 'nan', 'null']:
@@ -716,7 +769,7 @@ def handle_schema_changes(df, items):
         logger.info(f"DataFrame has {len(df_columns)} columns")
         
         # Sync both production and staging tables
-        staging_table = f"stg_{TABLE_NAME}"
+        staging_table = f"swp_{TABLE_NAME}"
         
         # Sync production table first
         sync_table_schema(TABLE_NAME, DATABASE_NAME, monday_columns, df_columns)
@@ -763,7 +816,7 @@ def prepare_staging_table():
     """ZERO-DOWNTIME: Prepare staging table for atomic swap"""
     logger.info("PREPARING staging table for zero-downtime refresh...")
     
-    staging_table = f"stg_{TABLE_NAME}"
+    staging_table = f"swp_{TABLE_NAME}"
     
     try:
         # Check if staging table exists, create if not
@@ -811,7 +864,7 @@ def load_to_staging_table(df):
         logger.warning("No data to load")
         return
     
-    staging_table = f"stg_{TABLE_NAME}"
+    staging_table = f"swp_{TABLE_NAME}"
     
     try:
         logger.info(f"Loading {len(df)} rows into staging table {DATABASE_NAME}.dbo.{staging_table}")
@@ -849,6 +902,10 @@ def load_to_staging_table(df):
                 for val in row.values:
                     if pd.isna(val) or val is None:
                         values.append(None)
+                    # ── NEW: handle native datetime.date values ───────────────
+                    elif isinstance(val, date):        # ← import date at top
+                        values.append(val)             # let pyodbc bind it
+                    # ──────────────────────────────────────────────────────────
                     elif hasattr(val, 'dtype'):
                         # Handle numpy types with NaN check
                         if pd.isna(val):
@@ -865,6 +922,41 @@ def load_to_staging_table(df):
             
             # Use executemany for bulk insert (production pattern)
             logger.info(f"Executing bulk insert of {len(values_list)} rows...")
+
+            # ------------------------------------------------------------------
+            # DEBUG: find strings that will break DATE / DATETIME columns
+            # ------------------------------------------------------------------
+            date_sql_cols = db.run_query(
+                f"""
+                SELECT COLUMN_NAME
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME = '{staging_table}'
+                AND DATA_TYPE IN ('date','datetime','datetime2','smalldatetime')
+                """,
+                DATABASE_NAME,
+            )["COLUMN_NAME"].tolist()
+
+            bad = []
+            for col in date_sql_cols:
+                if col not in df.columns:
+                    continue
+                mask = (
+                    df[col].notna()
+                    & df[col].apply(lambda x: isinstance(x, str))
+                )
+                if mask.any():
+                    bad.append(
+                        (col, df.loc[mask, col].unique()[:5])  # first few bad values
+                    )
+
+            if bad:
+                logger.error("Columns still holding date strings :")
+                for col, samples in bad:
+                    logger.error("   %s -> samples: %s", col, list(samples))
+                raise RuntimeError("Found string dates – fix before insert")
+            # ------------------------------------------------------------------
+
+
             cursor.executemany(insert_sql, values_list)
             conn.commit()
             
@@ -889,7 +981,7 @@ def atomic_swap_tables():
     """ZERO-DOWNTIME: Atomically swap staging table to production with minimal downtime"""
     logger.info("ATOMIC SWAP: Replacing production table with staging data...")
     
-    staging_table = f"stg_{TABLE_NAME}"
+    staging_table = f"swp_{TABLE_NAME}"
     
     try:
         # Get record counts for validation
@@ -964,15 +1056,16 @@ async def main():
             return
           # Step 3: Process items (production approach)
         df = process_items(items)
-        
-        # Step 4: Prepare for database (production approach)
-        df = prepare_for_database(df)
 
         # ─── DUPLICATE AN EXISTING COLUMN ────────────────────────────────────────
         # e.g. clone the 'Longson RM EX-FTY' column to a new column called 'ProductCode'
         if 'Longson RM EX-FTY' in df.columns:
             df['PC RM Ex-Factory Date'] = df['Longson RM EX-FTY']
         # ──────────────────────────────────────────────────────────────────────────
+        
+        # Step 4: Prepare for database (production approach)
+        df = prepare_for_database(df)
+
         
         # Step 4.5: Handle schema changes (NEW - Dynamic schema adaptation)
         handle_schema_changes(df, items)

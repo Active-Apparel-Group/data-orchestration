@@ -2,7 +2,7 @@
 Monday.com API Integration Module
 
 This module encapsulates all Monday.com API operations for the Customer Master Schedule workflow.
-It provides clean, reusable functions for creating items, managing groups, and handling API responses.
+It provides clean, reusable functions for creating items, managing gro        logging.info(f"Creating Monday.com item: {item_name} in group {group_id}")ps, and handling API responses.
 
 Key Functions:
 - create_monday_item: Create an item on Monday.com board
@@ -24,6 +24,8 @@ from datetime import datetime
 
 # Suppress warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="pandas")
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Monday.com API configuration
 API_URL = "https://api.monday.com/v2"
@@ -145,13 +147,13 @@ def get_board_info(board_id: str) -> Dict[str, Any]:
         
         if result['data']['boards']:
             board_info = result['data']['boards'][0]
-            logging.info(f"✅ Retrieved board info for {board_info['name']} (ID: {board_id})")
+            logging.info(f"SUCCESS: Retrieved board info for {board_info['name']} (ID: {board_id})")
             return board_info
         else:
             raise Exception(f"Board {board_id} not found")
             
     except Exception as e:
-        logging.error(f"❌ Failed to get board info for {board_id}: {e}")
+        logging.error(f"ERROR: Failed to get board info for {board_id}: {e}")
         raise
 
 def create_monday_item(
@@ -209,7 +211,7 @@ def create_monday_item(
     data = {'query': format_mutation_query(mutation)}
     
     try:
-        logging.info(f"🔄 Creating Monday.com item: {item_name} in group {group_id}")
+        logging.info(f"Creating Monday.com item: {item_name} in group {group_id}")
         
         response = requests.post(API_URL, headers=get_api_headers(), json=data, verify=False)
         result = validate_api_response(response, f"create item '{item_name}'")
@@ -218,13 +220,13 @@ def create_monday_item(
             item_id = result['data']['create_item']['id']
             group_title = result['data']['create_item']['group']['title']
             
-            logging.info(f"✅ Created Monday.com item: {item_name} (ID: {item_id}) in group '{group_title}'")
+            logging.info(f"SUCCESS: Created Monday.com item: {item_name} (ID: {item_id}) in group '{group_title}'")
             return item_id
         else:
             raise Exception(f"Item creation returned no data: {result}")
             
     except Exception as e:
-        logging.error(f"❌ Failed to create Monday.com item '{item_name}': {e}")
+        logging.error(f"ERROR: Failed to create Monday.com item '{item_name}': {e}")
         raise
 
 def update_item_column_values(
@@ -266,19 +268,19 @@ def update_item_column_values(
     data = {'query': format_mutation_query(mutation)}
     
     try:
-        logging.info(f"🔄 Updating Monday.com item {item_id} column values")
+        logging.info(f"Updating Monday.com item {item_id} column values")
         
         response = requests.post(API_URL, headers=get_api_headers(), json=data, verify=False)
         result = validate_api_response(response, f"update item {item_id} columns")
         
         if 'change_multiple_column_values' in result['data']:
-            logging.info(f"✅ Updated Monday.com item {item_id} column values")
+            logging.info(f"SUCCESS: Updated Monday.com item {item_id} column values")
             return True
         else:
             raise Exception(f"Column update returned no data: {result}")
             
     except Exception as e:
-        logging.error(f"❌ Failed to update Monday.com item {item_id}: {e}")
+        logging.error(f"ERROR: Failed to update Monday.com item {item_id}: {e}")
         raise
 
 def get_item_details(item_id: str) -> Dict[str, Any]:
@@ -324,13 +326,13 @@ def get_item_details(item_id: str) -> Dict[str, Any]:
         
         if result['data']['items']:
             item_details = result['data']['items'][0]
-            logging.info(f"✅ Retrieved details for item {item_id}: {item_details['name']}")
+            logging.info(f"SUCCESS: Retrieved details for item {item_id}: {item_details['name']}")
             return item_details
         else:
             raise Exception(f"Item {item_id} not found")
             
     except Exception as e:
-        logging.error(f"❌ Failed to get item details for {item_id}: {e}")
+        logging.error(f"ERROR: Failed to get item details for {item_id}: {e}")
         raise
 
 def ensure_group_exists(board_id: str, group_name: str) -> str:
@@ -376,7 +378,7 @@ def batch_create_items(
     for i in range(0, len(items_data), max_batch_size):
         batch = items_data[i:i + max_batch_size]
         
-        logging.info(f"🔄 Processing batch {i//max_batch_size + 1} ({len(batch)} items)")
+        logging.info(f"Processing batch {i//max_batch_size + 1} ({len(batch)} items)")
         
         for item_data in batch:
             try:
@@ -389,11 +391,11 @@ def batch_create_items(
                 created_item_ids.append(item_id)
                 
             except Exception as e:
-                logging.error(f"❌ Failed to create item '{item_data['item_name']}': {e}")
+                logging.error(f"ERROR: Failed to create item '{item_data['item_name']}': {e}")
                 # Continue with other items in batch
                 continue
     
-    logging.info(f"✅ Created {len(created_item_ids)} out of {len(items_data)} items")
+    logging.info(f"SUCCESS: Created {len(created_item_ids)} out of {len(items_data)} items")
     return created_item_ids
 
 # Error handling utilities

@@ -1,0 +1,124 @@
+{
+    "metadata": {
+        "description": "Monday.com Column IDs for Customer Master Schedule board",
+        "generated": "2025-06-15",
+        "board_name": "Customer Master Schedule",
+        "total_columns": 72
+    },
+    "mappable_fields": {
+        "exact_matches": {
+            "AAG ORDER NUMBER": "text_mkr5wya6",
+            "AAG SEASON": "dropdown_mkr58de6",
+            "CUSTOMER ALT PO": "text_mkrh94rx",
+            "CUSTOMER SEASON": "dropdown_mkr5rgs6",
+            "ORDER DATE PO RECEIVED": "date_mkr5zp5",
+            "DROP": "dropdown_mkr5w5e",
+            "PO NUMBER": "text_mkr5ej2x",
+            "PATTERN ID": "text_mkr5cz8m",
+            "STYLE DESCRIPTION": "long_text_mkr5p0cf",
+            "CATEGORY": "dropdown_mkr5s5n3",
+            "UNIT OF MEASURE": "color_mkr5yf27",
+            "ORDER TYPE": "dropdown_mkr518fc",
+            "DESTINATION": "text_mkr5kbc6",
+            "DESTINATION WAREHOUSE": "text_mkr5ps35",
+            "DELIVERY TERMS": "dropdown_mkr5kk5",
+            "PLANNED DELIVERY METHOD": "text_mkr5wcpw",
+            "NOTES": "long_text_mkr5hass",
+            "CUSTOMER PRICE": "numeric_mkr5cact",
+            "USA ONLY LSTP 75% EX WORKS": "numeric_mkr5yne4",
+            "EX WORKS (USD)": "numeric_mkr5erhv",
+            "ADMINISTRATION FEE": "numeric_mkr5k68",
+            "DESIGN FEE": "numeric_mkr5h612",
+            "FX CHARGE": "numeric_mkr5gp6a",
+            "HANDLING": "text_mkr5s3tm",
+            "SURCHARGE FEE": "numeric_mkr57cem",
+            "DISCOUNT": "numeric_mkr56xx8",
+            "FINAL FOB (USD)": "numeric_mkr5nhr7",
+            "HS CODE": "dropdown_mkr5k8yn",
+            "US DUTY RATE": "numeric_mkr5r6at",
+            "US DUTY": "numeric_mkr5ev2q",
+            "FREIGHT": "text_mkr5kyf4",
+            "US TARIFF RATE": "numeric_mkr55zg1",
+            "US TARIFF": "numeric_mkr51ndy",
+            "DDP US (USD)": "numeric_mkr5js0x",
+            "SMS PRICE USD": "numeric_mkr58nvp",
+            "FINAL PRICES Y/N": "text_mkr5ptvg",
+            "NOTES FOR PRICE": "long_text_mkr5znxn"
+        },
+        "mapped_fields": {
+            "CUSTOMER": "dropdown_mkr542p2",
+            "STYLE": "dropdown_mkr5tgaa",
+            "ALIAS RELATED ITEM": "text_mkrhra2c",
+            "COLOR": "dropdown_mkr5677f",
+            "CUSTOMER REQ IN DC DATE": "date_mkr554yz",
+            "CUSTOMER EX FACTORY DATE": "date_mkr57811",
+            "ORDER STATUS": "color_mkr5j5pp"
+        },
+        "target_only_fields": {
+            "Subitems": "subtasks_mkr5c0kp",
+            "ADD TO PLANNING": "color_mkrerxrs",
+            "FCST CONSUMED QTY": "numeric_mkrbty8b",
+            "FCST QTY": "numeric_mkrb56rj",
+            "Item ID": "pulse_id_mkr5pb5q",
+            "matchAlias": "text_mkr61hpz",
+            "PPS CMT DUE": "date_mkrvx550",
+            "PPS CMT RCV": "date_mkrvpbcr",
+            "PPS STATUS": "color_mkrvzryf"
+        }
+    },
+    "excluded_fields": {
+        "mirror_fields": {
+            "QTY ORDERED": "lookup_mkrbrdr1",
+            "QTY SHIPPED": "lookup_mkrds06t",
+            "QTY PACKED": "lookup_mkrdm6xp",
+            "EX-FTY (Change Request)": "lookup_mkr6113x",
+            "REQUESTED XFD STATUS": "lookup_mkr6eatd",
+            "EX-FTY (Forecast)": "lookup_mkr6bhyv",
+            "EX-FTY (Partner PO)": "lookup_mkr640ap",
+            "EX-FTY (Revised LS)": "lookup_mkr5nd5t",
+            "PRODUCTION TYPE": "lookup_mkr5j8kx",
+            "AQL INSPECTION": "lookup_mkr51rn0",
+            "AQL TYPE": "lookup_mkr5jem9",
+            "PLANNED CUT DATE": "lookup_mkr5bnt8",
+            "MO NUMBER": "lookup_mkr5ew17",
+            "PRODUCTION STATUS": "lookup_mkr5aapc",
+            "FACTORY COUNTRY": "lookup_mkr5yabx",
+            "FACTORY": "lookup_mkr55sr9",
+            "ALLOCATION STATUS": "lookup_mkr5hhjy",
+            "PRODUCTION QTY": "lookup_mkr5fkj1",
+            "TRIM ETA DATE": "lookup_mkr53kbm",
+            "FABRIC ETA DATE": "lookup_mkr5vk6m",
+            "TRIM STATUS": "lookup_mkr52fpd",
+            "FABRIC STATUS": "lookup_mkr5k4yj"
+        },
+        "formula_fields": {
+            "Net Demand": "formula_mkrb53jx",
+            "REVENUE (FOB)": "formula_mkrd937j",
+            "ORDER QTY": "formula_mkre54dj",
+            "PACKED QTY": "formula_mkrea5pd",
+            "SHIPPED QTY": "formula_mkre5ce5"
+        },
+        "board_relation_fields": {
+            "PLANNING BOARD": "board_relation_mkr5cer8"
+        }
+    },
+    "api_implementation": {
+        "mutation_example": {
+            "description": "Example column_values format for Monday.com API mutations",
+            "template": {
+                "text_mkr5wya6": "\"Order Number\"",
+                "dropdown_mkr542p2": "{\"ids\":[19]}",
+                "numeric_mkr5cact": "28.86",
+                "date_mkr5zp5": "{\"date\":\"2025-05-20\",\"icon\":\"\"}",
+                "color_mkr5j5pp": "{\"index\":7,\"post_id\":null}"
+            }
+        },
+        "notes": [
+            "Text fields: Use quoted strings",
+            "Dropdown fields: Use {\"ids\":[id_number]} format",
+            "Number fields: Use numeric values",
+            "Date fields: Use {\"date\":\"YYYY-MM-DD\",\"icon\":\"\"} format",
+            "Status fields: Use {\"index\":index_number,\"post_id\":null} format"
+        ]
+    }
+}

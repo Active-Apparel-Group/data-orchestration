@@ -2,7 +2,7 @@
 """
 GENERATED ETL Script: Monday.com Board Customer Master Schedule to SQL Server
 Board ID: 9200517329
-Table: MON_Customer_Master_Schedule
+Table: MON_CustMasterSchedule
 Database: orders
 Generated: 2025-06-18 21:02:11
 
@@ -44,11 +44,10 @@ import mapping_helper as mapping
 
 # Configuration - Monday.com API settings
 # Board-specific configuration (generated from template)
-BOARD_ID = 9200517329
-TABLE_NAME = "MON_Customer_Master_Schedule"
-DATABASE_NAME = "orders"
-BOARD_NAME = "Customer Master Schedule"
-BOARD_KEY = "MON_Customer_Master_Schedule"  # For data mapping YAML key
+board_config = mapping.get_board_config('customer_master_schedule')
+BOARD_ID = int(board_config['board_id'])
+TABLE_NAME = board_config['table_name'] 
+DATABASE_NAME = board_config['database']
 MONDAY_TOKEN = os.getenv('MONDAY_API_KEY') or config.get('apis', {}).get('monday', {}).get('api_token')
 API_VER = "2025-04"
 API_URL = config.get('apis', {}).get('monday', {}).get('api_url', "https://api.monday.com/v2")
@@ -113,7 +112,7 @@ def fetch_board_data_with_pagination():
         query GetBoardItems {{
           boards(ids: {BOARD_ID}) {{
             name
-            items_page(limit: 250{cursor_arg}) {{
+            items_page(limit: 100{cursor_arg}) {{
               cursor
               items {{
                 id
@@ -221,7 +220,7 @@ def process_items(items):
     records = []
     for item in items:
         record = {
-            "StyleKey": item["name"],
+            "Title": item["name"],
             "UpdateDate": item["updated_at"],
             "Group": item["group"]["title"],
             "Item ID": int(item["id"])  # Convert to integer for BIGINT compatibility
@@ -368,7 +367,7 @@ def prepare_for_database(df):
     potential_numeric_columns = []
     
     # Keywords that suggest a column should be numeric
-    numeric_keywords = ['QTY', 'QUANTITY', 'COUNT', 'NUMBER', 'PRICE', 'COST', 'USD', 'FEE', 
+    numeric_keywords = ['QTY', 'QUANTITY', 'COUNT',  'PRICE', 'COST', 'USD', 'FEE', 
                        'RATE', 'DUTY', 'TARIFF', 'FREIGHT', 'ID', 'REVENUE', 'FCST', 'ORDERED',
                        'SHIPPED', 'PACKED', 'INVOICED', 'WORKS', 'FOB', 'DDP', 'CHARGE']
     
@@ -753,7 +752,7 @@ def handle_schema_changes(df, items):
         logger.info(f"DataFrame has {len(df_columns)} columns")
         
         # Sync both production and staging tables
-        staging_table = f"stg_{TABLE_NAME}"
+        staging_table = f"swp_{TABLE_NAME}"
         
         # Sync production table first
         sync_table_schema(TABLE_NAME, DATABASE_NAME, monday_columns, df_columns)
@@ -800,7 +799,7 @@ def prepare_staging_table():
     """ZERO-DOWNTIME: Prepare staging table for atomic swap"""
     logger.info("PREPARING staging table for zero-downtime refresh...")
     
-    staging_table = f"stg_{TABLE_NAME}"
+    staging_table = f"swp_{TABLE_NAME}"
     
     try:
         # Check if staging table exists, create if not
@@ -848,7 +847,7 @@ def load_to_staging_table(df):
         logger.warning("No data to load")
         return
     
-    staging_table = f"stg_{TABLE_NAME}"
+    staging_table = f"swp_{TABLE_NAME}"
     
     try:
         logger.info(f"Loading {len(df)} rows into staging table {DATABASE_NAME}.dbo.{staging_table}")
@@ -926,7 +925,7 @@ def atomic_swap_tables():
     """ZERO-DOWNTIME: Atomically swap staging table to production with minimal downtime"""
     logger.info("ATOMIC SWAP: Replacing production table with staging data...")
     
-    staging_table = f"stg_{TABLE_NAME}"
+    staging_table = f"swp_{TABLE_NAME}"
     
     try:
         # Get record counts for validation
