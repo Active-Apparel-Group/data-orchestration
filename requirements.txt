@@ -5,6 +5,10 @@ numpy>=1.24.0
 # Database connectivity
 pyodbc>=4.0.39
 
+# Hybrid snapshot storage (optional)
+pyarrow>=14.0.0
+psycopg2-binary>=2.9.0
+
 # Configuration and environment
 python-dotenv>=1.0.0
 PyYAML>=6.0
@@ -28,6 +32,11 @@ rapidfuzz>=3.6.1
 
 # HTTP requests (for API integrations)
 requests>=2.31.0
+requests_toolbelt>=0.10.1
+
+# GraphQL
+gql
+
 
 # Data validation
 cerberus>=1.3.4
@@ -38,10 +47,18 @@ matplotlib>=3.7.0
 # Status reports
 tqdm>=4.66.1
 
-# Added by requirements scanner on 2025-06-16 22:13:18
+# Async and API tools
 aiohttp
-fuzzywuzzy
-urllib3
+jinja2
+tomli_w
+tomli>=2.0.1
 
-# Async
-asyncio
+UTC
+typing-extensions
+# Azure services and authentication
+azure-identity
+azure-storage-blob
+msal
+
+# Timezone support (for Python 3.9 compatibility - optional)
+pytz>=2023.3

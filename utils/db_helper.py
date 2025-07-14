@@ -2,6 +2,7 @@
 Lightweight SQL helper for Kestra/data pipelines.
 - Loads DB credentials from config.yaml in the working directory
 - Uses ODBC Driver 17 for SQL Server
+- Provides canonical customer name transformation
 """
 
 import os
@@ -13,7 +14,6 @@ from typing import Union, Optional
 
 import warnings
 warnings.filterwarnings("ignore", message="pandas only supports SQLAlchemy connectable")
-
 
 # --------------------------
 # CONSTANTS
@@ -146,3 +146,121 @@ def execute(
         if commit:
             conn.commit()
         return rowcount
+
+# --------------------------
+# MIGRATION HELPERS
+# --------------------------
+def run_migration(
+    migration_path: Union[str, Path],
+    db_key: str = 'UNIFIED_ORDERS',
+    verbose: bool = True
+) -> bool:
+    """
+    Execute a SQL migration file against the specified database.
+    
+    Args:
+        migration_path: Path to the .sql migration file
+        db_key: Database key from config.yaml (default: UNIFIED_ORDERS)
+        verbose: Whether to print progress messages
+        
+    Returns:
+        bool: True if migration succeeded, False otherwise
+    """
+    try:
+        migration_path = Path(migration_path)
+        
+        if not migration_path.exists():
+            raise FileNotFoundError(f"Migration file not found: {migration_path}")
+        
+        if verbose:
+            print(f"🔄 Running migration: {migration_path.name}")
+            print(f"📊 Database: {db_key}")
+        
+        # Read the migration script
+        with open(migration_path, 'r', encoding='utf-8') as f:
+            script = f.read()
+        
+        if not script.strip():
+            raise ValueError(f"Migration file is empty: {migration_path}")
+        
+        # Execute the migration
+        with get_connection(db_key) as conn:
+            cursor = conn.cursor()
+            cursor.execute(script)
+            conn.commit()
+            cursor.close()
+        
+        if verbose:
+            print(f"✅ Migration completed successfully: {migration_path.name}")
+        
+        return True
+        
+    except Exception as e:
+        if verbose:
+            print(f"❌ Migration failed: {migration_path.name if 'migration_path' in locals() else migration_path}")
+            print(f"🔥 Error: {str(e)}")
+        return False
+
+def run_migrations_directory(
+    migrations_dir: Union[str, Path],
+    db_key: str = 'UNIFIED_ORDERS',
+    pattern: str = "*.sql",
+    verbose: bool = True
+) -> dict:
+    """
+    Execute all SQL migration files in a directory in alphabetical order.
+    
+    Args:
+        migrations_dir: Path to directory containing migration files
+        db_key: Database key from config.yaml (default: UNIFIED_ORDERS)
+        pattern: File pattern to match (default: *.sql)
+        verbose: Whether to print progress messages
+        
+    Returns:
+        dict: Results summary with 'successful', 'failed', and 'details' keys
+    """
+    migrations_dir = Path(migrations_dir)
+    
+    if not migrations_dir.exists():
+        raise FileNotFoundError(f"Migrations directory not found: {migrations_dir}")
+    
+    # Find all migration files and sort them
+    migration_files = sorted(migrations_dir.glob(pattern))
+    
+    if not migration_files:
+        if verbose:
+            print(f"⚠️  No migration files found in: {migrations_dir}")
+        return {'successful': 0, 'failed': 0, 'details': []}
+    
+    if verbose:
+        print(f"🚀 Running {len(migration_files)} migrations from: {migrations_dir}")
+        print("=" * 60)
+    
+    results = {'successful': 0, 'failed': 0, 'details': []}
+    
+    for migration_file in migration_files:
+        success = run_migration(migration_file, db_key, verbose)
+        
+        result_detail = {
+            'file': migration_file.name,
+            'success': success,
+            'path': str(migration_file)
+        }
+        
+        if success:
+            results['successful'] += 1
+        else:
+            results['failed'] += 1
+        
+        results['details'].append(result_detail)
+        
+        if verbose:
+            print("-" * 60)
+    
+    if verbose:
+        print(f"\n📊 Migration Summary:")
+        print(f"   ✅ Successful: {results['successful']}")
+        print(f"   ❌ Failed: {results['failed']}")
+        print(f"   📁 Total: {len(migration_files)}")
+    
+    return results

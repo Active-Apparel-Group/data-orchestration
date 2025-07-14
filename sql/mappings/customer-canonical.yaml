@@ -1,0 +1,457 @@
+customers:
+  - canonical: ACTIVELY BLACK
+    status: review
+    packed_products: ''
+    shipped: ACTIVELY BLACK
+    master_order_list: ACTIVELY BLACK
+    mon_customer_ms: ''
+    aliases:
+      - ACTIVELY BLACK
+  - canonical: AESCAPE
+    status: approved
+    packed_products: AESCAPE
+    shipped: AESCAPE
+    master_order_list: AESCAPE
+    mon_customer_ms: ''
+    aliases:
+      - AESCAPE
+  - canonical: AIME LEON DORE
+    status: review
+    packed_products: ''
+    shipped: AIME LEON DORE
+    master_order_list: AIME LEON DORE
+    mon_customer_ms: ''
+    aliases:
+      - AIME LEON DORE
+  - canonical: AJE
+    status: approved
+    packed_products: ''
+    shipped: AJE
+    master_order_list: AJE ATHLETICA (AU)
+    mon_customer_ms: ''
+    aliases:
+      - AJE
+      - AJE ATHLETICA (AU)
+  - canonical: ALWRLD
+    status: review
+    packed_products: ALWRLD
+    shipped: ALWRLD
+    master_order_list: ALWRLD (US)
+    mon_customer_ms: ''
+    aliases:
+      - ALWRLD
+      - ALWRLD (US)
+  - canonical: ASHER GOLF
+    status: review
+    packed_products: ''
+    shipped: ''
+    master_order_list: ASHER GOLF
+    mon_customer_ms: ''
+    aliases:
+      - ASHER GOLF
+  - canonical: ASRV
+    status: review
+    packed_products: ASRV
+    shipped: ASRV
+    master_order_list: AESTHETIC REVOLUTION LLC (US)
+    mon_customer_ms: ''
+    aliases:
+      - ASRV
+      - AESTHETIC REVOLUTION LLC (US)
+  - canonical: B'HOOD
+    status: review
+    packed_products: ''
+    shipped: ''
+    master_order_list: B'HOOD
+    mon_customer_ms: ''
+    aliases:
+      - B'HOOD
+  - canonical: BAD BIRDIE
+    status: review
+    packed_products: ''
+    shipped: BAD BIRDIE
+    master_order_list: BAD BIRDIE
+    mon_customer_ms: ''
+    aliases:
+      - BAD BIRDIE
+  - canonical: BANDIER
+    status: review
+    packed_products: ''
+    shipped: BANDIER
+    master_order_list: BANDIER
+    mon_customer_ms: ''
+    aliases:
+      - BANDIER
+  - canonical: BANDIT RUNNING
+    status: approved
+    packed_products: BANDIT RUNNING
+    shipped: BANDIT RUNNING
+    master_order_list: BANDIT RUNNING
+    mon_customer_ms: ''
+    aliases:
+      - BANDIT RUNNING
+      - BANDIT
+  - canonical: BC BRANDS
+    status: review
+    packed_products: ''
+    shipped: ''
+    master_order_list: BC BRANDS
+    mon_customer_ms: ''
+    aliases:
+      - BC BRANDS
+  - canonical: BEAU HUDSON
+    status: review
+    packed_products: ''
+    shipped: BEAU HUDSON
+    master_order_list: ''
+    mon_customer_ms: ''
+    aliases:
+      - BEAU HUDSON
+  - canonical: BOGGI
+    status: approved
+    packed_products: BOGGI
+    shipped: BOGGI
+    master_order_list: BOGGI MILANO
+    mon_customer_ms: ''
+    aliases:
+      - BOGGI
+      - BOGGI MILANO
+  - canonical: BORN PRIMITIVE
+    status: review
+    packed_products: ''
+    shipped: BORN PRIMITIVE
+    master_order_list: BORN PRIMITIVE
+    mon_customer_ms: ''
+    aliases:
+      - BORN PRIMITIVE
+  - canonical: CAMILLA
+    status: approved
+    packed_products: CAMILLA
+    shipped: CAMILLA
+    master_order_list: CAMILLA (AU)
+    mon_customer_ms: ''
+    aliases:
+      - CAMILLA
+      - CAMILLA (AU)
+  - canonical: CUTS CLOTHING
+    status: approved
+    packed_products: ''
+    shipped: CUTS CLOTHING
+    master_order_list: CUTS CLOTHING
+    mon_customer_ms: ''
+    aliases:
+      - CUTS CLOTHING
+  - canonical: DAVID JONES(UNE PIECE)
+    status: review
+    packed_products: ''
+    shipped: DAVID JONES(UNE PIECE)
+    master_order_list: ''
+    mon_customer_ms: ''
+    aliases:
+      - DAVID JONES(UNE PIECE)
+  - canonical: DSSLR
+    status: review
+    packed_products: ''
+    shipped: ''
+    master_order_list: DSSLR
+    mon_customer_ms: ''
+    aliases:
+      - DSSLR
+  - canonical: EDWONDER
+    status: review
+    packed_products: ''
+    shipped: EDWONDER
+    master_order_list: EDWONDER
+    mon_customer_ms: ''
+    aliases:
+      - EDWONDER
+  - canonical: EQUINOX
+    status: review
+    packed_products: ''
+    shipped: EQUINOX
+    master_order_list: EQUINOX
+    mon_customer_ms: ''
+    aliases:
+      - EQUINOX
+  - canonical: EXOTICA
+    status: review
+    packed_products: EXOTICA
+    shipped: EXOTICA
+    master_order_list: ''
+    mon_customer_ms: ''
+    aliases:
+      - EXOTICA
+  - canonical: FARADAY LABS, INC (LAMBS)
+    status: review
+    packed_products: ''
+    shipped: ''
+    master_order_list: FARADAY LABS, INC (LAMBS)
+    mon_customer_ms: ''
+    aliases:
+      - FARADAY LABS, INC (LAMBS)
+  - canonical: FEETURES
+    status: approved
+    packed_products: ''
+    shipped: FEETURES
+    master_order_list: FEETURES
+    mon_customer_ms: ''
+    aliases:
+      - FEETURES
+  - canonical: G FORE
+    status: review
+    packed_products: ''
+    shipped: G FORE
+    master_order_list: G FORE
+    mon_customer_ms: ''
+    aliases:
+      - G FORE
+  - canonical: GREYSON
+    status: approved
+    packed_products: GREYSON
+    shipped: GREYSON
+    master_order_list: GREYSON CLOTHIERS
+    mon_customer_ms: ''
+    aliases:
+      - GREYSON
+      - GREYSON CLOTHIERS
+  - canonical: JOHNNIE O
+    status: approved
+    packed_products: JOHNNIE O
+    shipped: JOHNNIE O
+    master_order_list: JOHNNIE O
+    mon_customer_ms: JOHNNIE O
+    aliases:
+      - JOHNNIE O
+  - canonical: JOHNNY WAS
+    status: approved
+    packed_products: ''
+    shipped: JOHNNY WAS
+    master_order_list: JOHNNY WAS
+    mon_customer_ms: ''
+    aliases:
+      - JOHNNY WAS
+  - canonical: LAMBS
+    status: review
+    packed_products: LAMBS
+    shipped: LAMBS
+    master_order_list: ''
+    mon_customer_ms: ''
+    aliases:
+      - LAMBS
+  - canonical: LORNA JANE
+    status: approved
+    packed_products: LORNA JANE
+    shipped: LORNA JANE
+    master_order_list:
+      - LORNA JANE
+      - LORNA JANE (AU)
+      - LORNA JANE (NZ)
+    mon_customer_ms: ''
+    aliases:
+      - LORNA JANE
+      - LORNA JANE (AU)
+      - LORNA JANE (NZ)
+  - canonical: MACK WELDON
+    status: review
+    packed_products: ''
+    shipped: MACK WELDON
+    master_order_list: MACK WELDON
+    mon_customer_ms: ''
+    aliases:
+      - MACK WELDON
+  - canonical: PELOTON
+    status: approved
+    packed_products: PELOTON
+    shipped: PELOTON
+    master_order_list: Peloton Private Label
+    mon_customer_ms: ''
+    aliases:
+      - PELOTON
+      - Peloton Private Label
+  - canonical: RARE
+    status: review
+    packed_products: ''
+    shipped: RARE
+    master_order_list: ''
+    mon_customer_ms: ''
+    aliases:
+      - RARE
+  - canonical: REC GEN
+    status: review
+    packed_products: ''
+    shipped: REC GEN
+    master_order_list: ''
+    mon_customer_ms: ''
+    aliases:
+      - REC GEN
+  - canonical: RHONE
+    status: approved
+    packed_products: RHONE
+    shipped: RHONE
+    master_order_list: RHONE
+    mon_customer_ms: ''
+    aliases:
+      - RHONE
+  - canonical: RHYTHM
+    status: review
+    packed_products: RHYTHM
+    shipped: RHYTHM
+    master_order_list:
+      - RHYTHM
+      - RHYTHM (AU)
+      - RHYTHM (US)
+    mon_customer_ms: ''
+    aliases:
+      - RHYTHM
+      - RHYTHM (AU)
+      - RHYTHM (US)
+    matching_config:
+      style_match_strategy: alias_related_item
+      preferred_po_field: Customer_PO
+      style_field_override: ALIAS/RELATED ITEM
+      fuzzy_threshold: 85
+      size_aliases:
+        XS:
+          - EXTRA SMALL
+          - XSMALL
+        S:
+          - SMALL
+          - SM
+        M:
+          - MEDIUM
+          - MED
+        L:
+          - LARGE
+          - LRG
+        XL:
+          - EXTRA LARGE
+          - XLARGE
+        XXL:
+          - EXTRA EXTRA LARGE
+          - 2XL
+      exact_match_fields:
+        - Canonical_Customer
+        - Customer_PO
+        - ALIAS/RELATED ITEM
+        - Color
+      fuzzy_match_fields:
+        - ALIAS/RELATED ITEM
+        - Color
+  - canonical: RYDERWEAR
+    status: review
+    packed_products: RYDERWEAR
+    shipped: RYDERWEAR
+    master_order_list: RYDERWEAR (AU)
+    mon_customer_ms: ''
+    aliases:
+      - RYDERWEAR
+      - RYDERWEAR (AU)
+  - canonical: SEISSENSE
+    status: approved
+    packed_products: SEISSENSE
+    shipped: SEISSENSE
+    master_order_list: SEISSENSE
+    mon_customer_ms: ''
+    aliases:
+      - SEISSENSE
+  - canonical: SOUL CYCLE
+    status: review
+    packed_products: ''
+    shipped: SOUL CYCLE
+    master_order_list: SOUL CYCLE
+    mon_customer_ms: ''
+    aliases:
+      - SOUL CYCLE
+  - canonical: SPIRITUAL GANGSTER
+    status: approved
+    packed_products: SPIRITUAL GANGSTER
+    shipped: SPIRITUAL GANGSTER
+    master_order_list: SPIRITUAL GANGSTER
+    mon_customer_ms: ''
+    aliases:
+      - SPIRITUAL GANGSTER
+  - canonical: STARLIGHT
+    status: review
+    packed_products: ''
+    shipped: STARLIGHT
+    master_order_list: ''
+    mon_customer_ms: ''
+    aliases:
+      - STARLIGHT
+  - canonical: STARLIGHT CHILDREN'S FOUNDATION (AU)
+    status: review
+    packed_products: ''
+    shipped: ''
+    master_order_list: STARLIGHT CHILDREN'S FOUNDATION (AU)
+    mon_customer_ms: ''
+    aliases:
+      - STARLIGHT CHILDREN'S FOUNDATION (AU)
+  - canonical: SUMMERSALT
+    status: review
+    packed_products: ''
+    shipped: SUMMERSALT
+    master_order_list: SUMMERSALT
+    mon_customer_ms: ''
+    aliases:
+      - SUMMERSALT
+  - canonical: SUN DAY RED
+    status: approved
+    packed_products: SUN DAY RED
+    shipped: SUN DAY RED
+    master_order_list: SUN DAY RED
+    mon_customer_ms: ''
+    aliases:
+      - SUN DAY RED
+  - canonical: TAYLOR MADE
+    status: review
+    packed_products: ''
+    shipped: TAYLOR MADE
+    master_order_list: TAYLOR MADE
+    mon_customer_ms: ''
+    aliases:
+      - TAYLOR MADE
+  - canonical: TELFAR
+    status: review
+    packed_products: ''
+    shipped: TELFAR
+    master_order_list: TELFAR
+    mon_customer_ms: ''
+    aliases:
+      - TELFAR
+  - canonical: TITLE NINE
+    status: approved
+    packed_products: TITLE NINE
+    shipped: TITLE NINE
+    master_order_list: TITLE 9
+    mon_customer_ms: ''
+    aliases:
+      - TITLE NINE
+      - TITLE 9
+  - canonical: TRACK SMITH
+    status: approved
+    packed_products: TRACK SMITH
+    shipped: TRACK SMITH
+    master_order_list: TRACKSMITH
+    mon_customer_ms: ''
+    aliases:
+      - TRACK SMITH
+      - TRACKSMITH
+  - canonical: UNE PIECE
+    status: approved
+    packed_products: UNE PIECE
+    shipped: UNE PIECE
+    master_order_list: UNE PIECE (AU)
+    mon_customer_ms: ''
+    aliases:
+      - UNE PIECE
+      - UNE PIECE (AU)
+  - canonical: WHITE FOX
+    status: approved
+    packed_products: WHITE FOX
+    shipped: WHITE FOX
+    master_order_list: WHITE FOX (AU)
+    mon_customer_ms: ''
+    aliases:
+      - WHITE FOX
+      - WHITE FOX (AU)
+review_count: 36

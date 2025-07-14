@@ -1,0 +1,95 @@
+# ORDERS_UNIFIED to Monday.com Field Mapping Configuration
+# Generated: June 15, 2025
+# Purpose: Complete mapping specification for data transformation between ORDERS_UNIFIED and Monday.com
+
+metadata:
+  version: "1.1"
+  description: "Field mapping configuration for ORDERS_UNIFIED to Monday.com transformation"
+  source_system: "ORDERS_UNIFIED (SQL Server)"
+  target_system: "Monday.com via GraphQL API"
+  total_source_fields: 183
+  total_target_fields: 72
+  mappable_fields: 51
+
+# Direct 1:1 mappings - fields with identical names and compatible types
+exact_matches:
+  - source_field: "AAG ORDER NUMBER"
+    target_field: "AAG ORDER NUMBER"
+    target_column_id: "text_mkr5wya6"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "text"
+    sample_data:
+      source: "JOO-00505"
+      target: "JOO-00505"
+
+  - source_field: "AAG SEASON"
+    target_field: "AAG SEASON"
+    target_column_id: "dropdown_mkr58de6"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    sample_data:
+      source: "2026 SPRING"
+      target: "2026 SPRING"
+
+  - source_field: "CUSTOMER SEASON"
+    target_field: "CUSTOMER SEASON"
+    target_column_id: "dropdown_mkr5rgs6"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    sample_data:
+      source: "SPRING SUMMER 2026"
+      target: "SPRING SUMMER 2026"
+
+  # Additional mappings truncated for handover document...
+  # [See complete 808-line mapping file for full details]
+
+# Fields requiring transformation/mapping
+mapped_fields:
+  - source_field: "CUSTOMER NAME"
+    target_field: "CUSTOMER"
+    target_column_id: "dropdown_mkr542p2"
+    source_type: "NVARCHAR(MAX)"
+    target_type: "dropdown"
+    transformation: "customer_mapping_lookup"
+    mapping_source: "customer_mapping.yaml"
+    mapping_logic: |
+      1. Match ORDERS_UNIFIED.CUSTOMER_NAME against customer_mapping.yaml master_order_list values
+      2. Return corresponding canonical customer name
+      3. Handle multiple master_order_list entries per customer (arrays)
+      4. Fall back to original value if no mapping found
+
+  - source_field: "RANGE / COLLECTION"
+    target_field: "RANGE / COLLECTION"
+    target_column_id: "long_text_mks0vs1p"
+    source_type: "NVARCHAR(200)"
+    target_type: "long_text"
+    transformation: "direct_mapping"
+    sample_data:
+      source: "FALL 2025 CORE"
+      target: "FALL 2025 CORE"
+    notes: "New column added June 17, 2025 for product range/collection data"
+
+# Aggregated/computed fields
+computed_fields:
+  - target_field: "Title"
+    source_fields:
+      ["CUSTOMER STYLE", "CUSTOMER COLOUR DESCRIPTION", "AAG ORDER NUMBER"]
+    transformation: "concatenation"
+    formula: "CUSTOMER_STYLE + COLOR + AAG_ORDER_NUMBER"
+    sample_data:
+      source: ["JWHD100120", "WHITE", "JOO-00505"]
+      target: "JWHD100120WHITEJOO-00505"
+    notes: "Composite identifier for Monday.com items - Monday.com uses 'Title' as the item name field"
+
+# Transformation summary
+transformation_summary:
+  total_mappings: 51
+  direct_mappings: 37
+  transformed_mappings: 7
+  computed_fields: 2
+  target_only_fields: 9
+  source_only_fields: 143
+  excluded_fields: 28
+# [Complete 808-line configuration available in main mapping file]
+# This handover copy includes key mappings and transformation logic.
+# Refer to ../mapping/orders_unified_monday_mapping.yaml for complete details.

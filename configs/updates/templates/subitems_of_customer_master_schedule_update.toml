@@ -1,0 +1,51 @@
+# OPUS Universal Monday.com Update Configuration
+# Generated from: board_9200771505_metadata.json
+# Generated at: 2025-07-02 09:07:17
+# Board: Subitems of Customer Master Schedule (9200771505)
+
+[metadata]
+board_id = 9200771505
+board_name = "Subitems of Customer Master Schedule"
+table_name = "MON_SubitemsofCustomerMasterSchedule"
+database = "orders"
+update_type = "batch_item_updates"
+description = "Update Subitems of Customer Master Schedule items with latest data"
+
+[query_config]
+# SQL query to get update data
+query = """
+# TODO: Add your SQL query here
+# SELECT
+#     [Item ID] as monday_item_id,
+#     -- Add your columns here
+# FROM your_table
+# WHERE your_conditions
+"""
+
+# Column mapping configuration
+item_id_column = "monday_item_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+# Name
+"name" = "Name"
+# Size
+"dropdown_mkrak7qp" = "Size"
+# Order Qty
+"numeric_mkra7j8e" = "Order Qty"
+# Cut Qty
+"numeric_mkrbgdat" = "Cut Qty"
+# Sew Qty
+"numeric_mkrc5ryb" = "Sew Qty"
+# Finishing Qty
+"numeric_mkrc7jfj" = "Finishing Qty"
+# Received not Shipped Qty
+"numeric_mkrcq53k" = "Received not Shipped Qty"
+# Packed Qty
+"numeric_mkraepx7" = "Packed Qty"
+# Shipped Qty
+"numeric_mkrapgwv" = "Shipped Qty"
+# ORDER LINE STATUS
+"color_mkrbezbh" = "ORDER LINE STATUS"
+# Item ID
+"pulse_id_mkrag4a3" = "Item ID"

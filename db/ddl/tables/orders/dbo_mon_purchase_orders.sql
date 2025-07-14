@@ -1,0 +1,45 @@
+-- Table: dbo.MON_Purchase_Orders
+-- Database: ORDERS
+-- Purpose: [Add description of table purpose]
+-- Dependencies: [List any dependent tables/views]
+
+CREATE TABLE [dbo].[MON_Purchase_Orders] (
+    [Title] NVARCHAR(255) NULL,
+    [UpdateDate] NVARCHAR(255) NULL,
+    [Group] NVARCHAR(255) NULL,
+    [Item ID] BIGINT NULL,
+    [Subitems] NVARCHAR(255) NULL,
+    [REV] DECIMAL(18,4) NULL,
+    [PO File] NVARCHAR(477) NULL,
+    [Supporting Files] NVARCHAR(1130) NULL,
+    [Units] DECIMAL(18,4) NULL,
+    [Currency] NVARCHAR(255) NULL,
+    [PO Value] DECIMAL(18,4) NULL,
+    [Partner Factory] NVARCHAR(255) NULL,
+    [Legal Entity] NVARCHAR(255) NULL,
+    [Factory Country] NVARCHAR(255) NULL,
+    [Factory Location] NVARCHAR(255) NULL,
+    [ALLOCATION STATUS] NVARCHAR(255) NULL,
+    [Allocation Owner] NVARCHAR(255) NULL,
+    [Allocation Due] NVARCHAR(255) NULL,
+    [Raise PO] NVARCHAR(255) NULL,
+    [Approve PO] NVARCHAR(255) NULL,
+    [PO Approval Status] NVARCHAR(255) NULL,
+    [PO Status] NVARCHAR(255) NULL,
+    [PO Approved Date] NVARCHAR(255) NULL,
+    [PO Raised Date] NVARCHAR(255) NULL,
+    [link Style COO Plan] NVARCHAR(MAX) NULL,
+    [PO Value Planning Board] NVARCHAR(255) NULL,
+    [stat] NVARCHAR(3337) NULL,
+    [CMP Partner] NVARCHAR(255) NULL,
+    [CMP LS] NVARCHAR(255) NULL,
+    [LS % of Partner] NVARCHAR(255) NULL,
+    [CMP Diff (USD)] NVARCHAR(255) NULL,
+    [CMP Per Garment] NVARCHAR(255) NULL,
+    [CUSTOMER] NVARCHAR(255) NULL,
+    [COO Planning Allocations] NVARCHAR(858) NULL,
+    [ID] BIGINT NULL,
+    [Contract ID] NVARCHAR(255) NULL,
+    [TP Issue Date] NVARCHAR(255) NULL,
+    [Prepare TP] NVARCHAR(255) NULL
+);

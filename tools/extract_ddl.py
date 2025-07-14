@@ -11,17 +11,34 @@ import os
 import logging
 from pathlib import Path
 
-# Add src to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+# ─────────────────── Repository Root & Utils Import ───────────────────
+def find_repo_root() -> Path:
+    """Find repository root by looking for pipelines/utils folder"""
+    current = Path(__file__).resolve()
+    while current.parent != current:
+        if (current.parent.parent / "pipelines" / "utils").exists():
+            return current.parent.parent
+        current = current.parent
+    raise RuntimeError("Could not find repository root with utils/ folder")
 
-from audit_pipeline.config import get_connection
+repo_root = find_repo_root()
+sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
+
+# Import helpers
+import db_helper as db
+import logger_helper
+import staging_helper
+
+# Load configuration from centralized config
+config = db.load_config()
+
+logger = logger_helper.get_logger("extract_ddl")
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
-logger = logging.getLogger(__name__)
 
 def get_table_ddl(connection, schema_name='dbo', table_name=None):
     """
@@ -38,7 +55,8 @@ def get_table_ddl(connection, schema_name='dbo', table_name=None):
     cursor = connection.cursor()
     ddl_results = {}
     
-    try:        # Get list of tables
+    try:        
+        # Get list of tables
         if table_name:
             table_filter = f"AND TABLE_NAME = '{table_name}'"
         else:
@@ -134,7 +152,8 @@ def get_table_ddl(connection, schema_name='dbo', table_name=None):
                 create_statement += f",\n    CONSTRAINT [PK_{table_name}] PRIMARY KEY ({pk_cols})"
             
             create_statement += "\n);\n"
-              # Get indexes
+              
+            # Get indexes
             indexes_query = f"""
             SELECT 
                 i.name AS index_name,
@@ -192,20 +211,21 @@ def extract_ddl_for_database(db_key, output_dir, schema_name='dbo', table_name=N
         output_dir: Directory to save DDL files
         schema_name: Schema name (default: 'dbo')
         table_name: Specific table name (optional)
-        save_to_source: If True, also save organized DDL to sql/ddl/ directory
+        save_to_source: If True, also save organized DDL to db/ddl/ directory
     """
     logger.info(f"Extracting DDL for database: {db_key}")
     
     try:
-        with get_connection(db_key) as conn:
+        with db.get_connection(db_key) as conn:
             ddl_results = get_table_ddl(conn, schema_name, table_name)
-              # Create output directory
+              
+            # Create output directory
             output_path = Path(output_dir) / db_key.lower()
             output_path.mkdir(parents=True, exist_ok=True)
             
             # Also create organized source DDL directory if requested
             if save_to_source:
-                source_ddl_path = Path(__file__).parent.parent / "sql" / "ddl" / "tables" / db_key.lower()
+                source_ddl_path = Path(__file__).parent.parent / "db" / "ddl" / "tables" / db_key.lower()
                 source_ddl_path.mkdir(parents=True, exist_ok=True)
             
             # Save each table's DDL
@@ -303,8 +323,9 @@ def main():
     
     # Optional: schema name
     schema_name = input("\nEnter schema name (default: dbo): ").strip() or 'dbo'
-      # Optional: save to source control
-    save_to_source = input("\nSave organized DDL to source control (sql/ddl/)? (y/N): ").strip().lower() == 'y'
+      
+    # Optional: save to source control
+    save_to_source = input("\nSave organized DDL to source control (db/ddl/)? (y/N): ").strip().lower() == 'y'
     
     total_tables = 0
     
@@ -319,7 +340,7 @@ def main():
     print(f"\n🎉 Complete! Extracted DDL for {total_tables} tables")
     print(f"📁 Output files saved to: {output_dir.absolute()}")
     if save_to_source:
-        print(f"📁 Source DDL saved to: {Path(__file__).parent.parent / 'sql' / 'ddl'}")
+        print(f"📁 Source DDL saved to: {Path(__file__).parent.parent / 'db' / 'ddl'}")
     
     # Provide guidance
     print(f"\n💡 Next Steps:")
@@ -327,7 +348,7 @@ def main():
     print(f"   2. Add table descriptions and dependencies")
     if save_to_source:
         print(f"   3. Commit source DDL files to version control")
-        print(f"   4. Use sql/ddl/ files for schema documentation")
+        print(f"   4. Use db/ddl/ files for schema documentation")
 
 if __name__ == "__main__":
     main()

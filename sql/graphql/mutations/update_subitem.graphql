@@ -1,0 +1,17 @@
+mutation UpdateSubitem($board_id: ID!, $item_id: ID!, $subitem_id: ID!, $column_values: JSON!) {
+  change_subitem_column_values(
+    board_id: $board_id
+    item_id: $item_id
+    subitem_id: $subitem_id
+    column_values: $column_values
+  ) {
+    id
+    name
+    column_values {
+      id
+      text
+      value
+    }
+    updated_at
+  }
+}

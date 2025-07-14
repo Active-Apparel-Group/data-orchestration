@@ -1,0 +1,2472 @@
+version: 1
+generated_at: '2025-07-08T23:27:29Z'
+source_table: ORDER_LIST
+raw_tables:
+- x*_ORDER_LIST_RAW
+columns:
+- name: AAG ORDER NUMBER
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CUSTOMER NAME
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ORDER DATE PO RECEIVED
+  aliases: []
+  type: datetime2
+  rules:
+  - date
+  pk: false
+- name: PO NUMBER
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CUSTOMER ALT PO
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: AAG SEASON
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CUSTOMER SEASON
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: DROP
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: MONTH
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: RANGE / COLLECTION
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: PROMO GROUP / CAMPAIGN (HOT 30/GLOBAL EDIT)
+  aliases:
+  - PROMO GROUP / CAMPAIGN (HOT 30/GLOBAL EDIT
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CATEGORY
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: PATTERN ID
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: PLANNER
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: MAKE OR BUY
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ORIGINAL ALIAS/RELATED ITEM
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: PRICING ALIAS/RELATED ITEM
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ALIAS/RELATED ITEM
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CUSTOMER STYLE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: STYLE DESCRIPTION
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CUSTOMER'S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CUSTOMER COLOUR DESCRIPTION
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UNIT OF MEASURE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR WAREHOUSE CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: BULK AGREEMENT NUMBER
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR FACILITY CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR BUSINESS UNIT AREA
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: BULK AGREEMENT DESCRIPTION
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CO NUMBER - INITIAL DISTRO
+  aliases:
+  - CO NUMBER (INITIAL DISTRO)
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR CUSTOMER CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CO NUMBER - ALLOCATION DISTRO
+  aliases:
+  - CO NUMBER (ALLOCATION DISTRO)
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CO NUMBER (INITIAL DISTRO)
+  aliases:
+  - CO NUMBER - INITIAL DISTRO
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CO NUMBER (ALLOCATION DISTRO)
+  aliases:
+  - CO NUMBER - ALLOCATION DISTRO
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR ORDER TYPE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR SEASON CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ITEM TYPE CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: PRODUCT GROUP CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ITEM GROUP CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: PLANNER2
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: GENDER GROUP CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: FABRIC TYPE CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR MAKE/BUY CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR ITEM TYPE CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR PRODUCT GROUP CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR ITEM GROUP CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR GENDER GROUP CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR FABRIC TYPE CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: LONGSON ALIAS
+  aliases:
+  - Longson Alias
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR COLOUR CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: FACILITY CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CUSTOMER CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: Column2
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: Column1
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: AAG SEASON CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: MAKE OR BUY FLAG
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: MAKE/BUY CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: 0-3M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 10/M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 11-12 years
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 12-18M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 12/18 MTHS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 13-14 years
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 18-24M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 18/24 MTHS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 1Y
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 2Y
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 3-4 years
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 3-6M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 3/6 MTHS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 3Y
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 4Y
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 5-6 years
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 6-12M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 6-9M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 6/12 MTHS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 7-8 years
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 9-10 years
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 9-12M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 10-12
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 10/11
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 11-14
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 12-14
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 12/13
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 2/3
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 2T
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 3-4
+  aliases:
+  - '34'
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 30/30
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 30/32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 31/30
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 31/32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32/30
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32/32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32/34
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32/36
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 33/30
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 33/32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34/30
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34/32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34/34
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 35/30
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 35/32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36/30
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36/32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36/34
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38/30
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38/32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38/34
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38/36
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 3T
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 4/5
+  aliases:
+  - '45'
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 40/30
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 40/32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 4T
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 4XT
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 5-6
+  aliases:
+  - '56'
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 5T
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 6-10
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 6/7
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 6T
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 7-8
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 8/9
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 9-10
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: L(10-12)
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: L(14-16)
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: M(10-12)
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: M(8-10)
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: S(6-8)
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 04/XXS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 06/XS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 08/S
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 12/L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 14/XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 16/XXL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 18/XXXL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 1X
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 2X
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 2XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 3X
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 3XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 4X
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 4XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: S
+  aliases:
+  - S+
+  type: int
+  rules:
+  - int
+  pk: false
+- name: S+
+  aliases:
+  - S
+  type: int
+  rules:
+  - int
+  pk: false
+- name: S-PETITE
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XS-PETITE
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XXL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XXS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XXXL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XXXS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: L-XL
+  aliases:
+  - L/XL
+  type: int
+  rules:
+  - int
+  pk: false
+- name: S-M
+  aliases:
+  - S/M
+  type: int
+  rules:
+  - int
+  pk: false
+- name: S/P
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XL/2XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XXL/3XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XXS/XS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '0'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 0w
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '1'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '10'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 10w
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '12'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 12w
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '14'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '16'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '18'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '2'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '20'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '22'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '24'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '25'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '26'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '27'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '28'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '29'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 2w
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '3'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '30'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '31'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '32'
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: '33'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '34'
+  aliases:
+  - 3-4
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '35'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '36'
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: '38'
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: '4'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '40'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '42'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '43'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '44'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '45'
+  aliases:
+  - 4/5
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '46'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '48'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 4w
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '5'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '50'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '52'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '54'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '56'
+  aliases:
+  - 5-6
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '58'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '6'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '60'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 6w
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '7'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '8'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 8w
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: '9'
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 28-30L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 30-30L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 30-31L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 30-32L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 30x30
+  aliases:
+  - 30X30
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 30x32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 31-30L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 31-31L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 31-32L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 31x30
+  aliases:
+  - 31X30
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32-30L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32-31L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32-32L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32x30
+  aliases:
+  - 32X30
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32x32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32x34
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 33-30L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 33-31L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 33-32L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34-30L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34-31L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34-32L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34x30
+  aliases:
+  - 34X30
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34x32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34x34
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 35-30L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 35-31L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 35-32L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36-30L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36-31L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36-32L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36x30
+  aliases:
+  - 36X30
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36x32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36x34
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38-30L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38-31L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38-32L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38x30
+  aliases:
+  - 38X30
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38x32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38x34
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 40-30L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 40-31L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 40x30
+  aliases:
+  - 40X30
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 40x32
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 40x34
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: AB/M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: AB/S
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: AB/XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: C/L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: C/M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: C/S
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: C/XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: C/XS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: CD/L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: CD/M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: CD/S
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: CD/XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: CD/XS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: D/L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: D/M
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: D/S
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: D/XL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: D/XS
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: D/XXL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: L/XL
+  aliases:
+  - L-XL
+  type: int
+  rules:
+  - int
+  pk: false
+- name: M/L
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: O/S
+  aliases:
+  - OS
+  type: int
+  rules:
+  - int
+  pk: false
+- name: S/M
+  aliases:
+  - S-M
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XL/XXL
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: XS/S
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32C
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32D
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32DD
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 32DDD
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34C
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34D
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34DD
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 34DDD
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36C
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36D
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36DD
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 36DDD
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38C
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38D
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38DD
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: 38DDD
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: ONE SIZE
+  aliases:
+  - One Size
+  type: int
+  rules:
+  - int
+  pk: false
+- name: OS
+  aliases:
+  - O/S
+  type: int
+  rules:
+  - int
+  pk: false
+- name: One Sz
+  aliases:
+  - One_Sz
+  type: int
+  rules:
+  - int
+  pk: false
+- name: One_Sz
+  aliases:
+  - One Sz
+  type: int
+  rules:
+  - int
+  pk: false
+- name: TOTAL QTY
+  aliases: []
+  type: smallint
+  rules:
+  - int
+  pk: false
+- name: DESTINATION
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: DESTINATION WAREHOUSE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ALLOCATION (CHANNEL)
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: SHOP NAME
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: SHOP CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: COLLECTION DELIVERY
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ETA CUSTOMER WAREHOUSE DATE
+  aliases: []
+  type: datetime2
+  rules:
+  - date
+  pk: false
+- name: EX FACTORY DATE
+  aliases: []
+  type: datetime2
+  rules:
+  - date
+  pk: false
+- name: DELIVERY TERMS
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: PLANNED DELIVERY METHOD
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: NOTES
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ORDER TYPE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: VALIDATION
+  aliases:
+  - Validation
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: VALIDATION2
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: VALIDATION3
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: VALIDATION4
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CUSTOMER PRICE
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: USA ONLY LSTP 75% EX WORKS
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: EX WORKS (USD)
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: ADMINISTRATION FEE
+  aliases: []
+  type: decimal(2,1)
+  rules:
+  - decimal
+  pk: false
+- name: DESIGN FEE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: FX CHARGE
+  aliases: []
+  type: decimal(3,2)
+  rules:
+  - decimal
+  pk: false
+- name: HANDLING
+  aliases: []
+  type: decimal(2,1)
+  rules:
+  - decimal
+  pk: false
+- name: PNP
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: SURCHARGE FEE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: DISCOUNT
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: FINAL FOB (USD)
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: HS CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: US DUTY RATE
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: US DUTY
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: FREIGHT
+  aliases: []
+  type: tinyint
+  rules: []
+  pk: false
+- name: US TARIFF RATE
+  aliases: []
+  type: decimal(4,3)
+  rules:
+  - decimal
+  pk: false
+- name: US TARIFF
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: DDP US (USD)
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: UK DUTY RATE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UK FREIGHT
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UK INSURANCE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UK CIF
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UK DUTY
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: DDP UK (USD)
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CAN DUTY RATE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CAN DUTY
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: DDP CAN (USD)
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: SMS PRICE USD
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: FINAL PRICES Y/N
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: NOTES FOR PRICE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ∆
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR ADDRESS ID
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: TRACKING NUMBER
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR DELIVERY CODE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: COUNTRY OF ORIGIN
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: DELIVERY CODE (MODL)
+  aliases: []
+  type: tinyint
+  rules: []
+  pk: false
+- name: FX CHARGE 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INFOR EX-WORKS 4 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: AU Product 4 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: AU PnP 4 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: AU Price 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: AU Discount 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: US Product 4 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: US PnP 4 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: US Duty 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: US Tariff 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: TARIFF RELIEF DISCOUNT (20%)
+  aliases: []
+  type: decimal(17,15)
+  rules:
+  - decimal
+  pk: false
+- name: US Price 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: FOB TO USE ON PRODUCT INVOICE
+  aliases: []
+  type: decimal(17,15)
+  rules:
+  - decimal
+  pk: false
+- name: US Discount 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: US Price w/ Discount
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CAN Product 4 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ADDITIONAL TARIFF RATE
+  aliases: []
+  type: decimal(17,16)
+  rules:
+  - decimal
+  pk: false
+- name: CAN PnP 4 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CAN Duty 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ADDITIONAL TARIFF %
+  aliases:
+  - ADDITIONAL TARIFF
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ADDITIONAL TARIFF
+  aliases:
+  - ADDITIONAL TARIFF %
+  type: decimal(3,2)
+  rules:
+  - decimal
+  pk: false
+- name: CAN Price 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ADDITIONAL TARIFF VALUE
+  aliases: []
+  type: tinyint
+  rules: []
+  pk: false
+- name: CAN Discount 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: TARIFF RATE CHARGED TO AAG
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: CAN Price w/ Discount
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: TARIFF LOSS
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UK Product 4 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UK PnP 4 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INVOICE METHOD
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UK Duty 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UK Price 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UK Discount 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: UK Price w/ Discount
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: RMB price (ex. VAT)
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: RMB Discount 2 Dec
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: RMB Price w/ Discount
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: PRICING NOTES
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: NASC TO ROC PRICE (RMB) (inc VAT)
+  aliases: []
+  type: decimal(3,1)
+  rules:
+  - decimal
+  pk: false
+- name: FINANCE EST (USD)
+  aliases: []
+  type: int
+  rules:
+  - int
+  pk: false
+- name: Warehouse
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: NASC TO WHITE FOX (USD)
+  aliases: []
+  type: decimal(17,6)
+  rules:
+  - decimal
+  pk: false
+- name: INVOICE MONTH
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: INVOICE YEAR
+  aliases: []
+  type: smallint
+  rules:
+  - int
+  pk: false
+- name: ORTP (ORDER TYPE)
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: HDPR
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: PATTERN/STYLE NAME
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: RRP
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: PFI EXCHANGE RATE
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: FOB (AUD)
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: BUAR (BUSINESS AREA UNIT)
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: MARGIN
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
+- name: ADID
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false

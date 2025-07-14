@@ -1,0 +1,40 @@
+# OPUS Universal Monday.com Update Configuration
+# Purpose: TOML-based configuration for metadata-driven updates
+# Board: Customer Master Schedule (8709134353)
+
+[metadata]
+board_id = 9200517329
+board_name = "Customer Master Schedule"
+update_type = "batch_item_updates"
+description = "Update customer master schedule items with latest production data"
+
+[query_config]
+# SQL query to get update data
+query = """
+Select cms.[Item ID] as monday_item_id,
+ou.[ALIAS/RELATED ITEM] as [ALIAS RELATED ITEM]
+FROM [dbo].[ORDERS_UNIFIED] ou
+        JOIN [dbo].[MON_CustMasterSchedule] cms 
+            ON ou.[AAG ORDER NUMBER] = cms.[AAG ORDER NUMBER]
+            AND ou.[CUSTOMER STYLE] = cms.[STYLE] 
+            AND ou.[CUSTOMER COLOUR DESCRIPTION] = cms.[COLOR]
+            where [ALIAS/RELATED ITEM] IS NOT NULL  
+"""
+
+# Column mapping configuration
+item_id_column = "monday_item_id"
+
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+text_mkrhra2c = "ALIAS RELATED ITEM"
+
+[validation]
+required_fields = ["monday_item_id", "board_id"]
+max_batch_size = 15  # Process 15 records per API call
+timeout_seconds = 300
+
+[retry_config]
+max_retries = 3
+retry_delay_seconds = 5
+backoff_multiplier = 2

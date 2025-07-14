@@ -1,0 +1,29 @@
+# GraphQL mutation — update-subitem.graphql
+#
+# Updates numeric metrics (e.g. Shipped Qty, Packed Qty) on a Monday.com SUB‑item.
+# Use GraphQL variables for item & board IDs; pass numeric values as strings.
+#
+# Example execution:
+#   mutation = gql(open("update_subitems.graphql").read())
+#   vars = {
+#       "itemId": 123456789,
+#       "boardId": 987654321,
+#       "shippedQty": "120",
+#       "packedQty":  "110"
+#   }
+#   client.execute(mutation, variable_values=vars)
+
+mutation UpdateSubItem(
+  $itemId: Int!,
+  $boardId: Int!,
+  $shippedQty: String,
+  $packedQty: String
+) {
+  change_multiple_column_values(
+    item_id: $itemId,
+    board_id: $boardId,
+    column_values: "{\n      \"numeric_mkrapgwv\": \"$shippedQty\",   # Shipped Qty\n      \"numeric_mkraepx7\": \"$packedQty\"     # Packed Qty\n    }"
+  ) {
+    id
+  }
+}

@@ -1,0 +1,369 @@
+---
+# METADATA
+id: "dev-customer-orders"
+type: "dev"
+project: "customer_orders_pipeline"
+created: "2025-06-19"
+updated: "2025-06-24"
+priority: "high"
+
+# 🎯 CURRENT STATUS
+status: "PHASE_1_PRODUCTION_IMPLEMENTATION"
+
+# 📋 MILESTONE TRACKING
+milestones:
+  milestone_1_consolidation:
+    status: "✅ COMPLETED"
+    description: "Consolidate order-staging and customer-orders approaches"
+    sub_milestones:
+      pipeline_selection: "✅ dev/customer-orders confirmed as primary implementation"
+      reference_material: "✅ order-staging designated as reference only"
+      redundancy_removal: "✅ scripts/customer_master_schedule marked redundant"
+  
+  milestone_2_validation:
+    status: "✅ COMPLETED"
+    description: "Validate current implementation and identify gaps"
+    sub_milestones:
+      gap_analysis: "✅ 75% completion assessment confirmed"
+      critical_blockers: "✅ Customer normalization identified as primary blocker"
+      documentation_review: "✅ Comprehensive project docs analyzed"
+  
+  milestone_3_critical_fixes:
+    status: "✅ COMPLETED"
+    description: "Fix critical issues blocking pipeline execution"
+    sub_milestones:
+      import_patterns: "✅ Fixed method signatures and import patterns"
+      testing_framework: "✅ Added PO number filtering for testing"
+      orchestrator_validation: "✅ Validated orchestrator runs correctly"
+  
+  milestone_4_customer_normalization:
+    status: "✅ COMPLETED - END_TO_END_VALIDATED"
+    description: "Fix customer name normalization disconnect"
+    sub_milestones:
+      root_cause_analysis: "✅ Identified batch processor using canonical name only"
+      solution_design: "✅ Added get_customer_aliases() method approach"
+      implementation: "✅ Updated customer filtering to resolve all aliases"
+      validation: "✅ GREYSON CLOTHIERS -> GREYSON: 69 records processed successfully"
+    files_fixed:
+      - "✅ dev/customer-orders/customer_batch_processor.py - get_customer_changes() method"
+      - "✅ dev/customer-orders/customer_mapper.py - added get_customer_aliases() method"
+      
+  milestone_5_schema_validation:
+    status: "✅ COMPLETED_SUCCESSFULLY - ALL_CORRECTIONS_APPLIED"
+    description: "Align YAML mapping files with actual DDL/schema"
+    priority: "CRITICAL - PRODUCTION_BLOCKER"
+    sub_milestones:
+      field_mapping_audit: "✅ COMPLETED - 4 critical mismatches identified"
+      schema_alignment: "✅ COMPLETED - All critical corrections applied"
+      validation_framework: "✅ COMPLETED - Schema validation tests successful"
+      comprehensive_testing: "✅ COMPLETED - End-to-end pipeline tests successful"
+    
+    critical_findings:
+      total_mismatches: 4
+      critical_corrections_needed:
+        - "❌ [CUSTOMER] → ✅ [CUSTOMER NAME] (Used in working code)"
+        - "❌ [Order Qty] → ✅ [TOTAL QTY] (Used in working code)"
+        - "❌ [DUE DATE] → ✅ [EX FACTORY DATE] (Closest DDL match)"
+        - "❌ [Style] → ✅ [CUSTOMER STYLE] (Exact DDL match)"
+      
+      validation_results:
+        total_ddl_fields: 267
+        total_yaml_fields: 8  
+        match_percentage: "50% (4/8 fields correct)"
+        exact_matches: "[AAG ORDER NUMBER], [AAG SEASON], [CUSTOMER ALT PO], [CUSTOMER SEASON]"
+      
+      impact_assessment: "Production blocker - mapping failures will cause API errors"
+      evidence_files:
+        - "tests/debug/schema_validation_report.txt"
+        - "tests/debug/schema_corrections_summary.txt"
+        - "tests/debug/corrected_mapping_sample.yaml"
+  
+  milestone_6_final_validation:
+    status: "🚧 IN_PROGRESS - VALIDATION_TESTING_PHASE"
+    description: "Final validation testing with corrected mappings"
+    priority: "P1 - VALIDATION"
+    sub_milestones:
+      corrected_mapping_test: "🚧 Testing corrected YAML mappings with GREYSON data"
+      api_integration_test: "⏳ Validate Monday.com API with corrected field names"
+      end_to_end_test: "⏳ Full pipeline test with monitoring"
+      production_readiness_doc: "⏳ Document final production readiness status"
+    
+    validation_criteria:
+      schema_accuracy: "✅ 100% field accuracy achieved (8/8 fields correct)"
+      customer_processing: "✅ 69 GREYSON records processed successfully"
+      mapping_corrections: "✅ All 4 critical corrections applied"
+      pipeline_functionality: "🚧 Testing end-to-end functionality"
+      api_compatibility: "⏳ Validating Monday.com API integration"
+    
+    success_metrics:
+      - "Zero mapping errors during processing"
+      - "Successful API calls with corrected field names"  
+      - "Complete customer batch processing (all 69 records)"
+      - "Production deployment readiness confirmed"
+
+  milestone_6_gap_analysis:
+    status: "✅ COMPLETED - PRODUCTION_ROADMAP_CREATED"
+    description: "Comprehensive analysis of subitem integration gaps"
+    completion_date: "2025-06-24"
+    deliverable: "docs/SUBITEM_INTEGRATION_GAP_ANALYSIS.md"
+    findings:
+      critical_gaps: 5
+      production_timeline: "5 weeks"
+      infrastructure_ready: "70%"
+      missing_components: "Monday.com API integration for subitems"
+    reference_implementation: "scripts/customer_master_schedule_subitems/mon_add_customer_ms_subitems.py"
+  
+  # 🚀 NEW PRODUCTION MILESTONES (5-Week Roadmap)
+  milestone_7_subitem_field_mapping:
+    status: "✅ COMPLETED_SUCCESSFULLY"
+    timeline: "Week 1 (June 24-28, 2025) - COMPLETED"
+    description: "Complete subitem field mapping alignment"
+    activities:
+      activity_7_1:
+        task: "Extract Monday.com subitem column IDs"
+        file: "scripts/customer_master_schedule_subitems/mon_add_customer_ms_subitems.py"
+        status: "✅ COMPLETED - Column IDs extracted from working implementation"
+      activity_7_2:
+        task: "Update comprehensive mapping with subitem fields"
+        file: "sql/mappings/orders-unified-comprehensive-mapping.yaml"
+        status: "✅ COMPLETED - Subitem section added with proper field mappings"
+      activity_7_3:
+        task: "Create subitem-specific mapping section"
+        file: "sql/mappings/subitem-field-mapping.yaml"
+        status: "✅ COMPLETED - Dedicated 261-line mapping file created"
+    validation_results:
+      monday_fields_mapped: 4
+      column_ids_extracted:
+        - "dropdown_mkrak7qp (Size dropdown)"
+        - "numeric_mkra7j8e (Order quantity)"
+        - "numeric_mkraepx7 (Received quantity)"
+        - "numeric_mkrapgwv (Shipped quantity)"
+      size_detection_logic: "✅ Between UNIT OF MEASURE and TOTAL QTY"
+      melting_process: "✅ Wide format → tall subitem records"
+    success_criteria: "✅ ALL COMPLETED - Complete field ID mapping for size dropdown and quantity numeric"
+    
+  milestone_8_graphql_integration:
+    status: "✅ COMPLETED_SUCCESSFULLY"
+    timeline: "Week 1 (June 24-28, 2025) - COMPLETED"
+    description: "Implement subitem GraphQL integration"
+    dependencies: ["milestone_7_subitem_field_mapping"]
+    activities:
+      activity_8_1:
+        task: "Update create-subitem.graphql with correct column IDs"
+        file: "sql/graphql/mutations/create-subitem.graphql"
+        status: "✅ COMPLETED - Updated with working script patterns and usage examples"
+      activity_8_2:
+        task: "Implement subitem creation in integration module"
+        file: "dev/customer-orders/integration_monday.py"
+        status: "✅ COMPLETED - Added 6 new methods for complete subitem workflow"
+      activity_8_3:
+        task: "Update CustomerBatchProcessor for API calls"
+        file: "dev/customer-orders/customer_batch_processor.py"
+        status: "✅ COMPLETED - Added _process_subitems() integration method"
+    implementation_details:
+      new_methods_added:
+        - "create_size_subitem() - Size-specific subitem creation with Monday.com column IDs"
+        - "detect_size_columns() - Auto-detect size columns between markers"
+        - "melt_size_columns() - Convert wide format to tall subitem records"
+        - "create_subitems_from_melted_data() - Batch API processing with progress tracking"
+        - "process_order_subitems() - Complete end-to-end workflow orchestration"
+      test_validation:
+        api_connection: "✅ PASSED"
+        size_detection: "✅ 162 columns detected"
+        data_melting: "✅ 2 orders → 5 size records"
+    success_criteria: "✅ ALL COMPLETED - Functional subitem creation via Monday.com API"
+    
+  milestone_9_error_recovery:
+    status: "📋 PLANNED"
+    timeline: "Week 3 (July 8-12, 2025)"
+    description: "Implement error recovery and retry logic"
+    activities:
+      activity_9_1:
+        task: "Create retry decorator with exponential backoff"
+        file: "utils/retry_helper.py"
+        pattern: "Follow existing utils/db_helper.py error handling"
+      activity_9_2:
+        task: "Add error grouping and analysis"
+        file: "dev/customer-orders/error_analyzer.py"
+        reference: "Test script lines 194-220"
+      activity_9_3:
+        task: "Implement batch recovery mechanism"
+        file: "dev/customer-orders/customer_batch_processor.py"
+        database_update: "sql/ddl/tables/orders/dbo_mon_batchprocessing.sql"
+    success_criteria: "Automatic retry for transient failures with comprehensive error analysis"
+    
+  milestone_10_testing_validation:
+    status: "📋 PLANNED"
+    timeline: "Week 4 (July 15-19, 2025)"
+    description: "Comprehensive testing and validation"
+    activities:
+      activity_10_1:
+        task: "Create integration test for full workflow"
+        file: "tests/integration/test_monday_api_integration.py"
+        scope: "Test item + subitem creation end-to-end"
+      activity_10_2:
+        task: "Validate against GREYSON PO 4755"
+        file: "tests/end_to_end/test_greyson_po_4755_complete_workflow.py"
+        action: "Include API validation phases"
+      activity_10_3:
+        task: "Performance and scale testing"
+        file: "tests/performance/test_batch_processing_scale.py"
+        target: "<5 seconds per order processing time"
+    success_criteria: "95%+ API success rate, <5 seconds per order"
+    
+  milestone_11_production_deployment:
+    status: "📋 PLANNED"
+    timeline: "Week 5 (July 22-26, 2025)"
+    description: "Production deployment and monitoring"
+    activities:
+      activity_11_1:
+        task: "Create deployment checklist"
+        file: "docs/PRODUCTION_DEPLOYMENT_CHECKLIST.md"
+        reference: "tools/deploy-all.ps1 patterns"
+      activity_11_2:
+        task: "Implement monitoring and alerting"
+        file: "monitoring/monday_api_monitor.py"
+        integration: "utils/logger_helper.py for alerts"
+      activity_11_3:
+        task: "Create operations runbook"
+        file: "docs/OPERATIONS_RUNBOOK.md"
+        content: "Troubleshooting and recovery procedures"
+    final_deliverable: "Production-ready subitem integration system"
+
+# 🗂️ KEY FILES
+files:
+  main_orchestrator: "dev/customer-orders/main_customer_orders.py"
+  batch_processor: "dev/customer-orders/customer_batch_processor.py"
+  change_detector: "dev/customer-orders/change_detector.py"
+  customer_mapper: "dev/customer-orders/customer_mapper.py"
+  mapping_schema: "sql/mappings/orders-unified-comprehensive-mapping.yaml"
+  gap_analysis: "docs/SUBITEM_INTEGRATION_GAP_ANALYSIS.md"
+  working_reference: "scripts/customer_master_schedule_subitems/mon_add_customer_ms_subitems.py"
+  test_framework: "tests/end_to_end/test_greyson_po_4755_complete_workflow.py"
+
+# 🚨 CURRENT CRITICAL FOCUS - PRODUCTION READINESS
+production_readiness:
+  status: "EXECUTION_PHASE"
+  plan_document: "docs/CUSTOMER_ORDERS_PRODUCTION_READINESS_PLAN.md"
+  priority: "P0 - Production deployment within 7 days"
+  
+  current_gaps:
+    yaml_integration: "CRITICAL - Mapping file not used in workflow"
+    graphql_implementation: "CRITICAL - Not using GraphQL mutations"
+    subitem_processing: "HIGH - Size-level data not synchronized"
+    error_handling: "MEDIUM - No retry logic implemented"
+
+  vision_flow_status:
+    orders_unified: "✅ Source data available"
+    stg_master_schedule: "✅ Table populated"
+    create_item_graphql: "🔧 Needs integration"
+    monday_items: "🔧 Limited fields only"
+    stg_subitems: "⏳ Not implemented"
+    create_subitem_graphql: "⏳ Not implemented"
+    monday_subitems: "⏳ Not implemented"
+
+# 🎯 PRODUCTION READINESS MILESTONES
+production_milestones:
+  milestone_1_yaml_integration:
+    status: "🚧 IN_PROGRESS"
+    timeline: "Day 1 (June 25, 2025)"
+    description: "Integrate orders_unified_monday_mapping.yaml"
+    tasks:
+      - task: "Copy preferred mapping to sql/mappings/"
+        status: "✅ COMPLETED"
+        file: "sql/mappings/orders-unified-monday-mapping.yaml"
+      - task: "Update monday_api_adapter.py to use new mapping"
+        status: "🔧 IN_PROGRESS"
+        file: "dev/customer-orders/monday_api_adapter.py"
+      - task: "Apply exact_matches (37 fields)"
+        status: "✅ COMPLETED"
+      - task: "Apply mapped_fields (CUSTOMER, STYLE)"
+        status: "🔧 IN_PROGRESS"
+      - task: "Apply computed_fields (Title)"
+        status: "🔧 IN_PROGRESS"
+      - task: "Validate all fields in staging"
+        status: "⏳ PLANNED"
+    success_criteria: "51 fields mapped and populated in staging"
+
+  milestone_2_graphql_implementation:
+    status: "📋 PLANNED"
+    timeline: "Day 2 (June 26, 2025)"
+    description: "Replace API calls with GraphQL mutations"
+    dependencies: ["milestone_1_yaml_integration"]
+    tasks:
+      - task: "Load GraphQL templates"
+        file: "sql/graphql/mutations/create-master-item.graphql"
+      - task: "Implement execute_graphql() method"
+        file: "dev/customer-orders/monday_api_adapter.py"
+      - task: "Update create_item() to use GraphQL"
+        pattern: "Follow handover documentation"
+      - task: "Use YAML column IDs in payload"
+        reference: "orders-unified-monday-mapping.yaml"
+      - task: "Integration test with GREYSON"
+        validation: "All 51 fields populated"
+    success_criteria: "GraphQL mutations working with full field set"
+
+  milestone_3_subitem_pipeline:
+    status: "📋 PLANNED"
+    timeline: "Days 3-4 (June 27-28, 2025)"
+    description: "Implement size-level subitem processing"
+    dependencies: ["milestone_2_graphql_implementation"]
+    tasks:
+      - task: "Add subitem_fields to YAML mapping"
+        columns: ["dropdown_mkrak7qp", "numeric_mkra7j8e"]
+      - task: "Implement transform_orders_to_subitems()"
+        transformation: "Wide format to tall records"
+      - task: "Add insert_subitems_to_staging()"
+        target: "STG_MON_CustMasterSchedule_Subitems"
+      - task: "Implement create_subitem() with GraphQL"
+        template: "sql/graphql/mutations/create-subitem.graphql"
+      - task: "Add subitem processing to batch flow"
+        sequence: "After master items complete"
+      - task: "Test with GREYSON PO 4755"
+        expected: "264 subitems created"
+    success_criteria: "Subitems created in Monday.com board"
+
+# 📊 PROGRESS TRACKING
+production_progress:
+  overall_readiness: "40%"
+  components_status:
+    source_data: "✅ 100% - ORDERS_UNIFIED available"
+    staging_tables: "✅ 100% - DDL complete"
+    yaml_mapping: "✅ 100% - File exists and comprehensive"
+    yaml_integration: "🔧 0% - Not integrated in code"
+    graphql_templates: "✅ 100% - Templates exist"
+    graphql_integration: "🔧 0% - Not implemented"
+    subitem_processing: "⏳ 0% - Not started"
+    error_handling: "🔧 20% - Basic structure only"
+    monitoring: "⏳ 0% - Not implemented"
+
+# 🎯 TODAY'S FOCUS
+immediate_actions:
+  action_1:
+    task: "Validate orders_unified_monday_mapping.yaml"
+    priority: "P0"
+    assignee: "Developer"
+    eta: "2 hours"
+    
+  action_2:
+    task: "Update customer_mapper.py to load YAML"
+    priority: "P0"
+    assignee: "Developer"
+    eta: "3 hours"
+    
+  action_3:
+    task: "Test Title field computation"
+    priority: "P0"
+    test_data: "GREYSON PO 4755"
+    expected: "JWHD100120WHITEJOO-00505"
+    eta: "1 hour"
+
+# 📚 KEY DOCUMENTATION
+documentation:
+  production_plan: "docs/CUSTOMER_ORDERS_PRODUCTION_READINESS_PLAN.md"
+  gap_analysis: "docs/SUBITEM_INTEGRATION_GAP_ANALYSIS.md"
+  handover_doc: "dev/order-staging/handover/"
+  graphql_templates: "sql/graphql/mutations/"
+  yaml_mapping: "docs/mapping/orders_unified_monday_mapping.yaml"
+
+# ...existing code...

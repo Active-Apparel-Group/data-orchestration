@@ -1,0 +1,41 @@
+# Monday.com Subitem Creation Mutation
+# Reference: scripts/customer_master_schedule_subitems/mon_add_customer_ms_subitems.py (lines 140-160)
+# Board: 9200517329 (Customer Master Schedule)
+# Purpose: Create size-based subitems under parent master items
+
+mutation CreateSubitem($parentItemId: ID!, $itemName: String!, $columnValues: JSON!) {
+  create_subitem(
+    parent_item_id: $parentItemId
+    item_name: $itemName
+    column_values: $columnValues
+    create_labels_if_missing: true
+  ) {
+    id
+    name
+    board {
+      id
+      name
+    }
+    column_values {
+      id
+      text
+      value
+    }
+  }
+}
+
+# Column Values JSON Template (from working implementation):
+# {
+#   "dropdown_mkrak7qp": {"labels": ["XS"]},     // Size dropdown
+#   "numeric_mkra7j8e": "5",                     // Order quantity  
+#   "numeric_mkraepx7": 0,                       // Received quantity (future)
+#   "numeric_mkrapgwv": 0                        // Shipped quantity (future)
+# }
+
+# Usage Example:
+# Variables:
+# {
+#   "parentItemId": "1234567890",
+#   "itemName": "Size XL", 
+#   "columnValues": "{\"dropdown_mkrak7qp\":{\"labels\":[\"XL\"]},\"numeric_mkra7j8e\":\"3\",\"numeric_mkraepx7\":0,\"numeric_mkrapgwv\":0}"
+# }

@@ -4,7 +4,8 @@
 -- Dependencies: Mirrors MON_CustMasterSchedule_Subitems with additional staging columns, FK to STG_MON_CustMasterSchedule
 
 CREATE TABLE [dbo].[STG_MON_CustMasterSchedule_Subitems] (
-    -- All columns from MON_CustMasterSchedule_Subitems (production table)    [parent_item_id] NVARCHAR(200) NULL,
+    -- All columns from MON_CustMasterSchedule_Subitems (production table)
+    [parent_item_id] NVARCHAR(200) NULL,
     [subitem_id] NVARCHAR(200) NULL,
     [subitem_board_id] NVARCHAR(200) NULL,
     [Size] NVARCHAR(100) NULL,

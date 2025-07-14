@@ -1,0 +1,76 @@
+{
+  "boards": {
+    "8685586257": {
+      "board_name": "Factory List",
+      "table_name": "MON_Factory_List",
+      "database": "orders",
+      "last_run": "2025-06-30T09:55:01.697351",
+      "status": "active",
+      "metadata_path": "configs/boards/board_8685586257_metadata.json",
+      "workflow_path": "workflows/extract_board_8685586257.yaml"
+    },
+    "8983946335": {
+      "board_name": "Customers",
+      "table_name": "MON_Customers",
+      "database": "orders",
+      "discovered_at": "2025-06-29T20:03:49.602545",
+      "status": "discovered",
+      "metadata_path": "configs/boards/board_8983946335_metadata.json",
+      "config_path": "configs/boards/board_8983946335.json",
+      "workflow_path": "workflows/extract_board_8983946335.yaml"
+    },
+    "8446553051": {
+      "board_name": "Fabric Library",
+      "table_name": "MON_Fabric_Library",
+      "database": "orders",
+      "last_run": "2025-06-30T08:06:21.744473",
+      "status": "active",
+      "metadata_path": "configs/boards/board_8446553051_metadata.json",
+      "workflow_path": "workflows/extract_board_8446553051.yaml"
+    },
+    "8738178586": {
+      "board_name": "Partner Purchase Orders",
+      "table_name": "MON_Purchase_Orders",
+      "database": "orders",
+      "discovered_at": "2025-06-29T21:17:33.363389",
+      "status": "discovered",
+      "metadata_path": "configs/boards/board_8738178586_metadata.json",
+      "config_path": "configs/boards/board_8738178586.json",
+      "workflow_path": "workflows/extract_board_8738178586.yaml"
+    },
+    "8709134353": {
+      "board_name": "Planning",
+      "table_name": "MON_Planning",
+      "database": "orders",
+      "discovered_at": "2025-07-10T14:59:14.640816",
+      "status": "discovered",
+      "metadata_path": "configs/boards/board_8709134353_metadata.json",
+      "config_path": "configs/boards/board_8709134353.json",
+      "workflow_path": "workflows/extract_board_8709134353.yaml"
+    },
+    "9200517329": {
+      "board_name": "Customer Master Schedule",
+      "table_name": "MON_CustMasterSchedule",
+      "database": "orders",
+      "last_run": "2025-06-30T09:39:05.805863",
+      "status": "active",
+      "metadata_path": "configs/boards/board_9200517329_metadata.json",
+      "workflow_path": "workflows/extract_board_9200517329.yaml"
+    },
+    "9200771505": {
+      "board_name": "Subitems of Customer Master Schedule",
+      "table_name": "MON_SubitemsofCustomerMasterSchedule",
+      "database": "orders",
+      "discovered_at": "2025-07-02T09:07:17.207126",
+      "status": "discovered",
+      "metadata_path": "configs/boards/board_9200771505_metadata.json",
+      "config_path": "configs/boards/board_9200771505.json",
+      "workflow_path": "workflows/extract_board_9200771505.yaml"
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "created_at": "2025-06-29T00:00:00Z",
+    "updated_at": "2025-07-10T14:59:14.660567"
+  }
+}

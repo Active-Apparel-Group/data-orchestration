@@ -1,0 +1,7 @@
+mutation BatchUpdateItems($items: [ItemUpdate!]!) {
+  update_multiple_items(items: $items) {
+    id
+    name
+    updated_at
+  }
+}

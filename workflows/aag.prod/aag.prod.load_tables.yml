@@ -1,0 +1,84 @@
+id: load_tables
+namespace: aag.prod
+description: "Load database tables"
+
+triggers:
+  - id: upstream_dependancy
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: flow_trigger
+      flows:
+        - namespace: aag.prod
+          flowId: load_order_list
+          states: [SUCCESS]
+
+tasks:
+  - id: setup_and_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      �Ys? Starting Workflow: {{ flow.id }}
+      �Y". Timestamp: {{ now() }}
+      �Y��️  Namespace: {{ flow.namespace }}
+      �Y"� Description: Load Staging Tables in ORDERS database
+      �Y"� Script Location: scripts/{{flow.id}}/
+      �Y-"️  Database Connections: 0
+      
+  - id: execute_main_workflow
+    type: io.kestra.plugin.core.flow.WorkingDirectory
+    description: "Execute {{flow.id}} main script with environment configuration"
+    namespaceFiles:
+      enabled: true
+      include:
+        - pipelines/**
+        - configs/**
+        - utils/**
+    env:
+      AZ_TENANT_ID: "{{ secret('AZ_TENANT_ID') }}"
+      BLOB_CLIENT_ID: "{{ secret('BLOB_CLIENT_ID') }}"
+      BLOB_CLIENT_SECRET: "{{ secret('BLOB_CLIENT_SECRET') }}"
+      BLOB_ACCOUNT_NAME: "{{ secret('BLOB_ACCOUNT_NAME') }}"
+      BLOB_ACCOUNT_KEY: "{{ secret('BLOB_ACCOUNT_KEY') }}" 
+      PA_CLIENT_ID: "{{ secret('PA_CLIENT_ID') }}"
+      PA_CLIENT_SECRET: "{{ secret('PA_CLIENT_SECRET') }}"
+    tasks:
+      - id: load_mes_tables
+        type: io.kestra.plugin.scripts.python.Commands
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+          pullPolicy: NEVER
+        containerImage: my-custom-kestra:latest
+        description: "Execute main workflow logic for {{flow.id}}"
+        namespaceFiles:
+          enabled: true
+
+        commands:
+          - echo "�Ys? === Load MES Tables Starting ==="
+          - echo "�Y"" Executing main script for {{flow.id}}..."
+          - python pipelines/scripts/ingestion/load_tables.py --job mes_rpt_operational_perf
+          - python pipelines/scripts/ingestion/load_tables.py --job mes_styleno_gsdm_report
+          - echo "�o. === Board factory lists Completed ==="
+
+      - id: load_fm_tables
+        type: io.kestra.plugin.scripts.python.Commands
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+          pullPolicy: NEVER
+        containerImage: my-custom-kestra:latest
+        description: "Execute main workflow logic for {{flow.id}}"
+        namespaceFiles:
+          enabled: true
+
+        commands:
+          - echo "�Ys? === flow about ayoun Starting ==="
+          - echo "�Y"" Executing main script for {{flow.id}}..."
+          - python pipelines/scripts/ingestion/load_tables.py --job filemaker_packed_orders
+          - python pipelines/scripts/ingestion/load_tables.py --job filemaker_shipped_orders
+          - echo "�o. === Board factory lists Completed ==="
+          
+  - id: completion_log
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      �o. Workflow completed successfully!
+      �YZ� Workflow: {{flow.id}}
+      �Y"S Results: Check task outputs above for detailed execution results
+      ⏰ Completed at: {{ now() }}

@@ -1,0 +1,378 @@
+{
+  "metadata": {
+    "name": "Orders Unified to Monday.com Subitems Mapping",
+    "version": "1.0",
+    "created": "2025-06-19",
+    "description": "Comprehensive field mapping for ORDERS_UNIFIED → STG_MON_CustMasterSchedule_Subitems → Monday.com API",
+    "last_updated": "2025-06-19"
+  },
+  "database_schemas": {
+    "source_table": {
+      "name": "ORDERS_UNIFIED",
+      "description": "Source order data with UUID and hash tracking",
+      "key_fields": ["record_uuid", "source_hash"]
+    },
+    "staging_table": {
+      "name": "STG_MON_CustMasterSchedule_Subitems",
+      "description": "Staging table for subitem data before Monday.com API calls",
+      "required_columns": {
+        "system_tracking": {
+          "stg_id": {
+            "type": "bigint",
+            "nullable": false,
+            "description": "Primary key, identity column"
+          },
+          "stg_batch_id": {
+            "type": "nvarchar",
+            "nullable": false,
+            "description": "Batch tracking identifier"
+          },
+          "stg_parent_stg_id": {
+            "type": "bigint",
+            "nullable": true,
+            "description": "Links to parent staging record"
+          },
+          "stg_status": {
+            "type": "nvarchar",
+            "nullable": false,
+            "description": "Processing status (PENDING, PROCESSING, COMPLETED, FAILED)"
+          },
+          "stg_created_date": {
+            "type": "datetime2",
+            "nullable": false,
+            "description": "System timestamp when record was created"
+          },
+          "stg_processed_date": {
+            "type": "datetime2",
+            "nullable": true,
+            "description": "Timestamp when API call was made"
+          }
+        },
+        "monday_tracking": {
+          "stg_monday_subitem_id": {
+            "type": "bigint",
+            "nullable": true,
+            "description": "Monday.com subitem ID after creation",
+            "api_usage": "Required for updates"
+          },
+          "stg_monday_parent_item_id": {
+            "type": "bigint",
+            "nullable": true,
+            "description": "Monday.com parent item ID",
+            "api_usage": "Required for creation"
+          },
+          "stg_monday_subitem_board_id": {
+            "type": "bigint",
+            "nullable": true,
+            "description": "Monday.com board ID for subitem",
+            "api_usage": "Required for updates"
+          }
+        },
+        "uuid_tracking": {
+          "parent_source_uuid": {
+            "type": "uniqueidentifier",
+            "nullable": true,
+            "description": "Links to parent staging record UUID"
+          }
+        },
+        "api_metadata": {
+          "stg_error_message": {
+            "type": "nvarchar",
+            "nullable": true,
+            "description": "Error message from failed API calls"
+          },
+          "stg_retry_count": {
+            "type": "int",
+            "nullable": false,
+            "description": "Number of retry attempts"
+          },
+          "stg_api_payload": {
+            "type": "nvarchar",
+            "nullable": true,
+            "description": "JSON payload sent to Monday.com API"
+          }
+        },
+        "business_data": {
+          "essential_api_fields": {
+            "Size": {
+              "type": "nvarchar",
+              "nullable": false,
+              "description": "Size for subitem creation",
+              "api_usage": "item_name in create_subitem mutation"
+            },
+            "stg_size_label": {
+              "type": "nvarchar",
+              "nullable": true,
+              "description": "Raw size value for dropdown",
+              "api_usage": "dropdown_mkrak7qp column value"
+            },
+            "ORDER_QTY": {
+              "type": "decimal",
+              "nullable": false,
+              "description": "Order quantity",
+              "api_usage": "numeric_mkra7j8e column value"
+            }
+          },
+          "audit_fields": {
+            "AAG_ORDER_NUMBER": {
+              "type": "nvarchar",
+              "nullable": true,
+              "description": "Order number for debugging/audit",
+              "api_usage": "Not sent to API"
+            },
+            "STYLE": {
+              "type": "nvarchar",
+              "nullable": true,
+              "description": "Style for debugging/audit",
+              "api_usage": "Not sent to API"
+            },
+            "COLOR": {
+              "type": "nvarchar",
+              "nullable": true,
+              "description": "Color for debugging/audit",
+              "api_usage": "Not sent to API"
+            },
+            "CUSTOMER": {
+              "type": "nvarchar",
+              "nullable": true,
+              "description": "Customer for debugging/audit",
+              "api_usage": "Not sent to API"
+            },
+            "PO_NUMBER": {
+              "type": "nvarchar",
+              "nullable": true,
+              "description": "PO number for debugging/audit",
+              "api_usage": "Not sent to API"
+            },
+            "CUSTOMER_ALT_PO": {
+              "type": "nvarchar",
+              "nullable": true,
+              "description": "Alt PO for debugging/audit",
+              "api_usage": "Not sent to API"
+            },
+            "UNIT_OF_MEASURE": {
+              "type": "nvarchar",
+              "nullable": true,
+              "description": "UOM for validation reference",
+              "api_usage": "Not sent to API"
+            }
+          }
+        }
+      }
+    }
+  },
+  "monday_api_integration": {
+    "base_config": {
+      "api_url": "https://api.monday.com/v2",
+      "api_version": "2025-04",
+      "verify_ssl": false,
+      "timeout_seconds": 30
+    },
+    "column_mappings": {
+      "subitems_board": {
+        "dropdown_mkrak7qp": {
+          "name": "Size (Dropdown)",
+          "type": "dropdown",
+          "source_field": "stg_size_label",
+          "api_usage": "create_subitem + updates",
+          "format": "labels array"
+        },
+        "numeric_mkra7j8e": {
+          "name": "Order Qty",
+          "type": "numeric",
+          "source_field": "ORDER_QTY",
+          "api_usage": "create_subitem + updates",
+          "format": "string representation of integer"
+        },
+        "numeric_mkrapgwv": {
+          "name": "Shipped Qty",
+          "type": "numeric",
+          "source_field": "external_shipped_qty",
+          "api_usage": "updates only",
+          "format": "string representation of integer"
+        },
+        "numeric_mkraepx7": {
+          "name": "Packed Qty",
+          "type": "numeric",
+          "source_field": "external_packed_qty",
+          "api_usage": "updates only",
+          "format": "string representation of integer"
+        },
+        "numeric_mkrbgdat": {
+          "name": "Cut Qty",
+          "type": "numeric",
+          "source_field": "external_cut_qty",
+          "api_usage": "updates only",
+          "format": "string representation of integer"
+        },
+        "numeric_mkrc5ryb": {
+          "name": "Sew Qty",
+          "type": "numeric",
+          "source_field": "external_sew_qty",
+          "api_usage": "updates only",
+          "format": "string representation of integer"
+        },
+        "numeric_mkrc7jfj": {
+          "name": "Finishing Qty",
+          "type": "numeric",
+          "source_field": "external_finishing_qty",
+          "api_usage": "updates only",
+          "format": "string representation of integer"
+        },
+        "numeric_mkrcq53k": {
+          "name": "Received not Shipped Qty",
+          "type": "numeric",
+          "source_field": "external_received_not_shipped_qty",
+          "api_usage": "updates only",
+          "format": "string representation of integer"
+        },
+        "color_mkrbezbh": {
+          "name": "ORDER LINE STATUS",
+          "type": "color",
+          "source_field": "external_order_line_status",
+          "api_usage": "updates only",
+          "format": "color label"
+        },
+        "pulse_id_mkrag4a3": {
+          "name": "Item ID",
+          "type": "pulse_id",
+          "source_field": "external_item_id",
+          "api_usage": "updates only",
+          "format": "item ID"
+        }
+      }
+    },
+    "mutations": {
+      "create_subitem": {
+        "description": "Create a new subitem under parent item",
+        "required_fields": {
+          "parent_item_id": {
+            "source": "stg_monday_parent_item_id",
+            "type": "bigint"
+          },
+          "item_name": {
+            "source": "Size",
+            "format": "Size {stg_size_label}",
+            "type": "string"
+          }
+        },
+        "column_values": {
+          "dropdown_mkrak7qp": {
+            "source": "stg_size_label",
+            "format": "{\"labels\": [\"{value}\"]}"
+          },
+          "numeric_mkra7j8e": {
+            "source": "ORDER_QTY",
+            "format": "\"{value}\""
+          }
+        },
+        "response_mapping": {
+          "id": "stg_monday_subitem_id",
+          "board.id": "stg_monday_subitem_board_id",
+          "parent_item.id": "stg_monday_parent_item_id"
+        },
+        "graphql_template": "mutation { create_subitem(parent_item_id: {parent_item_id}, item_name: \"{item_name}\", column_values: \"{column_values}\", create_labels_if_missing: true) { id board { id } parent_item { id } } }"
+      },
+      "update_subitem": {
+        "description": "Update existing subitem columns",
+        "required_fields": {
+          "item_id": {
+            "source": "stg_monday_subitem_id",
+            "type": "bigint"
+          },
+          "board_id": {
+            "source": "stg_monday_subitem_board_id",
+            "type": "bigint"
+          }
+        },
+        "column_values": {
+          "conditional_columns": [
+            "numeric_mkrapgwv",
+            "numeric_mkraepx7",
+            "numeric_mkrbgdat",
+            "numeric_mkrc5ryb",
+            "numeric_mkrc7jfj",
+            "numeric_mkrcq53k",
+            "color_mkrbezbh",
+            "pulse_id_mkrag4a3"
+          ]
+        },
+        "graphql_template": "mutation { change_multiple_column_values(item_id: {item_id}, board_id: {board_id}, column_values: \"{column_values}\") { id } }"
+      }
+    }
+  },
+  "validation_rules": {
+    "required_for_creation": [
+      "stg_monday_parent_item_id",
+      "Size",
+      "ORDER_QTY"
+    ],
+    "required_for_updates": [
+      "stg_monday_subitem_id",
+      "stg_monday_subitem_board_id"
+    ],
+    "data_type_validations": {
+      "ORDER_QTY": {
+        "type": "decimal",
+        "min_value": 0,
+        "max_value": 999999
+      },
+      "stg_size_label": {
+        "type": "string",
+        "max_length": 100,
+        "required": true
+      }
+    }
+  },
+  "field_removal_strategy": {
+    "deprecated_columns": [
+      "CUSTOMER_STYLE",
+      "GROUP_NAME", 
+      "ITEM_NAME"
+    ],
+    "removal_plan": {
+      "phase": "post_validation",
+      "reason": "Not used in API calls or business logic",
+      "migration_required": true
+    }
+  },
+  "error_handling": {
+    "retryable_errors": [
+      "TEMPORARY_SERVER_ERROR",
+      "RATE_LIMIT_ERROR",
+      "NETWORK_ERROR"
+    ],
+    "non_retryable_errors": [
+      "AUTHENTICATION_ERROR",
+      "AUTHORIZATION_ERROR",
+      "VALIDATION_ERROR",
+      "BOARD_NOT_FOUND"
+    ],
+    "retry_config": {
+      "max_retries": 3,
+      "base_delay_seconds": 2,
+      "max_delay_seconds": 30,
+      "exponential_base": 2
+    }
+  },
+  "performance_optimization": {
+    "uuid_advantages": [
+      "Eliminates complex multi-column joins",
+      "Enables efficient change detection",
+      "Simplifies error recovery and retry logic",
+      "Provides clear audit trail"
+    ],
+    "indexing_strategy": {
+      "primary_indexes": [
+        "stg_id (clustered)",
+        "parent_source_uuid",
+        "stg_monday_subitem_id",
+        "stg_monday_subitem_board_id"
+      ],
+      "composite_indexes": [
+        "stg_batch_id + stg_status",
+        "stg_monday_parent_item_id + stg_status"
+      ]
+    }
+  }
+}

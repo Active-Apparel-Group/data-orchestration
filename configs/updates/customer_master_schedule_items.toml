@@ -1,0 +1,45 @@
+# OPUS Universal Monday.com Update Configuration
+# Purpose: TOML-based configuration for metadata-driven updates
+# Board: Customer Master Schedule (8709134353)
+
+[metadata]
+board_id = 8709134353
+board_name = "Customer Master Schedule"
+update_type = "batch_item_updates"
+description = "Update customer master schedule items with latest production data"
+
+[query_config]
+# SQL query to get update data
+query = """
+SELECT 
+    cms.stg_monday_item_id as monday_item_id,
+    cms.board_id,
+    cms.[ORDER QTY] as new_quantity,
+    cms.[CUSTOMER EX FACTORY DATE] as new_due_date,
+    cms.[ORDER STATUS] as new_status
+FROM STG_MON_CustMasterSchedule cms
+WHERE cms.board_id = 8709134353
+  AND cms.stg_monday_item_id IS NOT NULL
+  AND cms.update_operation = 'update_item'
+  AND cms.validation_status = 'VALID'
+"""
+
+# Column mapping configuration
+board_id_column = "board_id"
+item_id_column = "monday_item_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+"quantity" = "new_quantity"
+"due_date5" = "new_due_date"  
+"status" = "new_status"
+
+[validation]
+required_fields = ["monday_item_id", "board_id"]
+max_batch_size = 100
+timeout_seconds = 300
+
+[retry_config]
+max_retries = 3
+retry_delay_seconds = 5
+backoff_multiplier = 2

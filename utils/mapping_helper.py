@@ -85,6 +85,28 @@ def _load_mapping_config(config_path: str = None) -> Dict:
         raise MappingError(f"Mapping config file not found: {config_path}")
 
 
+def load_orders_mapping_config() -> Dict:
+    """
+    Load the orders mapping configuration from the comprehensive mapping YAML.
+    
+    Returns:
+        Dict containing field mappings, Monday.com column IDs, and transformation rules
+    """
+    # Load the orders mapping from the specific file
+    orders_mapping_path = Path(__file__).parent.parent / "sql" / "mappings" / "orders-unified-comprehensive-mapping.yaml"
+    
+    try:
+        with open(orders_mapping_path, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+        
+        return config
+        
+    except yaml.YAMLError as e:
+        raise MappingError(f"Invalid YAML in orders mapping config: {e}")
+    except FileNotFoundError:
+        raise MappingError(f"Orders mapping config file not found: {orders_mapping_path}")
+
+
 def get_mapping_metadata() -> Dict:
     """
     Get metadata about the mapping system.
@@ -496,50 +518,99 @@ def search_mappings(search_term: str, search_type: str = 'all') -> Dict:
     return results
 
 
-def get_mapping_stats() -> Dict:
+def get_orders_field_mappings() -> Dict:
     """
-    Get statistics about the mapping system.
+    Get the field mappings for orders with real Monday.com column IDs.
     
     Returns:
-        Dict with counts and statistics
+        Dict with source field -> Monday.com column ID mappings
     """
-    config = _load_mapping_config()
+    config = load_orders_mapping_config()
     
-    return {
-        'boards_count': len(config.get('monday_boards', {})),
-        'database_schemas_count': len(config.get('database_schemas', {})),
-        'field_type_mappings_count': len(config.get('field_types', {}).get('monday_to_sql', {})),
-        'standardized_fields_count': sum(len(fields) for fields in config.get('standardized_fields', {}).values()),
-        'customer_mappings_count': len(config.get('customer_mappings', {}).get('normalized_customers', {})),
-        'last_updated': config.get('metadata', {}).get('last_updated'),
-        'version': config.get('metadata', {}).get('version')
-    }
-
-
-def get_all_type_mappings(direction: str = 'monday_to_sql') -> Dict[str, str]:
-    """
-    Get all type mappings in the specified direction.
+    # Handle new expanded mapping structure
+    column_mappings = {}
     
-    Args:
-        direction: Either 'monday_to_sql' or 'sql_to_monday'
+    # Exact matches (list format in expanded mapping)
+    exact_matches = config.get('exact_matches', [])
+    if isinstance(exact_matches, list):
+        for mapping in exact_matches:
+            source = mapping.get('source_field')
+            target_column_id = mapping.get('target_column_id')
+            if source and target_column_id:
+                column_mappings[source] = target_column_id
+    
+    # Mapped fields (list format in expanded mapping)
+    mapped_fields = config.get('mapped_fields', [])
+    if isinstance(mapped_fields, list):
+        for mapping in mapped_fields:
+            source = mapping.get('source_field')
+            target_column_id = mapping.get('target_column_id')
+            if source and target_column_id:
+                column_mappings[source] = target_column_id
+    
+    # Computed fields (list format in expanded mapping)
+    computed_fields = config.get('computed_fields', [])
+    if isinstance(computed_fields, list):
+        for mapping in computed_fields:
+            source = mapping.get('source_field')
+            target_column_id = mapping.get('target_column_id')
+            if source and target_column_id:
+                column_mappings[source] = target_column_id
+    
+    # Legacy support for old structure
+    field_mappings = config.get('field_mappings', {})
+    if field_mappings:
+        # Exact matches (old structure)
+        exact_matches_old = field_mappings.get('exact_matches', {})
+        for field_name, field_config in exact_matches_old.items():
+            source = field_config.get('source')
+            target_column_id = field_config.get('target_column_id')
+            if source and target_column_id:
+                column_mappings[source] = target_column_id
         
+        # Other field types (old structure)
+        for field_type in ['numeric_fields', 'date_fields', 'text_fields']:
+            fields = field_mappings.get(field_type, {})
+            for field_name, field_config in fields.items():
+                source = field_config.get('source')
+                target_column_id = field_config.get('target_column_id')
+                if source and target_column_id:
+                    column_mappings[source] = target_column_id
+    
+    return column_mappings
+
+
+def get_orders_subitem_mappings() -> Dict:
+    """
+    Get the subitem field mappings for orders with real Monday.com column IDs.
+    
     Returns:
-        Dict mapping source types to target types
-        
-    Raises:
-        MappingError: If direction not supported
+        Dict with subitem field -> Monday.com column ID mappings
     """
-    config = _load_mapping_config()
+    config = load_orders_mapping_config()
     
-    if direction not in ['monday_to_sql', 'sql_to_monday']:
-        raise MappingError(f"Invalid direction '{direction}'. Use 'monday_to_sql' or 'sql_to_monday'")
+    # Handle new expanded mapping structure
+    subitem_mappings = {}
     
-    type_mappings = config.get('field_types', {}).get(direction, {})
+    # Subitem mappings (list format in expanded mapping)
+    subitem_fields = config.get('subitem_mappings', [])
+    if isinstance(subitem_fields, list):
+        for mapping in subitem_fields:
+            source = mapping.get('source_field')
+            target_column_id = mapping.get('target_column_id')
+            if source and target_column_id:
+                subitem_mappings[source] = target_column_id
     
-    if not type_mappings:
-        raise MappingError(f"No type mappings found for direction '{direction}'")
+    # Legacy support for old structure
+    field_mappings = config.get('field_mappings', {})
+    if field_mappings:
+        subitem_fields_old = field_mappings.get('subitem_fields', {})
+        for field_name, field_config in subitem_fields_old.items():
+            target_column_id = field_config.get('target_column_id')
+            if target_column_id:
+                subitem_mappings[field_name] = target_column_id
     
-    return type_mappings
+    return subitem_mappings
 
 
 # Convenience functions for common operations
@@ -574,6 +645,9 @@ __all__ = [
     'list_monday_boards',
     'search_mappings',
     'get_mapping_stats',
+    'load_orders_mapping_config',
+    'get_orders_field_mappings',
+    'get_orders_subitem_mappings',
     'MappingError',
     'MappingValidationError'
 ]
