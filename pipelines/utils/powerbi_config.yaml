@@ -1,0 +1,63 @@
+# Power BI Operations Configuration
+# Location: pipelines/utils/powerbi_config.yaml
+# Purpose: Power BI specific configuration (separate from main config.yaml)
+
+# === CREDENTIAL PROFILES ===
+credential_profiles:
+  # Power BI Service Account 1
+  powerbi_primary:
+    tenant_id: "${AZ_TENANT_ID}"
+    client_id: "${PBI_CLIENT_ID}" 
+    client_secret: "${PBI_CLIENT_SECRET}"
+    scope: "https://analysis.windows.net/powerbi/api/.default"
+    auth_type: "client_credentials"
+    description: "Primary Power BI service account"
+    
+  # Power Automate Service Account  
+  power_automate:
+    tenant_id: "${AZ_TENANT_ID}"
+    client_id: "${PA_CLIENT_ID}"
+    client_secret: "${PA_CLIENT_SECRET}" 
+    scope: "https://management.azure.com/.default"
+    auth_type: "client_credentials"
+    description: "Power Automate workflow triggers"
+
+# === IMMEDIATE REQUIREMENTS ===
+# Current dataflow that needs refresh
+priority_resources:
+  dataflows:
+    order_list_dataflow:
+      workspace_id: "c108ce52-f948-479a-a35f-d39758253bd0"  # Your actual workspace ID
+      dataflow_id: "e39aa979-a96e-404e-b9a5-8f9c8ef361ae"   # Your actual dataflow ID
+      name: "ORDER_LIST"
+      description: "Main order list dataflow - direct Power BI API refresh"
+      
+# === POWER AUTOMATE WORKFLOWS ===
+power_automate:
+  workflows:
+    order_list_refresh:
+      logic_app_url: "https://prod-27.australiasoutheast.logic.azure.com:443/workflows/f6b302ba68c040619502cbf79e89d853/triggers/manual/paths/invoke"
+      api_version: "2016-06-01"
+      access_key_params: "sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=HIXJekmqnQhsarXH5w8lbDDtzLt1qR7qOWy0HudZ4IM"
+      description: "Current Logic App workflow for ORDER_LIST dataflow refresh"
+
+# === FUTURE EXPANSION PLACEHOLDERS ===
+# Ready for scaling when needed
+future_resources:
+  workspaces: []
+  datasets: []
+  reports: []
+  datamarts: []
+  
+# === OPERATION SETTINGS ===
+operation_settings:
+  default_timeout: 30
+  max_retries: 3
+  retry_delay: 5
+  batch_size: 10
+  
+# === DATABASE CONFIGURATION ===
+database:
+  token_table: "dbo.PowerBITokens"
+  log_table: "log.PowerBIOperations"
+  default_database: "orders"

@@ -42,7 +42,7 @@
       "board_name": "Planning",
       "table_name": "MON_Planning",
       "database": "orders",
-      "discovered_at": "2025-07-10T14:59:14.640816",
+      "discovered_at": "2025-07-16T09:33:16.929442",
       "status": "discovered",
       "metadata_path": "configs/boards/board_8709134353_metadata.json",
       "config_path": "configs/boards/board_8709134353.json",
@@ -66,11 +66,31 @@
       "metadata_path": "configs/boards/board_9200771505_metadata.json",
       "config_path": "configs/boards/board_9200771505.json",
       "workflow_path": "workflows/extract_board_9200771505.yaml"
+    },
+    "9609317401": {
+      "board_name": "Customer Master Schedule",
+      "table_name": "MON_CustomerMasterSchedule",
+      "database": "orders",
+      "discovered_at": "2025-07-17T17:00:09.976644",
+      "status": "discovered",
+      "metadata_path": "configs/boards/board_9609317401_metadata.json",
+      "config_path": "configs/boards/board_9609317401.json",
+      "workflow_path": "workflows/extract_board_9609317401.yaml"
+    },
+    "9609317948": {
+      "board_name": "Subitems of Customer Master Schedule",
+      "table_name": "MON_SubitemsofCustomerMasterSchedule",
+      "database": "orders",
+      "discovered_at": "2025-07-17T17:06:56.268102",
+      "status": "discovered",
+      "metadata_path": "configs/boards/board_9609317948_metadata.json",
+      "config_path": "configs/boards/board_9609317948.json",
+      "workflow_path": "workflows/extract_board_9609317948.yaml"
     }
   },
   "metadata": {
     "version": "1.0",
     "created_at": "2025-06-29T00:00:00Z",
-    "updated_at": "2025-07-10T14:59:14.660567"
+    "updated_at": "2025-07-17T17:06:56.272126"
   }
 }

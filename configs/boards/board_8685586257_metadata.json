@@ -137,9 +137,9 @@
       "custom_extraction_field": null
     },
     {
-      "monday_id": "text_mkp69dat",
+      "monday_id": "long_text_mksxda8k",
       "monday_title": "Legal Entity Address",
-      "monday_type": "text",
+      "monday_type": "long_text",
       "sql_column": "Legal Entity Address",
       "sql_type": "NVARCHAR(MAX)",
       "extraction_field": "text",

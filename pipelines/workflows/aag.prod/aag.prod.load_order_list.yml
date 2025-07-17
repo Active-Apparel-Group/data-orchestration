@@ -54,7 +54,29 @@ tasks:
           - echo "📊 Executing complete SharePoint → SQL workflow..."
           - python pipelines/scripts/load_order_list/order_list_pipeline.py
           - echo "✅ === ORDER_LIST Pipeline Completed ==="
-
+      
+      - id: refresh_master_order_list
+        type: io.kestra.plugin.scripts.python.Commands
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+          pullPolicy: NEVER
+        containerImage: my-custom-kestra:latest
+        description: "Refresh Master Order List - Data Admin Workspace -> Dataflow Name: Master Order List"
+        namespaceFiles:
+          enabled: true
+        env:
+          AZ_TENANT_ID: "{{ secret('AZ_TENANT_ID') }}"
+          BLOB_CLIENT_ID: "{{ secret('BLOB_CLIENT_ID') }}"
+          BLOB_CLIENT_SECRET: "{{ secret('BLOB_CLIENT_SECRET') }}"
+          BLOB_ACCOUNT_NAME: "{{ secret('BLOB_ACCOUNT_NAME') }}"
+          BLOB_ACCOUNT_KEY: "{{ secret('BLOB_ACCOUNT_KEY') }}" 
+          
+        
+        commands:
+          - echo "🚀 === ORDER_LIST Pipeline - Refresh Gen1 Dataflow ==="
+          - echo "📊 Executing Master Order List refresh..."
+          - python pipelines/scripts/load_order_list/order_list_dataflow_refresh.py
+          - echo "✅ === ORDER_LIST Pipeline Completed ==="
           
   - id: completion_log
     type: io.kestra.plugin.core.log.Log

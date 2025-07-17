@@ -1,0 +1,51 @@
+# OPUS Async Batch Update Configuration
+# Purpose: High-performance async batch updates for Monday.com
+# Usage: python update_boards_async_batch.py --config this_file.toml --execute
+
+[metadata]
+board_id = "8709134353"  # Target Monday.com board ID
+description = "Async batch update for planning board FOB dates"
+created_date = "2025-07-15"
+author = "CTO / Head Data Engineer"
+
+[query_config]
+# SQL query to get update data
+query = """
+SELECT 
+    monday_item_id,
+    fob_date,
+    country_of_origin,
+    last_updated
+FROM planning_board_updates 
+WHERE needs_update = 1 
+    AND monday_item_id IS NOT NULL
+    AND fob_date IS NOT NULL
+ORDER BY last_updated DESC
+"""
+
+# Column mapping from SQL results to Monday.com column IDs
+[column_mapping]
+"date4" = "fob_date"              # FOB Date column
+"country" = "country_of_origin"   # Country column (will be formatted automatically)
+"text8" = "last_updated"          # Last updated timestamp
+
+# Update configuration
+item_id_column = "monday_item_id"  # SQL column containing Monday.com item IDs
+
+[validation]
+max_batch_size = 15              # Initial batch size (will fallback if timeout)
+max_concurrent_batches = 3       # Number of concurrent batches
+request_timeout_seconds = 25     # Request timeout (avoid 30s limit)
+rate_limit_delay_ms = 100        # Delay between batches
+
+[performance]
+# Performance settings for large datasets
+enable_connection_pooling = true
+retry_failed_batches = true
+progress_reporting_interval = 50  # Report progress every N batches
+
+[logging]
+log_level = "INFO"
+log_successful_updates = true
+log_failed_updates = true
+include_monday_response = false   # Set to true for debugging

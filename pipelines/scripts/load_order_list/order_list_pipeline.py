@@ -584,6 +584,9 @@ class OrderListPipeline:
 
 def main():
     """Enhanced main entry point with comprehensive options"""
+    # ✅ EMERGENCY FIX: Initialize logger for standalone main() function
+    logger = logger_helper.get_logger(__name__)
+    
     parser = argparse.ArgumentParser(
         description='ORDER_LIST Production Pipeline - Extract → Transform → Load',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -652,56 +655,56 @@ Examples:
     try:
         # Handle single-stage execution
         if args.extract_only:
-            self.logger.info("[*] RUNNING EXTRACT STAGE ONLY")
+            logger.info("[*] RUNNING EXTRACT STAGE ONLY")
             results = pipeline.run_extract_stage(limit_files=args.limit_files)
             success = results.get('success', False)
             
-            self.logger.info(f"\n{'='*60}")
-            self.logger.info(f"Extract stage {'COMPLETED SUCCESSFULLY' if success else 'FAILED'}")
+            logger.info(f"\n{'='*60}")
+            logger.info(f"Extract stage {'COMPLETED SUCCESSFULLY' if success else 'FAILED'}")
             if success:
-                self.logger.info(f"Files processed: {results.get('files_processed', 0)}")
-                self.logger.info(f"Records extracted: {results.get('total_records', 0)}")
-                self.logger.info(f"Duration: {results.get('duration', 0):.2f} seconds")
+                logger.info(f"Files processed: {results.get('files_processed', 0)}")
+                logger.info(f"Records extracted: {results.get('total_records', 0)}")
+                logger.info(f"Duration: {results.get('duration', 0):.2f} seconds")
             else:
-                self.logger.info(f"Error: {results.get('error', 'Unknown error')}")
+                logger.info(f"Error: {results.get('error', 'Unknown error')}")
             
             return 0 if success else 1
         
         elif args.transform_only:
-            self.logger.info("[*] RUNNING TRANSFORM STAGE ONLY")
+            logger.info("[*] RUNNING TRANSFORM STAGE ONLY")
             results = pipeline.run_transform_stage()
             success = results.get('success', False)
             
-            self.logger.info(f"\n{'='*60}")
-            self.logger.info(f"Transform stage {'COMPLETED SUCCESSFULLY' if success else 'FAILED'}")
+            logger.info(f"\n{'='*60}")
+            logger.info(f"Transform stage {'COMPLETED SUCCESSFULLY' if success else 'FAILED'}")
             if success:
-                self.logger.info(f"Customers processed: {results.get('total_customers_processed', 0)}")
-                self.logger.info(f"Records transformed: {results.get('total_rows', 0)}")
-                self.logger.info(f"Duration: {results.get('duration', 0):.2f} seconds")
+                logger.info(f"Customers processed: {results.get('total_customers_processed', 0)}")
+                logger.info(f"Records transformed: {results.get('total_rows', 0)}")
+                logger.info(f"Duration: {results.get('duration', 0):.2f} seconds")
             else:
-                self.logger.info(f"Error: {results.get('error', 'Unknown error')}")
+                logger.info(f"Error: {results.get('error', 'Unknown error')}")
             
             return 0 if success else 1
         
         elif args.validation_only:
-            self.logger.info("[*] RUNNING VALIDATION STAGE ONLY")
+            logger.info("[*] RUNNING VALIDATION STAGE ONLY")
             results = pipeline.run_validation_stage()
             success = results.get('success', False)
             
-            self.logger.info(f"\n{'='*60}")
-            self.logger.info(f"Validation stage {'PASSED' if success else 'FAILED'}")
+            logger.info(f"\n{'='*60}")
+            logger.info(f"Validation stage {'PASSED' if success else 'FAILED'}")
             if success:
-                self.logger.info(f"Total records: {results.get('total_records', 0)}")
-                self.logger.info(f"Data quality: {results.get('order_number_quality', 0):.1f}% order numbers valid")
-                self.logger.info(f"Unique customers: {results.get('unique_customers', 0)}")
+                logger.info(f"Total records: {results.get('total_records', 0)}")
+                logger.info(f"Data quality: {results.get('order_number_quality', 0):.1f}% order numbers valid")
+                logger.info(f"Unique customers: {results.get('unique_customers', 0)}")
             else:
-                self.logger.info(f"Validation failed: {results.get('error', 'Unknown error')}")
+                logger.info(f"Validation failed: {results.get('error', 'Unknown error')}")
             
             return 0 if success else 1
         
         else:
             # Run complete pipeline
-            self.logger.info("[*] RUNNING COMPLETE ORDER_LIST PIPELINE")
+            logger.info("[*] RUNNING COMPLETE ORDER_LIST PIPELINE")
             results = pipeline.run_complete_pipeline(
                 extract_limit=args.limit_files,
                 skip_blob=args.skip_blob,
@@ -712,35 +715,35 @@ Examples:
             success = results.get('success', False)
             
             # Final status
-            self.logger.info(f"\n{'='*80}")
-            self.logger.info("[*] PIPELINE {'COMPLETED SUCCESSFULLY' if success else 'FAILED'}")
-            self.logger.info(f"{'='*80}")
+            logger.info(f"\n{'='*80}")
+            logger.info("[*] PIPELINE {'COMPLETED SUCCESSFULLY' if success else 'FAILED'}")
+            logger.info(f"{'='*80}")
             
             if success:
-                self.logger.info("[+] Pipeline ID: {results.get('pipeline_id', 'N/A')}")
-                self.logger.info("[+] Total Duration: {results.get('duration', 0):.2f} seconds")
+                logger.info("[+] Pipeline ID: {results.get('pipeline_id', 'N/A')}")
+                logger.info("[+] Total Duration: {results.get('duration', 0):.2f} seconds")
                 
                 # Extract metrics if available
                 extract_stage = results.get('stages', {}).get('extract', {})
                 if extract_stage.get('success'):
-                    self.logger.info("[+] Files Processed: {extract_stage.get('files_processed', 0)}")
+                    logger.info("[+] Files Processed: {extract_stage.get('files_processed', 0)}")
                 
                 # Transform metrics
                 transform_stage = results.get('stages', {}).get('transform', {})
                 if transform_stage.get('success'):
-                    self.logger.info("[+] Records in ORDER_LIST: {transform_stage.get('total_rows', 0):,}")
-                    self.logger.info("[+] Customers Processed: {transform_stage.get('total_customers_processed', 0)}")
+                    logger.info("[+] Records in ORDER_LIST: {transform_stage.get('total_rows', 0):,}")
+                    logger.info("[+] Customers Processed: {transform_stage.get('total_customers_processed', 0)}")
                 
                 # Validation metrics if available
                 validation_results = results.get('validation_results', {})
                 if validation_results.get('success'):
-                    self.logger.info("[+] Data Quality: {validation_results.get('order_number_quality', 0):.1f}% valid order numbers")
+                    logger.info("[+] Data Quality: {validation_results.get('order_number_quality', 0):.1f}% valid order numbers")
                 
             else:
                 failed_stage = results.get('failed_stage', 'unknown')
                 error = results.get('error', 'Unknown error')
-                self.logger.error("[-] Failed at stage: {failed_stage}")
-                self.logger.error("[-] Error: {error}")
+                logger.error("[-] Failed at stage: {failed_stage}")
+                logger.error("[-] Error: {error}")
             
             # Save report to file if requested
             if args.report_file:
@@ -748,18 +751,18 @@ Examples:
                     report_content = pipeline.generate_final_report(results)
                     with open(args.report_file, 'w') as f:
                         f.write(report_content)
-                    self.logger.info("[*] Report saved to: {args.report_file}")
+                    logger.info("[*] Report saved to: {args.report_file}")
                 except Exception as e:
-                    self.logger.warning("[!] Could not save report to {args.report_file}: {e}")
+                    logger.warning("[!] Could not save report to {args.report_file}: {e}")
             
             return 0 if success else 1
     
     except KeyboardInterrupt:
-        self.logger.info("\n\n[!] Pipeline interrupted by user")
+        logger.info("\n\n[!] Pipeline interrupted by user")
         return 130
     except Exception as e:
-        self.logger.info(f"\n\n[!] Pipeline failed with unexpected error: {e}")
-        pipeline.logger.exception("Unexpected pipeline failure")
+        logger.error(f"\n\n[!] Pipeline failed with unexpected error: {e}")
+        logger.exception("Unexpected pipeline failure")
         return 1
 
 if __name__ == "__main__":

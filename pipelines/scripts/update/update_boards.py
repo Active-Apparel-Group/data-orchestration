@@ -36,6 +36,7 @@ sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
 
 import db_helper as db
 import logger_helper
+from country_mapper import format_country_for_monday
 
 class UniversalMondayUpdater:
     """
@@ -47,6 +48,7 @@ class UniversalMondayUpdater:
     - Metadata-driven mapping
     - GraphQL template system
     - Comprehensive error handling
+    - Country column type detection and formatting
     """
     
     def __init__(self, config_file: str = None):
@@ -69,6 +71,59 @@ class UniversalMondayUpdater:
             self.update_config = {}
             
         self.logger.info("UniversalMondayUpdater initialized")
+    
+    def format_country_value(self, country_name: str) -> dict:
+        """
+        Format country value for Monday.com country column type.
+        
+        Args:
+            country_name: Country name (e.g., "Cambodia")
+            
+        Returns:
+            Dict with countryCode and countryName for Monday.com API
+        """
+        return format_country_for_monday(country_name, self.logger)
+    
+    def detect_column_type(self, column_id: str, board_metadata: dict) -> str:
+        """
+        Detect Monday.com column type from board metadata.
+        
+        Args:
+            column_id: Monday.com column ID
+            board_metadata: Board metadata dict
+            
+        Returns:
+            Column type string (e.g., 'country', 'text', 'date', etc.)
+        """
+        columns = board_metadata.get('columns', [])
+        for column in columns:
+            if column.get('monday_id') == column_id:
+                return column.get('monday_type', 'text')
+        return 'text'  # Default fallback
+    
+    def format_column_value(self, column_id: str, value: any, board_metadata: dict) -> any:
+        """
+        Format column value based on Monday.com column type.
+        
+        Args:
+            column_id: Monday.com column ID
+            value: Raw value to format
+            board_metadata: Board metadata dict
+            
+        Returns:
+            Properly formatted value for Monday.com API
+        """
+        if pd.isna(value) or value is None:
+            return None
+            
+        column_type = self.detect_column_type(column_id, board_metadata)
+        
+        # Handle country columns specifically
+        if column_type == 'country':
+            return self.format_country_value(value)
+        
+        # For other types, return as string (existing behavior)
+        return str(value)
     
     def load_graphql_template(self, template_name: str) -> str:
         """Load GraphQL template from integrations/graphql/mutations/"""
@@ -369,11 +424,16 @@ class UniversalMondayUpdater:
                     item_id_column = update_config.get('item_id_column') or update_config.get('query_config', {}).get('item_id_column', 'monday_item_id')
                     item_id = int(row[item_id_column])
                     
-                    # Build column updates from mapping
+                    # Build column updates from mapping with column type detection
                     column_updates = {}
+                    metadata = self.load_board_metadata(board_id)  # Load metadata for column type detection
+                    
                     for monday_column_id, source_column in update_config['column_mapping'].items():
                         if source_column in row and pd.notna(row[source_column]):
-                            column_updates[monday_column_id] = str(row[source_column])
+                            # Format value based on column type (handles country columns)
+                            formatted_value = self.format_column_value(monday_column_id, row[source_column], metadata)
+                            if formatted_value is not None:
+                                column_updates[monday_column_id] = formatted_value
                     
                     if column_updates:  # Only add if there are updates to make
                         batch_updates.append({
@@ -565,6 +625,9 @@ class UniversalMondayUpdater:
         }
 
 def main():
+    import logger_helper
+    logger = logger_helper.get_logger(__name__)
+    
     parser = argparse.ArgumentParser(description="Universal Monday.com Update Script")
     parser.add_argument('--board_id', type=int, help='Monday.com board ID (optional if in config)')
     parser.add_argument('--item_id', type=int, help='Monday.com item ID (for single item update)')
@@ -588,7 +651,7 @@ def main():
         board_id = updater.update_config['metadata'].get('board_id')
     
     if not board_id:
-        self.logger.info("ERROR: board_id required either as argument or in config file")
+        logger.error("ERROR: board_id required either as argument or in config file")
         parser.print_help()
         return
     
@@ -601,33 +664,33 @@ def main():
         else:
             result = updater.update_item(board_id, args.item_id, column_updates, dry_run)
             
-        self.logger.info(json.dumps(result, indent=2))
+        logger.info(json.dumps(result, indent=2))
         
     elif args.config:
         # Batch update from TOML config
         if 'query_config' in updater.update_config and 'query' in updater.update_config['query_config']:
             query = updater.update_config['query_config']['query']
             result = updater.batch_update_from_query(query, updater.update_config, dry_run)
-            self.logger.info(json.dumps(result, indent=2))
+            logger.info(json.dumps(result, indent=2))
         else:
-            self.logger.info("ERROR: No query found in TOML config file")
+            logger.error("ERROR: No query found in TOML config file")
             
     elif args.query and args.config:
         # Batch update from query parameter
         result = updater.batch_update_from_query(args.query, updater.update_config, dry_run)
-        self.logger.info(json.dumps(result, indent=2))
+        logger.info(json.dumps(result, indent=2))
         
     else:
         parser.print_help()
-        self.logger.info("\nExamples:")
-        self.logger.info("  # Single item update (dry run)")
-        self.logger.info('  python scripts/universal_monday_update.py --board_id 8709134353 --item_id 123456 --column_updates \'{"status": "Done"}\'')
-        self.logger.info('')
-        self.logger.info("  # Execute single item update")
-        self.logger.info('  python scripts/universal_monday_update.py --board_id 8709134353 --item_id 123456 --column_updates \'{"status": "Done"}\' --execute')
-        self.logger.info('')
-        self.logger.info("  # Batch update from config")
-        self.logger.info("  python scripts/universal_monday_update.py --config planning_update_fob.toml --execute")
+        logger.info("\nExamples:")
+        logger.info("  # Single item update (dry run)")
+        logger.info('  python scripts/universal_monday_update.py --board_id 8709134353 --item_id 123456 --column_updates \'{"status": "Done"}\'')
+        logger.info('')
+        logger.info("  # Execute single item update")
+        logger.info('  python scripts/universal_monday_update.py --board_id 8709134353 --item_id 123456 --column_updates \'{"status": "Done"}\' --execute')
+        logger.info('')
+        logger.info("  # Batch update from config")
+        logger.info("  python scripts/universal_monday_update.py --config planning_update_fob.toml --execute")
 
 if __name__ == "__main__":
     main()

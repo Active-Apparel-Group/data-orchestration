@@ -15,8 +15,27 @@ import sys
 from pathlib import Path
 import argparse
 
+# --- repo utils path setup ----------------------------------------------------
+def find_repo_root() -> Path:
+    """Find repository root by looking for pipelines/utils folder"""
+    current = Path(__file__).resolve()
+    while current.parent != current:
+        if (current.parent.parent / "pipelines" / "utils").exists():
+            return current.parent.parent
+        current = current.parent
+    raise RuntimeError("Could not find repository root with utils/ folder")
+
+repo_root = find_repo_root()
+sys.path.insert(0, str(repo_root / "pipelines" / "utils"))  # pipelines/utils ONLY
+
+# Import logger helper using project standards
+import logger_helper
+
 CODEGEN_DIR = Path(__file__).parent
 BOARDS_DIR = CODEGEN_DIR.parent.parent / "configs" / "boards"
+
+# Initialize logger for Kestra/VS Code compatibility
+logger = logger_helper.get_logger(__name__)
 
 # --- Argument parsing ---
 parser = argparse.ArgumentParser(description="Extract Monday.com board metadata and generate TOML config")
@@ -30,7 +49,7 @@ metadata_path = BOARDS_DIR / f"board_{args.board_id}_metadata.json"
 
 # --- Step 1: Extract board metadata if not already present ---
 if metadata_path.exists():
-    self.logger.info(f"✅ Metadata file already exists: {metadata_path}\n  Skipping extraction.")
+    logger.info(f"✅ Metadata file already exists: {metadata_path}\n  Skipping extraction.")
 else:
     extractor_cmd = [
         sys.executable,
@@ -43,12 +62,12 @@ else:
         extractor_cmd += ["--table-name", args.table_name]
     if args.database:
         extractor_cmd += ["--database", args.database]
-    self.logger.info(f"🔍 Extracting board metadata: {' '.join(extractor_cmd)}")
+    logger.info(f"🔍 Extracting board metadata: {' '.join(extractor_cmd)}")
     result = subprocess.run(extractor_cmd)
     if result.returncode != 0:
-        self.logger.info("❌ Board extraction failed. Aborting.")
+        logger.info("❌ Board extraction failed. Aborting.")
         sys.exit(result.returncode)
-    self.logger.info(f"✅ Metadata file created: {metadata_path}")
+    logger.info(f"✅ Metadata file created: {metadata_path}")
 
 # --- Step 2: Generate TOML config ---
 toml_cmd = [
@@ -57,9 +76,9 @@ toml_cmd = [
     str(metadata_path),
     "--toml"
 ]
-self.logger.info(f"📝 Generating TOML config: {' '.join(toml_cmd)}")
+logger.info(f"📝 Generating TOML config: {' '.join(toml_cmd)}")
 result = subprocess.run(toml_cmd)
 if result.returncode != 0:
-    self.logger.info("❌ TOML generation failed.")
+    logger.info("❌ TOML generation failed.")
     sys.exit(result.returncode)
-self.logger.info("✅ TOML config generated.")
+logger.info("✅ TOML config generated.")

@@ -35,8 +35,27 @@ Examples:
 #!/usr/bin/env python3
 import json
 import argparse
+import sys
 from pathlib import Path
 from datetime import datetime
+
+# Standard import pattern for logger helper
+def find_repo_root():
+    current = Path(__file__).parent
+    while current != current.parent:
+        if (current.parent.parent / "pipelines" / "utils").exists():
+            return current.parent.parent
+        current = current.parent
+    raise FileNotFoundError("Could not find repository root")
+
+repo_root = find_repo_root()
+sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
+
+# Import logger helper using project standards
+import logger_helper
+
+# Initialize logger for Kestra/VS Code compatibility
+logger = logger_helper.get_logger(__name__)
 
 def transform_config(input_file: Path, output_file: Path):
     """
@@ -55,7 +74,7 @@ def transform_config(input_file: Path, output_file: Path):
     
     # 4) Write out
     output_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    self.logger.info(f"✅ Enhanced JSON config written to {output_file}")
+    logger.info(f"✅ Enhanced JSON config written to {output_file}")
 
 def generate_column_mapping_toml(columns: list) -> str:
     """
@@ -151,8 +170,8 @@ def transform_to_toml(input_file: Path, output_file: Path):
     final_content = "\n".join(toml_content)
     output_file.write_text(final_content, encoding="utf-8")
     
-    self.logger.info(f"✅ TOML configuration written to {output_file}")
-    self.logger.info(f"📊 Generated mapping for {len([c for c in columns if not c.get('exclude', False)])} columns")
+    logger.info(f"✅ TOML configuration written to {output_file}")
+    logger.info(f"📊 Generated mapping for {len([c for c in columns if not c.get('exclude', False)])} columns")
 
 def main():
     parser = argparse.ArgumentParser(

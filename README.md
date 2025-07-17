@@ -122,7 +122,8 @@ make clean         # Remove venv, .pyc, outputs
 **Quick Access:** Press `Ctrl+Shift+P` → "Tasks: Run Task"
 
 For VS Code users, we provide comprehensive task automation:
-- **📊 Data Pipeline Tasks** - Run ETL workflows and data processing
+- **� Power BI Dataflow Refresh** - Automated Gen1 dataflow refresh with business hours validation
+- **�📊 Data Pipeline Tasks** - Run ETL workflows and data processing
 - **🧪 Testing & Validation** - Code quality and functionality testing  
 - **🚀 Operations & Deployment** - Production deployment and infrastructure
 - **🔧 Development Tools** - Project management and automation utilities
@@ -256,7 +257,26 @@ See `requirements.txt` for all Python dependencies. Key packages:
 
 ## � Recent Updates (June 2025)
 
-## 🔄 Recent Updates (June 2025)
+## 🔄 Recent Updates (July 2025)
+
+### **Power BI Dataflow Automation - COMPLETED** ✅
+
+**NEW**: Intelligent Power BI Gen1 dataflow refresh automation with business hours scheduling:
+
+**✅ Production-Ready Components**:
+- **Business Hours Validation**: Automatic 9 AM-5 PM Brisbane time enforcement  
+- **Power Automate Integration**: Reliable SAS URL authentication (HTTP 202 success)
+- **Daily Limit Awareness**: Smart handling of Power BI's 8 refresh per 24-hour limit
+- **Kestra Workflow**: Complete automation with optimized scheduling
+- **Error Resilience**: Comprehensive HTTP 400, timeout, and network error handling
+- **Zero Dependencies**: No database logging requirements, fully self-contained
+
+**📋 Key Files**:
+- `pipelines/scripts/load_order_list/order_list_dataflow_refresh.py` - Production script
+- `workflows/order_list_dataflow_refresh_scheduled.yml` - Kestra automation
+- `docs/changelogs/power-bi-dataflow-refresh-implementation-complete.md` - Full implementation guide
+
+**🚀 Deployment Ready**: Immediate production deployment available with business hours optimization.
 
 ### **Critical Workflow Fixes - COMPLETED** ✅
 

@@ -1,0 +1,211 @@
+id: order_list_dataflow_refresh_scheduled
+namespace: dataflow
+
+title: "ORDER_LIST Dataflow Refresh - Business Hours Scheduled"
+description: |
+  Optimized scheduling for Power BI Master Order List dataflow refresh
+  - Runs 8 times per day during business hours (9 AM - 5 PM Brisbane)
+  - Distributes refreshes evenly to maximize data freshness
+  - Respects Power BI daily refresh limits
+  - Includes error handling and business hours validation
+
+labels:
+  environment: production
+  component: dataflow
+  data_source: power_bi
+  refresh_type: gen1_dataflow
+
+inputs:
+  - id: force_execution
+    type: BOOLEAN
+    defaults: false
+    description: "Force execution outside business hours (emergency only)"
+
+tasks:
+  - id: validate_environment
+    type: io.kestra.plugin.scripts.python.Script
+    description: "Validate Python environment and dependencies"
+    script: |
+      import sys
+      print(f"Python version: {sys.version}")
+      
+      # Check required packages
+      required_packages = ['requests', 'pytz', 'pyodbc']
+      for package in required_packages:
+          try:
+              __import__(package)
+              print(f"✅ {package} available")
+          except ImportError:
+              print(f"❌ {package} missing")
+              sys.exit(1)
+      
+      print("✅ Environment validation complete")
+
+  - id: order_list_dataflow_refresh
+    type: io.kestra.plugin.scripts.python.Script
+    description: "Execute ORDER_LIST dataflow refresh with business hours validation"
+    script: |
+      import sys
+      import os
+      from pathlib import Path
+      
+      # Add project root to Python path
+      project_root = Path("/app/scripts")  # Kestra workspace path
+      sys.path.insert(0, str(project_root / "pipelines" / "utils"))
+      
+      # Set working directory to project root
+      os.chdir(project_root)
+      
+      # Import and execute the dataflow refresh script
+      try:
+          # Import the main function from our enhanced script
+          from pipelines.scripts.load_order_list.order_list_dataflow_refresh import main
+          
+          # Execute with force_execution parameter from workflow input
+          force_execution = {{inputs.force_execution}}
+          
+          print(f"🚀 Starting ORDER_LIST dataflow refresh...")
+          print(f"📋 Force execution: {force_execution}")
+          
+          # Call the main function with custom payload
+          custom_payload = {
+              "trigger_type": "Gen1_Dataflow_Refresh",
+              "dataflow_name": "Master Order List",
+              "workspace": "Data Admin",
+              "trigger_source": "kestra_scheduled_workflow",
+              "force_execution": force_execution,
+              "workflow_id": "{{flow.id}}",
+              "execution_id": "{{flow.execution.id}}",
+              "timestamp": "{{now()}}",
+              "environment": "production"
+          }
+          
+          response = main(custom_payload, force_execution=force_execution)
+          
+          if response is None:
+              if force_execution:
+                  print("❌ Execution failed even with force_execution=True")
+                  sys.exit(1)
+              else:
+                  print("ℹ️ Execution blocked by business hours or daily limit validation")
+                  print("✅ This is expected behavior outside business hours")
+                  # Don't exit with error - this is normal behavior
+          else:
+              print(f"✅ Dataflow refresh completed successfully")
+              print(f"📊 Response status: {response.status_code}")
+              
+      except Exception as e:
+          print(f"❌ Dataflow refresh failed: {e}")
+          import traceback
+          traceback.print_exc()
+          sys.exit(1)
+
+  - id: log_execution_summary
+    type: io.kestra.plugin.scripts.python.Script
+    description: "Log execution summary and next scheduled run"
+    script: |
+      from datetime import datetime, timedelta
+      import pytz
+      
+      # Brisbane timezone
+      brisbane_tz = pytz.timezone('Australia/Brisbane')
+      current_time = datetime.now(brisbane_tz)
+      
+      print("\n📊 EXECUTION SUMMARY")
+      print("=" * 50)
+      print(f"🕐 Execution time: {current_time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+      print(f"🎯 Workflow: {{flow.id}}")
+      print(f"🔄 Execution ID: {{flow.execution.id}}")
+      print(f"⚙️ Force execution: {{inputs.force_execution}}")
+      
+      # Calculate next run time (next hour during business hours)
+      next_run = current_time.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+      
+      # If next run would be outside business hours, move to next business day 9 AM
+      if next_run.hour >= 17 or next_run.hour < 9:
+          if current_time.hour >= 17:
+              # After 5 PM, next run is tomorrow at 9 AM
+              next_run = (current_time + timedelta(days=1)).replace(hour=9, minute=0, second=0, microsecond=0)
+          else:
+              # Before 9 AM, next run is today at 9 AM
+              next_run = current_time.replace(hour=9, minute=0, second=0, microsecond=0)
+      
+      print(f"⏰ Next scheduled run: {next_run.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+      print("✅ Execution summary complete")
+
+# Optimized scheduling for 8 refreshes during business hours
+triggers:
+  - id: business_hours_refresh_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    description: "Optimized schedule for 8 daily refreshes during Brisbane business hours"
+    cron: "0 9,10,11,12,13,14,15,16 * * MON-FRI"  # Every hour from 9 AM to 4 PM Brisbane (8 times)
+    timezone: "Australia/Brisbane"
+    
+  - id: emergency_weekend_refresh
+    type: io.kestra.plugin.core.trigger.Schedule
+    description: "Emergency weekend refresh (limited to 2 times)"
+    cron: "0 10,14 * * SAT-SUN"  # 10 AM and 2 PM on weekends
+    timezone: "Australia/Brisbane"
+    inputs:
+      force_execution: false  # Still respect business hours on weekends
+
+# Error handling and notifications
+errors:
+  - id: dataflow_refresh_failed
+    type: io.kestra.plugin.notifications.mail.MailSend
+    description: "Send email notification on dataflow refresh failure"
+    to: 
+      - "data-team@activeapparel.com.au"
+    subject: "ORDER_LIST Dataflow Refresh Failed - {{flow.execution.id}}"
+    htmlTextContent: |
+      <h2>ORDER_LIST Dataflow Refresh Failed</h2>
+      <p><strong>Execution ID:</strong> {{flow.execution.id}}</p>
+      <p><strong>Time:</strong> {{flow.execution.startDate}}</p>
+      <p><strong>Error:</strong> {{flow.execution.taskRunList | selectattr('state', 'equalto', 'FAILED') | list | first.outputs.exitCode}}</p>
+      <p><strong>Force Execution:</strong> {{inputs.force_execution}}</p>
+      
+      <h3>Recommended Actions:</h3>
+      <ul>
+        <li>Check if daily refresh limit (8/day) has been exceeded</li>
+        <li>Verify Power BI service status</li>
+        <li>Check Power Automate flow logs</li>
+        <li>Review dataflow configuration in Power BI</li>
+      </ul>
+      
+      <h3>Manual Override:</h3>
+      <p>If urgent refresh needed outside business hours, run with force_execution=true</p>
+
+# Workflow documentation
+documentation: |
+  ## ORDER_LIST Dataflow Refresh Workflow
+  
+  ### Purpose
+  Automatically refresh the Power BI "Master Order List" Gen1 dataflow to ensure 
+  up-to-date data for reporting and analytics.
+  
+  ### Schedule Strategy
+  - **Weekdays**: 8 refreshes from 9 AM to 4 PM Brisbane time (hourly)
+  - **Weekends**: 2 refreshes at 10 AM and 2 PM (reduced frequency)
+  - **Limits**: Respects Power BI 8 refreshes per 24-hour limit
+  
+  ### Business Hours Validation
+  - Automatically blocks execution outside 9 AM - 5 PM Brisbane time
+  - Can be overridden with force_execution=true for emergencies
+  - Logs detailed validation results for troubleshooting
+  
+  ### Dependencies
+  - Power Automate Logic App (SAS URL authentication)
+  - Power BI "Data Admin" workspace access
+  - Database logging (optional - log.LogicAppTriggers table)
+  
+  ### Monitoring
+  - Kestra execution logs for workflow status
+  - Power Automate flow run history
+  - Power BI dataflow refresh history
+  - Email notifications on failures
+  
+  ### Emergency Procedures
+  1. **Outside Business Hours**: Set force_execution=true
+  2. **Daily Limit Exceeded**: Wait for midnight UTC reset
+  3. **Authentication Issues**: Check Power Automate SAS URL validity
+  4. **Dataflow Errors**: Review Power BI service configuration

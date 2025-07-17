@@ -30,6 +30,21 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Set
 import logging
 
+# Standard import pattern for logger helper
+def find_repo_root():
+    current = Path(__file__).parent
+    while current != current.parent:
+        if (current.parent.parent / "pipelines" / "utils").exists():
+            return current.parent.parent
+        current = current.parent
+    raise FileNotFoundError("Could not find repository root")
+
+repo_root = find_repo_root()
+sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
+
+# Import logger helper using project standards
+import logger_helper
+
 # Jinja2 for template rendering
 try:
     from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -390,12 +405,48 @@ tasks:
       ], capture_output=True, text=True, cwd="/app")
       
       if result.returncode != 0:
-          self.logger.info(f"Script failed with return code {{result.returncode}}")
-          self.logger.info(f"STDERR: {{result.stderr}}")
+          # Import logger helper in the Kestra script
+          from pathlib import Path
+          import sys
+          
+          def find_repo_root():
+              current = Path(__file__).parent
+              while current != current.parent:
+                  if (current / "pipelines" / "utils").exists():
+                      return current
+                  current = current.parent
+              return Path("/app")  # Fallback for Kestra
+          
+          repo_root = find_repo_root()
+          sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
+          
+          import logger_helper
+          logger = logger_helper.get_logger(__name__)
+          
+          logger.info(f"Script failed with return code {{result.returncode}}")
+          logger.info(f"STDERR: {{result.stderr}}")
           raise Exception(f"Extraction script failed: {{result.stderr}}")
       
-      self.logger.info(f"STDOUT: {{result.stdout}}")
-      self.logger.info("✅ Board extraction completed successfully")
+      # Import logger helper in the Kestra script  
+      from pathlib import Path
+      import sys
+      
+      def find_repo_root():
+          current = Path(__file__).parent
+          while current != current.parent:
+              if (current / "pipelines" / "utils").exists():
+                  return current
+              current = current.parent
+          return Path("/app")  # Fallback for Kestra
+      
+      repo_root = find_repo_root()
+      sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
+      
+      import logger_helper
+      logger = logger_helper.get_logger(__name__)
+      
+      logger.info(f"STDOUT: {{result.stdout}}")
+      logger.info("✅ Board extraction completed successfully")
 
 labels:
   board_id: "{vars['board_id']}"
@@ -487,7 +538,7 @@ if __name__ == "__main__":
         
         # Generate script
         script_path = generate_script_from_schema(board_schema)
-        self.logger.info(f"\n✅ Generated script: {script_path}")        
+        logger.info(f"\n✅ Generated script: {script_path}")        
         # Generate workflow
         generator = ScriptTemplateGenerator()
         workflow_content = generator.generate_workflow_config(board_schema)
@@ -496,8 +547,8 @@ if __name__ == "__main__":
         with open(workflow_path, 'w', encoding='utf-8') as f:
             f.write(workflow_content)
         
-        self.logger.info(f"✅ Generated workflow: {workflow_path}")
+        logger.info(f"✅ Generated workflow: {workflow_path}")
         
     else:
         logger.error(f"Metadata file not found: {metadata_file}")
-        self.logger.info("Please run board_schema_generator.py first to generate metadata.")
+        logger.info("Please run board_schema_generator.py first to generate metadata.")

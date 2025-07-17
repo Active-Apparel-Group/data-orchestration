@@ -69,7 +69,12 @@ class LoggerWrapper:
         """Log info message"""
         if args:
             msg = msg % args
-        self._logger.info(msg)
+        try:
+            self._logger.info(msg)
+        except UnicodeEncodeError:
+            # Handle Unicode issues by encoding to ASCII with error replacement
+            safe_msg = msg.encode('ascii', errors='replace').decode('ascii')
+            self._logger.info(safe_msg)
     
     def debug(self, msg, *args, **kwargs):
         """Log debug message"""
@@ -81,13 +86,23 @@ class LoggerWrapper:
         """Log warning message"""
         if args:
             msg = msg % args
-        self._logger.warning(msg)
+        try:
+            self._logger.warning(msg)
+        except UnicodeEncodeError:
+            # Handle Unicode issues by encoding to ASCII with error replacement
+            safe_msg = msg.encode('ascii', errors='replace').decode('ascii')
+            self._logger.warning(safe_msg)
     
     def error(self, msg, *args, **kwargs):
         """Log error message"""
         if args:
             msg = msg % args
-        self._logger.error(msg)
+        try:
+            self._logger.error(msg)
+        except UnicodeEncodeError:
+            # Handle Unicode issues by encoding to ASCII with error replacement
+            safe_msg = msg.encode('ascii', errors='replace').decode('ascii')
+            self._logger.error(safe_msg)
     
     def critical(self, msg, *args, **kwargs):
         """Log critical message"""

@@ -850,6 +850,9 @@ class OrderListTransformer:
         return result
 
 if __name__ == "__main__":
+    import logger_helper
+    logger = logger_helper.get_logger(__name__)
+    
     try:
         transformer = OrderListTransformer()
         result = transformer.run()
@@ -858,5 +861,5 @@ if __name__ == "__main__":
             sys.exit(1)
             
     except Exception as e:
-        self.logger.info(f"CRITICAL ERROR: {e}")
+        logger.error(f"CRITICAL ERROR: {e}")
         sys.exit(1)

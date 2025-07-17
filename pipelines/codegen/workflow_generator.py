@@ -8,9 +8,28 @@ Generates Kestra workflow YAML files for board extraction jobs.
 
 import json
 import yaml
+import sys
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any
+
+# Standard import pattern for logger helper
+def find_repo_root():
+    current = Path(__file__).parent
+    while current != current.parent:
+        if (current.parent.parent / "pipelines" / "utils").exists():
+            return current.parent.parent
+        current = current.parent
+    raise FileNotFoundError("Could not find repository root")
+
+repo_root = find_repo_root()
+sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
+
+# Import logger helper using project standards
+import logger_helper
+
+# Initialize logger for Kestra/VS Code compatibility
+logger = logger_helper.get_logger(__name__)
 
 def generate_workflow_yaml(board_id: int, config: Dict[str, Any]) -> str:
     """Generate Kestra workflow YAML for a board"""
@@ -56,6 +75,22 @@ def generate_workflow_yaml(board_id: int, config: Dict[str, Any]) -> str:
                 "script": f"""
 import subprocess
 import sys
+from pathlib import Path
+
+# Standard import pattern for logger helper in Kestra
+def find_repo_root():
+    current = Path(__file__).parent
+    while current != current.parent:
+        if (current / "pipelines" / "utils").exists():
+            return current
+        current = current.parent
+    return Path("/app")  # Fallback for Kestra
+
+repo_root = find_repo_root()
+sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
+
+import logger_helper
+logger = logger_helper.get_logger(__name__)
 
 # Run the unified board loader
 result = subprocess.run([
@@ -64,15 +99,15 @@ result = subprocess.run([
     "--board-id", "{board_id}"
 ], capture_output=True, text=True, cwd="/app")
 
-self.logger.info(f"Exit code: {{result.returncode}}")
-self.logger.info(f"STDOUT: {{result.stdout}}")
+logger.info(f"Exit code: {{result.returncode}}")
+logger.info(f"STDOUT: {{result.stdout}}")
 if result.stderr:
-    self.logger.info(f"STDERR: {{result.stderr}}")
+    logger.info(f"STDERR: {{result.stderr}}")
 
 if result.returncode != 0:
     raise Exception(f"Board extraction failed with exit code {{result.returncode}}")
 
-self.logger.info("✅ Board extraction completed successfully")
+logger.info("✅ Board extraction completed successfully")
                 """.strip(),
                 "env": {
                     "MONDAY_API_KEY": "{{ secret('MONDAY_API_KEY') }}",
@@ -107,6 +142,6 @@ if __name__ == "__main__":
         workflows_dir.mkdir(exist_ok=True)
         
         workflow_path = save_workflow(9200517329, config, workflows_dir)
-        self.logger.info(f"✅ Generated workflow: {workflow_path}")
+        logger.info(f"✅ Generated workflow: {workflow_path}")
     else:
-        self.logger.info("❌ Config file not found")
+        logger.info("❌ Config file not found")

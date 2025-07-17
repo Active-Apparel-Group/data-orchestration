@@ -37,6 +37,7 @@ sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
 
 import db_helper as db
 import logger_helper
+from country_mapper import format_country_for_monday
 
 class BatchMondayUpdater:
     """
@@ -47,6 +48,7 @@ class BatchMondayUpdater:
     - Rate limiting with delays
     - Comprehensive error handling
     - Batch mutation templates
+    - Country column type detection and formatting
     """
     
     def __init__(self, config_file: str = None):
@@ -66,6 +68,70 @@ class BatchMondayUpdater:
             self.update_config = {}
             
         self.logger.info("BatchMondayUpdater initialized")
+    
+    def format_country_value(self, country_name: str) -> dict:
+        """
+        Format country value for Monday.com country column type.
+        
+        Args:
+            country_name: Country name (e.g., "Cambodia")
+            
+        Returns:
+            Dict with countryCode and countryName for Monday.com API
+        """
+        return format_country_for_monday(country_name, self.logger)
+    
+    def load_board_metadata(self, board_id: int) -> dict:
+        """Load board metadata from configs/boards/"""
+        metadata_path = repo_root / "configs" / "boards" / f"board_{board_id}_metadata.json"
+        
+        if not metadata_path.exists():
+            self.logger.warning(f"Board metadata not found: {metadata_path}")
+            return {}
+            
+        with open(metadata_path, 'r') as f:
+            return json.load(f)
+    
+    def detect_column_type(self, column_id: str, board_metadata: dict) -> str:
+        """
+        Detect Monday.com column type from board metadata.
+        
+        Args:
+            column_id: Monday.com column ID
+            board_metadata: Board metadata dict
+            
+        Returns:
+            Column type string (e.g., 'country', 'text', 'date', etc.)
+        """
+        columns = board_metadata.get('columns', [])
+        for column in columns:
+            if column.get('monday_id') == column_id:
+                return column.get('monday_type', 'text')
+        return 'text'  # Default fallback
+    
+    def format_column_value(self, column_id: str, value: any, board_metadata: dict) -> any:
+        """
+        Format column value based on Monday.com column type.
+        
+        Args:
+            column_id: Monday.com column ID
+            value: Raw value to format
+            board_metadata: Board metadata dict
+            
+        Returns:
+            Properly formatted value for Monday.com API
+        """
+        if pd.isna(value) or value is None:
+            return None
+            
+        column_type = self.detect_column_type(column_id, board_metadata)
+        
+        # Handle country columns specifically
+        if column_type == 'country':
+            return self.format_country_value(value)
+        
+        # For other types, return as string (existing behavior)
+        return str(value)
     
     def execute_graphql(self, query: str, variables: dict = None) -> dict:
         """Execute GraphQL query against Monday.com API"""
@@ -207,11 +273,16 @@ class BatchMondayUpdater:
                     item_id_column = update_config.get('item_id_column', 'monday_item_id')
                     item_id = int(row[item_id_column])
                     
-                    # Build column updates from mapping
+                    # Build column updates from mapping with column type detection
                     column_updates = {}
+                    metadata = self.load_board_metadata(board_id)  # Load metadata for column type detection
+                    
                     for monday_column_id, source_column in update_config['column_mapping'].items():
                         if source_column in row and pd.notna(row[source_column]):
-                            column_updates[monday_column_id] = str(row[source_column])
+                            # Format value based on column type (handles country columns)
+                            formatted_value = self.format_column_value(monday_column_id, row[source_column], metadata)
+                            if formatted_value is not None:
+                                column_updates[monday_column_id] = formatted_value
                     
                     if column_updates:  # Only add if there are updates to make
                         batch_updates.append({
@@ -429,6 +500,9 @@ class BatchMondayUpdater:
         }
 
 def main():
+    import logger_helper
+    logger = logger_helper.get_logger(__name__)
+    
     parser = argparse.ArgumentParser(description="Batch Monday.com Update Script")
     parser.add_argument('--config', type=str, required=True, help='TOML config file for batch updates')
     parser.add_argument('--dry_run', action='store_true', default=True, help='Dry run mode (default: True)')
@@ -445,9 +519,9 @@ def main():
     if 'query_config' in updater.update_config and 'query' in updater.update_config['query_config']:
         query = updater.update_config['query_config']['query']
         result = updater.batch_update_from_query(query, updater.update_config, dry_run)
-        self.logger.info(json.dumps(result, indent=2))
+        logger.info(json.dumps(result, indent=2))
     else:
-        self.logger.info("ERROR: No query found in TOML config file")
+        logger.error("ERROR: No query found in TOML config file")
 
 if __name__ == "__main__":
     main()
