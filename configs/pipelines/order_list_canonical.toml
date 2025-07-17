@@ -1,0 +1,36 @@
+# Canonical ORDER_LIST Pipeline Configuration
+# Purpose: Configuration for enhanced ORDER_LIST pipeline with 100% canonical customer validation
+# Author: Data Engineering Team
+# Date: July 17, 2025
+# Version: 1.0 - Enhanced with canonical customer integration
+
+[metadata]
+pipeline_name = "ORDER_LIST_CANONICAL"
+pipeline_version = "1.0"
+description = "Enhanced ORDER_LIST pipeline with canonical customer validation and fuzzy matching"
+author = "Data Engineering Team"
+created_date = "2025-07-17"
+last_updated = "2025-07-17"
+
+
+[canonical_customer]
+enabled = true
+source_system = "master_order_list"
+yaml_config_path = "pipelines/utils/canonical_customers.yaml"
+enable_fuzzy_matching = true
+customer_mapping_threshold = 95.0
+strict_mode = false
+
+[database]
+default_connection = "orders"
+target_table = "ORDER_LIST"
+staging_prefix = "swp_"
+
+[processing]
+default_file_limit = 0  # 0 = unlimited
+test_file_limit = 5
+batch_size = 5000
+
+[logging]
+level = "INFO"
+log_canonical_mappings = true

@@ -20,7 +20,7 @@ class CanonicalCustomerManager:
         
         # Default to pipelines/utils/canonical_customers.yaml
         if config_path is None:
-            config_path = Path(__file__).parent.parent / "pipelines" / "utils" / "canonical_customers.yaml"
+            config_path = Path(__file__).parent / "canonical_customers.yaml"
         
         self.config_path = Path(config_path)
         self._load_canonical_config()

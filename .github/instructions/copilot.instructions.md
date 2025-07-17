@@ -14,13 +14,14 @@ You are working on a data orchestration project that integrates Monday.com with 
 
 ### File Organization
 ```
-sql/                   # Database concerns (DDL, queries, mappings, GraphQL)
-scripts/               # Executable Python scripts
-utils/                 # Shared utilities and helpers
-workflows/             # Kestra workflow definitions
-tasks/                 # YAML task definitions
-tests/                 # Test files organized by type
-docs/                  # Documentation
+sql/                        # Database concerns (DDL, queries, mappings, GraphQL)
+pipelines/      
+    scripts/                # Executable Python scripts
+    utils/                  # Shared utilities and helpers
+    workflows/              # Kestra workflow definitions
+tasks/                      # YAML task definitions
+tests/                      # Test files organized by type
+docs/                       # Documentation
 ```
 
 ### Coding Standards

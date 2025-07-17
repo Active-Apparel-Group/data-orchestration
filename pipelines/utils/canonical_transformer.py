@@ -1,40 +1,40 @@
 """
 Canonical Data Transformer
 Purpose: Transform source data to use canonical customer names upstream
-Location: utils/canonical_transformer.py
+Location: pipelines/utils/canonical_transformer.py
 """
 import pandas as pd
 from typing import Dict, Any
 import sys
 from pathlib import Path
 
-# Standard import pattern
+# Standard import pattern for pipelines
 def find_repo_root():
     current = Path(__file__).parent
     while current != current.parent:
-        if (current / "utils").exists():
+        if (current / "pipelines").exists():
             return current
         current = current.parent
     raise FileNotFoundError("Could not find repository root")
 
 repo_root = find_repo_root()
 sys.path.insert(0, str(repo_root / "utils"))
-sys.path.insert(0, str(repo_root / "dev" / "customer-orders"))
+sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
 
 import db_helper as db
 import logger_helper
-from customer_mapper import create_customer_mapper
+from canonical_customer_manager import CanonicalCustomerManager
 
 class CanonicalTransformer:
     """Transform source data to use canonical customer names"""
     
     def __init__(self):
         self.logger = logger_helper.get_logger(__name__)
-        self.customer_mapper = create_customer_mapper()
+        self.canonical_manager = CanonicalCustomerManager()
         
     def canonicalize_orders_unified(self, customer_filter: str = None, limit: int = None) -> pd.DataFrame:
         """
-        Load ORDERS_UNIFIED data and transform customer names to canonical format
+        Load ORDER_LIST data and transform customer names to canonical format
         
         Args:
             customer_filter: Optional canonical customer name to filter by
@@ -62,15 +62,16 @@ class CanonicalTransformer:
             [DROP],
             [CATEGORY],
             [PATTERN ID]
-        FROM [dbo].[ORDERS_UNIFIED]
+        FROM [dbo].[ORDER_LIST]
         WHERE [record_uuid] IS NOT NULL
         """
         
-        # Add customer filter if specified (use database customer name for query)
+        # Add customer filter if specified (use canonical customer name for query)
         if customer_filter:
-            # Get the database customer name for the filter
-            db_customer_name = self.customer_mapper.get_database_customer_name(customer_filter)
-            query += f" AND [CUSTOMER NAME] = '{db_customer_name}'"
+            # Get canonical customer's database variants for the filter
+            canonical_customer = self.canonical_manager.canonicalize_customer(customer_filter, 'master_order_list')
+            # Use the canonical customer name for filtering
+            query += f" AND [CUSTOMER NAME] = '{canonical_customer}'"
         
         # Add limit if specified
         if limit:
@@ -82,11 +83,11 @@ class CanonicalTransformer:
         with db.get_connection('orders') as conn:
             df = pd.read_sql(query, conn)
             
-        self.logger.info(f"Loaded {len(df)} records from ORDERS_UNIFIED")
+        self.logger.info(f"Loaded {len(df)} records from ORDER_LIST")
         
         # Transform customer names to canonical
         df['CUSTOMER'] = df['original_customer_name'].apply(
-            lambda x: self.customer_mapper.normalize_customer_name(x) if pd.notna(x) else x
+            lambda x: self.canonical_manager.canonicalize_customer(x, 'master_order_list') if pd.notna(x) else x
         )
         
         # Log transformation results
@@ -104,7 +105,7 @@ class CanonicalTransformer:
     
     def get_canonical_customers(self) -> list:
         """Get list of all canonical customer names"""
-        return self.customer_mapper.get_approved_customers()
+        return self.canonical_manager.get_approved_customers()
 
 
 def create_canonical_transformer() -> CanonicalTransformer:

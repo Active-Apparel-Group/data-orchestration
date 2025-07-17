@@ -8,6 +8,7 @@ import json
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple, Any
 import logging
+import warnings
 import sys
 import os
 
@@ -18,6 +19,10 @@ from .staging_operations import StagingOperations
 from .monday_api_client import MondayApiClient
 from .error_handler import ErrorHandler
 from .staging_config import get_config
+
+# Suppress pandas warnings
+warnings.filterwarnings("ignore", message="pandas only supports SQLAlchemy")
+
 
 # Import existing transformation functions
 from customer_master_schedule.order_mapping import (
@@ -34,18 +39,75 @@ logger = logging.getLogger(__name__)
 class BatchProcessor:
     """Main orchestrator for customer batch processing"""
     
-    def __init__(self, connection_string: str):
-        self.connection_string = connection_string
+    def __init__(self, db_key: str = 'orders'):
+        self.db_key = db_key
         self.config = get_config()
         
-        # Initialize components
-        self.staging_ops = StagingOperations(connection_string)
+        # Initialize components with config key (not connection string)
+        self.staging_ops = StagingOperations(db_key)
         self.monday_client = MondayApiClient()
-        self.error_handler = ErrorHandler(connection_string)
+        self.error_handler = ErrorHandler(db_key)
         
         # Load mapping configuration once
         self.mapping_config = load_mapping_config()
         self.customer_lookup = load_customer_mapping()
+
+    def cleanup_staging_tables(self) -> Dict[str, int]:
+        """
+        Clean up staging tables by removing incomplete/failed records.
+        This ensures we don't have orphaned or incomplete data from failed jobs.
+        
+        Returns:
+            Dictionary with cleanup results
+        """
+        logger.info("Starting staging tables cleanup...")
+        results = {
+            'orphaned_subitems': 0,
+            'failed_subitems': 0,
+            'failed_orders': 0
+        }
+        
+        try:
+            with self.staging_ops.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                # Step 1: Delete orphaned subitems (SQL Server compatible)
+                cursor.execute(
+                """
+                DELETE FROM [dbo].[STG_MON_CustMasterSchedule_Subitems]
+                WHERE stg_parent_stg_id IS NOT NULL
+                    AND stg_parent_stg_id NOT IN (SELECT stg_id FROM [dbo].[STG_MON_CustMasterSchedule])
+                """
+                                        )
+                results['orphaned_subitems'] = cursor.rowcount
+                logger.info(f"Deleted {results['orphaned_subitems']} orphaned subitems")
+
+                # Step 2: Delete failed or incomplete subitems
+                cursor.execute("""
+                    DELETE FROM [dbo].[STG_MON_CustMasterSchedule_Subitems]
+                    WHERE stg_status IN ('PENDING', 'API_FAILED')
+                        OR stg_monday_subitem_id IS NULL
+                """)
+                results['failed_subitems'] = cursor.rowcount
+                logger.info(f"Deleted {results['failed_subitems']} failed/incomplete subitems")
+
+                # Step 3: Delete failed or incomplete orders
+                cursor.execute("""
+                    DELETE FROM [dbo].[STG_MON_CustMasterSchedule]
+                    WHERE stg_status IN ('PENDING', 'API_FAILED')
+                        OR stg_monday_item_id IS NULL
+                """)
+                results['failed_orders'] = cursor.rowcount
+                logger.info(f"Deleted {results['failed_orders']} failed/incomplete orders")
+                
+                conn.commit()
+                
+                logger.info(f"Staging tables cleanup completed successfully: {results}")
+                return results
+                
+        except Exception as e:
+            logger.error(f"Failed to clean up staging tables: {str(e)}")
+            raise
     def get_customers_with_new_orders(self) -> List[str]:
         """Get list of customers with new orders not yet in MON_CustMasterSchedule"""
         
@@ -128,6 +190,38 @@ class BatchProcessor:
             effective_season = customer_season
         
         return f"{customer} {effective_season}".strip()
+    
+    def ensure_group_exists(self, order_row: pd.Series) -> str:
+        """Ensure group exists and return group ID"""
+        group_name = self.create_group_name(order_row)
+        
+        # Use Monday API client to ensure group exists
+        success, group_id, error = self.monday_client.ensure_group_exists(group_name)
+        
+        if not success:
+            logger.error(f"Failed to ensure group exists for '{group_name}': {error}")
+            # Return a default group ID or raise exception based on your needs
+            from .staging_config import MONDAY_CONFIG
+            return MONDAY_CONFIG.get('default_group_id', 'topics')  # fallback to default group
+        
+        return group_id
+    
+    def ensure_group_exists(self, order_row: pd.Series) -> str:
+        """Ensure Monday.com group exists and return group ID"""
+        try:
+            group_name = self.create_group_name(order_row)
+            
+            # For now, return a placeholder group ID or use Monday API to create/find group
+            # This should call your Monday.com API client to ensure group exists
+            # and return the actual group ID
+            
+            # Placeholder implementation - replace with actual Monday.com API call
+            logger.info(f"Ensuring group exists: {group_name}")
+            return "placeholder_group_id"  # Replace with actual Monday.com group ID
+            
+        except Exception as e:
+            logger.error(f"Failed to ensure group exists for order {order_row.get('AAG ORDER NUMBER', 'Unknown')}: {e}")
+            return "default_group_id"  # Fallback group ID
     
     def get_monday_column_values_for_staged_order(self, order_row: pd.Series) -> Dict:
         """Get Monday.com column values for staged order data"""
@@ -229,134 +323,99 @@ class BatchProcessor:
         return rows_inserted
     
     def create_monday_items_from_staging(self, batch_id: str) -> Tuple[int, int]:
-        """Step 2: Create Monday.com items from staging records"""
-        
-        logger.info(f"Creating Monday.com items for batch {batch_id}...")
-        
-        # Get pending orders from staging
-        pending_orders = self.staging_ops.get_pending_staging_orders(batch_id)
-        
-        if pending_orders.empty:
-            logger.info(f"No pending orders found for batch {batch_id}")
-            return 0, 0
-        
+        """Create Monday.com items in batches with robust error handling and optimized group creation"""
+        BATCH_SIZE = 20  # Monday.com recommended batch size is 50
+        current_batch = []
+        batch_stg_ids = []
         success_count = 0
         error_count = 0
-        
-        for _, order_row in pending_orders.iterrows():
-            stg_id = order_row['stg_id']
-            order_number = order_row.get('AAG ORDER NUMBER', 'Unknown')
-            
+
+        # Get staging records
+        staging_records = self.staging_ops.get_pending_staging_orders(batch_id)
+
+        # Cache for group IDs to avoid multiple API calls
+        group_cache = {}
+
+        # Use iterrows to get row data
+        for idx, record in staging_records.iterrows():
             try:
-                # Create item name and group name
-                item_name = self.create_item_name(order_row)
-                group_name = self.create_group_name(order_row)
+                # Get group name and ensure group exists (cached)
+                group_name = self.create_group_name(record)
                 
-                # Get column values for Monday.com
-                column_values = self.get_monday_column_values_for_staged_order(order_row)
-                
-                # Ensure group exists
-                group_success, group_id, group_error = self.monday_client.ensure_group_exists(group_name)
-                if not group_success:
-                    error_msg = f"Failed to ensure group exists: {group_error}"
-                    self.staging_ops.mark_staging_as_failed(stg_id, error_msg)
-                    
-                    # Log to error table
-                    self.error_handler.log_api_error('ITEM', {
-                        'stg_id': stg_id,
-                        'batch_id': batch_id,
-                        'customer_batch': order_row.get('stg_customer_batch'),
-                        'order_number': order_number,
-                        'item_name': item_name,
-                        'group_name': group_name,
-                        'retry_count': 0
-                    }, {
-                        'error_type': 'GROUP_CREATION_ERROR',
-                        'error_message': error_msg,
-                        'api_payload': json.dumps({'group_name': group_name})
-                    })
-                    
-                    error_count += 1
-                    continue
-                
-                # Create item
-                item_success, monday_item_id, item_error = self.monday_client.create_item(
-                    item_name, group_id, column_values
-                )
-                
-                if item_success:
-                    # Update staging with Monday.com item ID
-                    api_payload = json.dumps({
-                        'item_name': item_name,
-                        'group_id': group_id,
-                        'column_values': column_values
-                    })
-                    
-                    self.staging_ops.update_staging_with_monday_id(
-                        stg_id, int(monday_item_id), api_payload
-                    )
-                    
-                    # Update subitems with parent item ID using foreign key
-                    try:
-                        subitems_updated = self.staging_ops.update_subitems_parent_item_id(
-                            stg_id, int(monday_item_id)
-                        )
-                        if subitems_updated > 0:
-                            logger.info(f"Updated {subitems_updated} subitems with parent_item_id {monday_item_id}")
-                    except Exception as e:
-                        logger.error(f"Failed to update subitems parent_item_id for stg_id {stg_id}: {e}")
-                        # Don't fail the item creation for this issue
-                    
-                    success_count += 1
-                    logger.info(f"Created Monday.com item {monday_item_id} for order {order_number}")
-                    
+                # Check cache first
+                if group_name not in group_cache:
+                    logger.info(f"Ensuring group exists: {group_name}")
+                    success, group_id, error = self.monday_client.ensure_group_exists(group_name)
+                    if not success:
+                        logger.error(f"Failed to ensure group exists for '{group_name}': {error}")
+                        # Use fallback group ID
+                        from .staging_config import MONDAY_CONFIG
+                        group_id = MONDAY_CONFIG.get('default_group_id', 'topics')
+                    group_cache[group_name] = group_id
+                    logger.debug(f"Cached group '{group_name}' with ID: {group_id}")
                 else:
-                    # Mark staging as failed
-                    self.staging_ops.mark_staging_as_failed(stg_id, item_error)
-                    
-                    # Log to error table
-                    self.error_handler.log_api_error('ITEM', {
-                        'stg_id': stg_id,
-                        'batch_id': batch_id,
-                        'customer_batch': order_row.get('stg_customer_batch'),
-                        'order_number': order_number,
-                        'item_name': item_name,
-                        'group_name': group_name,
-                        'retry_count': 0
-                    }, {
-                        'error_type': 'ITEM_CREATION_ERROR',
-                        'error_message': item_error,
-                        'api_payload': json.dumps({
-                            'item_name': item_name,
-                            'group_id': group_id,
-                            'column_values': column_values
-                        })
-                    })
-                    
-                    error_count += 1
-                    logger.error(f"Failed to create Monday.com item for order {order_number}: {item_error}")
-            
+                    group_id = group_cache[group_name]
+
+                item = {
+                    "item_name": self.create_item_name(record),
+                    "group_id": group_id,
+                    "column_values": self.get_monday_column_values_for_staged_order(record),
+                    "stg_id": record["stg_id"]  # Add stg_id for tracking
+                }
+                current_batch.append(item)
+                batch_stg_ids.append(record["stg_id"])
             except Exception as e:
-                error_msg = f"Unexpected error creating item: {str(e)}"
-                self.staging_ops.mark_staging_as_failed(stg_id, error_msg)
+                logger.error(f"Failed to build Monday.com item for row {idx}: {e}\nRow data: {record.to_dict()}")
                 error_count += 1
-                logger.error(f"Unexpected error processing order {order_number}: {e}")
-        
-        # Update batch status
-        self.staging_ops.update_batch_status(
-            batch_id, 'ITEMS_CREATED', 
-            successful_records=success_count,
-            failed_records=error_count
-        )
-        
-        logger.info(f"Item creation completed: {success_count} success, {error_count} errors")
+                continue
+
+            # Process batch when full
+            if len(current_batch) >= BATCH_SIZE:
+                try:
+                    success, item_ids, error = self.monday_client.create_items_batch(current_batch)
+                    if success:
+                        # Update staging with item IDs
+                        for stg_id, item_id in zip(batch_stg_ids, item_ids):
+                            if item_id:  # Only update if item_id is not None
+                                self.staging_ops.update_staging_with_monday_id(stg_id, int(item_id))
+                        successful_items = sum(1 for item_id in item_ids if item_id is not None)
+                        success_count += successful_items
+                        failed_items = len(item_ids) - successful_items
+                        error_count += failed_items
+                    else:
+                        error_count += len(current_batch)
+                        logger.error(f"Batch creation failed: {error}")
+                except Exception as e:
+                    error_count += len(current_batch)
+                    logger.error(f"Exception during batch creation: {e}")
+                current_batch = []
+                batch_stg_ids = []
+
+        if current_batch:
+            try:
+                success, item_ids, error = self.monday_client.create_items_batch(current_batch)
+                if success:
+                    for stg_id, item_id in zip(batch_stg_ids, item_ids):
+                        if item_id:  # Only update if item_id is not None
+                            self.staging_ops.update_staging_with_monday_id(stg_id, int(item_id))
+                    successful_items = sum(1 for item_id in item_ids if item_id is not None)
+                    success_count += successful_items
+                    failed_items = len(item_ids) - successful_items
+                    error_count += failed_items
+                else:
+                    error_count += len(current_batch)
+                    logger.error(f"Batch creation failed: {error}")
+            except Exception as e:
+                error_count += len(current_batch)
+                logger.error(f"Exception during batch creation: {e}")
+
+        logger.info(f"Group cache summary: {len(group_cache)} unique groups cached: {list(group_cache.keys())}")
         return success_count, error_count
     
     def create_monday_subitems_from_staging(self, batch_id: str) -> Tuple[int, int]:
-        """Step 3: Create Monday.com subitems from staging records with parent_item_id"""
-        
+        """Step 3: Create Monday.com subitems from staging records with parent_item_id (BATCHED)"""
         logger.info(f"Creating Monday.com subitems for batch {batch_id}...")
-        
+
         # Get subitems that have parent_item_id set (ready for API creation)
         subitem_query = """
             SELECT 
@@ -373,89 +432,92 @@ class BatchProcessor:
               AND stg_monday_parent_item_id IS NOT NULL
             ORDER BY stg_parent_stg_id, Size
         """
-        
+
         with self.staging_ops.get_connection() as conn:
             subitems_df = pd.read_sql(subitem_query, conn, params=[batch_id])
-        
+
         if subitems_df.empty:
             logger.info(f"No subitems ready for API creation in batch {batch_id}")
             return 0, 0
-        
+
         logger.info(f"Found {len(subitems_df)} subitems ready for Monday.com API creation")
-        
+
+        # Process in batches - FIXED LOGIC
+        BATCH_SIZE = 10  # Reasonable batch size to avoid timeouts
         success_count = 0
         error_count = 0
         
-        for _, subitem in subitems_df.iterrows():
-            try:
-                # Format item name
+        for batch_start in range(0, len(subitems_df), BATCH_SIZE):
+            batch_end = min(batch_start + BATCH_SIZE, len(subitems_df))
+            batch_df = subitems_df.iloc[batch_start:batch_end]
+            
+            logger.info(f"Processing subitems batch {batch_start//BATCH_SIZE + 1}: items {batch_start+1}-{batch_end} of {len(subitems_df)}")
+            
+            # Prepare batch payload for THIS BATCH ONLY
+            batch_payload = []
+            batch_stg_id_map = []
+            
+            for _, subitem in batch_df.iterrows():
                 item_name = f"Size {subitem['Size']}"
-                
-                # Create subitem column values for Monday.com
                 subitem_column_values = {
                     "dropdown_mkrak7qp": {"labels": [str(subitem['Size'])]},  # Size dropdown
                     "numeric_mkra7j8e": str(subitem['ORDER_QTY'])  # Order Qty numeric
                 }
+                batch_payload.append({
+                    "parent_item_id": int(subitem['stg_monday_parent_item_id']),
+                    "item_name": item_name,
+                    "column_values": subitem_column_values
+                })
+                batch_stg_id_map.append({
+                    "stg_subitem_id": subitem['stg_subitem_id'],
+                    "AAG_ORDER_NUMBER": subitem['AAG_ORDER_NUMBER'],
+                    "Size": subitem['Size']
+                })
+
+            # Call batch API for THIS BATCH ONLY
+            try:
+                batch_success, batch_results, batch_error = self.monday_client.create_subitems_batch(batch_payload)
                 
-                # Create subitem via API
-                subitem_success, subitem_result, subitem_error = self.monday_client.create_subitem(
-                    int(subitem['stg_monday_parent_item_id']), 
-                    item_name, 
-                    subitem_column_values
-                )
-                
-                if subitem_success:
-                    # Extract subitem ID from result dictionary
-                    subitem_id = subitem_result['subitem_id']
-                    # Update staging subitem with Monday.com subitem ID
-                    self.staging_ops.update_subitem_with_monday_id(
-                        subitem['stg_subitem_id'], 
-                        int(subitem_id)
-                    )
-                    success_count += 1
-                    logger.info(f"Created subitem {subitem_id} for order {subitem['AAG_ORDER_NUMBER']}, size {subitem['Size']}")
+                if batch_success:
+                    # Process results for THIS BATCH
+                    for idx, result in enumerate(batch_results):
+                        stg_info = batch_stg_id_map[idx]  # Now correctly indexed to current batch
+                        if result and 'subitem_id' in result:
+                            subitem_id = result['subitem_id']
+                            self.staging_ops.update_subitem_with_monday_id(
+                                stg_info['stg_subitem_id'],
+                                int(subitem_id)
+                            )
+                            success_count += 1
+                            logger.info(f"Created subitem {subitem_id} for order {stg_info['AAG_ORDER_NUMBER']}, size {stg_info['Size']}")
+                        else:
+                            # Mark individual subitem as failed
+                            self.staging_ops.mark_subitem_as_failed(
+                                stg_info['stg_subitem_id'],
+                                "No subitem ID returned from API"
+                            )
+                            error_count += 1
+                            logger.error(f"Failed to create subitem for order {stg_info['AAG_ORDER_NUMBER']}, size {stg_info['Size']}")
                 else:
-                    # Mark subitem as failed
-                    self.staging_ops.mark_subitem_as_failed(
-                        subitem['stg_subitem_id'], 
-                        subitem_error
-                    )
+                    # Only mark THIS BATCH as failed
+                    for stg_info in batch_stg_id_map:  # Only current batch items
+                        self.staging_ops.mark_subitem_as_failed(
+                            stg_info['stg_subitem_id'],
+                            batch_error or "Batch subitem creation failed"
+                        )
+                        error_count += 1
+                        logger.error(f"Failed to create subitem for order {stg_info['AAG_ORDER_NUMBER']}, size {stg_info['Size']}: {batch_error}")
                     
-                    # Log subitem error
-                    self.error_handler.log_api_error('SUBITEM', {
-                        'stg_subitem_id': subitem['stg_subitem_id'],
-                        'parent_stg_id': subitem['stg_parent_stg_id'],
-                        'batch_id': batch_id,
-                        'order_number': subitem['AAG_ORDER_NUMBER'],
-                        'size_name': subitem['Size'],
-                        'order_qty': subitem['ORDER_QTY'],
-                        'retry_count': 0
-                    }, {
-                        'error_type': 'SUBITEM_CREATION_ERROR',
-                        'error_message': subitem_error,
-                        'api_payload': json.dumps({
-                            'parent_item_id': subitem['stg_monday_parent_item_id'],
-                            'size_name': subitem['Size'],
-                            'column_values': subitem_column_values
-                        })
-                    })
-                    error_count += 1
-                    logger.error(f"Failed to create subitem for order {subitem['AAG_ORDER_NUMBER']}: {subitem_error}")
-                        
             except Exception as e:
-                error_msg = f"Unexpected error creating subitem: {str(e)}"
-                error_count += 1
-                logger.error(f"Unexpected error processing subitem for order {subitem['AAG_ORDER_NUMBER']}: {e}")
-                
-                # Mark as failed if we have the stg_subitem_id
-                try:
+                # Only mark THIS BATCH as failed
+                for stg_info in batch_stg_id_map:  # Only current batch items
                     self.staging_ops.mark_subitem_as_failed(
-                        subitem['stg_subitem_id'], 
-                        error_msg
+                        stg_info['stg_subitem_id'],
+                        str(e)
                     )
-                except Exception:
-                    pass  # Don't fail on logging issues
-        
+                    error_count += 1
+                    logger.error(f"Unexpected error processing subitem for order {stg_info['AAG_ORDER_NUMBER']}, size {stg_info['Size']}: {e}")
+
         logger.info(f"Subitem creation completed: {success_count} success, {error_count} errors")
         return success_count, error_count
     
@@ -489,8 +551,14 @@ class BatchProcessor:
             # Step 3: Create subitems
             subitems_success, subitems_errors = self.create_monday_subitems_from_staging(batch_id)
             
-            # Step 4: Cleanup staging (CASCADE DELETE will remove both orders and subitems)
-            cleanup_results = self.staging_ops.cleanup_staging_batch(batch_id)
+            # Step 4: Promote successful records to production MON_ tables
+            orders_promoted, subitems_promoted = self.staging_ops.promote_successful_orders_to_production(batch_id)
+            
+            # Step 5: Validate promotion success
+            promotion_validation = self.staging_ops.validate_promotion_success(batch_id)
+            
+            # Step 6: Cleanup promoted staging records
+            cleanup_results = self.staging_ops.cleanup_promoted_staging_records(batch_id)
             
             # Final batch status
             total_errors = items_errors + subitems_errors
@@ -517,6 +585,9 @@ class BatchProcessor:
                 'items_errors': items_errors,
                 'subitems_created': subitems_success,
                 'subitems_errors': subitems_errors,
+                'orders_promoted': orders_promoted,
+                'subitems_promoted': subitems_promoted,
+                'promotion_validation': promotion_validation,
                 'orders_deleted': cleanup_results.get('orders_deleted', 0),
                 'subitems_deleted': cleanup_results.get('subitems_deleted', 0)
             }
@@ -713,11 +784,17 @@ class BatchProcessor:
             # Step 4: Create Monday.com items
             items_created, errors = self.create_monday_items_from_staging(batch_id)
             
-             # Step 5: Create Monday.com subitems
+            # Step 5: Create Monday.com subitems
             subitems_created, subitems_errors = self.create_monday_subitems_from_staging(batch_id)
             
-            # Step 6: Cleanup staging (CASCADE DELETE will remove both orders and subitems)
-            cleanup_results = self.staging_ops.cleanup_staging_batch(batch_id)
+            # Step 6: Promote successful records to production MON_ tables
+            orders_promoted, subitems_promoted = self.staging_ops.promote_successful_orders_to_production(batch_id)
+            
+            # Step 7: Validate promotion success
+            promotion_validation = self.staging_ops.validate_promotion_success(batch_id)
+            
+            # Step 8: Cleanup promoted staging records
+            cleanup_results = self.staging_ops.cleanup_promoted_staging_records(batch_id)
             
             # Step 7: Update final status
             total_errors = subitems_errors
@@ -820,8 +897,7 @@ class BatchProcessor:
         where_conditions = [
             "cms.[AAG ORDER NUMBER] IS NULL",
             "ou.[AAG ORDER NUMBER] IS NOT NULL",
-            "ou.[CUSTOMER STYLE] IS NOT NULL",
-            "ou.[CUSTOMER COLOUR DESCRIPTION] IS NOT NULL"
+            "ou.[CUSTOMER STYLE] IS NOT NULL"
         ]
         params = []
         
@@ -849,11 +925,12 @@ class BatchProcessor:
             ON ou.[AAG ORDER NUMBER] = cms.[AAG ORDER NUMBER]
             -- AND ou.[CUSTOMER NAME] = cms.[CUSTOMER] removed as canonical names won't always match so not needed given AAG order number unique to a customer
             AND ou.[CUSTOMER STYLE] = cms.[STYLE] 
-            AND ou.[CUSTOMER COLOUR DESCRIPTION] = cms.[COLOR]
         WHERE {' AND '.join(where_conditions)}
         ORDER BY ou.[ORDER DATE PO RECEIVED] DESC
         """
         
+        # print(f"Executing query: {query}")
+
         with self.staging_ops.get_connection() as conn:
             df = pd.read_sql(query, conn, params=params)
         

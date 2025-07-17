@@ -19,13 +19,17 @@ import logging
 from datetime import datetime
 from typing import List, Dict, Optional
 import base64
+import warnings
 import argparse
 
 # Add src to Python path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from load_cms.batch_processor import BatchProcessor
-from load_cms.staging_config import get_config
+from order_staging.batch_processor import BatchProcessor
+from order_staging.staging_config import get_config
+
+# Suppress pandas warnings
+warnings.filterwarnings("ignore", message="pandas only supports SQLAlchemy")
 
 # Configure logging
 def setup_logging():
@@ -105,15 +109,15 @@ def process_single_customer(processor: BatchProcessor, customer_name: str) -> Di
         result = processor.process_customer_batch(customer_name)
         
         # Print summary
-        self.logger.info(f"\n{'='*60}")
-        self.logger.info(f"Customer: {customer_name}")
-        self.logger.info(f"Batch ID: {result['batch_id']}")
-        self.logger.info(f"Status: {result['status']}")
-        self.logger.info(f"Orders Loaded: {result['orders_loaded']}")
-        self.logger.info(f"Items Created: {result['items_created']} (Errors: {result.get('items_errors', 0)})")
-        self.logger.info(f"Subitems Created: {result['subitems_created']} (Errors: {result.get('subitems_errors', 0)})")
-        self.logger.info(f"Records Promoted: {result.get('orders_promoted', 0)} orders, {result.get('subitems_promoted', 0)} subitems")
-        self.logger.info(f"{'='*60}\n")
+        print(f"\n{'='*60}")
+        print(f"Customer: {customer_name}")
+        print(f"Batch ID: {result['batch_id']}")
+        print(f"Status: {result['status']}")
+        print(f"Orders Loaded: {result['orders_loaded']}")
+        print(f"Items Created: {result['items_created']} (Errors: {result.get('items_errors', 0)})")
+        print(f"Subitems Created: {result['subitems_created']} (Errors: {result.get('subitems_errors', 0)})")
+        print(f"Records Promoted: {result.get('orders_promoted', 0)} orders, {result.get('subitems_promoted', 0)} subitems")
+        print(f"{'='*60}\n")
         
         return result
         
@@ -175,7 +179,7 @@ def process_specific_customer_po(processor: BatchProcessor, customer_name: str, 
         # Generate comprehensive batch summary
         if result['success']:
             summary_report = generate_batch_summary(result, customer_name, po_number)
-            self.logger.info(summary_report)
+            print(summary_report)
 
             # Save to file
             save_batch_summary(summary_report, result['batch_id'], customer_name, po_number)
@@ -380,12 +384,12 @@ def generate_overall_summary(results: List[Dict]) -> str:
 def print_final_summary(results: List[Dict]):
     """Print final processing summary"""
     if not results:
-        self.logger.info("No customers processed.")
+        print("No customers processed.")
         return
     
-    self.logger.info(f"\n{'='*80}")
-    self.logger.info("FINAL PROCESSING SUMMARY")
-    self.logger.info(f"{'='*80}")
+    print(f"\n{'='*80}")
+    print("FINAL PROCESSING SUMMARY")
+    print(f"{'='*80}")
     
     total_customers = len(results)
     successful_customers = len([r for r in results if r.get('status') not in ['FAILED']])
@@ -395,29 +399,29 @@ def print_final_summary(results: List[Dict]):
     total_items = sum(r.get('items_created', 0) for r in results)
     total_subitems = sum(r.get('subitems_created', 0) for r in results)
     
-    self.logger.info(f"Customers Processed: {total_customers}")
-    self.logger.info(f"Successful: {successful_customers}")
-    self.logger.info(f"Failed: {failed_customers}")
-    self.logger.info(f"Total Orders Loaded: {total_orders}")
-    self.logger.info(f"Total Items Created: {total_items}")
-    self.logger.info(f"Total Subitems Created: {total_subitems}")
+    print(f"Customers Processed: {total_customers}")
+    print(f"Successful: {successful_customers}")
+    print(f"Failed: {failed_customers}")
+    print(f"Total Orders Loaded: {total_orders}")
+    print(f"Total Items Created: {total_items}")
+    print(f"Total Subitems Created: {total_subitems}")
     
     # Show customer-by-customer results
-    self.logger.info(f"\nCustomer Results:")
-    self.logger.info("-" * 80)
+    print(f"\nCustomer Results:")
+    print("-" * 80)
     for result in results:
         status_icon = "✓" if result.get('status') not in ['FAILED'] else "✗"
-        self.logger.info(f"{status_icon} {result['customer_name']:<30} {result.get('status', 'UNKNOWN'):<20} "
+        print(f"{status_icon} {result['customer_name']:<30} {result.get('status', 'UNKNOWN'):<20} "
               f"Orders: {result.get('orders_loaded', 0):<3} Items: {result.get('items_created', 0):<3}")
     
     if failed_customers > 0:
-        self.logger.info(f"\nFailed Customers:")
-        self.logger.info("-" * 80)
+        print(f"\nFailed Customers:")
+        print("-" * 80)
         for result in results:
             if result.get('status') == 'FAILED':
-                self.logger.info(f"✗ {result['customer_name']}: {result.get('error', 'Unknown error')}")
+                print(f"✗ {result['customer_name']}: {result.get('error', 'Unknown error')}")
     
-    self.logger.info(f"{'='*80}")
+    print(f"{'='*80}")
 
 def main():
     """Main entry point with support for customer/PO specific processing"""
@@ -428,9 +432,20 @@ def main():
     parser.add_argument('--customer', type=str, help='Customer name')
     parser.add_argument('--po', type=str, help='PO number')
     parser.add_argument('--limit', type=int, default=None, help='Limit number of orders to process')
+    parser.add_argument('--skip-cleanup', action='store_true', help='Skip staging table cleanup')
     args = parser.parse_args()
 
-    processor = BatchProcessor(get_db_connection_string())
+    processor = BatchProcessor('orders')
+
+    # Clean up staging tables from any failed previous runs
+    if not args.skip_cleanup:
+        try:
+            logger.info("Cleaning up staging tables from previous runs...")
+            processor.cleanup_staging_tables()
+            logger.info("Staging tables cleanup completed successfully")
+        except Exception as e:
+            logger.error(f"Failed to clean up staging tables: {e}")
+            return 1
 
     if args.customer and args.po:
         # Use the updated entry point with limit support

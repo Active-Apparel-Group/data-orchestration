@@ -10,27 +10,187 @@ import uuid
 import asyncio
 import concurrent.futures
 import time
+import numpy as np
+import os
+import sys
+from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
 import logging
 
 from .staging_config import get_config, DATABASE_CONFIG
 
+# Add project root to path for utils imports
+project_root = str(Path(__file__).parent.parent.parent)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from utils import db_helper
+
 logger = logging.getLogger(__name__)
 
-class StagingOperations:
-    """Handles all staging table operations"""
-    
-    def __init__(self, connection_string: str):
-        self.connection_string = connection_string
+class StagingOperations:    
+    def __init__(self, db_key: str):
+        self.db_key = db_key  # Store db_key instead of connection_string
         self.config = get_config()
     
     def get_connection(self) -> pyodbc.Connection:
-        """Get database connection with proper configuration"""
-        return pyodbc.connect(
-            self.connection_string,
-            timeout=DATABASE_CONFIG['connection_timeout']
-        )
+        """Get database connection using db_helper"""
+        return db_helper.get_connection(self.db_key)
+    
+    def _clean_numeric_fields(self, df: pd.DataFrame, numeric_columns: list) -> pd.DataFrame:
+        """Clean numeric columns to handle empty strings and nulls for SQL Server compatibility"""
+        cleaned_df = df.copy()
+        
+        for col in numeric_columns:
+            if col in cleaned_df.columns:
+                def clean_value(val):
+                    if pd.isna(val) or val == '' or str(val).upper() in ['NULL', 'NONE']:
+                        return 0  # Default to 0 for empty/null values
+                    try:
+                        # Handle decimal strings by converting to float first, then int
+                        return int(float(val))
+                    except (ValueError, TypeError):
+                        logger.warning(f"Could not convert '{val}' in column '{col}' to numeric, using 0")
+                        return 0
+                
+                original_count = len(cleaned_df[col].unique())
+                cleaned_df[col] = cleaned_df[col].apply(clean_value)
+                cleaned_count = len(cleaned_df[col].unique())
+                
+                logger.info(f"Cleaned numeric field '{col}': {original_count} -> {cleaned_count} unique values")
+        
+        return cleaned_df
+    
+    def get_dynamic_numeric_fields_with_schema(self) -> Dict[str, Dict]:
+        """Get numeric columns with their exact data types and precision from staging table schema"""
+        
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Get detailed schema information for numeric columns
+            cursor.execute("""
+                SELECT 
+                    COLUMN_NAME,
+                    DATA_TYPE,
+                    NUMERIC_PRECISION,
+                    NUMERIC_SCALE,
+                    IS_NULLABLE
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = 'STG_MON_CustMasterSchedule' 
+                AND TABLE_SCHEMA = 'dbo'
+                AND COLUMN_NAME NOT LIKE 'stg_%'
+                AND DATA_TYPE IN ('decimal', 'numeric', 'int', 'bigint', 'float', 'real', 'money', 'smallmoney', 'smallint', 'tinyint')
+                ORDER BY COLUMN_NAME
+            """)
+            
+            schema_info = {}
+            for row in cursor.fetchall():
+                column_name = row[0]
+                data_type = row[1]
+                precision = row[2]
+                scale = row[3]
+                is_nullable = row[4]
+                
+                schema_info[column_name] = {
+                    'data_type': data_type,
+                    'precision': precision,
+                    'scale': scale,
+                    'is_nullable': is_nullable == 'YES'
+                }
+        
+        logger.info(f"Dynamically identified {len(schema_info)} numeric columns with schema info")
+        return schema_info
+    
+    def _clean_numeric_fields_dynamic(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Clean numeric columns dynamically based on exact staging table schema with precision"""
+        
+        # Get detailed schema information
+        numeric_schema = self.get_dynamic_numeric_fields_with_schema()
+        
+        if not numeric_schema:
+            logger.info("No numeric columns found in staging table schema")
+            return df
+        
+        # Filter to only columns that exist in the DataFrame
+        existing_numeric_columns = [col for col in numeric_schema.keys() if col in df.columns]
+        
+        if not existing_numeric_columns:
+            logger.info("No numeric columns found in DataFrame that need conversion")
+            return df
+        
+        logger.info(f"Cleaning {len(existing_numeric_columns)} numeric fields with precise schema info")
+        
+        cleaned_df = df.copy()
+        
+        for col in existing_numeric_columns:
+            schema_info = numeric_schema[col]
+            data_type = schema_info['data_type']
+            precision = schema_info['precision']
+            scale = schema_info['scale']
+            is_nullable = schema_info['is_nullable']
+            
+            def clean_value(val):
+                # Handle null/empty values
+                if pd.isna(val) or val == '' or str(val).strip().upper() in ['NULL', 'NONE', 'NAN']:
+                    return None if is_nullable else 0
+                
+                try:
+                    # Handle boolean-like strings
+                    val_str = str(val).strip().upper()
+                    if val_str in ['TRUE', 'FALSE']:
+                        val = 1 if val_str == 'TRUE' else 0
+                    
+                    # Clean the string value
+                    if isinstance(val, str):
+                        # Remove currency symbols, commas, etc.
+                        val = val.replace('$', '').replace(',', '').replace('%', '').strip()
+                        if val == '':
+                            return None if is_nullable else 0
+                    
+                    # Convert based on target data type
+                    if data_type in ['int', 'bigint', 'smallint', 'tinyint']:
+                        # Integer types
+                        return int(float(val))
+                        
+                    elif data_type in ['decimal', 'numeric']:
+                        # Decimal types with precision and scale
+                        float_val = float(val)
+                        
+                        # Apply scale (decimal places)
+                        if scale is not None and scale > 0:
+                            # Round to the specified decimal places
+                            rounded_val = round(float_val, scale)
+                            return rounded_val
+                        else:
+                            # No decimal places, treat as integer
+                            return int(float_val)
+                            
+                    elif data_type in ['float', 'real']:
+                        # Float types
+                        return float(val)
+                        
+                    elif data_type in ['money', 'smallmoney']:
+                        # Money types (4 decimal places)
+                        return round(float(val), 4)
+                        
+                    else:
+                        # Default to float
+                        return float(val)
+                        
+                except (ValueError, TypeError, OverflowError) as e:
+                    default_val = None if is_nullable else 0
+                    logger.warning(f"Could not convert '{val}' in column '{col}' ({data_type}) to numeric, using {default_val}: {e}")
+                    return default_val
+            
+            original_count = len(cleaned_df[col].unique())
+            cleaned_df[col] = cleaned_df[col].apply(clean_value)
+            cleaned_count = len(cleaned_df[col].unique())
+            
+            # Log the conversion details
+            logger.info(f"Cleaned numeric field '{col}' ({data_type}({precision},{scale})): {original_count} -> {cleaned_count} unique values")
+        
+        return cleaned_df
     
     def start_batch(self, customer_name: str, batch_type: str = 'FULL_BATCH') -> str:
         """Start a new batch and return batch_id"""
@@ -255,7 +415,11 @@ class StagingOperations:
                 logger.info(f"Sample group names: {sample_groups}")
         else:
             logger.warning("Missing columns for Group naming logic (CUSTOMER, CUSTOMER SEASON, AAG SEASON)")
-              # SIMPLE INSERT to avoid MemoryError issues
+        
+        # Clean numeric fields dynamically based on staging table schema
+        filtered_df = self._clean_numeric_fields_dynamic(filtered_df)
+        
+        # SIMPLE INSERT to avoid MemoryError issues
         logger.info(f"Using simple insert for {len(filtered_df)} records...")
         start_time = time.time()
         
@@ -357,7 +521,7 @@ class StagingOperations:
     
     def update_staging_with_monday_id(self, stg_id: int, monday_item_id: int, 
                                      api_payload: Optional[str] = None) -> bool:
-        """Update staging record with Monday.com item ID"""
+        """Update staging record with Monday.com item ID and propagate to subitems"""
         
         # Convert numpy types to native Python types
         stg_id = int(stg_id)
@@ -399,6 +563,16 @@ class StagingOperations:
         
         if rows_affected > 0:
             logger.info(f"Updated staging record {stg_id} with Monday item ID {monday_item_id}")
+            
+            # CRITICAL FIX: Propagate Monday.com item ID to subitems
+            # This enables subitems to be found by create_monday_subitems_from_staging()
+            try:
+                subitems_updated = self.update_subitems_parent_item_id(stg_id, monday_item_id)
+                logger.info(f"Propagated Monday item ID {monday_item_id} to {subitems_updated} subitems for parent stg_id {stg_id}")
+            except Exception as e:
+                logger.error(f"❌ Failed to propagate Monday item ID to subitems for stg_id {stg_id}: {e}")
+                # Don't fail the entire operation for subitem propagation issues
+            
         else:
             logger.warning(f"No staging record found with ID {stg_id}")
         return rows_affected > 0
@@ -503,132 +677,122 @@ class StagingOperations:
         return df
     
     def insert_subitems_to_staging(self, subitems_df: pd.DataFrame, 
-                                  batch_id: str) -> int:
-        """Insert unpivoted subitems to staging table"""
+                                batch_id: str) -> int:
+        """Insert unpivoted subitems to staging table using direct INSERT"""
+        """We should only be using this code path for new subitem records."""
         
         if subitems_df.empty:
             return 0
         
-        # Check if staging columns already exist (from new approach)
-        subitems_df = subitems_df.copy()
+        # Add required staging columns
+        insert_df = subitems_df.copy()
+        insert_df['stg_batch_id'] = batch_id
+        insert_df['stg_status'] = 'PENDING'
+        insert_df['stg_created_date'] = datetime.now()
+        insert_df['stg_retry_count'] = 0
         
-        if 'stg_batch_id' not in subitems_df.columns:
-            subitems_df['stg_batch_id'] = batch_id
-        if 'stg_status' not in subitems_df.columns:
-            subitems_df['stg_status'] = 'PENDING'
-        if 'stg_created_date' not in subitems_df.columns:
-            subitems_df['stg_created_date'] = datetime.now()
-        
+        # Get the actual columns that exist in the target table
         with self.get_connection() as conn:
             cursor = conn.cursor()
-              # Get column names for dynamic insert
-            columns = list(subitems_df.columns)
-            placeholders = ', '.join(['?' for _ in columns])
-            column_names = ', '.join([f'[{col}]' for col in columns])
+            cursor.execute("""
+                SELECT COLUMN_NAME 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = 'STG_MON_CustMasterSchedule_Subitems' 
+                AND TABLE_SCHEMA = 'dbo'
+                ORDER BY ORDINAL_POSITION
+            """)
+            target_columns = [row[0] for row in cursor.fetchall()]
+        
+        # Filter DataFrame to only include columns that exist in target table
+        available_columns = [col for col in insert_df.columns if col in target_columns]
+        filtered_df = insert_df[available_columns].copy()
+        
+        logger.info(f"Column filtering: {len(insert_df.columns)} -> {len(available_columns)} columns")
+
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.fast_executemany = True
             
-            insert_query = f"""
-                INSERT INTO [dbo].[STG_MON_CustMasterSchedule_Subitems] ({column_names})
-                VALUES ({placeholders})
-            """
-            
-            # Prepare bulk data for executemany (much faster than row-by-row)
-            bulk_values = []
-            for _, row in subitems_df.iterrows():
-                values = []
-                for col in columns:
-                    value = row[col]
-                    # Handle pandas NA/NaN values for SQL Server
-                    if pd.isna(value):
-                        values.append(None)
-                    else:
-                        values.append(value)
-                bulk_values.append(tuple(values))
-              # Execute bulk insert in chunks for better performance
-            chunk_size = DATABASE_CONFIG.get('bulk_insert_batch_size', 1000)
-            logger.info(f"Executing bulk insert of {len(bulk_values)} subitem records in chunks of {chunk_size}...")
-            
-            rows_inserted = 0
-            for i in range(0, len(bulk_values), chunk_size):
-                chunk = bulk_values[i:i + chunk_size]
-                logger.info(f"Inserting subitem chunk {i//chunk_size + 1}: {len(chunk)} records...")
-                cursor.executemany(insert_query, chunk)
-                rows_inserted += len(chunk)
+            try:
+                # Build dynamic INSERT based on available columns
+                columns = list(filtered_df.columns)
+                placeholders = ','.join(['?' for _ in columns])
+                column_list = ','.join([f'[{col}]' for col in columns])
                 
-                # Commit each chunk
+                insert_query = f"""
+                    INSERT INTO [dbo].[STG_MON_CustMasterSchedule_Subitems]
+                    ({column_list})
+                    VALUES ({placeholders})
+                """
+                
+                start_time = time.time()
+                logger.info(f"Starting bulk insert of {len(filtered_df)} records...")
+                
+                # Prepare values list with proper type handling
+                values = []
+                for i, (_, row) in enumerate(filtered_df.iterrows()):
+                    row_values = []
+                    for col in columns:
+                        val = row[col]
+                        if pd.isna(val):
+                            row_values.append(None)
+                        elif isinstance(val, (np.integer, int)):
+                            row_values.append(int(val))
+                        elif isinstance(val, (np.floating, float)):
+                            row_values.append(float(val))
+                        elif isinstance(val, pd.Timestamp):
+                            row_values.append(val.to_pydatetime())
+                        elif isinstance(val, datetime):
+                            row_values.append(val)
+                        else:
+                            row_values.append(str(val))
+                    row_values_tuple = tuple(row_values)
+                    values.append(row_values_tuple)
+                    
+                    # Log first few rows for debugging
+                    if i < 3:
+                        logger.debug(f"Row {i}: {row_values_tuple}")
+                
+                logger.info(f"Prepared {len(values)} value tuples for insertion")
+                
+                # Execute bulk insert
+                cursor.executemany(insert_query, values)
+                rows_inserted = len(values)
                 conn.commit()
                 
-            logger.info(f"Completed subitem bulk insert: {rows_inserted} records")
-        
-        logger.info(f"Inserted {rows_inserted} subitems to staging for batch {batch_id}")
-        return rows_inserted
-    
-    def promote_successful_records(self, batch_id: str) -> Tuple[int, int]:
-        """Move successful records from staging to production tables"""
-        
-        with self.get_connection() as conn:
-            cursor = conn.cursor()
-            
-            # Promote main orders
-            cursor.execute("""
-                INSERT INTO [dbo].[MON_CustMasterSchedule] 
-                SELECT [Title], [UpdateDate], [Group], [Subitems], [CUSTOMER], 
-                       [AAG ORDER NUMBER], [AAG SEASON], [ORDER DATE PO RECEIVED],
-                       [CUSTOMER SEASON], [DROP], [PO NUMBER], [CUSTOMER ALT PO],
-                       [STYLE], [STYLE DESCRIPTION], [ALIAS RELATED ITEM], [COLOR],
-                       [CATEGORY], [PATTERN ID], [UNIT OF MEASURE], [FCST QTY],
-                       [FCST CONSUMED QTY], [ORDER QTY], [PACKED QTY], [SHIPPED QTY],
-                       [Net Demand], [ORDER TYPE], [DESTINATION], [DESTINATION WAREHOUSE],
-                       [CUSTOMER REQ IN DC DATE], [CUSTOMER EX FACTORY DATE], [DELIVERY TERMS],
-                       [PLANNED DELIVERY METHOD], [NOTES], [CUSTOMER PRICE], 
-                       [USA ONLY LSTP 75% EX WORKS], [EX WORKS (USD)], [ADMINISTRATION FEE],
-                       [DESIGN FEE], [FX CHARGE], [HANDLING], [SURCHARGE FEE], [DISCOUNT],
-                       [FINAL FOB (USD)], [HS CODE], [US DUTY RATE], [US DUTY], [FREIGHT],
-                       [US TARIFF RATE], [US TARIFF], [DDP US (USD)], [SMS PRICE USD],
-                       [FINAL PRICES Y/N], [NOTES FOR PRICE], [stg_monday_item_id] as [Item ID],
-                       [matchAlias], [PLANNING BOARD], [REQUESTED XFD STATUS], 
-                       [EX-FTY (Change Request)], [EX-FTY (Forecast)], [EX-FTY (Partner PO)],
-                       [EX-FTY (Revised LS)], [PRODUCTION TYPE], [AQL INSPECTION], [AQL TYPE],
-                       [PLANNED CUT DATE], [MO NUMBER], [PRODUCTION STATUS], [FACTORY COUNTRY],
-                       [FACTORY], [ALLOCATION STATUS], [PRODUCTION QTY], [TRIM ETA DATE],
-                       [FABRIC ETA DATE], [TRIM STATUS], [ADD TO PLANNING], [FABRIC STATUS],
-                       [PPS STATUS], [PPS CMT DUE], [PPS CMT RCV], [REVENUE (FOB)], [ORDER STATUS]
-                FROM [dbo].[STG_MON_CustMasterSchedule]
-                WHERE [stg_batch_id] = ? AND [stg_status] = 'API_SUCCESS'
-            """, (batch_id,))
-            
-            orders_promoted = cursor.rowcount
-            
-            # Promote subitems
-            cursor.execute("""
-                INSERT INTO [dbo].[MON_CustMasterSchedule_Subitems]
-                SELECT [parent_item_id], [stg_monday_subitem_id] as [subitem_id], 
-                       [stg_monday_subitem_board_id] as [subitem_board_id], [Size], 
-                       [Order Qty], [Cut Qty], [Sew Qty], [Finishing Qty], 
-                       [Received not Shipped Qty], [Packed Qty], [Shipped Qty], 
-                       [ORDER LINE STATUS], [Item ID]
-                FROM [dbo].[STG_MON_CustMasterSchedule_Subitems]
-                WHERE [stg_batch_id] = ? AND [stg_status] = 'API_SUCCESS'
-            """, (batch_id,))
-            
-            subitems_promoted = cursor.rowcount
-            
-            # Mark staging records as promoted
-            cursor.execute("""
-                UPDATE [dbo].[STG_MON_CustMasterSchedule]
-                SET [stg_status] = 'PROMOTED'
-                WHERE [stg_batch_id] = ? AND [stg_status] = 'API_SUCCESS'
-            """, (batch_id,))
-            
-            cursor.execute("""
-                UPDATE [dbo].[STG_MON_CustMasterSchedule_Subitems]
-                SET [stg_status] = 'PROMOTED'
-                WHERE [stg_batch_id] = ? AND [stg_status] = 'API_SUCCESS'
-            """, (batch_id,))
-            
-            conn.commit()
-        
-        logger.info(f"Promoted {orders_promoted} orders and {subitems_promoted} subitems to production")
-        return orders_promoted, subitems_promoted
+                elapsed_time = time.time() - start_time
+                records_per_second = rows_inserted / elapsed_time if elapsed_time > 0 else 0
+                
+                logger.info(f"Completed bulk insert: {rows_inserted} records in {elapsed_time:.2f} seconds")
+                logger.info(f"Performance: {records_per_second:.1f} records/second")
+                
+                return rows_inserted
+                
+            except Exception as e:
+                logger.error(f"Failed to perform bulk insert: {str(e)}")
+                logger.error(f"Exception type: {type(e).__name__}")
+                logger.error(f"Exception args: {e.args}")
+                
+                # Enhanced error logging
+                import traceback
+                logger.error(f"Full traceback:\n{traceback.format_exc()}")
+                
+                # Log the problematic data for debugging
+                logger.error(f"DataFrame shape: {filtered_df.shape}")
+                logger.error(f"DataFrame columns: {list(filtered_df.columns)}")
+                logger.error(f"DataFrame dtypes:\n{filtered_df.dtypes}")
+                
+                # Log sample data
+                if not filtered_df.empty:
+                    logger.error(f"Sample row:\n{filtered_df.iloc[0].to_dict()}")
+                
+                # Log sample prepared values
+                if values:
+                    logger.error(f"Sample prepared value tuple: {values[0]}")
+                    logger.error(f"Value tuple types: {[type(v) for v in values[0]]}")
+                
+                conn.rollback()
+                raise
     
     def cleanup_successful_staging(self, batch_id: str) -> int:
         """Clean up successful staging records after promotion"""
@@ -743,7 +907,7 @@ class StagingOperations:
             logger.info("No orders provided for subitem generation")
             return 0
         
-        logger.info(f"Generating subitems for {len(orders_df)} orders in batch {batch_id}")
+        logger.info(f"Generating SUBITEMS for {len(orders_df)} orders in batch {batch_id}")
         
         # First, get the stg_id values for inserted orders
         parent_query = """
@@ -812,6 +976,10 @@ class StagingOperations:
         # Convert to DataFrame and insert
         subitems_df = pd.DataFrame(all_subitems)
         logger.info(f"Generated {len(subitems_df)} subitems for insertion")
+
+        # print subitems_df as table
+        print(f"Sending batch id {batch_id} to get added to staging table")
+        print(subitems_df.to_string(index=False))
         
         # Use existing bulk insert method
         return self.insert_subitems_to_staging(subitems_df, batch_id)
@@ -908,7 +1076,7 @@ class StagingOperations:
     def generate_and_insert_subitems(self, batch_id: str) -> int:
         """Generate subitems using SQL JOIN + smart column detection"""
         
-        logger.info(f"Generating subitems for batch {batch_id}")
+        logger.info(f"Generating subitems from second function for batch {batch_id}")
         
         # OPTION 3: Single query to get staging metadata + original size data
         combined_query = """
@@ -925,6 +1093,7 @@ class StagingOperations:
         
         with self.get_connection() as conn:
             combined_df = pd.read_sql(combined_query, conn, params=[batch_id])
+
         
         if combined_df.empty:
             logger.warning(f"No orders found for subitem generation in batch {batch_id}")
@@ -990,6 +1159,8 @@ class StagingOperations:
                 
                 subitem_df = melted[final_cols]
                 all_subitems.append(subitem_df)
+
+
         
         if not all_subitems:
             logger.info("No subitems generated (no positive quantities found)")
@@ -1023,11 +1194,11 @@ class StagingOperations:
             
             if orphan_count > 0:
                 orphan_delete_query = """
-                    DELETE sub
-                    FROM [dbo].[STG_MON_CustMasterSchedule_Subitems] sub
-                    LEFT JOIN [dbo].[STG_MON_CustMasterSchedule] parent
-                        ON sub.stg_parent_stg_id = parent.stg_id
-                    WHERE parent.stg_id IS NULL
+                    DELETE FROM [dbo].[STG_MON_CustMasterSchedule_Subitems]
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM [dbo].[STG_MON_CustMasterSchedule]
+                        WHERE [dbo].[STG_MON_CustMasterSchedule].stg_id = [dbo].[STG_MON_CustMasterSchedule_Subitems].stg_parent_stg_id
+                    )
                 """
                 cursor.execute(orphan_delete_query)
                 results['orphans_deleted'] = cursor.rowcount
@@ -1056,3 +1227,261 @@ class StagingOperations:
         
         logger.info(f"Cleaned up all completed staging: {results}")
         return results
+
+    def promote_dbhelper(self, batch_id: str = None) -> Tuple[int, int]:
+        """
+        Test DB connection and query using db_helper.
+        Returns (row_count, 0) for compatibility.
+        """
+        import utils.db_helper as db
+        try:
+            result = db.run_query("SELECT TOP 5 * FROM dbo.ORDERS_UNIFIED", "orders")
+            print("Sample from ORDERS:\n", result)
+            return (len(result), 0)
+        except Exception as e:
+            print(f"❌ DB test failed: {e}")
+            return (0, 0)
+
+
+    def promote_successful_orders_to_production(self, batch_id: str) -> Tuple[int, int]:
+        """
+        Promote successful staging records to production MON_ tables using mapping file
+        
+        Args:
+            batch_id: The batch to promote
+            
+        Returns:
+            Tuple of (orders_promoted, subitems_promoted)
+        """
+        logger.info(f"Promoting successful records from batch {batch_id} to production")
+
+        # Load mapping file
+        try:
+            mapping_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'docs', 'mapping', 'stg_to_mon_promotion_mapping.json')
+            with open(mapping_file_path, 'r') as f:
+                mapping = json.load(f)
+        except Exception as e:
+            logger.error(f"Failed to load mapping file: {e}")
+            raise
+
+        # Get column mappings for orders
+        orders_mappings = mapping['tables']['orders']['mappings']
+        
+        # Build column lists for INSERT
+        mapped_columns = []
+        select_columns = []
+        
+        for mon_col, mapping_info in orders_mappings.items():
+            if 'stg_column' in mapping_info and 'mon_column' in mapping_info:
+                mapped_columns.append(f"[{mapping_info['mon_column']}]")
+                select_columns.append(f"[{mapping_info['stg_column']}]")
+                
+        orders_promoted = 0
+        subitems_promoted = 0
+        
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            try:
+                # Build dynamic INSERT based on mapping
+                promote_orders_query = f"""
+                    INSERT INTO [dbo].[MON_CustMasterSchedule] (
+                        {', '.join(mapped_columns)}
+                    )
+                    SELECT 
+                        {', '.join(select_columns)}
+                    FROM [dbo].[STG_MON_CustMasterSchedule]
+                    WHERE stg_batch_id = ? 
+                      AND stg_status = 'API_SUCCESS'
+                      AND stg_monday_item_id IS NOT NULL
+                """
+                
+                # logger.info(f"Generated promotion query:\n{promote_orders_query}")
+                
+                cursor.execute(promote_orders_query, (batch_id,))
+                orders_promoted = cursor.rowcount
+                
+                # Step 2: Promote successful subitems using mapping file
+                subitems_mappings = mapping['tables']['subitems']['mappings']
+                
+                # Build column lists for subitem INSERT
+                subitem_mapped_columns = []
+                subitem_select_columns = []
+                
+                for mon_col, mapping_info in subitems_mappings.items():
+                    if 'stg_column' in mapping_info and 'mon_column' in mapping_info:
+                        subitem_mapped_columns.append(f"[{mapping_info['mon_column']}]")
+                        subitem_select_columns.append(f"sub.[{mapping_info['stg_column']}]")
+                
+                promote_subitems_query = f"""
+                    INSERT INTO [dbo].[MON_CustMasterSchedule_Subitems] (
+                        {', '.join(subitem_mapped_columns)}
+                    )
+                    SELECT 
+                        {', '.join(subitem_select_columns)}
+                    FROM [dbo].[STG_MON_CustMasterSchedule_Subitems] sub
+                    INNER JOIN [dbo].[STG_MON_CustMasterSchedule] parent
+                        ON sub.stg_parent_stg_id = parent.stg_id
+                    WHERE parent.stg_batch_id = ?
+                      AND parent.stg_status = 'API_SUCCESS' 
+                      AND sub.stg_status = 'API_SUCCESS'
+                      AND sub.stg_monday_subitem_id IS NOT NULL
+                """
+                
+                # logger.info(f"Generated subitem promotion query:\n{promote_subitems_query}")
+                
+                cursor.execute(promote_subitems_query, (batch_id,))
+                subitems_promoted = cursor.rowcount
+                
+                # Step 3: Update staging records to mark as promoted
+                mark_promoted_query = """
+                    UPDATE [dbo].[STG_MON_CustMasterSchedule] 
+                    SET stg_status = 'PROMOTED'
+                    WHERE stg_batch_id = ? 
+                      AND stg_status = 'API_SUCCESS'
+                      AND stg_monday_item_id IS NOT NULL
+                """
+                cursor.execute(mark_promoted_query, (batch_id,))
+                
+                # Mark subitems as promoted
+                # Note: This assumes subitems are linked to parent items via stg_parent_stg_id
+                mark_subitems_promoted_query = """
+                    UPDATE sub
+                    SET stg_status = 'PROMOTED'
+                    FROM [dbo].[STG_MON_CustMasterSchedule_Subitems] sub
+                    INNER JOIN [dbo].[STG_MON_CustMasterSchedule] parent
+                        ON sub.stg_parent_stg_id = parent.stg_id
+                    WHERE parent.stg_batch_id = ?
+                    AND parent.stg_status = 'PROMOTED'
+                    AND sub.stg_monday_subitem_id IS NOT NULL
+                """
+
+
+                cursor.execute(mark_subitems_promoted_query, (batch_id,))
+                
+                conn.commit()
+                
+                logger.info(f"Promoted to production: {orders_promoted} orders, {subitems_promoted} subitems")
+                return orders_promoted, subitems_promoted
+                
+            except Exception as e:
+                conn.rollback()
+                logger.error(f"Failed to promote records to production: {e}")
+                raise
+
+    def validate_promotion_success(self, batch_id: str) -> Dict[str, any]:
+        """
+        Validate that promotion was successful by comparing staging vs production counts
+        
+        Args:
+            batch_id: The batch to validate
+            
+        Returns:
+            Dictionary with validation results
+        """
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Count staging records that should have been promoted
+            cursor.execute("""
+                SELECT COUNT(*) FROM [dbo].[STG_MON_CustMasterSchedule]
+                WHERE stg_batch_id = ? AND stg_status = 'PROMOTED'
+            """, (batch_id,))
+            staging_orders_promoted = cursor.fetchone()[0]
+            
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM [dbo].[STG_MON_CustMasterSchedule_Subitems] sub
+                INNER JOIN [dbo].[STG_MON_CustMasterSchedule] parent
+                    ON sub.stg_parent_stg_id = parent.stg_id
+                WHERE parent.stg_batch_id = ? AND sub.stg_status = 'PROMOTED'
+            """, (batch_id,))
+            staging_subitems_promoted = cursor.fetchone()[0]
+            
+            # Get Monday.com item IDs from promoted staging records
+            cursor.execute("""
+                SELECT stg_monday_item_id FROM [dbo].[STG_MON_CustMasterSchedule]
+                WHERE stg_batch_id = ? AND stg_status = 'PROMOTED'
+                  AND stg_monday_item_id IS NOT NULL
+            """, (batch_id,))
+            promoted_item_ids = [row[0] for row in cursor.fetchall()]
+            
+            # Count corresponding records in production tables
+            production_orders_count = 0
+            production_subitems_count = 0
+            
+            if promoted_item_ids:
+                item_ids_str = ','.join(map(str, promoted_item_ids))
+                
+                cursor.execute(f"""
+                    SELECT COUNT(*) FROM [dbo].[MON_CustMasterSchedule]
+                    WHERE [Item ID] IN ({item_ids_str})
+                """)
+                production_orders_count = cursor.fetchone()[0]
+                
+                cursor.execute(f"""
+                    SELECT COUNT(*) FROM [dbo].[MON_CustMasterSchedule_Subitems]
+                    WHERE [parent_item_id] IN ({item_ids_str})
+                """)
+                production_subitems_count = cursor.fetchone()[0]
+            
+            validation_result = {
+                'batch_id': batch_id,
+                'staging_orders_promoted': staging_orders_promoted,
+                'staging_subitems_promoted': staging_subitems_promoted,
+                'production_orders_found': production_orders_count,
+                'production_subitems_found': production_subitems_count,
+                'orders_match': staging_orders_promoted == production_orders_count,
+                'subitems_match': staging_subitems_promoted == production_subitems_count,
+                'validation_passed': (staging_orders_promoted == production_orders_count and 
+                                    staging_subitems_promoted == production_subitems_count),
+                'promoted_item_ids': promoted_item_ids
+            }
+            
+            logger.info(f"Promotion validation: {validation_result}")
+            return validation_result
+
+    def cleanup_promoted_staging_records(self, batch_id: str) -> Dict[str, int]:
+        """
+        Clean up staging records that have been successfully promoted to production
+        
+        Args:
+            batch_id: The batch to clean up
+            
+        Returns:
+            Dictionary with cleanup results
+        """
+        logger.info(f"Cleaning up promoted staging records for batch {batch_id}")
+        
+        results = {'orders_deleted': 0, 'subitems_deleted': 0}
+        
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            try:
+                # Count subitems that will be deleted (for reporting)
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM [dbo].[STG_MON_CustMasterSchedule_Subitems] sub
+                    INNER JOIN [dbo].[STG_MON_CustMasterSchedule] parent
+                        ON sub.stg_parent_stg_id = parent.stg_id
+                    WHERE parent.stg_batch_id = ? AND parent.stg_status = 'PROMOTED'
+                """, (batch_id,))
+                results['subitems_deleted'] = cursor.fetchone()[0]
+                
+                # Delete promoted orders (CASCADE will handle subitems)
+                cursor.execute("""
+                    DELETE FROM [dbo].[STG_MON_CustMasterSchedule]
+                    WHERE stg_batch_id = ? AND stg_status = 'PROMOTED'
+                """, (batch_id,))
+                results['orders_deleted'] = cursor.rowcount
+                
+                conn.commit()
+                
+                logger.info(f"Cleaned up promoted staging: {results}")
+                return results
+                
+            except Exception as e:
+                conn.rollback()
+                logger.error(f"Failed to clean up promoted staging records: {e}")
+                raise
