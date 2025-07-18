@@ -55,7 +55,7 @@ if not logger.handlers:  # Only configure if not already configured
     
     # Try to add file handler (fallback to console if fails)
     try:
-        log_file = repo_root / 'monday_integration.log'
+        log_file = repo_root / '__logs' / 'monday_integration.log'
         file_handler = logging.FileHandler(log_file)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)

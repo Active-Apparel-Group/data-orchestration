@@ -27,7 +27,7 @@ Usage:
 
 Examples:
     python create_script_mappings.py board_8709134353_metadata.json
-    python create_script_mappings.py board_8709134353_metadata.json --toml -o planning_update.toml
+    python create_script_mappings.py board_8446553051_metadata.json --toml -o fabric_library_update.toml
 """
 #----
 

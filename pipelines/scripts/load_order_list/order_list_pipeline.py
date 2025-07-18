@@ -322,14 +322,14 @@ class OrderListPipeline:
             total_records = int(count_result['total_records'].iloc[0]) if not count_result.empty else 0
             validations['total_records'] = total_records
             
-            # 2. Data quality checks
+            # 2. Data quality checks - FIXED COLUMN NAMES
             quality_query = """
                 SELECT 
                     COUNT(*) as total_records,
                     COUNT(CASE WHEN [AAG ORDER NUMBER] IS NOT NULL AND [AAG ORDER NUMBER] != '' THEN 1 END) as valid_order_numbers,
-                    COUNT(CASE WHEN [CUSTOMER] IS NOT NULL AND [CUSTOMER] != '' THEN 1 END) as valid_customers,
-                    COUNT(CASE WHEN [ORDER QTY] IS NOT NULL AND TRY_CAST([ORDER QTY] AS INT) IS NOT NULL THEN 1 END) as valid_quantities,
-                    COUNT(DISTINCT [CUSTOMER]) as unique_customers,
+                    COUNT(CASE WHEN [CUSTOMER NAME] IS NOT NULL AND [CUSTOMER NAME] != '' THEN 1 END) as valid_customers,
+                    COUNT(CASE WHEN [TOTAL QTY] IS NOT NULL AND TRY_CAST([TOTAL QTY] AS INT) IS NOT NULL THEN 1 END) as valid_quantities,
+                    COUNT(DISTINCT [CUSTOMER NAME]) as unique_customers,
                     COUNT(DISTINCT [_SOURCE_TABLE]) as source_tables
                 FROM ORDER_LIST
             """

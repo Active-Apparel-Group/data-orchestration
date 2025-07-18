@@ -1,0 +1,123 @@
+# OPUS Universal Monday.com Update Configuration
+# Generated from: board_8446553051_metadata.json
+# Generated at: 2025-07-18 20:32:09
+# Board: Fabric Library (8446553051)
+
+[metadata]
+board_id = 8446553051
+board_name = "Fabric Library"
+table_name = "MON_FabricLibrary"
+database = "orders"
+update_type = "batch_item_updates"
+description = "Update Fabric Library items with latest data"
+
+[query_config]
+# SQL query to get update data
+query = """
+# TODO: Add your SQL query here
+# SELECT
+#     [Item ID] as monday_item_id,
+#     -- Add your columns here
+# FROM your_table
+# WHERE your_conditions
+"""
+
+# Column mapping configuration
+item_id_column = "monday_item_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+# Name
+"name" = "Name"
+# Subitems
+"subitems__1" = "Subitems"
+# AAG CODE
+"text_mkp76vjb" = "AAG CODE"
+# ND/NS
+"dropdown_mkp77009" = "ND/NS"
+# ND/NS CODE
+"text52__1" = "ND/NS CODE"
+# MILL ARTICLE
+"long_text_mknrt8cw" = "MILL ARTICLE"
+# ACTIVE
+"color_mkp8aj5b" = "ACTIVE"
+# OLD CODE
+"text_mkn1cyzh" = "OLD CODE"
+# FABRIC NAME
+"long_text_mkp8xcgs" = "FABRIC NAME"
+# FABRIC NAME CN
+"long_text_mkp8dhax" = "FABRIC NAME CN"
+# MATERIAL TYPE
+"dropdown_mknqp252" = "MATERIAL TYPE"
+# FABRIC GROUP
+"fabric_group_mkn1beyp" = "FABRIC GROUP"
+# COMPOSITION
+"long_text_mkp84462" = "COMPOSITION"
+# GSM
+"numeric_mkp7qq6e" = "GSM"
+# WIDTH (CM)
+"numeric_mkp7zh86" = "WIDTH (CM)"
+# CUTTABLE WIDTH (CM)
+"numeric_mkp720dp" = "CUTTABLE WIDTH (CM)"
+# MILL
+"text9__1" = "MILL"
+# COO
+"dup__of_mill__1" = "COO"
+# PRICE
+"numeric_mkp7haq1" = "PRICE"
+# PRICING UNIT
+"dropdown_mkp8wqcp" = "PRICING UNIT"
+# CURRENCY
+"board_relation_mkp84dhd" = "CURRENCY"
+# UNIT OF MEASURE
+"dropdown_mkp8grj3" = "UNIT OF MEASURE"
+# CURR CONV
+"board_relation_mkp8wvtg" = "CURR CONV"
+# FX Rate
+"lookup_mkp89rvr" = "FX Rate"
+# RMB/M
+"numbers_mkn17eyn" = "RMB/M"
+# USD/M
+"numbers_1_mkn18nps" = "USD/M"
+# MOQ (M)
+"numbers7__1" = "MOQ (M)"
+# MCQ (M)
+"dup__of_moq__1" = "MCQ (M)"
+# MOQ (SURCHARGE)
+"moq__surcharge__mkn2t977" = "MOQ (SURCHARGE)"
+# MCQ (M) SURCHARGE
+"mcq__m__surcharge_mkn29gkd" = "MCQ (M) SURCHARGE"
+# LEAD TIME
+"numeric_mkp8hn10" = "LEAD TIME"
+# YIELD
+"numeric_mkp8qce3" = "YIELD"
+# KNITTING
+"numbers3__1" = "KNITTING"
+# DYEING/FINISHING
+"numbers_1__1" = "DYEING/FINISHING"
+# FABRIC TRANSIT
+"numbers_2__1" = "FABRIC TRANSIT"
+# TOTAL FABRIC L/T
+"formula__1" = "TOTAL FABRIC L/T"
+# FDS - AAG
+"files__1" = "FDS - AAG"
+# FDS/FIS - FROM CUSTOMER
+"files2__1" = "FDS/FIS - FROM CUSTOMER"
+# CARE INSTRUCTIONS
+"long_text_mkn1fdc7" = "CARE INSTRUCTIONS"
+# TEST REPORTS
+"files1__1" = "TEST REPORTS"
+# SPECIAL PROPERTY TESTING
+"file_mknq9sa8" = "SPECIAL PROPERTY TESTING"
+# SPECIAL PROPERTIES
+"long_text_mkp82z9x" = "SPECIAL PROPERTIES"
+# NOTES
+"long_text_mkp8jkfc" = "NOTES"
+# CUSTOMER
+"dropdown__1" = "CUSTOMER"
+# NOMINATED
+"dropdown_mkp89d7s" = "NOMINATED"
+# ECO
+"dropdown_mkp8pzg7" = "ECO"
+# Item ID
+"pulse_id_mkp727kj" = "Item ID"

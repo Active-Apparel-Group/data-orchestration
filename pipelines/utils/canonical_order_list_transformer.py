@@ -65,19 +65,33 @@ class CanonicalOrderListTransformer:
         self.logger.info(f"Customer canonicalization: '{customer_from_table}' → '{canonical_customer}'")
         self.logger.info(f"Source customer name: '{source_customer_name}'")
         
-        # Build SELECT expressions with canonical customer injection
-        select_expressions = [
-            f"'{canonical_customer}' AS [CANONICAL_CUSTOMER]",  # Inject canonical customer
-            f"'{source_customer_name or customer_from_table}' AS [SOURCE_CUSTOMER_NAME]",  # Original from config or table
-            f"'{customer_from_table}' AS [customer_source]"  # Table source identifier
-        ]
+        # Build SELECT expressions - SIMPLE APPROACH
+        select_expressions = []
         
-        # Add other column mappings (existing logic)
+        # Process all DDL columns 
         for col in ddl_columns:
-            if col["name"] in ["CANONICAL_CUSTOMER", "SOURCE_CUSTOMER_NAME", "customer_source"]:
-                continue  # Skip - already added above
-                
             canonical_name = col["name"]
+            
+            # Special handling for canonical customer columns
+            if canonical_name == "CUSTOMER NAME":
+                # Keep original customer name - we'll update it later with bulk UPDATE
+                if f"[{canonical_name}]" in self._get_table_columns(table_name):
+                    select_expressions.append(f"[{canonical_name}]")
+                else:
+                    select_expressions.append(f"NULL AS [{canonical_name}]")
+                continue
+            elif canonical_name == "SOURCE_CUSTOMER_NAME":
+                # Use CUSTOMER NAME as SOURCE_CUSTOMER_NAME (alias approach)
+                if "[CUSTOMER NAME]" in self._get_table_columns(table_name):
+                    select_expressions.append(f"[CUSTOMER NAME] AS [{canonical_name}]")
+                else:
+                    select_expressions.append(f"'{customer_from_table}' AS [{canonical_name}]")
+                continue
+            elif canonical_name == "_SOURCE_TABLE":
+                select_expressions.append(f"'{table_name}' AS [{canonical_name}]")
+                continue
+            
+            # For all other columns, find matches in raw table
             candidates = [canonical_name] + col.get("aliases", [])
             
             # Find column match in raw table
@@ -105,7 +119,7 @@ class CanonicalOrderListTransformer:
                     select_expressions.append(f"CAST(NULL AS NVARCHAR(255)) AS [{canonical_name}]")
         
         # Generate final SQL with canonical customer integration
-        sql = f"""
+        insert_sql = f"""
         INSERT INTO [dbo].[swp_ORDER_LIST] 
         SELECT 
             {','.join(select_expressions)}
@@ -113,7 +127,37 @@ class CanonicalOrderListTransformer:
         WHERE [CUSTOMER NAME] IS NOT NULL  -- Data quality filter
         """
         
-        return sql
+        # Generate the bulk UPDATE statement for canonical customer mapping
+        update_sql = f"""
+        UPDATE [dbo].[swp_ORDER_LIST] 
+        SET [CUSTOMER NAME] = '{canonical_customer}'
+        WHERE [_SOURCE_TABLE] = '{table_name}'
+        """
+        
+        # Combine INSERT and UPDATE into single transaction
+        complete_sql = f"""
+        BEGIN TRANSACTION;
+        {insert_sql.strip()};
+        {update_sql.strip()};
+        COMMIT;
+        """
+        
+        return complete_sql
+    
+    def _get_table_columns(self, table_name: str) -> list:
+        """Get column names from a table"""
+        try:
+            with db.get_connection('orders') as conn:
+                schema_query = f"""
+                SELECT COLUMN_NAME 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = '{table_name}'
+                """
+                columns_df = pd.read_sql(schema_query, conn)
+                return [f"[{col}]" for col in columns_df['COLUMN_NAME'].tolist()]
+        except Exception as e:
+            self.logger.error(f"Error getting columns for table {table_name}: {e}")
+            return []
     
     def _find_column_match(self, table_name: str, candidates: list) -> str:
         """Find first matching column in raw table"""

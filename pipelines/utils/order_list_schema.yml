@@ -16,6 +16,12 @@ columns:
   rules:
   - trim
   pk: false
+- name: SOURCE_CUSTOMER_NAME
+  aliases: []
+  type: string
+  rules:
+  - trim
+  pk: false
 - name: ORDER DATE PO RECEIVED
   aliases: []
   type: datetime2

@@ -36,7 +36,7 @@ venv.bak/
 .venv
 
 # Environment variables
-.env
+.env*
 .env.local
 .env.*.local
 
@@ -115,4 +115,5 @@ config.yml
 
 # Backup files
 __backup/
+__legacy/
 .backup

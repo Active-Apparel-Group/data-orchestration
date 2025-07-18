@@ -45,7 +45,11 @@ def get_logger(name="monday_integration"):
                 else:
                     repo_root = Path.cwd()
                 
-                log_file = repo_root / 'monday_integration.log'
+                # Create __logs directory if it doesn't exist
+                logs_dir = repo_root / '__logs'
+                logs_dir.mkdir(exist_ok=True)
+                
+                log_file = logs_dir / 'monday_integration.log'
                 file_handler = logging.FileHandler(log_file)
                 file_handler.setFormatter(formatter)
                 logger.addHandler(file_handler)

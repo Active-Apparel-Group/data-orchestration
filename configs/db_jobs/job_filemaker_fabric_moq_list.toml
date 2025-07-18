@@ -1,0 +1,53 @@
+# Database-to-Database ETL Job Configuration
+# Job: Filemaker Fabric
+# Created: 2025-06-29
+# 
+# This is a test job configuration for extracting data from quickdata database
+# and loading it into the orders database. Update the queries and mappings below.
+
+[meta]
+job_name = "filemaker_fabric_supplier_moq_list"
+description = "Copy data from filemaker to orders database"
+created_date = "2025-06-29"
+created_by = "system"
+
+[source]
+db_name = "longson"
+file = "sql/operations/views/v_fabric_supplier_moq_list.sql"
+# Override with your specific query:
+
+[target]
+db_name = "orders"
+table = "FM_fabric_supplier_moq_list"
+# Options: "replace", "append", "truncate_insert"
+load_mode = "replace"
+
+[options]
+# ETL options
+use_staging_table = true
+atomic_swap = true
+chunk_size = 1000
+timeout = 300
+validate_schema = false
+log_sample_data = true
+drop_target_first = true
+retain_float = false  # or false (default)
+
+[exclude]
+# Columns to exclude from source (optional)
+columns = []
+
+
+# Mapping section commented out - not needed for this test
+# [mapping]
+# Map source columns to target columns
+# source_column = "target_column"
+# id = "record_id"
+# name = "record_name"
+# created_date = "created_at"
+# updated_date = "updated_at"
+
+# [transform]
+# Optional: column-specific transforms using Python expressions
+# column_name = "lambda x: x.upper()"
+# status = "lambda x: 'ACTIVE' if x else 'INACTIVE'"

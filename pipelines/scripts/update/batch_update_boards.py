@@ -380,7 +380,7 @@ class BatchMondayUpdater:
         error_count = 0
         
         # Load single update template
-        template_path = repo_root / "integrations" / "graphql" / "mutations" / "update_item.graphql"
+        template_path = repo_root / "sql" / "graphql" / "mutations" / "update_item.graphql"
         with open(template_path, 'r') as f:
             update_query = f.read()
         

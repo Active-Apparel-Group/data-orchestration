@@ -126,18 +126,18 @@ class UniversalMondayUpdater:
         return str(value)
     
     def load_graphql_template(self, template_name: str) -> str:
-        """Load GraphQL template from integrations/graphql/mutations/"""
-        # Get repo root from current location (must have both utils and integrations)
+        """Load GraphQL template from sql/graphql/mutations/"""
+        # Get repo root from current location (must have utils folder)
         current = Path(__file__).parent
         while current != current.parent:
-            if (current / "utils").exists() and (current / "integrations").exists():
+            if (current / "utils").exists():
                 repo_root = current
                 break
             current = current.parent
         else:
-            raise FileNotFoundError("Could not find repository root (needs both utils and integrations folders)")
+            raise FileNotFoundError("Could not find repository root (needs utils folder)")
             
-        template_path = repo_root / "integrations" / "graphql" / "mutations" / f"{template_name}.graphql"
+        template_path = repo_root / "sql" / "graphql" / "mutations" / f"{template_name}.graphql"
         
         if not template_path.exists():
             raise FileNotFoundError(f"GraphQL template not found: {template_path}")
