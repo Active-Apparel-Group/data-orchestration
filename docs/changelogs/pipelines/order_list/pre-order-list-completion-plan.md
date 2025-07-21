@@ -1,6 +1,6 @@
 # 🎯 Pre-Order-List Project Completion Plan
 
-> **Goal**: Complete repository restructure foundation before starting order-list-delta-monday-sync project
+> **Goal**: Complete repository restructure foundation before starting sync-order-list-monday project
 
 ## 📋 **Required Completion Checklist**
 
@@ -54,7 +54,7 @@ rmdir pipelines\integrations /s /q
 - [ ] Update documentation references
 
 #### **1.4 Order-List Specific Prep** (10 minutes)
-- [ ] Create `src/pipelines/order_delta_sync/` module
+- [ ] Create `src/pipelines/sync_order_list/` module
 - [ ] Create `configs/pipelines/` for TOML configs
 - [ ] Prepare `sql/operations/` for 003-006.sql files
 - [ ] Set up `db/migrations/` for schema changes
@@ -66,7 +66,7 @@ rmdir pipelines\integrations /s /q
 **Impact**: Clear development guidance
 
 #### **2.1 Documentation Updates**
-- [x] ✅ Updated execution tree in order-list-delta-monday-sync.md
+- [x] ✅ Updated execution tree in sync-order-list-monday.md
 - [x] ✅ Added integration section showing existing infrastructure leverage
 - [x] ✅ File placement guidelines created
 - [ ] Create order-list project folder structure
@@ -74,9 +74,9 @@ rmdir pipelines\integrations /s /q
 #### **2.2 Folder Preparation**
 ```powershell
 # Create order-list specific structure
-mkdir src\pipelines\order_delta_sync
+mkdir src\pipelines\sync_order_list
 mkdir configs\pipelines
-mkdir docs\implementation\order_delta_sync
+mkdir docs\implementation\sync_order_list
 
 # Prepare for SQL files
 # 001-002 will go in db/migrations/
@@ -151,4 +151,4 @@ Before starting order-list project, validate:
 - [ ] **Foundation**: Folders ready for order-list SQL files
 - [ ] **Documentation**: Updated and aligned with structure
 
-**When all checked**: Ready to start order-list-delta-monday-sync development! 🚀
+**When all checked**: Ready to start sync-order-list-monday development! 🚀

@@ -123,9 +123,9 @@ Following project [test.instructions.md](../../.github/instructions/test.instruc
 
 ### Database Testing Pattern
 ```python
-# Always use actual database connections
+# Always use actual database connections to 'orders' database
 with db.get_connection('orders') as conn:
-    sql = "SELECT COUNT(*) FROM ORDER_LIST WHERE [criteria]"
+    sql = "SELECT COUNT(*) FROM ORDER_LIST_V2 WHERE [criteria]"
     result = pd.read_sql(sql, conn)
     
 # Validate against expected criteria
@@ -141,7 +141,7 @@ validation = {
 ```python
 # Load and validate TOML configuration
 import tomli
-config_path = Path("configs/pipelines/order_list_delta_sync_dev.toml")
+config_path = Path("configs/pipelines/sync_order_list_dev.toml")
 with open(config_path, 'rb') as f:
     config = tomli.load(f)
 
@@ -208,7 +208,7 @@ missing_sections = [s for s in required_sections if s not in config]
 
 ### Before Each Milestone:
 - [ ] All test files follow ASCII-only output standards
-- [ ] Database connections use appropriate config (orders, dms, dms_item, infor_132)
+- [ ] Database connections use 'orders' database (contains ORDER_LIST tables)
 - [ ] Configuration loading uses correct TOML patterns
 - [ ] Import paths follow modern src/pipelines/ structure
 - [ ] Success criteria clearly defined with numeric thresholds
@@ -243,6 +243,6 @@ missing_sections = [s for s in required_sections if s not in config]
 
 **Test Framework Reference**: [.github/instructions/test.instructions.md](../../.github/instructions/test.instructions.md)  
 **Development Standards**: [.github/instructions/copilot.instructions.md](../../.github/instructions/copilot.instructions.md)  
-**Project Overview**: [docs/changelogs/order-list-delta-monday-sync.md](../changelogs/order-list-delta-monday-sync.md)
+**Project Overview**: [docs/changelogs/sync-order-list-monday.md](../changelogs/sync-order-list-monday.md)
 
 **Testing Philosophy**: Validate early, validate often, validate with actual data.

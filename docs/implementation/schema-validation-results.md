@@ -77,7 +77,7 @@ The schema foundation is **solid and validated**. The merge operations are **arc
 **Files Validated:**
 - ✅ `db/migrations/001_create_shadow_tables.sql` - Complete shadow table schema  
 - ✅ `sql/operations/003_merge_headers.sql` - Merge operations corrected and validated
-- ✅ `configs/pipelines/order_list_delta_sync_dev.toml` - Configuration framework ready
+- ✅ `configs/pipelines/sync_order_list_dev.toml` - Configuration framework ready
 
 **Tools Created:**
 - ✅ `tools/validate_schema_references.py` - Production schema validator

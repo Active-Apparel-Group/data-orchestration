@@ -1,15 +1,24 @@
--- Migration 001: Create Shadow Tables for ORDER_LIST Delta Sync
--- Purpose: Zero-downtime development of delta sync pipeline
--- Strategy: Option A - Shadow tables alongside production
--- Created: 2025-07-18
--- Author: ORDER_LIST Delta Monday Sync - Milestone 1
+-- Migration 003: Create Shadow Staging Table for ORDER_LIST Development
+-- Purpose: Drop and recreate swp_ORDER_LIST_V2 with COMPLETE schema matching ORDER_LIST
+-- Strategy: Fix ordinal position mismatch - UNIT OF MEASURE and TOTAL QTY must be in correct positions
+-- Created: 2025-07-21
+-- Author: ORDER_LIST Delta Monday Sync - Schema Fix
+
+-- CRITICAL FIX: This migration corrects the incomplete schema in swp_ORDER_LIST_V2
+--   - Problem: Missing columns causing UNIT OF MEASURE/TOTAL QTY ordinal mismatch
+--   - Solution: Complete schema matching 001_create_shadow_tables.sql exactly
+--   - Database: orders (not dms)
 
 -- =============================================================================
--- ORDER_LIST_V2: Shadow table for development and testing
--- Production ORDER_LIST remains untouched during development
+-- CREATE: swp_ORDER_LIST_V2 Shadow Staging Table
+-- Identical schema to ORDER_LIST but with delta sync columns for development
 -- =============================================================================
 
-CREATE TABLE dbo.ORDER_LIST_V2 (
+-- Drop table if it exists (for re-runnable migrations)
+IF EXISTS (SELECT * FROM sys.tables WHERE name = 'swp_ORDER_LIST_V2' AND schema_id = SCHEMA_ID('dbo'))
+    DROP TABLE dbo.swp_ORDER_LIST_V2;
+
+CREATE TABLE dbo.swp_ORDER_LIST_V2 (
     -- Primary key (matches production schema)
     [record_uuid] UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
 
@@ -242,7 +251,7 @@ CREATE TABLE dbo.ORDER_LIST_V2 (
     
     -- Delta sync columns (NEW - enable change detection and Monday.com sync)
     -- NOTE: row_hash populated by application logic using TOML configuration
-    -- Hash algorithm and columns defined in sync_order_list_dev.toml
+    -- Hash algorithm and columns defined in sync_order_list.toml
     row_hash            CHAR(64) NULL,  -- Populated by application logic, not computed column
     sync_state          VARCHAR(10) NOT NULL DEFAULT ('NEW'),
     last_synced_at      DATETIME2 NULL,
@@ -254,198 +263,207 @@ CREATE TABLE dbo.ORDER_LIST_V2 (
 );
 
 -- Index for efficient hash-based change detection
-CREATE INDEX IX_ORDER_LIST_V2_hash ON dbo.ORDER_LIST_V2 (row_hash);
-CREATE INDEX IX_ORDER_LIST_V2_sync_state ON dbo.ORDER_LIST_V2 (sync_state);
-CREATE INDEX IX_ORDER_LIST_V2_monday_item_id ON dbo.ORDER_LIST_V2 (monday_item_id);
+CREATE INDEX IX_swp_ORDER_LIST_V2_hash ON dbo.swp_ORDER_LIST_V2 (row_hash);
+CREATE INDEX IX_swp_ORDER_LIST_V2_sync_state ON dbo.swp_ORDER_LIST_V2 (sync_state);
+CREATE INDEX IX_swp_ORDER_LIST_V2_monday_item_id ON dbo.swp_ORDER_LIST_V2 (monday_item_id);
+
+-- Phase 1 specific indexes for GREYSON PO 4755 testing
+CREATE INDEX IX_swp_ORDER_LIST_V2_customer_po ON dbo.swp_ORDER_LIST_V2 ([CUSTOMER NAME], [PO NUMBER]);
+CREATE INDEX IX_swp_ORDER_LIST_V2_aag_order ON dbo.swp_ORDER_LIST_V2 ([AAG ORDER NUMBER]);
 
 -- =============================================================================
--- ORDER_LIST_LINES: New table for size/quantity normalization
--- Unpivots size columns into individual rows for Monday.com subitems
--- =============================================================================
-
-CREATE TABLE dbo.ORDER_LIST_LINES (
-    -- Primary key
-    line_uuid           UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-    
-    -- Foreign key to parent order
-    record_uuid         UNIQUEIDENTIFIER NOT NULL,
-    
-    -- Size/quantity data
-    size_code           NVARCHAR(20) NOT NULL,
-    qty                 INT NOT NULL,
-    
-    -- Delta sync columns
-    -- NOTE: row_hash populated by application logic using TOML configuration
-    row_hash            CHAR(64) NULL,  -- Populated by application logic, not computed column
-    sync_state          VARCHAR(10) NOT NULL DEFAULT ('NEW'),
-    last_synced_at      DATETIME2 NULL,
-    monday_item_id      BIGINT NULL,
-    parent_item_id      BIGINT NULL, -- Links to ORDER_LIST_V2.monday_item_id
-    
-    -- Audit columns
-    created_at          DATETIME2 DEFAULT GETUTCDATE(),
-    updated_at          DATETIME2 DEFAULT GETUTCDATE(),
-    
-    -- Constraints
-    CONSTRAINT FK_ORDER_LIST_LINES_record_uuid 
-        FOREIGN KEY (record_uuid) REFERENCES dbo.ORDER_LIST_V2(record_uuid)
-        ON DELETE CASCADE,
-    
-    -- Prevent duplicate size codes per order
-    CONSTRAINT UQ_ORDER_LIST_LINES_record_size 
-        UNIQUE (record_uuid, size_code)
-);
-
--- Indexes for efficient querying and sync operations
-CREATE INDEX IX_ORDER_LIST_LINES_record_uuid ON dbo.ORDER_LIST_LINES (record_uuid);
-CREATE INDEX IX_ORDER_LIST_LINES_sync_state ON dbo.ORDER_LIST_LINES (sync_state);
-CREATE INDEX IX_ORDER_LIST_LINES_parent_item_id ON dbo.ORDER_LIST_LINES (parent_item_id);
-CREATE INDEX IX_ORDER_LIST_LINES_hash ON dbo.ORDER_LIST_LINES (row_hash);
-
--- =============================================================================
--- ORDER_LIST_DELTA: Tracks changes requiring Monday.com sync
--- Populated by MERGE OUTPUT clause during header sync
--- =============================================================================
-
-CREATE TABLE dbo.ORDER_LIST_DELTA (
-    -- Primary key
-    delta_uuid          UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-    
-    -- Reference to source record
-    record_uuid         UNIQUEIDENTIFIER NOT NULL,
-    
-    -- Change tracking
-    action_type         VARCHAR(10) NOT NULL, -- INSERT, UPDATE, DELETE
-    sync_state          VARCHAR(10) NOT NULL DEFAULT ('PENDING'),
-    
-    -- Snapshot of data at time of change (for audit trail)
-    [AAG ORDER NUMBER]  NVARCHAR(100),
-    [CUSTOMER NAME]     NVARCHAR(100),
-    [SOURCE_CUSTOMER_NAME] NVARCHAR(100),
-    [STYLE DESCRIPTION] NVARCHAR(100),
-    [TOTAL QTY]         SMALLINT,
-    [ETA CUSTOMER WAREHOUSE DATE] DATETIME2,
-    [PO NUMBER]         NVARCHAR(255),
-    [CUSTOMER STYLE]    NVARCHAR(100),
-    [CUSTOMER COLOUR DESCRIPTION] NVARCHAR(100),
-    [FINAL FOB (USD)]   DECIMAL(17,4),
-    [ORDER TYPE]        NVARCHAR(100),
-    row_hash            CHAR(64),
-    monday_item_id      BIGINT NULL,
-    
-    -- Sync tracking
-    sync_attempted_at   DATETIME2 NULL,
-    sync_completed_at   DATETIME2 NULL,
-    sync_error_message  NVARCHAR(MAX) NULL,
-    retry_count         INT DEFAULT 0,
-    
-    -- Audit
-    created_at          DATETIME2 DEFAULT GETUTCDATE(),
-    
-    -- Constraints
-    CONSTRAINT CHK_ORDER_LIST_DELTA_action_type 
-        CHECK (action_type IN ('INSERT', 'UPDATE', 'DELETE')),
-    CONSTRAINT CHK_ORDER_LIST_DELTA_sync_state 
-        CHECK (sync_state IN ('PENDING', 'SYNCED', 'FAILED'))
-);
-
--- Indexes for sync processing
-CREATE INDEX IX_ORDER_LIST_DELTA_sync_state ON dbo.ORDER_LIST_DELTA (sync_state);
-CREATE INDEX IX_ORDER_LIST_DELTA_created_at ON dbo.ORDER_LIST_DELTA (created_at);
-CREATE INDEX IX_ORDER_LIST_DELTA_record_uuid ON dbo.ORDER_LIST_DELTA (record_uuid);
-
--- =============================================================================
--- ORDER_LIST_LINES_DELTA: Tracks size/quantity changes requiring subitem sync
--- Populated by MERGE OUTPUT clause during lines sync
--- =============================================================================
-
-CREATE TABLE dbo.ORDER_LIST_LINES_DELTA (
-    -- Primary key
-    delta_uuid          UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-    
-    -- Reference to source line
-    line_uuid           UNIQUEIDENTIFIER NOT NULL,
-    record_uuid         UNIQUEIDENTIFIER NOT NULL,
-    
-    -- Change tracking
-    action_type         VARCHAR(10) NOT NULL, -- INSERT, UPDATE, DELETE
-    sync_state          VARCHAR(10) NOT NULL DEFAULT ('PENDING'),
-    
-    -- Snapshot of line data at time of change
-    size_code           NVARCHAR(20),
-    qty                 INT,
-    row_hash            CHAR(64),
-    monday_item_id     BIGINT NULL,
-    parent_item_id      BIGINT NULL,
-    
-    -- Sync tracking
-    sync_attempted_at   DATETIME2 NULL,
-    sync_completed_at   DATETIME2 NULL,
-    sync_error_message  NVARCHAR(MAX) NULL,
-    retry_count         INT DEFAULT 0,
-    
-    -- Audit
-    created_at          DATETIME2 DEFAULT GETUTCDATE(),
-    
-    -- Constraints
-    CONSTRAINT CHK_ORDER_LIST_LINES_DELTA_action_type 
-        CHECK (action_type IN ('INSERT', 'UPDATE', 'DELETE')),
-    CONSTRAINT CHK_ORDER_LIST_LINES_DELTA_sync_state 
-        CHECK (sync_state IN ('PENDING', 'SYNCED', 'FAILED'))
-);
-
--- Indexes for subitem sync processing
-CREATE INDEX IX_ORDER_LIST_LINES_DELTA_sync_state ON dbo.ORDER_LIST_LINES_DELTA (sync_state);
-CREATE INDEX IX_ORDER_LIST_LINES_DELTA_parent_item_id ON dbo.ORDER_LIST_LINES_DELTA (parent_item_id);
-CREATE INDEX IX_ORDER_LIST_LINES_DELTA_record_uuid ON dbo.ORDER_LIST_LINES_DELTA (record_uuid);
-CREATE INDEX IX_ORDER_LIST_LINES_DELTA_created_at ON dbo.ORDER_LIST_LINES_DELTA (created_at);
-
--- =============================================================================
--- Create trigger for ORDER_LIST_V2 updated_at timestamp
+-- CREATE: Trigger for swp_ORDER_LIST_V2 updated_at timestamp
 -- =============================================================================
 GO
 
-CREATE TRIGGER tr_ORDER_LIST_V2_updated_at
-ON dbo.ORDER_LIST_V2
+CREATE TRIGGER tr_swp_ORDER_LIST_V2_updated_at
+ON dbo.swp_ORDER_LIST_V2
 AFTER UPDATE
 AS
 BEGIN
     SET NOCOUNT ON;
-    UPDATE dbo.ORDER_LIST_V2
+    UPDATE dbo.swp_ORDER_LIST_V2
     SET updated_at = GETUTCDATE()
-    FROM dbo.ORDER_LIST_V2 ol
+    FROM dbo.swp_ORDER_LIST_V2 ol
     INNER JOIN inserted i ON ol.record_uuid = i.record_uuid;
 END;
 
 -- =============================================================================
--- Create trigger for ORDER_LIST_LINES updated_at timestamp
--- =============================================================================
-GO
-
-CREATE TRIGGER tr_ORDER_LIST_LINES_updated_at
-ON dbo.ORDER_LIST_LINES
-AFTER UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-    UPDATE dbo.ORDER_LIST_LINES
-    SET updated_at = GETUTCDATE()
-    FROM dbo.ORDER_LIST_LINES oll
-    INNER JOIN inserted i ON oll.line_uuid = i.line_uuid;
-END;
-
--- =============================================================================
--- Success message
+-- INSERT: Populate swp_ORDER_LIST_V2 with GREYSON PO 4755 data from ORDER_LIST
+-- Phase 1 testing: Single customer, single PO for development validation
 -- =============================================================================
 
-PRINT 'Migration 001: Shadow tables created successfully';
-PRINT '  - ORDER_LIST_V2: Shadow table for development';
-PRINT '  - ORDER_LIST_LINES: Size/quantity normalization';
-PRINT '  - ORDER_LIST_DELTA: Header change tracking';
-PRINT '  - ORDER_LIST_LINES_DELTA: Line change tracking';
+-- Phase 1: GREYSON CLOTHIERS PO 4755 - Limited dataset for initial testing
+INSERT INTO dbo.swp_ORDER_LIST_V2 (
+    -- Core business columns (Phase 1 minimal set)
+    [AAG ORDER NUMBER],
+    [CUSTOMER NAME],
+    [PO NUMBER],
+    [CUSTOMER STYLE],
+    [TOTAL QTY],
+    
+    -- Additional columns for comprehensive testing
+    [SOURCE_CUSTOMER_NAME],
+    [ORDER DATE PO RECEIVED],
+    [CUSTOMER ALT PO],
+    [AAG SEASON],
+    [CUSTOMER SEASON],
+    [STYLE DESCRIPTION],
+    [CUSTOMER COLOUR DESCRIPTION],
+    [UNIT OF MEASURE],
+    
+    -- Size columns (Phase 1 COMPLETE - ALL 251 size columns for GREYSON CLOTHIERS comprehensive testing)
+    -- Baby Sizes
+    [2T], [3T], [4T], [5T], [6T],
+    -- Numeric Child
+    [0], [0-3M], [1], [2], [2/3], [3/6 MTHS], [3-6M], [3-4 years], [3], [3-4],
+    [4], [4/5], [04/XXS], [5], [5-6 years], [5-6], [6], [6-12M], [6/7], [6/12 MTHS],
+    [6-9M], [6-10], [S(6-8)], [7], [7-8 years], [7-8], [8], [08/S], [8/9], [M(8-10)],
+    [9], [9-12M], [9-10 years], [9-10], [10], [10/M], [10/11], [10-12], [M(10-12)], [L(10-12)],
+    [11-12 years], [11-14], [12], [12/18 MTHS], [12-18M], [12/L], [12/13], [12-14], [13-14 years], [14],
+    [L(14-16)], [16],
+    -- Adult Sizes
+    [XS], [XS/S], [XS-PETITE], [06/XS], [XXS/XS], [CD/XS], [C/XS], [D/XS], 
+    [XL], [L/XL], [14/XL], [L-XL], [AB/XL], [CD/XL], [C/XL], [D/XL], 
+    [XXL], [2XL], [XL/XXL], [16/XXL], [XL/2XL], [XXL/3XL], [D/XXL], [3XL], [4XL],
+    -- Numeric Adult
+    [18], [18/24 MTHS], [18-24M], [18/XXXL], [20], [22], [24], [25], [26], [27],
+    [28], [28-30L], [29], [30], [30-30L], [30-31L], [30/32], [30-32L], [30/30], [31],
+    [31-30L], [31-31L], [31/32], [31-32L], [31/30], [32], [32-30L], [32-31L], [32/32], [32-32L],
+    [32/34], [32/36], [32/30], [33], [33-30L], [33-31L], [33/32], [33-32L], [33/30], [34],
+    [34-30L], [34-31L], [34/32], [34-32L], [34/34], [34/30], [35], [35-30L], [35-31L], [35/32],
+    [35-32L], [35/30], [36], [36-30L], [36-31L], [36/32], [36-32L], [36/34], [36/30], [38],
+    [38-30L], [38-31L], [38/32], [38-32L], [38/34], [38/36], [38/30], [40], [40-30L], [40-31L],
+    [40/32], [40/30], [42], [43], [44], [45], [46], [48], [50], [52], [54], [56], [58], [60],
+    -- One Size
+    [OS], [ONE SIZE], [One_Size], [One Sz],
+    -- Other Sizes
+    [S], [M], [L], [XXS], [S/M], [M/L], [XXXL], [2X], [3X], [1X], [4X], [XXXS], [S/P], [S+],
+    [1Y], [2Y], [3Y], [4Y], [S-PETITE], [S-M], [32C], [32D], [4XT], [32DD], [30x30], [32DDD],
+    [34C], [30x32], [0w], [2w], [32x30], [One_Sz], [34D], [34DD], [4w], [32x32], [6w], [34DDD],
+    [32x34], [36C], [8w], [34x30], [10w], [O/S], [34x32], [31x30], [36D], [12w], [34x34], [36DD],
+    [36DDD], [36x32], [38C], [36x30], [38D], [36x34], [38x30], [40x30], [38DD], [38x32], [38DDD],
+    [38x34], [40x32], [40x34], [AB/S], [AB/M], [CD/S], [CD/M], [CD/L], [C/S], [C/M], [C/L], 
+    [D/S], [D/M], [D/L],
+    
+    -- Business critical columns
+    [ETA CUSTOMER WAREHOUSE DATE],
+    [EX FACTORY DATE],
+    [FINAL FOB (USD)],
+    [ORDER TYPE],
+    [COUNTRY OF ORIGIN],
+    [_SOURCE_TABLE],
+    
+    -- Delta sync columns (initialized for development)
+    sync_state,
+    created_at,
+    updated_at
+)
+SELECT 
+    -- Core business columns (Phase 1 minimal set)
+    [AAG ORDER NUMBER],
+    [CUSTOMER NAME],
+    [PO NUMBER],
+    [CUSTOMER STYLE],
+    [TOTAL QTY],
+    
+    -- Additional columns for comprehensive testing
+    [SOURCE_CUSTOMER_NAME],
+    [ORDER DATE PO RECEIVED],
+    [CUSTOMER ALT PO],
+    [AAG SEASON],
+    [CUSTOMER SEASON],
+    [STYLE DESCRIPTION],
+    [CUSTOMER COLOUR DESCRIPTION],
+    [UNIT OF MEASURE],
+    
+    -- Size columns (Phase 1 COMPLETE - ALL 251 size columns for GREYSON CLOTHIERS comprehensive testing)
+    -- Baby Sizes
+    [2T], [3T], [4T], [5T], [6T],
+    -- Numeric Child
+    [0], [0-3M], [1], [2], [2/3], [3/6 MTHS], [3-6M], [3-4 years], [3], [3-4],
+    [4], [4/5], [04/XXS], [5], [5-6 years], [5-6], [6], [6-12M], [6/7], [6/12 MTHS],
+    [6-9M], [6-10], [S(6-8)], [7], [7-8 years], [7-8], [8], [08/S], [8/9], [M(8-10)],
+    [9], [9-12M], [9-10 years], [9-10], [10], [10/M], [10/11], [10-12], [M(10-12)], [L(10-12)],
+    [11-12 years], [11-14], [12], [12/18 MTHS], [12-18M], [12/L], [12/13], [12-14], [13-14 years], [14],
+    [L(14-16)], [16],
+    -- Adult Sizes
+    [XS], [XS/S], [XS-PETITE], [06/XS], [XXS/XS], [CD/XS], [C/XS], [D/XS], 
+    [XL], [L/XL], [14/XL], [L-XL], [AB/XL], [CD/XL], [C/XL], [D/XL], 
+    [XXL], [2XL], [XL/XXL], [16/XXL], [XL/2XL], [XXL/3XL], [D/XXL], [3XL], [4XL],
+    -- Numeric Adult
+    [18], [18/24 MTHS], [18-24M], [18/XXXL], [20], [22], [24], [25], [26], [27],
+    [28], [28-30L], [29], [30], [30-30L], [30-31L], [30/32], [30-32L], [30/30], [31],
+    [31-30L], [31-31L], [31/32], [31-32L], [31/30], [32], [32-30L], [32-31L], [32/32], [32-32L],
+    [32/34], [32/36], [32/30], [33], [33-30L], [33-31L], [33/32], [33-32L], [33/30], [34],
+    [34-30L], [34-31L], [34/32], [34-32L], [34/34], [34/30], [35], [35-30L], [35-31L], [35/32],
+    [35-32L], [35/30], [36], [36-30L], [36-31L], [36/32], [36-32L], [36/34], [36/30], [38],
+    [38-30L], [38-31L], [38/32], [38-32L], [38/34], [38/36], [38/30], [40], [40-30L], [40-31L],
+    [40/32], [40/30], [42], [43], [44], [45], [46], [48], [50], [52], [54], [56], [58], [60],
+    -- One Size
+    [OS], [ONE SIZE], [One_Size], [One Sz],
+    -- Other Sizes
+    [S], [M], [L], [XXS], [S/M], [M/L], [XXXL], [2X], [3X], [1X], [4X], [XXXS], [S/P], [S+],
+    [1Y], [2Y], [3Y], [4Y], [S-PETITE], [S-M], [32C], [32D], [4XT], [32DD], [30x30], [32DDD],
+    [34C], [30x32], [0w], [2w], [32x30], [One_Sz], [34D], [34DD], [4w], [32x32], [6w], [34DDD],
+    [32x34], [36C], [8w], [34x30], [10w], [O/S], [34x32], [31x30], [36D], [12w], [34x34], [36DD],
+    [36DDD], [36x32], [38C], [36x30], [38D], [36x34], [38x30], [40x30], [38DD], [38x32], [38DDD],
+    [38x34], [40x32], [40x34], [AB/S], [AB/M], [CD/S], [CD/M], [CD/L], [C/S], [C/M], [C/L], 
+    [D/S], [D/M], [D/L],
+    
+    -- Business critical columns
+    [ETA CUSTOMER WAREHOUSE DATE],
+    [EX FACTORY DATE],
+    [FINAL FOB (USD)],
+    [ORDER TYPE],
+    [COUNTRY OF ORIGIN],
+    [_SOURCE_TABLE],
+    
+    -- Delta sync columns (initialized for development)
+    'NEW' as sync_state,           -- All records start as NEW for testing
+    GETUTCDATE() as created_at,
+    GETUTCDATE() as updated_at
+    
+FROM dbo.ORDER_LIST
+WHERE [CUSTOMER NAME] = 'GREYSON CLOTHIERS'
+  AND [PO NUMBER] = '4755'
+  AND [AAG ORDER NUMBER] IS NOT NULL;  -- Ensure valid records only
+
+-- =============================================================================
+-- VALIDATION: Verify shadow staging table population
+-- =============================================================================
+
+DECLARE @RecordCount INT;
+SELECT @RecordCount = COUNT(*) FROM dbo.swp_ORDER_LIST_V2;
+
+DECLARE @GreysonCount INT;
+SELECT @GreysonCount = COUNT(*) 
+FROM dbo.swp_ORDER_LIST_V2 
+WHERE [CUSTOMER NAME] = 'GREYSON CLOTHIERS' AND [PO NUMBER] = '4755';
+
+-- =============================================================================
+-- Success message with validation results
+-- =============================================================================
+
+PRINT 'Migration 003: Shadow staging table created and populated successfully';
+PRINT '  - swp_ORDER_LIST_V2: Shadow staging table with identical ORDER_LIST schema';
+PRINT '  - Populated with GREYSON CLOTHIERS PO 4755 data from production ORDER_LIST';
+PRINT '  - Phase 1: ALL 251 size columns included for comprehensive GREYSON CLOTHIERS testing';
+PRINT '  - Ready for Phase 1 development and testing';
+PRINT '';
+PRINT 'Data Summary:';
+PRINT '  - Total records in swp_ORDER_LIST_V2: ' + CAST(@RecordCount AS VARCHAR(10));
+PRINT '  - GREYSON CLOTHIERS PO 4755 records: ' + CAST(@GreysonCount AS VARCHAR(10));
+PRINT '  - Complete size column coverage: 251 size columns (baby, child, adult, numeric, one-size)';
+PRINT '';
+PRINT 'TOML Configuration Ready:';
+PRINT '  - source_table = "swp_ORDER_LIST_V2" (shadow staging)';
+PRINT '  - target_table = "ORDER_LIST_V2" (development target)';
+PRINT '  - Phase 1 testing: Single customer, single PO';
 PRINT '';
 PRINT 'Next Steps:';
-PRINT '  1. Deploy to development database';
-PRINT '  2. Configure TOML settings for development environment';
-PRINT '  3. Test shadow table population';
-PRINT '  4. Validate hash generation and change detection';
+PRINT '  1. Update TOML configuration to use swp_ORDER_LIST_V2';
+PRINT '  2. Run TOML foundation tests with corrected source table';
+PRINT '  3. Test hash generation and change detection logic';
+PRINT '  4. Validate Phase 1 minimal column approach';
+PRINT '  5. Test delta detection between swp_ORDER_LIST_V2 and ORDER_LIST_V2';

@@ -433,7 +433,28 @@ CREATE TABLE [dbo].[ORDER_LIST] (
     [ADID] NVARCHAR(255) NULL,  -- Coverage: 6.7%
     -- METADATA
     [_SOURCE_TABLE] NVARCHAR(255) NULL,  -- Coverage: 100.0%
+
+    -- Delta sync columns (NEW - enable change detection and Monday.com sync)
+    -- NOTE: row_hash populated by application logic using TOML configuration
+    -- Hash algorithm and columns defined in sync_order_list.toml
+    row_hash            CHAR(64) NULL,  -- Populated by application logic, not computed column
+    sync_state          VARCHAR(10) NOT NULL DEFAULT ('NEW'),
+    last_synced_at      DATETIME2 NULL,
+    monday_item_id      BIGINT NULL,
+    
+    -- Audit columns
+    created_at          DATETIME2 DEFAULT GETUTCDATE(),
+    updated_at          DATETIME2 DEFAULT GETUTCDATE()
 );
+
+-- Index for efficient hash-based change detection
+CREATE INDEX IX_swp_ORDER_LIST_V2_hash ON dbo.swp_ORDER_LIST_V2 (row_hash);
+CREATE INDEX IX_swp_ORDER_LIST_V2_sync_state ON dbo.swp_ORDER_LIST_V2 (sync_state);
+CREATE INDEX IX_swp_ORDER_LIST_V2_monday_item_id ON dbo.swp_ORDER_LIST_V2 (monday_item_id);
+
+-- Phase 1 specific indexes for GREYSON PO 4755 testing
+CREATE INDEX IX_swp_ORDER_LIST_V2_customer_po ON dbo.swp_ORDER_LIST_V2 ([CUSTOMER NAME], [PO NUMBER]);
+CREATE INDEX IX_swp_ORDER_LIST_V2_aag_order ON dbo.swp_ORDER_LIST_V2 ([AAG ORDER NUMBER]);
 
 -- COMPLETE SCHEMA SUMMARY:
 -- Total columns: 417

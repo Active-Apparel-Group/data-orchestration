@@ -1,0 +1,19 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE OR ALTER  VIEW [dbo].[vORDERS_UNIFIED] as 
+Select *,
+       [PROMO GROUP / CAMPAIGN (HOT 30/GLOBAL EDIT)] as "PROMO GROUP / CAMPAIGN (HOT 30/GLOBAL EDIT",
+       [CUSTOMER'S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS] as "CUSTOMER''S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS",
+       null as "ACTIVE",
+       null as "All",
+       null as "Multiple Items",
+       [TOTAL QTY] as "Sum of TOTAL QTY",
+       [∆] as "Delta"
+from ORDER_LIST;
+GO
+
+
+-- find duplicate column names in view vORDERS_UNIFIED
+SELECT * from vORDERS_UNIFIED

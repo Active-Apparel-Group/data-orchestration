@@ -8,7 +8,7 @@ It supports running single migrations or entire directories of migrations.
 Usage:
     python tools/run_migration.py path/to/migration.sql
     python tools/run_migration.py sql/migrations/
-    python tools/run_migration.py sql/migrations/ --db UNIFIED_ORDERS --pattern "*.sql"
+    python tools/run_migration.py sql/migrations/ --db ORDERS --pattern "*.sql"
 
 Features:
 - Uses db_helper.py for consistent database connections
@@ -22,10 +22,20 @@ import sys
 import argparse
 from pathlib import Path
 
-# Add project root to path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root / "utils"))
+# Add src/pipelines/utils to path for modern package structure
+src_utils_path = Path(__file__).parent.parent / "src" / "pipelines" / "utils"
+sys.path.insert(0, str(src_utils_path))
 
+# Import from modern package structure
+from db import get_connection, load_config
+from logger import get_logger
+
+# Initialize logger
+logger = get_logger(__name__)
+
+# Add legacy path for db_helper functions
+pipelines_utils_path = Path(__file__).parent.parent / "pipelines" / "utils"
+sys.path.insert(0, str(pipelines_utils_path))
 import db_helper
 
 def main():
@@ -41,7 +51,7 @@ Examples:
   python tools/run_migration.py sql/migrations/
   
   # Run migrations with specific database
-  python tools/run_migration.py sql/migrations/ --db UNIFIED_ORDERS
+  python tools/run_migration.py sql/migrations/ --db ORDERS
   
   # Run migrations with pattern matching
   python tools/run_migration.py sql/migrations/ --pattern "001_*.sql"
@@ -55,7 +65,7 @@ Examples:
     
     parser.add_argument(
         '--db', '--database',
-        default='UNIFIED_ORDERS',
+        default='ORDERS',
         help='Database key from config.yaml (default: UNIFIED_ORDERS)'
     )
     
@@ -75,6 +85,19 @@ Examples:
         '--validate-only',
         action='store_true',
         help='Validate migration files without executing them'
+    )
+    
+    parser.add_argument(
+        '--show-results',
+        action='store_true',
+        help='Display query results as DataFrames'
+    )
+    
+    parser.add_argument(
+        '--max-rows',
+        type=int,
+        default=20,
+        help='Maximum rows to display when --show-results is used (default: 20)'
     )
     
     args = parser.parse_args()
@@ -121,11 +144,21 @@ Examples:
     try:
         if migration_path.is_file():
             # Single migration file
-            success = db_helper.run_migration(
-                migration_path=migration_path,
-                db_key=args.db,
-                verbose=verbose
-            )
+            if args.show_results:
+                # Use run_query for results display
+                success = db_helper.run_query_with_display(
+                    migration_path=migration_path,
+                    db_key=args.db,
+                    max_rows=args.max_rows,
+                    verbose=verbose
+                )
+            else:
+                # Use run_migration for execution without results
+                success = db_helper.run_migration(
+                    migration_path=migration_path,
+                    db_key=args.db,
+                    verbose=verbose
+                )
             
             return 0 if success else 1
             

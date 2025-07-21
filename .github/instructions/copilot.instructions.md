@@ -21,7 +21,7 @@ src/                        # ✅ Modern Python package (pip install -e .)
         utils/              # Modern utilities (db.py, logger.py, config.py)
         integrations/       # API integrations (monday/, azure/, etc.)
         load_order_list/    # Existing ORDER_LIST pipeline
-        order_delta_sync/   # 🆕 NEW - Delta sync pipeline
+        sync_order_list/    # 🆕 NEW - Monday sync pipeline
 sql/                        # Database operations & business logic
     operations/             # Daily operational queries
     graphql/                # 🔄 CONSOLIDATED - Monday.com GraphQL templates
@@ -57,8 +57,6 @@ import logger_helper
 
 ### Coding Standards
 
-### Coding Standards
-
 #### Python
 - **Modern Imports**: Use `from pipelines.utils import db` after `pip install -e .`
 - **Legacy Support**: Use [`sys.path`](sys.path ) pattern during transition for legacy scripts
@@ -70,6 +68,7 @@ import logger_helper
 
 #### SQL Standards
 - **⚠️ CRITICAL**: Table names, column names, and definitions MUST be defined and approved before migration
+- **⚠️ CRITICAL**: all sql scripts to be run during testing must use [`run_migration.py`](tools/run_migration.py)
 - **Naming Convention**: snake_case for tables/columns
 - **Staging Tables**: Prefix with `swp_` (staging with processing)
 - **Schema Management**: DDL in [`db/ddl/`](db/ddl/ ), migrations in [`db/migrations/`](db/migrations/ )
@@ -82,7 +81,7 @@ import logger_helper
 - **Configuration**: TOML-based board and column mappings
 - **Async Processing**: Batch operations with 15-item default batch size
 - **Rate Limiting**: 0.1 second delays between API calls
-- **Kestra Logging**: Use standardized logger for production compatibility
+- **Kestra Logging**: Use standardized logger for production compatibility 
 
 #### PowerShell
 - Use `;` not `&&` for command chaining
@@ -121,7 +120,7 @@ with db.get_connection('database_name') as conn:
 import tomli
 from pathlib import Path
 
-config_path = Path("configs/pipelines/order_list_delta_sync.toml")
+config_path = Path("configs/pipelines/sync_order_list.toml")
 with open(config_path, 'rb') as f:
     config = tomli.load(f)
 
@@ -138,7 +137,7 @@ with open(config_path, 'r') as f:
 import tomli
 from pathlib import Path
 
-config_path = Path("configs/pipelines/order_list_delta_sync.toml")
+config_path = Path("configs/pipelines/sync_order_list.toml")
 with open(config_path, 'rb') as f:
     config = tomli.load(f)
 
@@ -159,54 +158,34 @@ with open(config_path, 'r') as f:
 
 ### Error Handling
 - Always use try/except for database operations
-- Log errors using `utils/logger_helper.py`
+- Log errors using `pipelines.utils.logger` or `logger_helper.get_logger(__name__)` for Kestra compatibility
 - Provide meaningful error messages with context
 
 ## 🚫 **Unicode & Emoji Usage Policy**
 
 **Do NOT use emoji or non-ASCII Unicode characters in:**
 - Log messages
-- Comments
+- Comments  
 - Docstrings
 - Output to files or terminals
 
-**Problematic Unicode/Emoji examples (to avoid):**
-- ✅ (U+2705) - "White Heavy Check Mark"
-- 📝 (U+1F4DD) - "Memo"
-- 💡 (U+1F4A1) - "Light Bulb"
-- 🔍 (U+1F50D) - "Magnifying Glass"
-- 📋 (U+1F4CB) - "Clipboard"
-- 📊 (U+1F4CA) - "Bar Chart"
-- 📥 (U+1F4E5) - "Inbox Tray"
-- 🔄 (U+1F504) - "Anticlockwise Arrows Button"
-- 🗄️ (U+1F5C4) - "File Cabinet"
-- 💾 (U+1F4BE) - "Floppy Disk"
-- ⏱️ (U+23F1) - "Stopwatch"
-- 🎉 (U+1F389) - "Party Popper"
-- 🚀 (U+1F680) - "Rocket"
-
 **ASCII alternatives to use instead:**
 - "SUCCESS" instead of ✅
-- "INFO" instead of 📝
-- "TIP" instead of 💡
-- "SEARCH" instead of 🔍
-- "SCHEMA" instead of 📋
-- "DATA" instead of 📊
-- "FETCH" instead of 📥
-- "PROCESS" instead of 🔄
-- "STAGING" instead of 🗄️
-- "SAVE" instead of 💾
-- "TIME" instead of ⏱️
-- "COMPLETE" instead of 🎉
-- "START" instead of 🚀
+- "INFO" instead of 📝  
+- "ERROR" instead of ❌
+- "WARNING" instead of ⚠️
+- "PROCESS" instead of �
 
 **Rationale:**
-- Unicode/emoji can cause encoding errors in logs, terminals, and files.
-- ASCII is universally compatible and safe for all environments.
+- Unicode/emoji can cause encoding errors in logs, terminals, and files
+- ASCII is universally compatible and safe for all environments
+
+**Exception:**
+- **Documentation**: Unicode is allowed in markdown files (e.g., README.md) for clarity and emphasis
 
 ## What NOT to Do
 
-❌ Don't create files in project root - use proper subdirectories
+❌ Don't create files without approval in milestone documentation - use established naming conventions
 ❌ Don't use bash syntax (`&&`) in PowerShell  
 ❌ Don't hardcode database connections - use config files
 ❌ Don't hardcode database names - use appropriate database from config (dms, dms_item, orders, infor_132)
@@ -216,42 +195,83 @@ with open(config_path, 'r') as f:
 ❌ Don't break existing import patterns during transition period
 ❌ Don't create new dependencies without checking existing utils
 ❌ Don't modify `pipelines/utils/config.yaml` - it contains live credentials
+❌ Don't create duplicate files like business_key_generator.py when order_key_generator.py exists
+❌ Don't run python scripts in powershell - use `python` command directly (with python script, or .sql script with `run_migration.py`)
 
-## Current Project State
+## Current Project State (July 2025)
 
-### Repository Restructure (Recently Completed)
+### Repository Structure: Stabilized
 - ✅ **Modern Package Structure**: `src/pipelines/` with `pip install -e .` support
-- ✅ **GraphQL Consolidation**: All templates in `sql/graphql/` with `GraphQLLoader` utility
-- ✅ **Kestra-Compatible Logging**: Standardized `logger_helper.py` for production
-- 🔄 **Transition Period**: Legacy `pipelines/utils/` still supported during migration
+- ✅ **Business Key Architecture**: Customer canonicalization and Excel-compatible matching
+- ✅ **OrderKeyGenerator & CanonicalCustomerManager**: Core utilities implemented
+- ✅ **Testing Framework**: Structured phases with measurable success criteria (95%+ thresholds)
+- ✅ **Import Standards**: Modern/legacy split documented and working
 
 ### Enhanced Pipeline Development
-- **New Project**: Order List → Monday.com delta sync pipeline
-- **Shadow Table Strategy**: `ORDER_LIST_V2` for zero-downtime development
-- **TOML Configuration**: Environment-specific settings in `configs/pipelines/`
-- **Async GraphQL Processing**: Batch operations with standardized templates
+- **Active Development**: Milestone 2 complete - ORDER_LIST delta sync with business keys
+- **OrderKeyGenerator**: Excel-compatible business key generation using customer canonicalization
+- **CanonicalCustomerManager**: YAML-driven customer name resolution with unique key definitions
+- **Testing Framework**: Structured phases with 95%+ success thresholds for production validation
+- **Modern Architecture**: Clean package structure with modern/legacy import pattern support
 
 ### Development Standards
 - **Schema Approval Required**: All table/column changes must be pre-approved
-- **Production Safety**: Shadow tables during development, atomic cutover for production
+- **Modern Import Patterns**: Use `from pipelines.utils import module` with pip install -e .
+- **Legacy Support**: Transition patterns with sys.path for legacy scripts
 - **Configuration-Driven**: TOML files define business logic, mappings, and environment settings
 - **Kestra Integration**: All new code must use compatible logging patterns
+- **Error Prevention**: Follow established naming conventions to prevent file conflicts
+
+## 🚨 Critical Error Prevention
+
+### Naming & File Organization Rules
+- **NEVER** create files without checking project structure documentation
+- **ALWAYS** use established import patterns (modern vs legacy transition support)
+- **VERIFY** file placement against existing successful implementations
+- **PREVENT** duplicate file creation (like business_key_generator.py vs order_key_generator.py)
+
+### Business Key & Customer Resolution Standards
+- **USE** CanonicalCustomerManager for all customer name resolution
+- **APPLY** customer-specific unique keys from canonical_customers.yaml configuration
+- **IMPLEMENT** Excel-compatible NEW detection using AAG ORDER NUMBER existence checks
+- **ENSURE** OrderKeyGenerator is single source of truth for business key generation
+
+### Task Execution Methodology
+For EVERY action you take, follow this structured approach:
+
+#### 1. Pre-Action Planning
+- **Summarize task goals** (high-level bullet points)
+- **Reference current documentation** and existing implementations
+- **Check instructions, docs, and reference files** before proceeding
+- **Ask yourself**: Am I approaching this correctly? Have I reviewed existing patterns?
+
+#### 2. Execute Actions  
+- Perform the planned action using established patterns
+- Document what was done and why
+
+#### 3. Post-Action Review
+- **Show original goals** and mark completed items with ✅
+- **If any failures**: Document corrective action and preventative measures
+- **Self-assess**: Is this the right approach? Does it follow project standards?
+
+#### 4. Iterate Until Complete
+- Continue until all goals achieved with proper validation
 
 ### Active Development: Order List Delta Sync
-**Current Focus**: Building ORDER_LIST → Monday.com incremental sync pipeline
+**Current Focus**: ORDER_LIST → Monday.com incremental sync with business keys (Milestone 2 Complete)
 
 **Key Components**:
-- **Hash-based Change Detection**: PERSISTED computed columns for efficient delta identification
-- **Dual Table Strategy**: `ORDER_LIST` (headers) + `ORDER_LIST_LINES` (unpivoted sizes)
-- **State Management**: `sync_state` tracking (NEW, CHANGED, SYNCED, FAILED)
-- **Shadow Development**: `ORDER_LIST_V2` for zero production impact
-- **TOML Configuration**: Environment-specific board mappings and business rules
+- **Business Key Architecture**: OrderKeyGenerator with customer canonicalization
+- **Customer Resolution**: CanonicalCustomerManager using YAML configuration  
+- **Excel Compatibility**: NEW detection via AAG ORDER NUMBER existence checks
+- **Structured Testing**: Framework with 95%+ success rate validation criteria
+- **Modern Package Structure**: Clean src/pipelines/utils/ organization
 
-**Implementation Approach**:
-1. **Milestone 1**: Shadow tables + TOML config + `ORDER_LIST_LINES` structure
-2. **Milestone 2**: Delta merge operations + GraphQL integration  
-3. **Milestone 3**: Monday.com two-pass sync (headers → lines)
-4. **Milestone 4**: Production cutover + operational handoff
+**Implementation Status**:
+- ✅ **Milestone 1**: Modern package structure and utilities implemented
+- ✅ **Milestone 2**: Business key generation and customer canonicalization complete  
+- 🔄 **Milestone 3**: SQL merge operations with business keys (next phase)
+- 🔄 **Milestone 4**: Monday.com integration testing and production deployment
 
 ## Response Style
 - Provide working code examples with proper imports

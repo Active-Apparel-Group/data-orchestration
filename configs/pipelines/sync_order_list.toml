@@ -1,0 +1,157 @@
+# ORDER_LIST Monday Sync Configuration
+# ===========================================
+# Single source of truth for all pipeline configuration
+# Use [phase] to track implementation progress
+# Use [environment.{mode}] to switch between dev/prod environments
+
+[phase]
+# Track implementation progress
+current = "phase1_minimal"              # phase1_minimal, phase2_expanded, phase3_production, phase4_cutover
+description = "Single PO with minimal columns"
+start_date = "2025-07-19"
+target_completion = "2025-07-22"
+
+# ENVIRONMENT CONFIGURATION - Production Ready Structure
+# =====================================================
+
+[environment.development]
+# Development environment - uses shadow tables for safety
+source_table = "swp_ORDER_LIST_V2"              # Shadow staging table for development
+target_table = "ORDER_LIST_V2"                  # Shadow production table for development
+lines_table = "ORDER_LIST_LINES"                # Lines table (shared)
+source_lines_table = "swp_ORDER_LIST_LINES"     # Shadow staging lines table for development
+database = "orders"                             # Database name from config.yaml
+
+[environment.production]
+# Production environment - uses live production tables
+source_table = "swp_ORDER_LIST"                 # Production staging table
+target_table = "ORDER_LIST"                     # Live production table
+lines_table = "ORDER_LIST_LINES"                # Lines table (shared)  
+source_lines_table = "swp_ORDER_LIST_LINES"     # Production staging lines table
+database = "orders"                             # Database name from config.yaml
+
+# PHASE 1: MINIMAL VIABLE PIPELINE CONFIGURATION
+# ==============================================
+
+[test_data.phase1]
+# Single customer, single PO for initial testing
+limit_customers = ["GREYSON"]
+limit_pos = ["4755"]
+limit_records = 10                      # Maximum records per test
+test_mode = true
+
+[columns.phase1]
+# MINIMAL COLUMN SET - Core business fields only
+# Focus: Prove the pipeline works end-to-end
+order_list = [
+    "AAG ORDER NUMBER",                 # Primary business key
+    "CUSTOMER NAME",                    # Customer identification
+    "PO NUMBER",                        # Purchase order reference
+    "CUSTOMER STYLE",                   # Product identification
+    "TOTAL QTY"                         # Quantity summary
+]
+
+# SIZE COLUMNS - Dynamic discovery between markers
+[size_detection.phase1]
+start_after = "UNIT OF MEASURE"        # Column that precedes size columns
+end_before = "TOTAL QTY"               # Column that follows size columns
+max_sizes = 300                        # Limit for phase 1 testing
+
+[hash.phase1]
+# Change detection logic - minimal columns for testing
+columns = [
+    "AAG ORDER NUMBER",
+    "CUSTOMER NAME",                    # Customer identification
+    "PO NUMBER",
+    "CUSTOMER STYLE",
+    "TOTAL QTY"
+]
+algorithm = "SHA2_256"
+
+[monday.development]
+# Development Monday.com boards  
+items_board_id = 9609317401             # Dev items board
+subitems_board_id = 9609317948          # Dev subitems board
+create_groups = true                    # Auto-create customer groups
+environment = "development"
+metadata_path = "configs/boards/board_9609317401_metadata.json"
+
+[monday.production]  
+# Production Monday.com boards
+items_board_id = 8709134353             # Prod items board
+subitems_board_id = 9200771505          # Prod subitems board
+create_groups = true                    # Auto-create customer groups
+environment = "production"
+metadata_path = "configs/boards/board_8709134353_metadata.json"
+
+[monday.phase1]
+# Phase 1 uses development boards for testing
+board_id = 9609317401                   # Dev items board (phase1 compatibility)
+subitem_board_id = 9609317948           # Dev subitems board  
+create_groups = true                    # Auto-create customer groups
+environment = "development"
+
+# Column mapping - ORDER_LIST headers to Monday items
+[monday.column_mapping.phase1.headers]
+"AAG ORDER NUMBER" = "text123"         # Will be discovered from board metadata
+"CUSTOMER NAME" = "text456"             # Customer identification (corrected)
+"PO NUMBER" = "text789"
+"CUSTOMER STYLE" = "text101"
+"TOTAL QTY" = "numbers102"
+
+# Column mapping - ORDER_LIST_LINES to Monday subitems
+[monday.column_mapping.phase1.lines]
+"size_code" = "text_size"
+"qty" = "numbers_qty"
+
+# PHASE 2: EXPANDED TESTING CONFIGURATION (FUTURE)
+# ================================================
+# [test_data.phase2]
+# limit_customers = ["GREYSON", "JOHNNIE O", "TRACKSMITH"]
+# limit_records = 50
+# test_mode = true
+
+# [columns.phase2] 
+# order_list = [
+#     # Phase 1 columns plus 15 additional business-critical columns
+# ]
+
+# PHASE 3: PRODUCTION CONFIGURATION (FUTURE)
+# ==========================================
+# [environment.production]
+# mode = "production"
+# target_table = "ORDER_LIST"           # Production table after cutover
+# database = "orders"
+
+# APPROVED PATTERNS FROM load_cms ANALYSIS
+# ========================================
+
+[sync.approved_patterns]
+# ID relationship tracking (item_id → parent_item_id) - APPROVED
+# Already implemented in shadow table spec (001_create_shadow_tables.sql)
+track_item_relationships = true         # monday_item_id → parent_item_id linking
+
+# Auto-create customer groups - APPROVED (Must Have)
+auto_create_groups = true               # Create customer groups if missing  
+store_groups_in_db = true               # Enhancement: maintain group registry in DB
+group_registry_table = "monday_board_groups"   # Future table for group management
+
+# Enhanced error handling with delta table retry - APPROVED
+error_recovery_method = "delta_table"   # Use PENDING/FAILED states in delta tables
+max_retries = 3                         # Maximum retry attempts per record
+retry_backoff = "exponential"           # Exponential backoff (1s, 2s, 4s)
+
+# Batch processing approach - APPROVED (if needed)
+batch_method = "uuid_based"             # Use record_uuid as logical batch identifier
+batch_size = 100                        # Records per batch (only if uuid insufficient)
+
+[sync.rejected_patterns] 
+# Explicitly rejected patterns from load_cms analysis
+staging_validation = false              # Delta tables replace staging approach
+separate_staging_tables = false         # Use ORDER_LIST_V2/LINES directly
+
+# CURRENT IMPLEMENTATION FOCUS
+# ============================
+# Phase 1 implementation will use only the phase1 sections above
+# This ensures we validate core workflow before expanding scope
+# All subsequent phases will extend this single configuration file

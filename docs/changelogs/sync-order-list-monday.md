@@ -17,7 +17,7 @@ This doc can be dropped into your repo### **Key Structural Decisions**
 - `src/pipelines/utils/`: Modern import patterns
 
 **3. New Pipeline Module**:
-- `src/pipelines/order_delta_sync/`: Dedicated to your delta sync workflow
+- `src/pipelines/sync_order_list/`: Dedicated to your delta sync workflow
 - Imports from existing `load_order_list` and `integrations/monday`
 
 ---
@@ -31,9 +31,10 @@ This doc can be dropped into your repo### **Key Structural Decisions**
 ## Quick Links & Key Files
 
 **Configuration & Setup:**
-- [Development Config](../../configs/pipelines/order_list_delta_sync_dev.toml) - TOML configuration for development environment
+- [Development Config](../../configs/pipelines/sync_order_list_dev.toml) - TOML configuration for development environment
 - [Shadow Tables DDL](../../db/migrations/001_create_shadow_tables.sql) - Database migration for shadow tables
-- [Config Parser](../../src/pipelines/order_delta_sync/config_parser.py) - Python configuration parser
+- [Config Parser](../../src/pipelines/sync_order_list/config_parser.py) - Python configuration parser
+- **Database**: `orders` (contains ORDER_LIST, ORDER_LIST_V2, ORDER_LIST_LINES tables)
 
 **Testing & Validation:**
 - [Testing Documentation](../implementation/order-list-delta-testing.md) - Comprehensive testing outcomes and procedures
@@ -67,32 +68,26 @@ This doc can be dropped into your repo (as `README.md` or `PLAN.md`) to align en
 
 ---
 
-## MILESTONE 1 STATUS: COMPLETE
+## MILESTONE 2 STATUS: IN PROGRESS - Business Key Implementation
 
-**Implementation Date**: July 18, 2025  
-**Overall Success Rate**: 100.0% (4/4 validation tests passed)  
-**Status**: FOUNDATION READY FOR MILESTONE 2 DEVELOPMENT
+**Start Date**: July 19, 2025  
+**Focus**: Excel-compatible business key matching with customer-specific duplicate resolution  
+**Status**: IMPLEMENTING CUSTOMER RESOLUTION & BUSINESS KEY GENERATION
 
-### Milestone 1 Deliverables COMPLETED:
-- SUCCESS: **Shadow Tables DDL**: Complete ORDER_LIST_V2 schema with all 417 columns
-- SUCCESS: **TOML Configuration**: Environment-specific development settings loaded
-- SUCCESS: **Configuration Parser**: DeltaSyncConfig with hash SQL generation using CONCAT
-- SUCCESS: **Database Integration**: orders database connection validated
-- SUCCESS: **Migration Infrastructure**: No hardcoded hash logic, configuration-driven approach
-- SUCCESS: **Unicode Compliance**: All emoji/Unicode violations eliminated per coding standards
+### Milestone 2 Architecture Changes:
+- **CRITICAL**: Replaced UUID-based merge logic with business key matching for Excel compatibility
+- **CRITICAL**: Database target is `orders` (contains ORDER_LIST production tables)
+- **NEW**: Customer canonicalization using existing [`canonical_customers.yaml`](../../pipelines/utils/canonical_customers.yaml)
+- **NEW**: Customer-specific unique key generation from `order_key_config.unique_keys`
+- **NEW**: Excel-compatible NEW detection via `AAG ORDER NUMBER` existence check
+- **ENHANCED**: Integration with existing [`reconcile_order_list.py`](../../pipelines/utils/reconcile_order_list.py) duplicate resolution logic
 
-### Key Implementation Lessons Learned:
-1. **Import Path Discipline**: Modern src/pipelines/ structure requires careful path resolution
-2. **Configuration Over Hardcoding**: TOML-driven hash logic prevents SQL migration brittleness  
-3. **Schema Alignment Critical**: Shadow tables must match production ORDER_LIST exactly (417 columns)
-4. **ASCII Output Required**: Unicode/emoji violations cause encoding errors in logs and terminals
-5. **Test-Driven Foundation**: Structured validation prevents integration issues in later milestones
-
-### Technical Validation Results:
-- **TOML Configuration**: 11 sections loaded successfully with all required components
-- **Config Parser**: DeltaSyncConfig initialized with proper Kestra-compatible logging
-- **Database Config**: orders database connection configuration valid
-- **Migration DDL**: No hardcoded hash logic, all required tables present in schema
+### Key Implementation Insight:
+Excel source data cannot use UUID as merge keys. The corrected approach:
+1. **Primary NEW Detection**: `[AAG ORDER NUMBER]` not in `ORDER_LIST` → **NEW**
+2. **Business Key Matching**: Use customer-specific `unique_keys` from YAML config
+3. **Duplicate Resolution**: Apply existing reconciliation logic for edge cases
+4. **Hash-Based Changes**: Once matched, use row hash for **CHANGED** vs **UNCHANGED**
 
 ---
 
@@ -116,7 +111,7 @@ data-orchestration (root)
 ├── README.md / PLAN.md                  # ← This doc in docs/changelogs/
 ├── configs/                             # Configuration management
 │   └── pipelines/
-│       └── order_list_delta_sync.toml   # hash columns, sizes, delta schema, Monday column map
+│       └── sync_order_list.toml         # hash columns, sizes, delta schema, Monday column map
 ├── db/                                  # 📁 SCHEMA EVOLUTION & MANAGEMENT
 │   ├── ddl/                            # CREATE TABLE statements (documentation)
 │   │   ├── order_list_tables.sql       # Current schema definitions
@@ -136,16 +131,24 @@ data-orchestration (root)
 │   │   ├── extract.py                 # Excel → SWP_ORDER_LIST, pre-calc hashes
 │   │   ├── transform.py               # Data transformation logic
 │   │   └── load.py                    # Database loading utilities
-│   ├── order_delta_sync/              # NEW: Monday sync pipeline
+│   ├── sync_order_list/               # NEW: Monday sync pipeline (Business Key-Based)
 │   │   ├── __init__.py
-│   │   ├── run_merges.py              # Executes 003, 004, 005 in sequence (orchestrate SQL)
-│   │   ├── sync_monday.py             # Two-pass sync (headers, then lines), updates sync_state
-│   │   └── cli.py                     # Entry point: end-to-end ingest → merge → sync
+│   │   ├── config_parser.py           # ✅ EXISTS: TOML configuration parser
+│   │   ├── merge_orchestrator.py      # NEW: Executes 003, 004, 005 SQL in sequence
+│   │   ├── monday_sync.py             # NEW: Two-pass sync (headers, then lines)
+│   │   └── cli.py                     # NEW: Entry point: end-to-end ingest → merge → sync
 │   ├── integrations/                  # SUCCESS: Consolidated integrations
 │   │   ├── monday/                    # Monday.com API integration
 │   │   │   ├── __init__.py
 │   │   │   ├── client.py              # Monday API client
 │   │   │   └── sync_engine.py         # Sync state management
+│   │   └── __init__.py
+│   ├── shared/                        # NEW: Shared functional modules
+│   │   ├── customer/                  # Customer-related utilities
+│   │   │   ├── __init__.py
+│   │   │   ├── canonical_customers.yaml  # ✅ EXISTS: Customer configuration
+│   │   │   ├── canonical_manager.py   # ✅ EXISTS: Canonical customer resolution
+│   │   │   └── order_key_generator.py # ✅ EXISTS: Customer-specific unique keys
 │   │   └── __init__.py
 │   └── utils/                         # SUCCESS: Modern utilities
 │       ├── db.py                      # Database connections
@@ -153,7 +156,7 @@ data-orchestration (root)
 │       └── config.py                  # Configuration management
 └── docs/
     ├── changelogs/
-    │   └── order-list-delta-monday-sync.md # ← This document
+    │   └── sync-order-list-monday.md     # ← This document
     ├── references/
     │   ├── mermaid_flow.md            # sequence diagram & ERD
     │   └── column_coverage.csv        # full schema audit
@@ -172,7 +175,7 @@ data-orchestration (root)
 - `src/pipelines/utils/`: Modern import patterns
 
 **3. New Pipeline Module**:
-- `src/pipelines/order_delta_sync/`: Dedicated to your delta sync workflow
+- `src/pipelines/sync_order_list/`: Dedicated to your delta sync workflow
 - Imports from existing `load_order_list` and `integrations/monday`
 
 ---
@@ -195,11 +198,12 @@ Week 4: Scheduled maintenance window for production cutover
 3. **Migration scripts**: `db/migrations/001_create_shadow_tables.sql`
 4. **Configuration parser**: Load TOML settings in Python pipeline
 
-#### **Milestone 2: Delta Engine (Week 2)**  
-1. **Hash-based change detection**: Implement using TOML hash logic
-2. **Size column discovery**: Dynamic detection between markers
-3. **Merge operations**: SQL scripts for headers and lines
-4. **GraphQL integration**: Async batch processing with `graphql_loader.py`
+#### **Milestone 2: Business Key-Based Delta Engine (Week 2)**  
+1. **Customer Resolution & Business Keys**: Customer canonicalization + unique key generation from YAML config
+2. **Excel-Compatible NEW Detection**: AAG ORDER NUMBER existence check (no UUID dependency)
+3. **Enhanced Merge Operations**: Business key matching with customer-specific duplicate resolution
+4. **Hash-Based Change Detection**: CHANGED vs UNCHANGED using TOML hash logic
+5. **GraphQL Integration**: Async batch processing with template loading
 
 #### **Milestone 3: Monday Integration (Week 3)**
 1. **Two-pass sync**: Headers → Lines dependency chain
@@ -215,7 +219,7 @@ Week 4: Scheduled maintenance window for production cutover
 
 ### **Environment Configuration Strategy**:
 
-#### **Development (`configs/pipelines/order_list_delta_sync_dev.toml`)**:
+#### **Development (`configs/pipelines/sync_order_list_dev.toml`)**:
 ```toml
 [environment]
 target_table = "ORDER_LIST_V2"      # Shadow table for safety
@@ -225,7 +229,7 @@ board_type = "development"
 board_id = 123456789                 # Test Monday board
 ```
 
-#### **Production (`configs/pipelines/order_list_delta_sync_prod.toml`)**:
+#### **Production (`configs/pipelines/sync_order_list_prod.toml`)**:
 ```toml  
 [environment]
 target_table = "ORDER_LIST"         # Production table after cutover
@@ -256,6 +260,17 @@ extractor = OrderListExtractor()
 data = extractor.load_excel_to_swp_table()
 ```
 
+**From `src/pipelines/shared/customer/`**:
+```python
+# Reuse customer resolution and business key logic
+from pipelines.shared.customer.canonical_manager import CanonicalCustomerManager
+from pipelines.shared.customer.order_key_generator import OrderKeyGenerator
+
+# In your new monday_sync.py
+canonical_manager = CanonicalCustomerManager()
+key_generator = OrderKeyGenerator()
+```
+
 **From `src/pipelines/integrations/monday/`**:
 ```python  
 # Centralized Monday.com integration
@@ -265,8 +280,6 @@ from pipelines.integrations.monday.sync_engine import DeltaSyncEngine
 client = MondayClient()
 sync_engine = DeltaSyncEngine(client)
 ```
-
-**From `src/pipelines/utils/`**:
 ```python
 # Modern import patterns (no more sys.path hacks!)
 from pipelines.utils.db import get_connection
@@ -281,7 +294,7 @@ with get_connection('dms') as conn:
 ### **Development Sequence**:
 
 1. **Complete Enhanced Phase 1** (45 min) - Repository consolidation
-2. **Create new pipeline module** - `src/pipelines/order_delta_sync/`
+2. **Create new pipeline module** - `src/pipelines/sync_order_list/`
 3. **Leverage existing components** - Reuse load_order_list infrastructure  
 4. **Focus on sync logic** - Delta sync and Monday integration only
 
@@ -294,9 +307,10 @@ with get_connection('dms') as conn:
 | **Schema Changes** | `db/migrations/001_*.sql` | One-time database modifications |
 | **Current Schema** | `db/ddl/order_list_*.sql` | Documentation of table structure |
 | **Operational SQL** | `sql/operations/003_*.sql` | Repeatable business operations |
-| **Python Pipeline** | `src/pipelines/order_delta_sync/` | Delta sync workflow logic |
+| **Pipeline Logic** | `src/pipelines/sync_order_list/` | Delta sync workflow logic |
+| **Shared Customer Logic** | `src/pipelines/shared/customer/` | Canonical customers & order keys |
 | **Monday Integration** | `src/pipelines/integrations/monday/` | API client and sync engine |
-| **Configuration** | `configs/pipelines/order_list_delta_sync.toml` | Pipeline settings |
+| **Configuration** | `configs/pipelines/sync_order_list.toml` | Pipeline settings |
 
 ---
 
@@ -379,7 +393,7 @@ CREATE TABLE dbo.ORDER_LIST_LINES (
             CONCAT_WS('|', record_uuid, size_code, qty)))),
     sync_state          VARCHAR(10) NOT NULL DEFAULT ('NEW'),
     last_synced_at      DATETIME2 NULL,
-    monday_subitem_id   BIGINT NULL,
+    monday_item_id      BIGINT NULL,
     parent_item_id      BIGINT NULL -- links to ORDER_LIST.monday_item_id
 );
 ```
@@ -497,21 +511,32 @@ df['record_uuid'] = [str(uuid.uuid4()) for _ in range(len(df))]
 # bulk-insert to SWP_ORDER_LIST with record_uuid
 ```
 
-**run\_merges.py:**
+**merge_orchestrator.py:**
 
 ```python
 import pyodbc
 # Call each of 003_merge_headers.sql, 004_unpivot_sizes.sql, 005_merge_lines.sql in order
 ```
 
-**sync\_monday.py (two-pass):**
+**monday_sync.py (two-pass):**
 
 ```python
-# Pass A: sync headers (ORDER_LIST_DELTA where PENDING)
-# for each, call Monday.com API, update ORDER_LIST with monday_item_id, set SYNCED
+# ARCHITECTURE CLARIFICATION (July 21, 2025):
+# - Processing Model: Record-based batch processing using record_uuid as unifying key
+# - NO batch_id column - use record_uuid to link ORDER_LIST ↔ ORDER_LIST_LINES ↔ DELTA tables
+# - sync_state + sync_completed_at ONLY exist in DELTA tables (not main tables)
 
-# Pass B: sync lines (ORDER_LIST_LINES_DELTA where PENDING and parent item_id known)
-# for each, call Monday.com subitem API, update ORDER_LIST_LINES with subitem_id, set SYNCED
+# Pass A: sync headers (ORDER_LIST_DELTA WHERE sync_state = 'PENDING')
+# for each record_uuid batch:
+#   - call Monday.com API to create/update item
+#   - update ORDER_LIST_V2.monday_item_id (main table)
+#   - update ORDER_LIST_DELTA.sync_state = 'SYNCED', sync_completed_at = GETUTCDATE()
+
+# Pass B: sync lines (ORDER_LIST_LINES_DELTA WHERE sync_state = 'PENDING' AND parent has monday_item_id)
+# for each record_uuid batch with existing monday_item_id:
+#   - call Monday.com subitem API linked to parent monday_item_id
+#   - update ORDER_LIST_LINES.monday_item_id (main table)  
+#   - update ORDER_LIST_LINES_DELTA.sync_state = 'SYNCED', sync_completed_at = GETUTCDATE()
 ```
 
 ---
@@ -523,7 +548,7 @@ import pyodbc
 The TOML configuration file defines all business logic, mappings, and environment-specific settings:
 
 ```toml
-# configs/pipelines/order_list_delta_sync.toml
+# configs/pipelines/sync_order_list.toml
 
 [environment]
 # Development uses shadow tables and test Monday board
@@ -639,7 +664,7 @@ from pipelines.utils.config import load_config
 from pipelines.integrations.monday.graphql_loader import GraphQLLoader
 
 # Load environment-specific configuration
-config = load_config('order_list_delta_sync_dev.toml')  # or _prod.toml
+config = load_config('sync_order_list_dev.toml')  # or _prod.toml
 
 # GraphQL templates loaded based on TOML configuration
 loader = GraphQLLoader()

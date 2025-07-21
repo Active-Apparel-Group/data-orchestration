@@ -9,6 +9,12 @@ import os
 import sys
 from pathlib import Path
 
+
+if sys.platform == "win32":
+    import ctypes
+    ctypes.windll.kernel32.SetConsoleOutputCP(65001)
+
+
 def get_logger(name="monday_integration"):
     """
     Get appropriate logger based on environment (Kestra vs local development)
@@ -50,7 +56,7 @@ def get_logger(name="monday_integration"):
                 logs_dir.mkdir(exist_ok=True)
                 
                 log_file = logs_dir / 'monday_integration.log'
-                file_handler = logging.FileHandler(log_file)
+                file_handler = logging.FileHandler(log_file, encoding='utf-8')
                 file_handler.setFormatter(formatter)
                 logger.addHandler(file_handler)
             except (PermissionError, OSError):

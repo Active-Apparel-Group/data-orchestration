@@ -1,0 +1,91 @@
+-- ================================================================
+-- unpivot_sizes.j2 - Dynamic Size Unpivot Template (Jinja2)
+-- ================================================================
+-- Purpose: UNPIVOT {{ size_columns|length }} size columns from NEW/CHANGED headers
+-- Generated from: TOML size_detection configuration
+-- Target: {{ lines_table }} (normalized size/quantity pairs)
+-- ================================================================
+
+DECLARE @StartTime DATETIME2 = GETUTCDATE();
+DECLARE @UnpivotedCount INT = 0;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+    
+    -- =============================================================
+    -- UNPIVOT: Size columns → normalized lines
+    -- =============================================================
+    
+    INSERT INTO {{ source_lines_table }} (
+        record_uuid, 
+        size_code, 
+        qty,
+        row_hash,
+        sync_state,
+        created_at,
+        updated_at
+    )
+    SELECT 
+        unpivoted.record_uuid,
+        unpivoted.size_code,
+        unpivoted.qty,
+        CONVERT(CHAR(64), HASHBYTES('SHA2_256', 
+            CONCAT_WS('|', unpivoted.record_uuid, unpivoted.size_code, unpivoted.qty)), 2) as row_hash,
+        'NEW' as sync_state,
+        GETUTCDATE() as created_at,
+        GETUTCDATE() as updated_at
+    FROM (
+        SELECT 
+            record_uuid,
+            sync_state,
+            size_code,
+            qty
+        FROM {{ target_table }}
+        UNPIVOT (
+            qty FOR size_code IN (
+                {% for size in size_columns -%}
+                [{{ size }}]{% if not loop.last %},{% endif %}
+                {% endfor -%}
+            )
+        ) AS sizes
+    ) AS unpivoted
+    WHERE unpivoted.sync_state IN ('NEW', 'CHANGED')  -- Only process delta records
+    AND unpivoted.qty > 0;  -- Exclude zero quantities
+    
+    SET @UnpivotedCount = @@ROWCOUNT;
+    
+    COMMIT TRANSACTION;
+    
+    -- =============================================================
+    -- SUCCESS METRICS
+    -- =============================================================
+    
+    PRINT 'Size Unpivot Complete: {{ size_columns|length }} columns → {{ source_lines_table }}';
+    PRINT 'Execution Time: ' + CAST(DATEDIFF(SECOND, @StartTime, GETUTCDATE()) AS VARCHAR(10)) + ' seconds';
+    PRINT 'Lines Created: ' + CAST(@UnpivotedCount AS VARCHAR(10));
+    
+    SELECT 
+        NEWID() AS execution_id,
+        @UnpivotedCount AS records_affected,
+        {{ size_columns|length }} AS size_columns_processed,
+        'SUCCESS' AS status,
+        GETUTCDATE() AS completed_at;
+
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+    
+    DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+    
+    PRINT 'Size Unpivot Failed: ' + @ErrorMessage;
+    
+    SELECT 
+        NEWID() AS execution_id,
+        0 AS records_affected,
+        0 AS size_columns_processed,
+        'FAILED' AS status,
+        @ErrorMessage AS error_message,
+        GETUTCDATE() AS completed_at;
+    
+    RAISERROR(@ErrorMessage, 16, 1);
+END CATCH;

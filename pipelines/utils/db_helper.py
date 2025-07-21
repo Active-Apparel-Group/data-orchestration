@@ -15,10 +15,32 @@ from typing import Union, Optional
 import warnings
 warnings.filterwarnings("ignore", message="pandas only supports SQLAlchemy connectable")
 
+# Import logger following Kestra compatibility standards
+try:
+    from pipelines.utils import logger_helper
+except ImportError:
+    # Fallback to direct import
+    import importlib.util
+    
+    logger_helper_path = Path(__file__).parent / "logger_helper.py"
+    spec = importlib.util.spec_from_file_location("logger_helper", logger_helper_path)
+    if spec and spec.loader:
+        logger_helper = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(logger_helper)
+    else:
+        # Final fallback
+        import logging
+        class MockLoggerHelper:
+            @staticmethod
+            def get_logger(name):
+                return logging.getLogger(name)
+        logger_helper = MockLoggerHelper()
+
 # --------------------------
 # CONSTANTS
 # --------------------------
 DEFAULT_DRIVER = "{ODBC Driver 17 for SQL Server}"
+logger = logger_helper.get_logger(__name__)
 
 # --------------------------
 # CONFIG LOADING
@@ -125,6 +147,50 @@ def run_query(
     with get_connection(db_key) as conn:
         return pd.read_sql(query, conn, params=params, index_col=index_col)
 
+def run_query_with_display(
+    migration_path: 'Path',
+    db_key: str,
+    max_rows: int = 20,
+    verbose: bool = True
+) -> bool:
+    """
+    Run a SQL query and display results as DataFrame with row limits.
+    Used by run_migration.py with --show-results flag.
+    """
+    try:
+        # Read SQL file
+        with open(migration_path, "r") as f:
+            query = f.read()
+            
+        if verbose:
+            print(f"📊 Executing query from: {migration_path.name}")
+            
+        # Execute query and get results
+        df = run_query(query, db_key)
+        
+        if verbose:
+            print(f"✅ Query executed successfully")
+            print(f"📈 Total rows: {len(df)}")
+            print(f"🔍 Displaying first {min(max_rows, len(df))} rows:")
+            print("=" * 60)
+            
+        # Display results with row limit
+        if len(df) > 0:
+            display_df = df.head(max_rows)
+            print(display_df.to_string(index=False))
+            
+            if len(df) > max_rows:
+                print(f"\n... ({len(df) - max_rows} more rows not shown)")
+        else:
+            print("No results returned")
+            
+        return True
+        
+    except Exception as e:
+        if verbose:
+            print(f"❌ Query failed: {str(e)}")
+        return False
+
 def execute(
     sql_or_path: Union[str, 'Path'],
     db_key: str,
@@ -150,6 +216,104 @@ def execute(
 # --------------------------
 # MIGRATION HELPERS
 # --------------------------
+def extract_migration_metadata(script_content: str) -> dict:
+    """
+    Extract structured metadata from SQL migration files.
+    
+    Parses Architecture Validation sections, Next Steps, and Success messages
+    from SQL comments to provide rich feedback after migration execution.
+    
+    Args:
+        script_content: The SQL script content to parse
+        
+    Returns:
+        dict: Extracted metadata with 'validation', 'next_steps', 'success_info' keys
+    """
+    import re
+    
+    metadata = {
+        'validation': [],
+        'next_steps': [],
+        'success_info': []
+    }
+    
+    lines = script_content.split('\n')
+    current_section = None
+    
+    for line in lines:
+        line = line.strip()
+        
+        # Remove SQL comment prefixes
+        clean_line = line.replace('-- ', '').replace('PRINT ', '').strip()
+        clean_line = clean_line.replace("'", "").replace(";", "")
+        
+        # Skip empty lines and pure comment separators
+        if not clean_line or clean_line.startswith('=') or clean_line in ['', "''", '']:
+            continue
+        
+        # Section detection
+        if 'ARCHITECTURE VALIDATION' in clean_line.upper():
+            current_section = 'validation'
+            continue
+        elif 'NEXT STEPS' in clean_line.upper():
+            current_section = 'next_steps'
+            continue
+        elif 'SUCCESS MESSAGE' in clean_line.upper() or 'SUCCESS:' in clean_line.upper():
+            current_section = 'success_info'
+            continue
+        
+        # Extract content based on current section
+        if current_section == 'validation' and ('✅' in clean_line or clean_line.startswith('✅')):
+            metadata['validation'].append(clean_line)
+        elif current_section == 'next_steps' and (clean_line.startswith(('1.', '2.', '3.', '4.', '5.'))):
+            metadata['next_steps'].append(clean_line)
+        elif current_section == 'success_info' and ('- ' in clean_line or clean_line.startswith('-')):
+            metadata['success_info'].append(clean_line)
+    
+    return metadata
+
+def display_migration_summary(migration_name: str, metadata: dict, verbose: bool = True):
+    """
+    Display formatted migration summary with extracted metadata.
+    
+    Args:
+        migration_name: Name of the migration file
+        metadata: Extracted metadata from extract_migration_metadata
+        verbose: Whether to show detailed output
+    """
+    if not verbose:
+        return
+    
+    print()
+    print("=" * 70)
+    print(f"🎯 MIGRATION SUMMARY: {migration_name}")
+    print("=" * 70)
+    
+    # Architecture Validation
+    if metadata['validation']:
+        print()
+        print("📋 ARCHITECTURE VALIDATION:")
+        for item in metadata['validation']:
+            print(f"   {item}")
+    
+    # Next Steps
+    if metadata['next_steps']:
+        print()
+        print("🚀 NEXT STEPS:")
+        for step in metadata['next_steps']:
+            print(f"   {step}")
+    
+    # Success Information
+    if metadata['success_info']:
+        print()
+        print("✅ COLUMN STATUS:")
+        for info in metadata['success_info']:
+            print(f"   {info}")
+    
+    print()
+    print("=" * 70)
+    print()
+
 def run_migration(
     migration_path: Union[str, Path],
     db_key: str = 'UNIFIED_ORDERS',
@@ -157,6 +321,9 @@ def run_migration(
 ) -> bool:
     """
     Execute a SQL migration file against the specified database.
+    
+    Enhanced with metadata extraction to display Architecture Validation,
+    Next Steps, and Success information from SQL comments.
     
     Args:
         migration_path: Path to the .sql migration file
@@ -173,8 +340,8 @@ def run_migration(
             raise FileNotFoundError(f"Migration file not found: {migration_path}")
         
         if verbose:
-            self.logger.info(f"🔄 Running migration: {migration_path.name}")
-            self.logger.info(f"📊 Database: {db_key}")
+            logger.info(f"PROCESS: Running migration: {migration_path.name}")
+            logger.info(f"INFO: Database: {db_key}")
         
         # Read the migration script
         with open(migration_path, 'r', encoding='utf-8') as f:
@@ -182,6 +349,9 @@ def run_migration(
         
         if not script.strip():
             raise ValueError(f"Migration file is empty: {migration_path}")
+        
+        # Extract metadata before execution
+        metadata = extract_migration_metadata(script)
         
         # Execute the migration
         with get_connection(db_key) as conn:
@@ -191,14 +361,17 @@ def run_migration(
             cursor.close()
         
         if verbose:
-            self.logger.info(f"✅ Migration completed successfully: {migration_path.name}")
+            logger.info(f"SUCCESS: Migration completed successfully: {migration_path.name}")
+        
+        # Display enhanced summary with extracted metadata
+        display_migration_summary(migration_path.name, metadata, verbose)
         
         return True
         
     except Exception as e:
         if verbose:
-            self.logger.info(f"❌ Migration failed: {migration_path.name if 'migration_path' in locals() else migration_path}")
-            self.logger.info(f"🔥 Error: {str(e)}")
+            logger.error(f"ERROR: Migration failed: {migration_path.name if 'migration_path' in locals() else migration_path}")
+            logger.error(f"ERROR: {str(e)}")
         return False
 
 def run_migrations_directory(
@@ -229,12 +402,12 @@ def run_migrations_directory(
     
     if not migration_files:
         if verbose:
-            self.logger.info(f"⚠️  No migration files found in: {migrations_dir}")
+            logger.info(f"WARNING: No migration files found in: {migrations_dir}")
         return {'successful': 0, 'failed': 0, 'details': []}
     
     if verbose:
-        self.logger.info(f"🚀 Running {len(migration_files)} migrations from: {migrations_dir}")
-        self.logger.info("=" * 60)
+        logger.info(f"PROCESS: Running {len(migration_files)} migrations from: {migrations_dir}")
+        logger.info("=" * 60)
     
     results = {'successful': 0, 'failed': 0, 'details': []}
     
@@ -255,12 +428,12 @@ def run_migrations_directory(
         results['details'].append(result_detail)
         
         if verbose:
-            self.logger.info("-" * 60)
+            logger.info("-" * 60)
     
     if verbose:
-        self.logger.info(f"\n📊 Migration Summary:")
-        self.logger.info(f"   ✅ Successful: {results['successful']}")
-        self.logger.info(f"   ❌ Failed: {results['failed']}")
-        self.logger.info(f"   📁 Total: {len(migration_files)}")
+        logger.info(f"\nINFO: Migration Summary:")
+        logger.info(f"   SUCCESS: {results['successful']}")
+        logger.info(f"   FAILED: {results['failed']}")
+        logger.info(f"   TOTAL: {len(migration_files)}")
     
     return results

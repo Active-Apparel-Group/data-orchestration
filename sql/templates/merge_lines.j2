@@ -1,0 +1,118 @@
+-- ================================================================
+-- merge_lines.j2 - Lines Merge Template (Jinja2)
+-- ================================================================
+-- Purpose: MERGE {{ source_lines_table }} → {{ lines_table }} + OUTPUT to {{ lines_delta_table }}
+-- Generated from: TOML configuration
+-- Business Key: record_uuid + size_code combination
+-- ================================================================
+
+DECLARE @StartTime DATETIME2 = GETUTCDATE();
+DECLARE @ProcessedCount INT = 0;
+DECLARE @NewLinesCount INT = 0;
+DECLARE @ChangedLinesCount INT = 0;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+    
+    -- =============================================================
+    -- MERGE OPERATION: Lines staging → Lines table
+    -- =============================================================
+    
+    MERGE {{ lines_table }} AS target
+    USING {{ source_lines_table }} AS source
+    ON target.record_uuid = source.record_uuid 
+    AND target.size_code = source.size_code
+    
+    -- INSERT: NEW lines
+    WHEN NOT MATCHED BY TARGET THEN
+        INSERT (
+            record_uuid, 
+            size_code, 
+            qty,
+            row_hash,
+            sync_state,
+            created_at,
+            updated_at
+        )
+        VALUES (
+            source.record_uuid,
+            source.size_code,
+            source.qty,
+            source.row_hash,
+            'NEW',
+            GETUTCDATE(),
+            GETUTCDATE()
+        )
+    
+    -- UPDATE: Changed quantities
+    WHEN MATCHED AND target.row_hash <> source.row_hash THEN
+        UPDATE SET 
+            qty = source.qty,
+            row_hash = source.row_hash,
+            sync_state = 'CHANGED',
+            updated_at = GETUTCDATE()
+    
+    -- OUTPUT: Capture changes for delta tracking
+    OUTPUT
+        COALESCE(INSERTED.line_uuid, DELETED.line_uuid) AS line_uuid,
+        COALESCE(INSERTED.record_uuid, DELETED.record_uuid) AS record_uuid,
+        COALESCE(INSERTED.size_code, DELETED.size_code) AS size_code,
+        COALESCE(INSERTED.qty, DELETED.qty) AS qty,
+        $action AS action_type,
+        'PENDING' AS sync_state,
+        GETUTCDATE() AS created_at,
+        NULL AS monday_item_id,
+        NULL AS sync_completed_at
+    INTO {{ lines_delta_table }} (
+        line_uuid, record_uuid, size_code, qty, action_type,
+        sync_state, created_at, monday_item_id, sync_completed_at
+    );
+    
+    SET @ProcessedCount = @@ROWCOUNT;
+    
+    -- Count new vs changed lines
+    SELECT @NewLinesCount = COUNT(*) FROM {{ lines_delta_table }}
+    WHERE created_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'INSERT';
+    
+    SELECT @ChangedLinesCount = COUNT(*) FROM {{ lines_delta_table }}
+    WHERE created_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'UPDATE';
+    
+    COMMIT TRANSACTION;
+    
+    -- =============================================================
+    -- SUCCESS METRICS
+    -- =============================================================
+    
+    PRINT 'Lines Merge Complete: {{ lines_staging }} → {{ lines_table }}';
+    PRINT 'Binding Key: record_uuid (unified across ORDER_LIST, ORDER_LIST_LINES, and DELTA tables)';
+    PRINT 'Total Processed: ' + CAST(@ProcessedCount AS VARCHAR(10));
+    PRINT 'New Lines: ' + CAST(@NewLinesCount AS VARCHAR(10));
+    PRINT 'Changed Lines: ' + CAST(@ChangedLinesCount AS VARCHAR(10));
+    
+    SELECT 
+        NEWID() AS execution_id,
+        @ProcessedCount AS records_affected,
+        @NewLinesCount AS new_lines_count,
+        @ChangedLinesCount AS changed_lines_count,
+        'SUCCESS' AS status,
+        GETUTCDATE() AS completed_at;
+
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+    
+    DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+    
+    PRINT 'Lines Merge Failed: ' + @ErrorMessage;
+    
+    SELECT 
+        NEWID() AS execution_id,
+        0 AS records_affected,
+        0 AS new_lines_count,
+        0 AS changed_lines_count,
+        'FAILED' AS status,
+        @ErrorMessage AS error_message,
+        GETUTCDATE() AS completed_at;
+    
+    RAISERROR(@ErrorMessage, 16, 1);
+END CATCH;
