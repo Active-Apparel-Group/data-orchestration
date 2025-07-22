@@ -1,0 +1,8 @@
+query GetGroupByID($boardId: ID!) {
+  groups(ids: ["group_1", "group_2"]) {
+    groups {
+      id
+      title
+    }
+  }
+}

@@ -18,7 +18,7 @@ from typing import Dict, List, Any, Optional
 import tomli
 
 # Modern import pattern for project utilities
-from pipelines.utils import db, logger
+from src.pipelines.utils import db, logger
 
 class DeltaSyncConfig:
     """
@@ -73,10 +73,13 @@ class DeltaSyncConfig:
         if missing_sections:
             raise ValueError(f"Missing required configuration sections: {missing_sections}")
         
-        # Validate environment-specific section exists
-        env_section = f"environment.{self._environment}"
-        if env_section not in self._config:
-            raise ValueError(f"Missing environment configuration section: [{env_section}]")
+        # Validate environment-specific section exists (nested TOML structure)
+        if 'environment' not in self._config:
+            raise ValueError(f"Missing [environment] section in configuration")
+            
+        environment_config = self._config['environment']
+        if self._environment not in environment_config:
+            raise ValueError(f"Missing environment configuration section: [environment.{self._environment}]")
         
         self.logger.info(f"Configuration validated successfully for environment: {self._environment}")
     
@@ -87,9 +90,8 @@ class DeltaSyncConfig:
         return self._environment
     
     def _get_env_config(self) -> Dict[str, Any]:
-        """Get environment-specific configuration section"""
-        env_key = f"environment.{self._environment}"
-        return self._config.get(env_key, {})
+        """Get environment-specific configuration section (nested TOML structure)"""
+        return self._config.get('environment', {}).get(self._environment, {})
     
     # Environment Configuration (using environment-specific sections)
     @property
@@ -165,10 +167,17 @@ class DeltaSyncConfig:
     def monday_board_id(self) -> int:
         """Monday.com board ID for the current environment"""
         monday_config = self._config.get('monday', {}).get(self._environment, {})
+        
+        # Try both naming conventions: items_board_id (new) and board_id (legacy)
+        board_id = monday_config.get('items_board_id') or monday_config.get('board_id')
+        
         # Fallback to legacy phase1 config if environment config not found
-        if not monday_config:
+        if not board_id and not monday_config:
             monday_config = self._config.get('monday', {}).get('phase1', {})
-        return monday_config.get('board_id', 9609317401)  # Default dev board
+            board_id = monday_config.get('board_id')
+        
+        # Default to development board ID if still not found
+        return board_id or 9609317401
     
     @property
     def monday_group_id(self) -> str:

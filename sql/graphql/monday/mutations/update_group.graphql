@@ -1,0 +1,31 @@
+mutation UpdateGroup($boardId: ID!, $groupId: String!, $groupAttribute: String!, $newValue, String!) {
+  update_group(
+    board_id: $boardId,
+    group_id: $groupId,
+    group_attribute: $groupAttribute,
+    new_value: $newValue
+  ) {
+    id
+    title
+  }
+}
+
+
+
+# Notes:
+# - The mutation UpdateGroup updates a group's attribute (such as its title) on a Monday.com board.
+# - Required variables: boardId (ID), groupId (String), groupAttribute (String), newValue (String).
+# - Example usage:
+#   mutation UpdateGroup($boardId: ID!, $groupId: String!, $groupAttribute: String!, $newValue: String!) {
+#     update_group(
+#       board_id: $boardId,
+#       group_id: $groupId,
+#       group_attribute: $groupAttribute,
+#       new_value: $newValue
+#     ) {
+#       id
+#       title
+#     }
+#   }
+# - These notes are for documentation only and are not part of the GraphQL execution.
+

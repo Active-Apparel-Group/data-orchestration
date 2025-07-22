@@ -104,6 +104,99 @@ Excel source data cannot use UUID as merge keys. The corrected approach:
 
 ## Aligned Repo Structure (Execution Tree)
 
+**UPDATED**: Task 8.1 Implementation - Modern Python Module Architecture
+
+```
+src/pipelines/sync_order_list/
+├── merge_orchestrator.py             # ✅ Template-driven SQL generation (Task 5.0)
+├── config_parser.py                  # ✅ TOML configuration + dynamic size columns (Task 2.0)
+├── sql_template_engine.py            # ✅ Jinja2 template rendering (Task 1.0)
+├── cli.py                             # ✅ Command line interface
+├── monday_sync_orchestrator.py       # 🎯 Two-pass Monday sync coordinator [Task 8.2-8.5]
+├── monday_column_mapper.py           # ✅ TOML → Monday field mapping [Task 8.1.4]
+├── monday/                            # ✅ Monday.com operations module [Task 8.1.2]
+│   ├── __init__.py                    # ✅ Module exports
+│   └── integration_handler.py         # ✅ Unified Monday handler: single/batch/async [Task 8.1.3]
+└── data/                              # ✅ DELTA table operations module [Task 8.1.2]
+    ├── __init__.py                    # ✅ Module exports  
+    ├── delta_reader.py                # 📋 ORDER_LIST_DELTA batch reader [Task 8.2.2]
+    ├── lines_delta_reader.py          # 📋 ORDER_LIST_LINES_DELTA reader [Task 8.3.1]
+    ├── state_updater.py               # 📋 Items sync state management [Task 8.2.4]
+    └── lines_state_updater.py         # 📋 Lines sync state management [Task 8.3.3]
+
+src/pipelines/integrations/monday/
+├── __init__.py                        # ✅ Shared Monday.com integration exports
+└── graphql_loader.py                 # ✅ GraphQL template loader (leveraged by Task 8.1.3)
+
+sql/graphql/monday/
+├── mutations/
+│   ├── create-master-item.graphql     # ✅ Single item creation
+│   ├── create-subitem.graphql         # ✅ Single subitem creation  
+│   ├── update_item.graphql            # ✅ Single item update
+│   ├── update_subitem.graphql         # ✅ Single subitem update
+│   ├── batch_create_items.graphql     # ✅ Batch item creation template [Task 8.1.1]
+│   ├── batch_create_subitems.graphql  # ✅ Batch subitem creation template [Task 8.1.1]
+│   ├── batch_update_items.graphql     # ✅ Batch item update template [Task 8.1.1]
+│   └── create_group.graphql           # ✅ Group creation for seasons [Task 8.1.1]
+└── queries/
+    ├── get-board-schema.graphql       # ✅ Board metadata retrieval
+    ├── get-group-byid.graphql         # ✅ Group lookup by ID
+    └── validate-item.graphql          # ✅ Item validation
+
+sql/templates/
+├── merge_headers.j2                   # ✅ Dynamic headers merge (Task 1.1)
+├── unpivot_sizes.j2                   # ✅ Dynamic size unpivot (Task 1.2)
+└── merge_lines.j2                     # ✅ Dynamic lines merge (Task 1.3)
+
+configs/pipelines/
+└── sync_order_list.toml               # ✅ TOML configuration (needs monday.sync section - Task 8.1.5)
+
+tests/sync-order-list-monday/
+├── integration/                       # ✅ Integration tests (Tasks 1-7)
+│   ├── test_merge_headers.py          # ✅ Headers merge validation
+│   ├── test_unpivot_sizes.py          # ✅ Size unpivot validation
+│   ├── test_merge_lines.py            # ✅ Lines merge validation
+│   ├── test_config_parser_real.py     # ✅ Real database integration
+│   └── test_new_order_detection.py    # ✅ NEW order accuracy testing
+├── e2e/                               # ✅ End-to-end tests  
+│   └── test_complete_pipeline.py      # ✅ Full pipeline validation (Task 5.0)
+└── monday/                            # 📋 Monday.com integration tests [Task 8.7]
+    ├── test_integration_handler.py    # 📋 Handler validation [Task 8.7.1]
+    ├── test_column_mapper.py          # 📋 TOML mapping validation [Task 8.7.1] 
+    └── test_complete_monday_sync.py   # 📋 End-to-end Monday sync [Task 8.7.2]
+```
+
+### 📊 **Architecture Benefits**
+
+**BEFORE Task 8.1**:
+- 8 separate components scattered across codebase
+- Duplicated Monday.com logic in 3 different files  
+- No standard folder structure
+- Hardcoded column mappings
+
+**AFTER Task 8.1**:
+- ✅ **Unified Integration**: Single handler for all Monday.com operations
+- ✅ **Modern Structure**: Proper Python modules with clear separation
+- ✅ **Zero Duplication**: Consolidates scattered Monday.com functionality
+- ✅ **TOML-Driven**: No hardcoded column mappings, easy to extend
+- ✅ **Leverages Existing**: Uses proven `graphql_loader.py` infrastructure
+- ✅ **Production Ready**: Async batch processing with rate limiting
+
+### 🎯 **Next Steps for Task 8.2**
+
+Ready to proceed with **Task 8.2 Implementation**: Headers→Items Sync Engine (Pass 1)
+- TOML Configuration enhancement (add monday.sync section)
+- Data module implementation (delta_reader.py, state_updater.py)  
+- Integration with monday_sync_orchestrator.py
+
+**Files Ready**: 
+- ✅ `integration_handler.py` - Monday.com operations
+- ✅ `monday_column_mapper.py` - TOML-driven mapping
+- ✅ `graphql_loader.py` - Template system
+- ✅ Batch GraphQL templates created
+
+---
+
 > **Aligned with data-orchestration repository consolidation plan**
 
 ```plaintext

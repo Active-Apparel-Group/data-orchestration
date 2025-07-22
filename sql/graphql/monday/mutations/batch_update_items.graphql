@@ -1,0 +1,53 @@
+# Monday.com Batch Item Updates Template
+# This template is used for high-performance batch updates to existing items
+# IMPORTANT: This is a TEMPLATE - the actual mutation is built dynamically in Python
+
+# Example of what this template generates (3 items batch):
+mutation BatchUpdateItems(
+  $boardId_0: ID!,
+  $itemId_0: ID!,
+  $columnValues_0: JSON!,
+  $boardId_1: ID!,
+  $itemId_1: ID!,
+  $columnValues_1: JSON!,
+  $boardId_2: ID!,
+  $itemId_2: ID!,
+  $columnValues_2: JSON!
+) {
+  update_0: change_multiple_column_values(
+    board_id: $boardId_0,
+    item_id: $itemId_0,
+    column_values: $columnValues_0
+  ) {
+    id
+    name
+    column_values { id text value }
+    updated_at
+  }
+  
+  update_1: change_multiple_column_values(
+    board_id: $boardId_1,
+    item_id: $itemId_1,
+    column_values: $columnValues_1
+  ) {
+    id
+    name
+    column_values { id text value }
+    updated_at
+  }
+  
+  update_2: change_multiple_column_values(
+    board_id: $boardId_2,
+    item_id: $itemId_2,
+    column_values: $columnValues_2
+  ) {
+    id
+    name
+    column_values { id text value }
+    updated_at
+  }
+}
+
+# NOTE: This template is used by the existing update_boards_batch.py and update_boards_async_batch.py scripts
+# These scripts already implement the dynamic generation logic shown above
+# Task 8.0 can leverage this same pattern for Monday sync operations

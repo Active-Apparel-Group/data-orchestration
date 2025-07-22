@@ -1,0 +1,61 @@
+# Monday.com Batch Item Creation Template
+# This template is used by Task 8.0 for high-performance batch processing
+# IMPORTANT: This is a TEMPLATE - the actual mutation is built dynamically in Python
+
+# Example of what this template generates (3 items batch):
+mutation BatchCreateItems(
+  $boardId: ID!,
+  $groupId: String,
+  $item0_name: String!,
+  $item0_columnValues: JSON,
+  $item1_name: String!,
+  $item1_columnValues: JSON,
+  $item2_name: String!,
+  $item2_columnValues: JSON
+) {
+  create_0: create_item(
+    board_id: $boardId,
+    group_id: $groupId,
+    item_name: $item0_name,
+    column_values: $item0_columnValues
+  ) {
+    id
+    name
+    board { id }
+    column_values { id text value }
+    created_at
+  }
+  
+  create_1: create_item(
+    board_id: $boardId,
+    group_id: $groupId,
+    item_name: $item1_name,
+    column_values: $item1_columnValues
+  ) {
+    id
+    name
+    board { id }
+    column_values { id text value }
+    created_at
+  }
+  
+  create_2: create_item(
+    board_id: $boardId,
+    group_id: $groupId,
+    item_name: $item2_name,
+    column_values: $item2_columnValues
+  ) {
+    id
+    name
+    board { id }
+    column_values { id text value }
+    created_at
+  }
+}
+
+# NOTE: In practice, items_creator.py will:
+# 1. Take a batch of N items
+# 2. Generate variable definitions: $item0_name, $item1_name, ..., $itemN_name
+# 3. Generate mutation aliases: create_0, create_1, ..., create_N
+# 4. Build variables dict with all the item data
+# 5. Execute single GraphQL request with all items

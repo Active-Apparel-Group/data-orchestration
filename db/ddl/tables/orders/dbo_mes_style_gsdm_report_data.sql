@@ -1,0 +1,46 @@
+-- Table: dbo.MES_Style_GSDM_Report_Data
+-- Database: ORDERS
+-- Purpose: [Add description of table purpose]
+-- Dependencies: [List any dependent tables/views]
+
+CREATE TABLE [dbo].[MES_Style_GSDM_Report_Data] (
+    [id] BIGINT NULL,
+    [style_sort_id] BIGINT NULL,
+    [factory_name] NVARCHAR(255) NULL,
+    [client_id] BIGINT NULL,
+    [style_id] BIGINT NULL,
+    [order_no] NVARCHAR(255) NULL,
+    [style_no] NVARCHAR(255) NULL,
+    [client_style_no] NVARCHAR(255) NULL,
+    [style_sort] NVARCHAR(255) NULL,
+    [client_name] NVARCHAR(255) NULL,
+    [dress_name] NVARCHAR(255) NULL,
+    [season_name] NVARCHAR(255) NULL,
+    [versions] NVARCHAR(255) NULL,
+    [style_description] NVARCHAR(255) NULL,
+    [total_cost_value] FLOAT NULL,
+    [total_time] FLOAT NULL,
+    [section_sewing_sam] FLOAT NULL,
+    [section_after_sam] FLOAT NULL,
+    [section_cut_sam] FLOAT NULL,
+    [create_time] NVARCHAR(255) NULL,
+    [update_time] NVARCHAR(255) NULL,
+    [create_by_nick] NVARCHAR(255) NULL,
+    [update_by_nick] NVARCHAR(255) NULL,
+    [order_number] BIGINT NULL,
+    [sewing_sam] FLOAT NULL,
+    [nullmachine_sam] FLOAT NULL,
+    [hand] FLOAT NULL,
+    [hand1] FLOAT NULL,
+    [hand2] FLOAT NULL,
+    [hand3] FLOAT NULL,
+    [hand4] FLOAT NULL,
+    [section_hot_sam] FLOAT NULL,
+    [workSubclass1] FLOAT NULL,
+    [workSubclass2] FLOAT NULL,
+    [workSubclass3] FLOAT NULL,
+    [workSubclass4] FLOAT NULL,
+    [workSubclass5] FLOAT NULL,
+    [workSubclass6] FLOAT NULL,
+    [workSubclass7] FLOAT NULL
+);

@@ -1,0 +1,62 @@
+# Monday.com Batch Subitem Creation Template  
+# This template is used by Task 8.0 Pass 2 for high-performance subitem batch processing
+# IMPORTANT: This is a TEMPLATE - the actual mutation is built dynamically in Python
+
+# Example of what this template generates (3 subitems batch):
+mutation BatchCreateSubitems(
+  $item0_parentId: ID!,
+  $item0_name: String!,
+  $item0_columnValues: JSON,
+  $item1_parentId: ID!,
+  $item1_name: String!,
+  $item1_columnValues: JSON,
+  $item2_parentId: ID!,
+  $item2_name: String!,
+  $item2_columnValues: JSON
+) {
+  create_subitem_0: create_subitem(
+    parent_item_id: $item0_parentId,
+    item_name: $item0_name,
+    column_values: $item0_columnValues,
+    create_labels_if_missing: true
+  ) {
+    id
+    name
+    board { id }
+    column_values { id text value }
+    created_at
+  }
+  
+  create_subitem_1: create_subitem(
+    parent_item_id: $item1_parentId,
+    item_name: $item1_name,
+    column_values: $item1_columnValues,
+    create_labels_if_missing: true
+  ) {
+    id
+    name
+    board { id }
+    column_values { id text value }
+    created_at
+  }
+  
+  create_subitem_2: create_subitem(
+    parent_item_id: $item2_parentId,
+    item_name: $item2_name,
+    column_values: $item2_columnValues,
+    create_labels_if_missing: true
+  ) {
+    id
+    name
+    board { id }
+    column_values { id text value }
+    created_at
+  }
+}
+
+# NOTE: In practice, subitems_creator.py will:
+# 1. Take a batch of N subitems with parent_item_ids from Pass 1
+# 2. Generate variable definitions: $item0_parentId, $item1_parentId, ..., $itemN_parentId
+# 3. Generate mutation aliases: create_subitem_0, create_subitem_1, ..., create_subitem_N
+# 4. Build variables dict with all the subitem data and parent relationships
+# 5. Execute single GraphQL request with all subitems

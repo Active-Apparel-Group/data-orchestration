@@ -1,0 +1,12 @@
+mutation CreateGroup($board_id: ID!, $group_name: String!) {
+  create_group(
+    board_id: $board_id
+    group_name: $group_name
+  ) {
+    id
+    title
+    color
+    position
+    archived
+  }
+}

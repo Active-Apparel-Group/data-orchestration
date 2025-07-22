@@ -11,28 +11,20 @@ import os
 import logging
 from pathlib import Path
 
-# ─────────────────── Repository Root & Utils Import ───────────────────
-def find_repo_root() -> Path:
-    """Find repository root by looking for pipelines/utils folder"""
-    current = Path(__file__).resolve()
-    while current.parent != current:
-        if (current.parent.parent / "pipelines" / "utils").exists():
-            return current.parent.parent
-        current = current.parent
-    raise RuntimeError("Could not find repository root with utils/ folder")
+# Clean import pattern matching working integration tests
+repo_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(repo_root))
 
-repo_root = find_repo_root()
-sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
-
-# Import helpers
-import db_helper as db
-import logger_helper
+# Modern import pattern for project utilities
+from pipelines.utils import db, logger
 import staging_helper
+
+
 
 # Load configuration from centralized config
 config = db.load_config()
 
-logger = logger_helper.get_logger("extract_ddl")
+logger = logger.get_logger("extract_ddl")
 
 # Configure logging
 logging.basicConfig(

@@ -4,6 +4,26 @@
 # Use [phase] to track implementation progress
 # Use [environment.{mode}] to switch between dev/prod environments
 
+# DDL REFERENCE LINKS - Database Schema Documentation
+# ==================================================
+[ddl_references]
+# DELTA Tables (Primary sync targets) - Critical for sync_engine.py
+order_list_delta = "db/ddl/tables/orders/dbo_order_list_delta.sql"                  # 69 headers ready for sync
+order_list_lines_delta = "db/ddl/tables/orders/dbo_order_list_lines_delta.sql"      # 317 lines ready for sync
+
+# Source/Target Tables  
+order_list_v2 = "db/ddl/tables/orders/dbo_order_list_v2.sql"                        # Development target table
+order_list_lines = "db/ddl/tables/orders/dbo_order_list_lines.sql"                  # Lines staging table
+swp_order_list_v2 = "db/ddl/tables/orders/dbo_swp_order_list_v2.sql"                # Shadow/staging table
+swp_order_list_lines = "db/ddl/tables/orders/dbo_swp_order_list_lines.sql"          # Shadow lines table
+
+# Status/Tracking Tables
+monday_sync_status = "db/ddl/tables/orders/dbo_order_list_monday_sync_status.sql"  # Sync status tracking
+
+# Documentation & Tools
+sync_architecture = "docs/runbooks/sync_engine_toml_configuration.md"    # TOML configuration guide
+ddl_extraction = "tools/extract_ddl.py"                                 # DDL extraction utility
+
 [phase]
 # Track implementation progress
 current = "phase1_minimal"              # phase1_minimal, phase2_expanded, phase3_production, phase4_cutover
@@ -18,6 +38,8 @@ target_completion = "2025-07-22"
 # Development environment - uses shadow tables for safety
 source_table = "swp_ORDER_LIST_V2"              # Shadow staging table for development
 target_table = "ORDER_LIST_V2"                  # Shadow production table for development
+delta_table = "ORDER_LIST_DELTA"                # Headers DELTA table ✅
+lines_delta_table = "ORDER_LIST_LINES_DELTA"    # Lines DELTA table ✅
 lines_table = "ORDER_LIST_LINES"                # Lines table (shared)
 source_lines_table = "swp_ORDER_LIST_LINES"     # Shadow staging lines table for development
 database = "orders"                             # Database name from config.yaml
@@ -26,9 +48,30 @@ database = "orders"                             # Database name from config.yaml
 # Production environment - uses live production tables
 source_table = "swp_ORDER_LIST"                 # Production staging table
 target_table = "ORDER_LIST"                     # Live production table
+delta_table = "ORDER_LIST_DELTA"                # Same DELTA tables for both environments ✅
+lines_delta_table = "ORDER_LIST_LINES_DELTA"    # Same DELTA tables for both environments ✅
 lines_table = "ORDER_LIST_LINES"                # Lines table (shared)  
 source_lines_table = "swp_ORDER_LIST_LINES"     # Production staging lines table
 database = "orders"                             # Database name from config.yaml
+
+# DATABASE CONFIGURATION
+# ======================
+[database]
+# Essential columns required for sync operations (ACTUAL ORDER_LIST_V2 columns)
+essential_columns = [
+    "AAG ORDER NUMBER",                 # Primary business key
+    "CUSTOMER NAME",                    # Customer identification
+    "PO NUMBER",                        # Purchase order reference
+    "CUSTOMER STYLE",                   # Product identification  
+    "TOTAL QTY"                         # Quantity summary
+]
+
+# Sync tracking columns (ORDER_LIST_V2 ACTUAL column names)
+sync_columns = [
+    "monday_item_id",                   # Monday.com item ID storage (lowercase!)
+    "sync_state",                       # Status tracking (PENDING/SYNCED/ERROR)
+    "last_synced_at"                    # Last sync timestamp
+]
 
 # PHASE 1: MINIMAL VIABLE PIPELINE CONFIGURATION
 # ==============================================
@@ -70,39 +113,78 @@ algorithm = "SHA2_256"
 
 [monday.development]
 # Development Monday.com boards  
-items_board_id = 9609317401             # Dev items board
-subitems_board_id = 9609317948          # Dev subitems board
+board_id = 9609317401                   # Dev items board
+subitem_board_id = 9609317948           # Dev subitems board
 create_groups = true                    # Auto-create customer groups
 environment = "development"
 metadata_path = "configs/boards/board_9609317401_metadata.json"
 
 [monday.production]  
 # Production Monday.com boards
-items_board_id = 8709134353             # Prod items board
-subitems_board_id = 9200771505          # Prod subitems board
+board_id = 8709134353                   # Prod items board
+subitem_board_id = 9200771505           # Prod subitems board
 create_groups = true                    # Auto-create customer groups
 environment = "production"
 metadata_path = "configs/boards/board_8709134353_metadata.json"
 
-[monday.phase1]
-# Phase 1 uses development boards for testing
-board_id = 9609317401                   # Dev items board (phase1 compatibility)
-subitem_board_id = 9609317948           # Dev subitems board  
-create_groups = true                    # Auto-create customer groups
-environment = "development"
+# ENVIRONMENT-SPECIFIC MONDAY.COM CONFIGURATION
+# ===============================================
 
-# Column mapping - ORDER_LIST headers to Monday items
-[monday.column_mapping.phase1.headers]
+# Column mapping - ORDER_LIST headers to Monday items (DEVELOPMENT)
+[monday.column_mapping.development.headers]
 "AAG ORDER NUMBER" = "text123"         # Will be discovered from board metadata
-"CUSTOMER NAME" = "text456"             # Customer identification (corrected)
+"CUSTOMER NAME" = "text456"             # Customer identification 
 "PO NUMBER" = "text789"
 "CUSTOMER STYLE" = "text101"
 "TOTAL QTY" = "numbers102"
 
-# Column mapping - ORDER_LIST_LINES to Monday subitems
-[monday.column_mapping.phase1.lines]
+# Column mapping - ORDER_LIST_LINES to Monday subitems (DEVELOPMENT)
+[monday.column_mapping.development.lines]
 "size_code" = "text_size"
 "qty" = "numbers_qty"
+
+# Column mapping - ORDER_LIST headers to Monday items (PRODUCTION)
+[monday.column_mapping.production.headers]
+"AAG ORDER NUMBER" = "text_prod_001"   # Production column IDs (TBD from board metadata)
+"CUSTOMER NAME" = "text_prod_002"      # Customer identification
+"PO NUMBER" = "text_prod_003"
+"CUSTOMER STYLE" = "text_prod_004"
+"TOTAL QTY" = "numbers_prod_001"
+
+# Column mapping - ORDER_LIST_LINES to Monday subitems (PRODUCTION)
+[monday.column_mapping.production.lines]
+"size_code" = "text_prod_size"         # Production subitem column IDs (TBD)
+"qty" = "numbers_prod_qty"
+
+# Monday.com Sync Configuration - TOML-Driven Architecture
+# ========================================================
+[monday.sync]
+# Integration architecture using new unified handler
+handler_type = "unified_integration"      # Uses src/pipelines/sync_order_list/monday/integration_handler.py
+graphql_template_engine = true            # Template-driven GraphQL generation
+column_mapper_type = "toml_driven"        # Zero hardcoded mappings via monday_column_mapper.py
+
+# Template-based operations configuration
+[monday.sync.templates]
+# GraphQL templates for different operation types
+create_items = "sql/graphql/monday/mutations/batch_create_items.graphql"
+create_subitems = "sql/graphql/monday/mutations/batch_create_subitems.graphql"
+update_items = "sql/graphql/monday/mutations/batch_update_items.graphql"
+update_subitems = "sql/graphql/monday/mutations/batch_update_subitems.graphql"
+create_groups = "sql/graphql/monday/mutations/create_group.graphql"
+
+# Column mapping configuration
+[monday.sync.column_mapping]
+# Source: monday_column_mapper.py with TOML configuration
+mapping_file = "configs/pipelines/sync_order_list.toml"  # This file
+section_prefix = "monday.column_mapping"                 # Section within TOML
+environment_aware = true                                 # Support dev/prod switching
+
+# Group creation strategies
+[monday.sync.groups]
+strategy = "season"                        # Create groups for customer season (CUSTOMER + SEASON)
+auto_create = true                         # Create groups if they don't exist
+map_to = "GroupMonday"                     # Maps to GroupMonday column in ORDER_LIST table
 
 # PHASE 2: EXPANDED TESTING CONFIGURATION (FUTURE)
 # ================================================

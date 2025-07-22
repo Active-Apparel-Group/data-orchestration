@@ -200,15 +200,13 @@ columns:
   - trim
   pk: false
 - name: CO NUMBER (INITIAL DISTRO)
-  aliases:
-  - CO NUMBER - INITIAL DISTRO
+  aliases: []
   type: string
   rules:
   - trim
   pk: false
 - name: CO NUMBER (ALLOCATION DISTRO)
-  aliases:
-  - CO NUMBER - ALLOCATION DISTRO
+  aliases: []
   type: string
   rules:
   - trim
@@ -878,15 +876,13 @@ columns:
   - int
   pk: false
 - name: S
-  aliases:
-  - S+
+  aliases: []
   type: int
   rules:
   - int
   pk: false
 - name: S+
-  aliases:
-  - S
+  aliases: []
   type: int
   rules:
   - int

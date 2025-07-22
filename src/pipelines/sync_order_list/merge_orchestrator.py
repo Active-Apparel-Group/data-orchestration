@@ -35,7 +35,7 @@ import time
 repo_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(repo_root))
 
-from pipelines.utils import db, logger
+from src.pipelines.utils import db, logger
 from .config_parser import DeltaSyncConfig, load_delta_sync_config
 from .sql_template_engine import SQLTemplateEngine
 

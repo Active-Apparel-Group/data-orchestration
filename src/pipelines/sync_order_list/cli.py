@@ -1,457 +1,147 @@
 """
-Command Line Interface for ORDER_LIST Delta Sync Pipeline
-========================================================
-Purpose: Entry point CLI for end-to-end ORDER_LIST → Monday.com sync pipeline
+Ultra-Lightweight ORDER_LIST Monday.com Sync CLI
+===============================================
+Purpose: Command-line interface for ORDER_LIST → Monday.com synchronization
 Location: src/pipelines/sync_order_list/cli.py
-Created: 2025-07-20 (Milestone 2: Business Key Implementation)
+Created: 2025-07-22 (Architecture Simplification)
 
-This module provides the command line interface for the complete ORDER_LIST delta sync
-pipeline. It orchestrates the full workflow from Excel ingestion to Monday.com sync.
+Ultra-Minimal Architecture:
+- 2 files total: monday_api_client.py + sync_engine.py
+- Direct TOML + GraphQL template execution
+- Zero abstraction layers
 
-Complete Workflow:
-1. Excel ingestion (via load_order_list pipeline)
-2. Business key generation and canonicalization
-3. SQL merge operations (via merge_orchestrator.py)
-4. Two-pass Monday.com sync (via monday_sync.py)
-5. Comprehensive reporting and validation
-
-Architecture Integration:
-- Leverages existing load_order_list pipeline for Excel ingestion
-- Uses shared customer utilities for business key resolution
-- Orchestrates merge_orchestrator and monday_sync modules
-- Provides rich CLI with dry-run support and validation options
+Usage:
+    python -m src.pipelines.sync_order_list.cli sync --dry-run
+    python -m src.pipelines.sync_order_list.cli sync --execute --limit 100
 """
 
-import sys
 import argparse
-import time
+import sys
 import json
+import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Optional, Dict, Any
 
-# Modern import pattern for project utilities
-from pipelines.utils import db, logger
-from .config_parser import DeltaSyncConfig, load_delta_sync_config
-from .merge_orchestrator import MergeOrchestrator
-from .monday_sync import MondaySync
+# Modern Python package imports - ultra-minimal dependencies
+from src.pipelines.utils import logger
 
-# Integration with existing load_order_list pipeline
-try:
-    from pipelines.load_order_list.extract import OrderListExtractor
-    from pipelines.load_order_list.transform import OrderListTransformer
-    LOAD_ORDER_LIST_AVAILABLE = True
-except ImportError:
-    LOAD_ORDER_LIST_AVAILABLE = False
+# Import ultra-lightweight components
+from .sync_engine import SyncEngine
 
-class SyncOrderListCLI:
+
+class UltraLightweightSyncCLI:
     """
-    Command Line Interface for ORDER_LIST Delta Sync Pipeline
+    Ultra-lightweight CLI for ORDER_LIST → Monday.com sync
+    Direct execution with minimal complexity
     """
     
-    def __init__(self, environment: str = 'dev'):
+    def __init__(self, config_path: str = "configs/pipelines/sync_order_list.toml"):
         """
-        Initialize CLI with configuration
+        Initialize CLI with TOML configuration
         
         Args:
-            environment: Configuration environment ('dev', 'prod', or TOML path)
+            config_path: Path to sync_order_list.toml configuration
         """
-        self.config = load_delta_sync_config(environment)
+        self.config_path = config_path
         self.logger = logger.get_logger(__name__)
         
-        # Initialize pipeline components
-        config = load_delta_sync_config(environment)
-        self.merge_orchestrator = MergeOrchestrator(config)
-        self.monday_sync = MondaySync(config)
+        # Initialize sync engine
+        self.sync_engine = SyncEngine(config_path)
         
-        # Track overall pipeline statistics
-        self.pipeline_stats = {
-            'start_time': None,
-            'end_time': None,
-            'total_duration': 0,
-            'records_processed': 0,
-            'records_synced': 0,
-            'operations_completed': []
-        }
-        
-        self.logger.info(f"ORDER_LIST Delta Sync CLI initialized for {environment}")
+        self.logger.info(f"Ultra-lightweight sync CLI initialized")
     
-    def execute_complete_pipeline(self, excel_file: Optional[str] = None, dry_run: bool = False, 
-                                 validation_only: bool = False) -> Dict[str, Any]:
+    def sync_command(self, dry_run: bool = False, limit: Optional[int] = None, 
+                     customer: Optional[str] = None) -> Dict[str, Any]:
         """
-        Execute complete ORDER_LIST → Monday.com sync pipeline
+        Execute sync command
         
         Args:
-            excel_file: Path to Excel file (uses latest if None)
-            dry_run: If True, validate operations but don't execute
-            validation_only: If True, only run validation checks
+            dry_run: If True, validate but don't execute
+            limit: Optional limit on number of records to process
+            customer: Optional customer filter
             
         Returns:
-            Complete pipeline execution results
+            Sync execution results
         """
-        self.pipeline_stats['start_time'] = time.time()
-        
-        self.logger.info("🚀 Starting complete ORDER_LIST Delta Sync Pipeline")
-        self.logger.info(f"Environment: {self.config.board_type}")
-        self.logger.info(f"Target table: {self.config.target_table}")
-        self.logger.info(f"Dry run: {dry_run}")
-        
-        if validation_only:
-            return self._execute_validation_only()
+        self.logger.info(f"🚀 Starting ORDER_LIST → Monday.com sync")
+        self.logger.info(f"Mode: {'DRY RUN' if dry_run else 'EXECUTE'}")
+        if limit:
+            self.logger.info(f"Limit: {limit} records")
+        if customer:
+            self.logger.info(f"Customer filter: {customer}")
         
         try:
-            # Step 1: Excel ingestion (optional - use existing SWP data if not provided)
-            if excel_file:
-                ingestion_result = self._execute_excel_ingestion(excel_file, dry_run)
-                if not ingestion_result['success']:
-                    return self._format_failure_result("Excel ingestion failed", ingestion_result)
+            # Execute sync using sync engine
+            result = self.sync_engine.run_sync(dry_run=dry_run, limit=limit)
+            
+            # Log results
+            if result['success']:
+                self.logger.info(f"✅ Sync completed: {result['total_synced']} records in {result['execution_time_seconds']:.2f}s")
+                self.logger.info(f"   Headers: {result['headers'].get('synced', 0)}, Lines: {result['lines'].get('synced', 0)}")
             else:
-                self.logger.info("📋 Skipping Excel ingestion - using existing SWP_ORDER_LIST data")
-                ingestion_result = {'success': True, 'records_processed': 0, 'skipped': True}
+                self.logger.error(f"❌ Sync failed: {result.get('error', 'Unknown error')}")
             
-            # Step 2: Merge operations (SWP → ORDER_LIST with delta tracking)
-            merge_result = self.merge_orchestrator.execute_merge_sequence(dry_run)
-            if not merge_result['success']:
-                return self._format_failure_result("Merge operations failed", merge_result)
-            
-            # Step 3: Monday.com sync (two-pass: headers → lines)
-            sync_result = self.monday_sync.execute_two_pass_sync(dry_run)
-            if not sync_result['success']:
-                return self._format_failure_result("Monday.com sync failed", sync_result)
-            
-            # Step 4: Final validation and reporting
-            validation_result = self._execute_final_validation()
-            
-            # Compile complete results
-            self.pipeline_stats['end_time'] = time.time()
-            self.pipeline_stats['total_duration'] = self.pipeline_stats['end_time'] - self.pipeline_stats['start_time']
-            
-            result = {
-                'success': True,
-                'dry_run': dry_run,
-                'pipeline_stats': self.pipeline_stats,
-                'steps': {
-                    'excel_ingestion': ingestion_result,
-                    'merge_operations': merge_result,
-                    'monday_sync': sync_result,
-                    'validation': validation_result
-                },
-                'summary': self._generate_pipeline_summary()
-            }
-            
-            self.logger.info(f"✅ Complete pipeline finished successfully in {self.pipeline_stats['total_duration']:.2f}s")
             return result
             
         except Exception as e:
-            self.logger.exception(f"Fatal pipeline error: {e}")
-            return self._format_failure_result("Fatal pipeline error", {'error': str(e)})
-    
-    def _execute_excel_ingestion(self, excel_file: str, dry_run: bool) -> Dict[str, Any]:
-        """
-        Execute Excel ingestion using existing load_order_list pipeline
-        
-        Args:
-            excel_file: Path to Excel file to ingest
-            dry_run: If True, validate but don't execute
-            
-        Returns:
-            Ingestion results dictionary
-        """
-        self.logger.info(f"📥 Step 1: Excel Ingestion ({excel_file})")
-        
-        if not LOAD_ORDER_LIST_AVAILABLE:
-            self.logger.warning("load_order_list pipeline not available - using mock ingestion")
-            return {
-                'success': True,
-                'records_processed': 100,
-                'duration_seconds': 1.0,
-                'mock': True
-            }
-        
-        start_time = time.time()
-        
-        try:
-            if dry_run:
-                self.logger.info("📝 DRY RUN: Would ingest Excel file to SWP_ORDER_LIST")
-                return {
-                    'success': True,
-                    'records_processed': 0,
-                    'duration_seconds': 0.1,
-                    'dry_run': True
-                }
-            
-            # Use existing load_order_list pipeline
-            extractor = OrderListExtractor()
-            transformer = OrderListTransformer()
-            
-            # Extract Excel data
-            raw_data = extractor.extract_excel(excel_file)
-            
-            # Transform with business key generation
-            transformed_data = transformer.transform_with_business_keys(raw_data)
-            
-            # Load to SWP_ORDER_LIST
-            load_result = extractor.load_to_swp_table(transformed_data)
-            
-            duration = time.time() - start_time
-            
-            self.logger.info(f"✅ Excel ingestion completed: {load_result['records']} records in {duration:.2f}s")
-            
-            return {
-                'success': True,
-                'records_processed': load_result['records'],
-                'duration_seconds': round(duration, 2),
-                'file_processed': excel_file
-            }
-            
-        except Exception as e:
-            duration = time.time() - start_time
-            self.logger.exception(f"Excel ingestion failed: {e}")
+            self.logger.exception(f"Sync command failed: {e}")
             return {
                 'success': False,
                 'error': str(e),
-                'duration_seconds': round(duration, 2)
+                'records_processed': 0
             }
     
-    def _execute_validation_only(self) -> Dict[str, Any]:
+    def status_command(self) -> Dict[str, Any]:
         """
-        Execute validation-only mode (no data processing)
+        Get sync status
         
         Returns:
-            Validation results dictionary
+            Current sync status
         """
-        self.logger.info("🔍 Validation-only mode: Checking pipeline readiness")
-        
-        validation_results = {}
-        overall_success = True
-        
-        # Configuration validation
-        config_validation = self._validate_configuration()
-        validation_results['configuration'] = config_validation
-        if not config_validation['success']:
-            overall_success = False
-        
-        # Database validation
-        db_validation = self._validate_database_setup()
-        validation_results['database'] = db_validation
-        if not db_validation['success']:
-            overall_success = False
-        
-        # Prerequisites validation
-        prereq_validation = self.merge_orchestrator.validate_prerequisites()
-        validation_results['prerequisites'] = prereq_validation
-        if not prereq_validation['success']:
-            overall_success = False
-        
-        # Monday.com integration validation
-        monday_validation = self._validate_monday_integration()
-        validation_results['monday_integration'] = monday_validation
-        if not monday_validation['success']:
-            overall_success = False
-        
-        return {
-            'success': overall_success,
-            'validation_mode': True,
-            'validations': validation_results,
-            'summary': f"{'✅ All validations passed' if overall_success else '❌ Some validations failed'}"
-        }
-    
-    def _validate_configuration(self) -> Dict[str, Any]:
-        """Validate TOML configuration completeness"""
-        self.logger.debug("Validating TOML configuration")
-        
         try:
-            # Check required configuration sections
-            required_sections = ['environment', 'database', 'hash', 'monday']
-            missing_sections = []
-            
-            config_dict = self.config._config
-            for section in required_sections:
-                if section not in config_dict:
-                    missing_sections.append(section)
-            
-            # Validate Monday.com configuration
-            monday_valid = self.config.validate_monday_config()
-            
-            success = len(missing_sections) == 0 and monday_valid
-            
-            return {
-                'success': success,
-                'missing_sections': missing_sections,
-                'monday_config_valid': monday_valid,
-                'target_table': self.config.target_table,
-                'board_type': self.config.board_type
-            }
-            
-        except Exception as e:
-            return {
-                'success': False,
-                'error': str(e)
-            }
-    
-    def _validate_database_setup(self) -> Dict[str, Any]:
-        """Validate database tables and connections"""
-        self.logger.debug("Validating database setup")
-        
-        try:
-            with db.get_connection(self.config.database_connection) as conn:
-                cursor = conn.cursor()
-                
-                validations = {}
-                
-                # Check target table exists
-                target_table = self.config.get_full_table_name('target')
-                try:
-                    cursor.execute(f"SELECT COUNT(*) FROM {target_table}")
-                    count = cursor.fetchone()[0]
-                    validations['target_table'] = {'exists': True, 'record_count': count}
-                except Exception as e:
-                    validations['target_table'] = {'exists': False, 'error': str(e)}
-                
-                # Check SWP table exists
-                try:
-                    cursor.execute("SELECT COUNT(*) FROM dbo.SWP_ORDER_LIST")
-                    swp_count = cursor.fetchone()[0]
-                    validations['swp_table'] = {'exists': True, 'record_count': swp_count}
-                except Exception as e:
-                    validations['swp_table'] = {'exists': False, 'error': str(e)}
-                
-                success = all(v.get('exists', False) for v in validations.values())
-                
-                return {
-                    'success': success,
-                    'connection': 'successful',
-                    'tables': validations
-                }
-                
-        except Exception as e:
-            return {
-                'success': False,
-                'connection': 'failed',
-                'error': str(e)
-            }
-    
-    def _validate_monday_integration(self) -> Dict[str, Any]:
-        """Validate Monday.com integration readiness"""
-        self.logger.debug("Validating Monday.com integration")
-        
-        try:
-            # Get sync status
-            status = self.monday_sync.get_sync_status()
-            
-            return {
-                'success': not status.get('error'),
-                'integration_available': status.get('monday_integration_available', False),
-                'board_id': self.config.monday_board_id,
-                'sync_status': status
-            }
-            
-        except Exception as e:
-            return {
-                'success': False,
-                'error': str(e),
-                'integration_available': False
-            }
-    
-    def _execute_final_validation(self) -> Dict[str, Any]:
-        """Execute final validation after pipeline completion"""
-        self.logger.info("🔍 Final Validation: Checking pipeline results")
-        
-        try:
-            # Get updated sync status
-            sync_status = self.monday_sync.get_sync_status()
-            
-            # Count records in various states
-            validation_summary = {
-                'sync_status': sync_status,
-                'validation_time': time.time(),
-                'pipeline_successful': True  # Based on previous steps
-            }
-            
+            # For now, return basic status - could be enhanced with database queries
             return {
                 'success': True,
-                'validation_summary': validation_summary
+                'status': 'ready',
+                'config_path': self.config_path,
+                'engine': 'ultra-lightweight'
             }
             
         except Exception as e:
-            self.logger.exception(f"Final validation failed: {e}")
+            self.logger.exception(f"Status command failed: {e}")
             return {
                 'success': False,
                 'error': str(e)
             }
-    
-    def _format_failure_result(self, message: str, error_details: Dict[str, Any]) -> Dict[str, Any]:
-        """Format failure result with consistent structure"""
-        self.pipeline_stats['end_time'] = time.time()
-        if self.pipeline_stats['start_time']:
-            self.pipeline_stats['total_duration'] = self.pipeline_stats['end_time'] - self.pipeline_stats['start_time']
-        
-        self.logger.error(f"❌ Pipeline failed: {message}")
-        
-        return {
-            'success': False,
-            'error_message': message,
-            'error_details': error_details,
-            'pipeline_stats': self.pipeline_stats
-        }
-    
-    def _generate_pipeline_summary(self) -> Dict[str, Any]:
-        """Generate comprehensive pipeline summary"""
-        return {
-            'environment': self.config.board_type,
-            'target_table': self.config.target_table,
-            'total_duration': round(self.pipeline_stats['total_duration'], 2),
-            'operations_completed': len(self.pipeline_stats['operations_completed']),
-            'monday_board_id': self.config.monday_board_id,
-            'pipeline_version': 'Milestone 2 - Business Key Implementation'
-        }
 
 
 def main():
     """Main CLI entry point"""
     parser = argparse.ArgumentParser(
-        description="ORDER_LIST Delta Sync Pipeline - Excel → Azure SQL → Monday.com",
+        description="Ultra-Lightweight ORDER_LIST Monday.com Sync",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Complete pipeline with Excel file
-  python -m pipelines.sync_order_list.cli --excel orders.xlsx --environment dev
+  # Dry run sync (validate only)
+  python -m src.pipelines.sync_order_list.cli sync --dry-run
   
-  # Dry run validation
-  python -m pipelines.sync_order_list.cli --dry-run --environment dev
+  # Execute sync with limit
+  python -m src.pipelines.sync_order_list.cli sync --execute --limit 100
   
-  # Use existing SWP data (skip Excel ingestion)
-  python -m pipelines.sync_order_list.cli --environment dev
+  # Execute full sync
+  python -m src.pipelines.sync_order_list.cli sync --execute
   
-  # Validation only
-  python -m pipelines.sync_order_list.cli --validation-only --environment prod
+  # Check status
+  python -m src.pipelines.sync_order_list.cli status
         """
     )
     
-    # Primary arguments
+    # Configuration arguments
     parser.add_argument(
-        '--excel', 
+        '--config', 
         type=str, 
-        help='Path to Excel file for ingestion (optional - uses existing SWP data if not provided)'
-    )
-    
-    parser.add_argument(
-        '--environment', 
-        type=str, 
-        default='dev',
-        help='Configuration environment: dev, prod, or path to TOML file (default: dev)'
-    )
-    
-    # Execution mode arguments
-    parser.add_argument(
-        '--dry-run', 
-        action='store_true',
-        help='Validate operations but do not execute (safe mode)'
-    )
-    
-    parser.add_argument(
-        '--validation-only', 
-        action='store_true',
-        help='Only run validation checks, do not process data'
+        default='configs/pipelines/sync_order_list.toml',
+        help='Path to TOML configuration file'
     )
     
     # Output arguments
@@ -470,29 +160,55 @@ Examples:
     parser.add_argument(
         '--quiet', 
         action='store_true',
-        help='Suppress most output (errors only)'
+        help='Suppress most output'
     )
+    
+    # Subcommands
+    subparsers = parser.add_subparsers(dest='command', help='Commands')
+    
+    # Sync command
+    sync_parser = subparsers.add_parser('sync', help='Execute sync operation')
+    sync_group = sync_parser.add_mutually_exclusive_group(required=True)
+    sync_group.add_argument('--dry-run', action='store_true', help='Validate but do not execute')
+    sync_group.add_argument('--execute', action='store_true', help='Execute sync operations')
+    
+    sync_parser.add_argument('--limit', type=int, help='Limit number of records to process')
+    sync_parser.add_argument('--customer', type=str, help='Filter by customer name')
+    
+    # Status command
+    status_parser = subparsers.add_parser('status', help='Get sync status')
     
     args = parser.parse_args()
     
     # Configure logging
     log_level = 'DEBUG' if args.verbose else ('ERROR' if args.quiet else 'INFO')
-    import logging
     logging.basicConfig(
         level=getattr(logging, log_level),
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     
+    # Check for command
+    if not args.command:
+        parser.print_help()
+        sys.exit(1)
+    
     try:
         # Initialize CLI
-        cli = SyncOrderListCLI(args.environment)
+        cli = UltraLightweightSyncCLI(args.config)
         
-        # Execute pipeline
-        result = cli.execute_complete_pipeline(
-            excel_file=args.excel,
-            dry_run=args.dry_run,
-            validation_only=args.validation_only
-        )
+        # Execute command
+        if args.command == 'sync':
+            dry_run = args.dry_run
+            result = cli.sync_command(
+                dry_run=dry_run,
+                limit=args.limit,
+                customer=args.customer
+            )
+        elif args.command == 'status':
+            result = cli.status_command()
+        else:
+            print(f"Unknown command: {args.command}")
+            sys.exit(1)
         
         # Output results
         if args.output_json:
@@ -501,29 +217,26 @@ Examples:
             print(f"Results saved to {args.output_json}")
         
         if not args.quiet:
-            print("\n" + "="*60)
-            print("PIPELINE EXECUTION SUMMARY")
-            print("="*60)
+            print("\n" + "="*50)
+            print("SYNC OPERATION RESULTS")
+            print("="*50)
             print(f"Success: {'✅ Yes' if result['success'] else '❌ No'}")
-            print(f"Environment: {args.environment}")
+            print(f"Command: {args.command}")
             
-            if 'pipeline_stats' in result:
-                stats = result['pipeline_stats']
-                print(f"Duration: {stats.get('total_duration', 0):.2f} seconds")
+            if 'records_processed' in result:
+                print(f"Records processed: {result['records_processed']}")
             
-            if 'summary' in result:
-                summary = result['summary']
-                for key, value in summary.items():
-                    print(f"{key.replace('_', ' ').title()}: {value}")
+            if 'execution_time_seconds' in result:
+                print(f"Execution time: {result['execution_time_seconds']:.2f}s")
             
-            if not result['success'] and 'error_message' in result:
-                print(f"\nError: {result['error_message']}")
+            if not result['success'] and 'error' in result:
+                print(f"Error: {result['error']}")
         
         # Exit with appropriate code
         sys.exit(0 if result['success'] else 1)
         
     except KeyboardInterrupt:
-        print("\n⚠️  Pipeline interrupted by user")
+        print("\n⚠️  Operation interrupted by user")
         sys.exit(2)
     except Exception as e:
         print(f"❌ Fatal error: {e}")

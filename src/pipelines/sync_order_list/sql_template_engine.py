@@ -25,13 +25,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 import jinja2
 
-# Legacy transition support pattern - SAME AS WORKING TESTS
-repo_root = Path(__file__).parent.parent.parent.parent
-sys.path.insert(0, str(repo_root))
-sys.path.insert(0, str(repo_root / "src"))
-
-# Import with working pattern
-from pipelines.utils import logger
+# Modern Python package imports
+from src.pipelines.utils import logger
 from src.pipelines.sync_order_list.config_parser import DeltaSyncConfig
 
 class SQLTemplateEngine:
