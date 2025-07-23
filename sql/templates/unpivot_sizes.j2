@@ -1,9 +1,11 @@
 -- ================================================================
--- unpivot_sizes.j2 - Dynamic Size Unpivot Template (Jinja2)
+-- unpivot_sizes.j2 - Dynamic Size Unpivot Template (Jinja2) - Main Tables Only
 -- ================================================================
--- Purpose: UNPIVOT {{ size_columns|length }} size columns from NEW/CHANGED headers
+-- Purpose: UNPIVOT {{ size_columns|length }} size columns from PENDING sync records
+-- Architecture: Main Tables Only - Direct main table query 
 -- Generated from: TOML size_detection configuration
--- Target: {{ lines_table }} (normalized size/quantity pairs)
+-- Target: {{ source_lines_table }} (normalized size/quantity pairs)
+-- Filter: sync_state = 'PENDING' (replaces intermediate table dependency)
 -- ================================================================
 
 DECLARE @StartTime DATETIME2 = GETUTCDATE();
@@ -49,7 +51,7 @@ BEGIN TRY
             )
         ) AS sizes
     ) AS unpivoted
-    WHERE unpivoted.sync_state IN ('NEW', 'CHANGED')  -- Only process delta records
+    WHERE unpivoted.sync_state = 'PENDING'  -- Only process pending sync records
     AND unpivoted.qty > 0;  -- Exclude zero quantities
     
     SET @UnpivotedCount = @@ROWCOUNT;
@@ -60,7 +62,8 @@ BEGIN TRY
     -- SUCCESS METRICS
     -- =============================================================
     
-    PRINT 'Size Unpivot Complete: {{ size_columns|length }} columns → {{ source_lines_table }}';
+    PRINT 'Size Unpivot Complete (Main Tables): {{ size_columns|length }} columns to {{ source_lines_table }}';
+    PRINT 'Direct Main Table Query: No intermediate table dependency';
     PRINT 'Execution Time: ' + CAST(DATEDIFF(SECOND, @StartTime, GETUTCDATE()) AS VARCHAR(10)) + ' seconds';
     PRINT 'Lines Created: ' + CAST(@UnpivotedCount AS VARCHAR(10));
     

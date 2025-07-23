@@ -1,0 +1,180 @@
+# Column mapping - ORDER_LIST headers to Monday items (DEVELOPMENT BOARD: 9609317401)
+[monday.column_mapping.headers]
+# === Core Order Information ===
+"AAG ORDER NUMBER" = "text_mkr5wya6"  # text - AAG ORDER NUMBER
+"PO NUMBER" = "text_mkr5ej2x"  # text - PO NUMBER
+"CUSTOMER NAME" = "dropdown_mkr542p2"  # dropdown - CUSTOMER
+"CUSTOMER ALT PO" = "text_mkrh94rx"  # text - CUSTOMER ALT PO
+"ORDER DATE PO RECEIVED" = "date_mkr5zp5"  # date - ORDER DATE PO RECEIVED
+"ORDER TYPE" = "dropdown_mkr518fc"  # dropdown - ORDER TYPE
+
+# === Product Details ===
+"CUSTOMER COLOUR DESCRIPTION" = "dropdown_mkr5677f"  # dropdown - COLOR
+"CUSTOMER STYLE" = "dropdown_mkr5tgaa"  # dropdown - STYLE
+"PATTERN ID" = "text_mkr5cz8m"  # text - PATTERN ID
+"STYLE DESCRIPTION" = "long_text_mkr5p0cf"  # long_text - STYLE DESCRIPTION
+"NOTES" = "long_text_mkr5hass"  # long_text - NOTES
+"UNIT OF MEASURE" = "color_mkr5yf27"  # status - UNIT OF MEASURE
+"ALIAS/RELATED ITEM" = "text_mkrhra2c"  # text - ALIAS RELATED ITEM
+
+
+# === Season and Planning ===
+"AAG SEASON" = "dropdown_mkr58de6"  # dropdown - AAG SEASON
+"CATEGORY" = "dropdown_mkr5s5n3"  # dropdown - CATEGORY
+"CUSTOMER SEASON" = "dropdown_mkr5rgs6"  # dropdown - CUSTOMER SEASON
+"DROP" = "dropdown_mkr5w5e"  # dropdown - DROP
+"RANGE / COLLECTION" = "long_text_mks0vs1p"  # long_text - RANGE / COLLECTION
+"AAG SEASON CODE" = "dropdown_mkr58de6"  # dropdown - AAG SEASON
+
+# === Dates and Timelines ===
+"DELIVERY TERMS" = "dropdown_mkr5kk5"  # dropdown - DELIVERY TERMS
+"DESTINATION WAREHOUSE" = "text_mkr5ps35"  # text - DESTINATION WAREHOUSE
+"PLANNED DELIVERY METHOD" = "text_mkr5wcpw"  # text - PLANNED DELIVERY METHOD
+"ETA CUSTOMER WAREHOUSE DATE" = "date_mkr554yz"  # dropdown - CUSTOMER REQ IN DC DATE
+"EX FACTORY DATE" = "date_mkr57811"  # date - CUSTOMER EX FACTORY DATE
+"Warehouse" = "text_mkr5ps35"  # text - DESTINATION WAREHOUSE
+
+# === Pricing and Financials ===
+"ADMINISTRATION FEE" = "numeric_mkr5k68"  # numbers - ADMINISTRATION FEE
+"CUSTOMER PRICE" = "numeric_mkr5cact"  # numbers - CUSTOMER PRICE
+"DDP US (USD)" = "numeric_mkr5js0x"  # numbers - DDP US (USD)
+"DESIGN FEE" = "numeric_mkr5h612"  # numbers - DESIGN FEE
+"DISCOUNT" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"EX WORKS (USD)" = "numeric_mkr5erhv"  # numbers - EX WORKS (USD)
+"FINAL FOB (USD)" = "numeric_mkr5nhr7"  # numbers - FINAL FOB (USD)
+"FINAL PRICES Y/N" = "text_mkr5ptvg"  # text - FINAL PRICES Y/N
+"FX CHARGE" = "numeric_mkr5gp6a"  # numbers - FX CHARGE
+"NOTES FOR PRICE" = "long_text_mkr5znxn"  # long_text - NOTES FOR PRICE
+"SMS PRICE USD" = "numeric_mkr58nvp"  # numbers - SMS PRICE USD
+"SURCHARGE FEE" = "numeric_mkr57cem"  # numbers - SURCHARGE FEE
+"US DUTY" = "numeric_mkr5ev2q"  # numbers - US DUTY
+"US DUTY RATE" = "numeric_mkr5r6at"  # numbers - US DUTY RATE
+"US TARIFF" = "numeric_mkr51ndy"  # numbers - US TARIFF
+"US TARIFF RATE" = "numeric_mkr55zg1"  # numbers - US TARIFF RATE
+
+# === Shipping and Logistics ===
+"DESTINATION" = "text_mkr5kbc6"  # text - DESTINATION
+"FREIGHT" = "numeric_mksfr0r2"  # numbers - FREIGHT
+"HANDLING" = "text_mkr5s3tm"  # text - HANDLING
+"HS CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE
+"UK FREIGHT" = "numeric_mksfr0r2"  # numbers - FREIGHT
+
+
+
+
+"USA ONLY LSTP 75% EX WORKS" = "numeric_mkr5yne4"  # numbers - USA ONLY LSTP 75% EX WORKS
+"ADDITIONAL TARIFF" = "numeric_mkr51ndy"  # numbers - US TARIFF (fuzzy: 0.88)
+"ADDITIONAL TARIFF %" = "numeric_mkr51ndy"  # numbers - US TARIFF (fuzzy: 0.88)
+"ADDITIONAL TARIFF RATE" = "numeric_mkr55zg1"  # numbers - US TARIFF RATE (fuzzy: 0.92)
+"ADDITIONAL TARIFF VALUE" = "numeric_mkr51ndy"  # numbers - US TARIFF (fuzzy: 0.88)
+"AU Discount 2 Dec" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"AU Price 2 Dec" = "numeric_mkr5cact"  # numbers - CUSTOMER PRICE (fuzzy: 0.84)
+"CAN DUTY" = "numeric_mkr5ev2q"  # numbers - US DUTY (fuzzy: 0.88)
+"CAN DUTY RATE" = "numeric_mkr5r6at"  # numbers - US DUTY RATE (fuzzy: 0.91)
+"CAN Discount 2 Dec" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"CAN Duty 2 Dec" = "numeric_mkr5ev2q"  # numbers - US DUTY (fuzzy: 0.88)
+"CAN Price 2 Dec" = "numeric_mkr5cact"  # numbers - CUSTOMER PRICE (fuzzy: 0.81)
+"CAN Price w/ Discount" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"DDP CAN (USD)" = "numeric_mkr5js0x"  # numbers - DDP US (USD) (fuzzy: 0.88)
+"DDP UK (USD)" = "numeric_mkr5js0x"  # numbers - DDP US (USD) (fuzzy: 0.90)
+"FOB (AUD)" = "numeric_mkr5nhr7"  # numbers - FINAL FOB (USD) (fuzzy: 0.88)
+"FX CHARGE 2 Dec" = "numeric_mkr5gp6a"  # numbers - FX CHARGE
+"INFOR EX-WORKS 4 Dec" = "numeric_mkr5erhv"  # numbers - EX WORKS (USD) (fuzzy: 0.88)
+"NASC TO ROC PRICE (RMB) (inc VAT)" = "numeric_mkr5cact"  # numbers - CUSTOMER PRICE (fuzzy: 0.88)
+"RMB Discount 2 Dec" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"RMB Price w/ Discount" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"RMB price (ex. VAT)" = "numeric_mkr5cact"  # numbers - CUSTOMER PRICE (fuzzy: 0.81)
+"TARIFF LOSS" = "numeric_mkr55zg1"  # numbers - US TARIFF RATE (fuzzy: 0.88)
+"TARIFF RATE CHARGED TO AAG" = "numeric_mkr55zg1"  # numbers - US TARIFF RATE (fuzzy: 0.88)
+"TARIFF RELIEF DISCOUNT (20%)" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"UK DUTY" = "numeric_mkr5r6at"  # numbers - US DUTY RATE (fuzzy: 0.88)
+"UK DUTY RATE" = "numeric_mkr5r6at"  # numbers - US DUTY RATE (fuzzy: 0.92)
+"UK Discount 2 Dec" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"UK Duty 2 Dec" = "numeric_mkr5ev2q"  # numbers - US DUTY (fuzzy: 0.88)
+"UK Price 2 Dec" = "numeric_mkr5cact"  # numbers - CUSTOMER PRICE (fuzzy: 0.84)
+"UK Price w/ Discount" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"US Discount 2 Dec" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"US Duty 2 Dec" = "numeric_mkr5ev2q"  # numbers - US DUTY
+"US Price 2 Dec" = "numeric_mkr5cact"  # numbers - CUSTOMER PRICE (fuzzy: 0.88)
+"US Price w/ Discount" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"US Tariff 2 Dec" = "numeric_mkr51ndy"  # numbers - US TARIFF
+
+# === Other ===
+
+"5" = "numeric_mkr5yne4"  # numbers - USA ONLY LSTP 75% EX WORKS
+"7" = "numeric_mkr5yne4"  # numbers - USA ONLY LSTP 75% EX WORKS
+"AB/S" = "dropdown_mkr58de6"  # dropdown - AAG SEASON (fuzzy: 0.75)
+"ADID" = "color_mkrerxrs"  # status - ADD TO PLANNING (fuzzy: 0.86)
+"ALLOCATION (CHANNEL)" = "lookup_mkr5hhjy"  # mirror - ALLOCATION STATUS (fuzzy: 0.88)
+"BULK AGREEMENT NUMBER" = "text_mkr5ej2x"  # text - PO NUMBER (fuzzy: 0.88)
+"C/S" = "lookup_mkr5k4yj"  # mirror - FABRIC STATUS
+"C/XS" = "lookup_mkr5k4yj"  # mirror - FABRIC STATUS (fuzzy: 0.75)
+"CD/L" = "lookup_mkr5nd5t"  # mirror - EX-FTY (Revised LS) (fuzzy: 0.75)
+"CD/S" = "lookup_mkr6eatd"  # mirror - REQUESTED XFD STATUS (fuzzy: 0.75)
+"CO NUMBER (ALLOCATION DISTRO)" = "text_mkr5ej2x"  # text - PO NUMBER (fuzzy: 0.89)
+"CO NUMBER (INITIAL DISTRO)" = "text_mkr5ej2x"  # text - PO NUMBER (fuzzy: 0.89)
+"CO NUMBER - ALLOCATION DISTRO" = "text_mkr5ej2x"  # text - PO NUMBER (fuzzy: 0.89)
+"CO NUMBER - INITIAL DISTRO" = "text_mkr5ej2x"  # text - PO NUMBER (fuzzy: 0.89)
+"CUSTOMER CODE" = "dropdown_mkr542p2"  # dropdown - CUSTOMER
+"Column1" = "dropdown_mkr5677f"  # dropdown - COLOR (fuzzy: 0.75)
+"Column2" = "dropdown_mkr5677f"  # dropdown - COLOR (fuzzy: 0.75)
+"D/L" = "lookup_mkr5nd5t"  # mirror - EX-FTY (Revised LS)
+"D/S" = "lookup_mkr6eatd"  # mirror - REQUESTED XFD STATUS
+"D/XL" = "lookup_mkr6eatd"  # mirror - REQUESTED XFD STATUS (fuzzy: 0.75)
+"D/XS" = "lookup_mkr6eatd"  # mirror - REQUESTED XFD STATUS (fuzzy: 0.75)
+"FACILITY CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"GENDER GROUP CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"INFOR ADDRESS ID" = "pulse_id_mkr5pb5q"  # item_id - Item ID (fuzzy: 0.82)
+"INFOR CUSTOMER CODE" = "dropdown_mkr542p2"  # dropdown - CUSTOMER
+"INFOR FACILITY CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"INFOR GENDER GROUP CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"INFOR ITEM GROUP CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"INFOR ITEM TYPE CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"INFOR MAKE/BUY CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"INFOR PRODUCT GROUP CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"INVOICE METHOD" = "text_mkr5wcpw"  # text - PLANNED DELIVERY METHOD (fuzzy: 0.88)
+"ITEM GROUP CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"ITEM TYPE CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"L" = "text_mkrh94rx"  # text - CUSTOMER ALT PO
+"L-XL" = "numeric_mkr5yne4"  # numbers - USA ONLY LSTP 75% EX WORKS (fuzzy: 0.75)
+"L/XL" = "numeric_mkr5yne4"  # numbers - USA ONLY LSTP 75% EX WORKS (fuzzy: 0.75)
+"LONGSON ALIAS" = "text_mkrhra2c"  # text - ALIAS RELATED ITEM (fuzzy: 0.76)
+"M" = "name"  # name - Name
+"MAKE/BUY CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"ORIGINAL ALIAS/RELATED ITEM" = "text_mkrhra2c"  # text - ALIAS RELATED ITEM
+"PNP" = "date_mkrvx550"  # date - PPS CMT DUE (fuzzy: 0.80)
+"PRICING ALIAS/RELATED ITEM" = "text_mkrhra2c"  # text - ALIAS RELATED ITEM
+"PRICING NOTES" = "long_text_mkr5hass"  # long_text - NOTES
+"PRODUCT GROUP CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"PROMO GROUP / CAMPAIGN (HOT 30/GLOBAL EDIT)" = "dropdown_mkr5w5e"  # dropdown - DROP (fuzzy: 0.75)
+"S" = "subtasks_mkr5c0kp"  # subtasks - Subitems
+"S-M" = "numeric_mkr58nvp"  # numbers - SMS PRICE USD (fuzzy: 0.80)
+"S/M" = "numeric_mkr58nvp"  # numbers - SMS PRICE USD (fuzzy: 0.80)
+"S/P" = "numeric_mkr58nvp"  # numbers - SMS PRICE USD
+"SHOP CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"SHOP NAME" = "name"  # name - Name
+"SOURCE_CUSTOMER_NAME" = "name"  # name - Name
+"TOTAL QTY" = "lookup_mkr5fkj1"  # mirror - PRODUCTION QTY (fuzzy: 0.88)
+"US PnP 4 Dec" = "numeric_mkr5ev2q"  # numbers - US DUTY (fuzzy: 0.80)
+"US Product 4 Dec" = "numeric_mkr5ev2q"  # numbers - US DUTY (fuzzy: 0.80)
+"XS/S" = "numeric_mkr5erhv"  # numbers - EX WORKS (USD) (fuzzy: 0.75)
+"BULK AGREEMENT DESCRIPTION" = "long_text_mkr5p0cf"  # long_text - STYLE DESCRIPTION (fuzzy: 0.88)
+"INFOR ORDER TYPE" = "dropdown_mkr518fc"  # dropdown - ORDER TYPE
+"ORTP (ORDER TYPE)" = "dropdown_mkr518fc"  # dropdown - ORDER TYPE
+"CUSTOMER'S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS" = "dropdown_mkr542p2"  # dropdown - CUSTOMER
+"FABRIC TYPE CODE" = "dropdown_mkr518fc"  # dropdown - ORDER TYPE (fuzzy: 0.88)
+"INFOR COLOUR CODE" = "dropdown_mkr5677f"  # dropdown - COLOR (fuzzy: 0.95)
+"INFOR FABRIC TYPE CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE (fuzzy: 0.88)
+"PATTERN/STYLE NAME" = "name"  # name - Name
+"COLLECTION DELIVERY" = "dropdown_mkr5kk5"  # dropdown - DELIVERY TERMS (fuzzy: 0.88)
+"INFOR SEASON CODE" = "dropdown_mkr58de6"  # dropdown - AAG SEASON (fuzzy: 0.88)
+"PLANNER" = "text_mkr5wcpw"  # text - PLANNED DELIVERY METHOD (fuzzy: 0.92)
+"PLANNER2" = "text_mkr5wcpw"  # text - PLANNED DELIVERY METHOD (fuzzy: 0.86)
+"DELIVERY CODE (MODL)" = "dropdown_mkr5kk5"  # dropdown - DELIVERY TERMS (fuzzy: 0.88)
+"INFOR DELIVERY CODE" = "dropdown_mkr5kk5"  # dropdown - DELIVERY TERMS (fuzzy: 0.88)
+"INFOR WAREHOUSE CODE" = "text_mkr5ps35"  # text - DESTINATION WAREHOUSE (fuzzy: 0.88)
+
+
+"COUNTRY OF ORIGIN" = "lookup_mkr5yabx"  # mirror - FACTORY COUNTRY (fuzzy: 0.88)
+"COUNTRY OF ORIGN" = "lookup_mkr5yabx"  # mirror - FACTORY COUNTRY (fuzzy: 0.88)
+"TRACKING NUMBER" = "text_mkr5wya6"  # text - AAG ORDER NUMBER (fuzzy: 0.88)

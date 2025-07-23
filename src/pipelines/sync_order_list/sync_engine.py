@@ -18,6 +18,7 @@ Usage:
 
 import os
 import sys
+import tomli
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -43,23 +44,34 @@ class SyncEngine:
         self.logger = logger.get_logger(__name__)
         self.config_path = Path(toml_config_path)
         
-        # Load TOML configuration
+        # Load configuration using proper config parser
+        from .config_parser import DeltaSyncConfig
+        self.config = DeltaSyncConfig.from_toml(toml_config_path, environment='development')
+        
+        # Load TOML configuration for legacy compatibility  
         self.toml_config = self._load_toml_config()
         
         # Initialize Monday.com API client
         self.monday_client = MondayAPIClient(toml_config_path)
         
         # Environment determination (development vs production)
-        self.environment = self._determine_environment()
+        self.environment = self.config.environment
         
-        # Database configuration - use environment-specific DELTA tables
-        self.db_config = self.toml_config.get('database', {})
-        env_config = self.toml_config.get('environment', {}).get(self.environment, {})
+        # Database configuration using proper config parser - DELTA-FREE ARCHITECTURE
+        # Phase 3: Direct main table queries (eliminates DELTA dependency)
+        self.headers_table = self.config.target_table              # ORDER_LIST_V2 (main)
+        self.lines_table = self.config.lines_table                 # ORDER_LIST_LINES (main)
         
-        # Use DELTA tables from environment config (NOT main tables)
-        self.headers_delta_table = env_config.get('delta_table', 'ORDER_LIST_DELTA')         # Headers DELTA
-        self.lines_delta_table = env_config.get('lines_delta_table', 'ORDER_LIST_LINES_DELTA')  # Lines DELTA
-        self.status_table = self.db_config.get('status_table', 'ORDER_LIST_MONDAY_SYNC_STATUS')
+        # Legacy DELTA tables - deprecated but kept for rollback capability
+        self.headers_delta_table = self.config.target_table        # Points to main table now
+        self.lines_delta_table = self.config.lines_table           # Points to main table now
+        
+        # Main tables for final sync status propagation
+        self.main_headers_table = self.config.target_table
+        self.main_lines_table = self.config.lines_table
+        
+        # Database connection key
+        self.db_key = self.config.db_key
         
         # Sync configuration
         sync_config = self.toml_config.get('monday', {}).get('sync', {})
@@ -67,8 +79,9 @@ class SyncEngine:
         self.batch_size = sync_config.get('batch_size', 100)
         self.delta_hours = sync_config.get('delta_hours', 24)
         
-        self.logger.info(f"Sync engine initialized for ORDER_LIST_DELTA → Monday.com ({self.environment})")
-        self.logger.info(f"Headers DELTA: {self.headers_delta_table}, Lines DELTA: {self.lines_delta_table}")
+        self.logger.info(f"Sync engine initialized for ORDER_LIST_V2 → Monday.com ({self.environment})")
+        self.logger.info(f"DELTA-FREE Architecture: Headers: {self.headers_table}, Lines: {self.lines_table}")
+        self.logger.info("Phase 3: Direct main table queries (DELTA tables eliminated)")
     
     def _load_toml_config(self) -> Dict[str, Any]:
         """Load and parse TOML configuration"""
@@ -99,7 +112,7 @@ class SyncEngine:
     
     def run_sync(self, dry_run: bool = False, limit: Optional[int] = None) -> Dict[str, Any]:
         """
-        Execute complete sync workflow - SEPARATED headers and lines operations
+        Execute complete sync workflow with record_uuid cascade logic
         
         Args:
             dry_run: If True, validate queries and API calls but don't execute
@@ -113,159 +126,350 @@ class SyncEngine:
         sync_start_time = datetime.now()
         
         try:
-            # Operation 1: Sync headers (ORDER_LIST_DELTA → Monday items)
-            headers_results = self._sync_headers(limit, dry_run)
-            
-            # Operation 2: Sync lines (ORDER_LIST_LINES_DELTA → Monday subitems)
-            lines_results = self._sync_lines(limit, dry_run)
-            
-            # Combine results
-            total_synced = headers_results.get('synced', 0) + lines_results.get('synced', 0)
-            sync_duration = (datetime.now() - sync_start_time).total_seconds()
-            
-            result = {
-                'success': True,
-                'headers': headers_results,
-                'lines': lines_results,
-                'total_synced': total_synced,
-                'execution_time_seconds': sync_duration,
-                'sync_timestamp': sync_start_time
-            }
-            
-            self.logger.info(f"✅ Sync completed successfully! Headers: {headers_results.get('synced', 0)}, Lines: {lines_results.get('synced', 0)}")
-            return result
-            
-        except Exception as e:
-            self.logger.error(f"Sync workflow failed: {e}")
-            raise
-    
-    def _sync_headers(self, limit: Optional[int], dry_run: bool) -> Dict[str, Any]:
-        """Sync headers from ORDER_LIST_DELTA to Monday.com items"""
-        try:
-            # Get pending headers from ORDER_LIST_DELTA
+            # Get pending headers from ORDER_LIST_V2 (main table - DELTA-FREE)
             pending_headers = self._get_pending_headers(limit)
             
             if not pending_headers:
                 self.logger.info("No pending headers found for sync")
-                return {'synced': 0, 'message': 'No pending headers'}
+                return {'success': True, 'synced': 0, 'message': 'No pending headers'}
             
             self.logger.info(f"Found {len(pending_headers)} pending headers for sync")
             
-            # Process headers as Monday.com items
-            if dry_run:
-                self.logger.info(f"DRY RUN: Would sync {len(pending_headers)} headers")
-                return {'synced': 0, 'dry_run': True, 'would_sync': len(pending_headers)}
+            # Group headers by customer and record_uuid for atomic processing
+            customer_batches = self._group_by_customer_and_uuid(pending_headers)
             
-            # TODO: Actual Monday.com API calls for headers
-            return {'synced': len(pending_headers), 'message': 'Headers sync completed'}
+            total_synced = 0
+            all_results = []
             
-        except Exception as e:
-            self.logger.error(f"Headers sync failed: {e}")
-            raise
-    
-    def _sync_lines(self, limit: Optional[int], dry_run: bool) -> Dict[str, Any]:
-        """Sync lines from ORDER_LIST_LINES_DELTA to Monday.com subitems"""
-        try:
-            # Get pending lines from ORDER_LIST_LINES_DELTA
-            pending_lines = self._get_pending_lines(limit)
-            
-            if not pending_lines:
-                self.logger.info("No pending lines found for sync")
-                return {'synced': 0, 'message': 'No pending lines'}
-            
-            self.logger.info(f"Found {len(pending_lines)} pending lines for sync")
-            
-            # Process lines as Monday.com subitems
-            if dry_run:
-                self.logger.info(f"DRY RUN: Would sync {len(pending_lines)} lines")
-                return {'synced': 0, 'dry_run': True, 'would_sync': len(pending_lines)}
-            
-            # TODO: Actual Monday.com API calls for lines
-            return {'synced': len(pending_lines), 'message': 'Lines sync completed'}
-            
-        except Exception as e:
-            self.logger.error(f"Lines sync failed: {e}")
-            raise
-            headers, lines = self._separate_headers_and_lines(pending_records)
-            
-            # Phase 3: Execute Monday.com operations
-            results = {
-                'headers': None,
-                'lines': None,
-                'success': True,
-                'records_processed': 0,
-                'errors': []
-            }
-            
-            # Process headers (create items/groups if needed)
-            if headers:
-                self.logger.info(f"Processing {len(headers)} header records")
-                header_result = self._process_headers_sync(headers, dry_run)
-                results['headers'] = header_result
-                results['records_processed'] += header_result.get('records_processed', 0)
+            # Process each customer batch atomically
+            for customer_name, record_batches in customer_batches.items():
+                self.logger.info(f"Processing {len(record_batches)} record batches for customer: {customer_name}")
                 
-                if not header_result.get('success', False):
-                    results['success'] = False
-                    results['errors'].extend(header_result.get('errors', []))
+                for record_uuid, batch_records in record_batches.items():
+                    try:
+                        # Process this record_uuid batch atomically
+                        batch_result = self._process_record_uuid_batch(record_uuid, batch_records, dry_run)
+                        all_results.append(batch_result)
+                        
+                        if batch_result.get('success', False):
+                            total_synced += batch_result.get('records_synced', 0)
+                            
+                    except Exception as e:
+                        self.logger.error(f"Failed to process record_uuid {record_uuid}: {e}")
+                        all_results.append({
+                            'success': False,
+                            'record_uuid': record_uuid,
+                            'error': str(e),
+                            'records_synced': 0
+                        })
             
-            # Process lines (create subitems)
-            if lines:
-                self.logger.info(f"Processing {len(lines)} line records")
-                lines_result = self._process_lines_sync(lines, dry_run)
-                results['lines'] = lines_result
-                results['records_processed'] += lines_result.get('records_processed', 0)
-                
-                if not lines_result.get('success', False):
-                    results['success'] = False
-                    results['errors'].extend(lines_result.get('errors', []))
+            # Calculate results
+            sync_duration = (datetime.now() - sync_start_time).total_seconds()
+            successful_batches = len([r for r in all_results if r.get('success', False)])
             
-            # Phase 4: Update sync status in database
-            if not dry_run and results['success']:
-                self._update_sync_status(pending_records, 'SYNCED')
-            elif not dry_run and not results['success']:
-                self._update_sync_status(pending_records, 'ERROR')
-            
-            # Calculate execution time
-            execution_time = (datetime.now() - sync_start_time).total_seconds()
-            
-            # Final results
-            final_results = {
-                'success': results['success'],
-                'records_processed': results['records_processed'],
-                'headers_processed': len(headers) if headers else 0,
-                'lines_processed': len(lines) if lines else 0,
-                'execution_time_seconds': execution_time,
+            result = {
+                'success': successful_batches > 0,
+                'total_synced': total_synced,
+                'batches_processed': len(all_results),
+                'successful_batches': successful_batches,
+                'failed_batches': len(all_results) - successful_batches,
+                'execution_time_seconds': sync_duration,
+                'sync_timestamp': sync_start_time,
                 'dry_run': dry_run,
-                'errors': results['errors'],
-                'details': results
+                'batch_results': all_results
             }
             
-            if results['success']:
-                self.logger.info(f"Sync completed successfully: {results['records_processed']} records in {execution_time:.2f}s")
-            else:
-                self.logger.error(f"Sync completed with errors: {len(results['errors'])} errors")
-            
-            return final_results
+            self.logger.info(f"✅ Sync completed! Total synced: {total_synced}, Successful batches: {successful_batches}/{len(all_results)}")
+            return result
             
         except Exception as e:
-            self.logger.exception(f"Sync workflow failed: {e}")
+            sync_duration = (datetime.now() - sync_start_time).total_seconds()
+            self.logger.error(f"Sync workflow failed: {e}")
             return {
                 'success': False,
                 'error': str(e),
-                'records_processed': 0,
-                'execution_time_seconds': (datetime.now() - sync_start_time).total_seconds()
+                'total_synced': 0,
+                'execution_time_seconds': sync_duration
             }
+    
+    def _group_by_customer_and_uuid(self, headers: List[Dict[str, Any]]) -> Dict[str, Dict[str, List[Dict[str, Any]]]]:
+        """
+        Group headers by customer and record_uuid for atomic batch processing
+        
+        Returns:
+            {customer_name: {record_uuid: [header_records]}}
+        """
+        customer_batches = {}
+        
+        for header in headers:
+            customer_name = header.get('CUSTOMER NAME', 'UNKNOWN')
+            record_uuid = header.get('record_uuid')
+            
+            if not record_uuid:
+                self.logger.warning(f"Header missing record_uuid: {header.get('AAG ORDER NUMBER', 'unknown')}")
+                continue
+                
+            if customer_name not in customer_batches:
+                customer_batches[customer_name] = {}
+                
+            if record_uuid not in customer_batches[customer_name]:
+                customer_batches[customer_name][record_uuid] = []
+                
+            customer_batches[customer_name][record_uuid].append(header)
+        
+        return customer_batches
+    
+    def _process_record_uuid_batch(self, record_uuid: str, headers: List[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
+        """
+        Process a single record_uuid batch atomically:
+        1. Create groups (if needed)
+        2. Create Monday.com items → get item_ids
+        3. Update ORDER_LIST_V2 with monday_item_id (DELTA-FREE)
+        4. Get related lines from ORDER_LIST_LINES (DELTA-FREE)
+        5. Inject parent_item_id into lines
+        6. Create Monday.com subitems → get subitem_ids
+        7. Update ORDER_LIST_LINES with monday_subitem_id (DELTA-FREE)
+        8. Sync status already written directly to main tables (no propagation needed)
+        """
+        try:
+            self.logger.info(f"Processing record_uuid batch: {record_uuid} ({len(headers)} headers)")
+            
+            if dry_run:
+                return {
+                    'success': True,
+                    'record_uuid': record_uuid,
+                    'records_synced': len(headers),
+                    'dry_run': True,
+                    'message': f'DRY RUN: Would process {len(headers)} headers'
+                }
+            
+            # Step 1: Create groups if needed
+            groups_result = self._create_groups_for_headers(headers, dry_run)
+            if not groups_result.get('success', False):
+                return {
+                    'success': False,
+                    'record_uuid': record_uuid,
+                    'error': 'Group creation failed',
+                    'records_synced': 0
+                }
+            
+            # Step 2: Create Monday.com items
+            items_result = self.monday_client.execute('create_items', headers, dry_run)
+            if not items_result.get('success', False):
+                return {
+                    'success': False,
+                    'record_uuid': record_uuid,
+                    'error': 'Item creation failed',
+                    'records_synced': 0
+                }
+            
+            monday_item_ids = items_result.get('monday_ids', [])
+            
+            # Step 3: Update ORDER_LIST_V2 with monday_item_id
+            self._update_headers_delta_with_item_ids(record_uuid, monday_item_ids)
+            
+            # Step 4: Get related lines for this record_uuid
+            related_lines = self._get_lines_by_record_uuid(record_uuid)
+            
+            if related_lines:
+                # Step 5: Inject parent_item_id into lines
+                lines_with_parent = self._inject_parent_item_ids(related_lines, record_uuid, monday_item_ids)
+                
+                # Step 6: Create Monday.com subitems
+                subitems_result = self.monday_client.execute('create_subitems', lines_with_parent, dry_run)
+                
+                if subitems_result.get('success', False):
+                    monday_subitem_ids = subitems_result.get('monday_ids', [])
+                    
+                    # Step 7: Update ORDER_LIST_LINES_DELTA with monday_item_id (subitems)
+                    self._update_lines_delta_with_subitem_ids(record_uuid, monday_subitem_ids)
+            
+            # Step 8: Propagate sync status to main tables
+            self._propagate_sync_status_to_main_tables(record_uuid)
+            
+            total_records = len(headers) + len(related_lines) if related_lines else len(headers)
+            
+            return {
+                'success': True,
+                'record_uuid': record_uuid,
+                'records_synced': total_records,
+                'headers_synced': len(headers),
+                'lines_synced': len(related_lines) if related_lines else 0,
+                'monday_item_ids': monday_item_ids
+            }
+            
+        except Exception as e:
+            self.logger.exception(f"Failed to process record_uuid {record_uuid}: {e}")
+            return {
+                'success': False,
+                'record_uuid': record_uuid,
+                'error': str(e),
+                'records_synced': 0
+            }
+    
+    def _create_groups_for_headers(self, headers: List[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
+        """Create Monday.com groups for headers if needed"""
+        try:
+            # Extract unique group names needed
+            unique_groups = set()
+            for header in headers:
+                group_name = self._get_group_name_from_header(header)
+                if group_name:
+                    unique_groups.add(group_name)
+            
+            if not unique_groups:
+                return {'success': True, 'groups_created': 0}
+            
+            # Convert to group records
+            group_records = [{'group_name': group_name} for group_name in unique_groups]
+            
+            # Create groups via Monday.com API
+            return self.monday_client.execute('create_groups', group_records, dry_run)
+            
+        except Exception as e:
+            self.logger.exception(f"Failed to create groups: {e}")
+            return {'success': False, 'error': str(e)}
+    
+    def _get_group_name_from_header(self, header: Dict[str, Any]) -> Optional[str]:
+        """Extract group name from header record using TOML mapping"""
+        # Check if group mapping exists in TOML
+        group_mapping = (self.toml_config.get('monday', {})
+                        .get('sync', {})
+                        .get('groups', {}))
+        
+        if not group_mapping:
+            return None
+            
+        # Get the database field that maps to group
+        group_field = group_mapping.get('map_to', 'CUSTOMER NAME')
+        return header.get(group_field)
+    
+    def _get_lines_by_record_uuid(self, record_uuid: str) -> List[Dict[str, Any]]:
+        """Get lines from ORDER_LIST_LINES (main table - DELTA-FREE) for specific record_uuid"""
+        try:
+            lines_query = f"""
+            SELECT {', '.join(self._get_lines_columns())}
+            FROM [{self.lines_table}]
+            WHERE [record_uuid] = '{record_uuid}'
+            AND [sync_state] = 'PENDING'
+            ORDER BY [size_code]
+            """
+            
+            with db.get_connection(self.db_key) as connection:
+                cursor = connection.cursor()
+                cursor.execute(lines_query)
+                
+                columns = [column[0] for column in cursor.description]
+                records = [dict(zip(columns, row)) for row in cursor.fetchall()]
+                
+                self.logger.info(f"Retrieved {len(records)} lines for record_uuid: {record_uuid}")
+                return records
+                
+        except Exception as e:
+            self.logger.error(f"Failed to get lines for record_uuid {record_uuid}: {e}")
+            return []
+    
+    def _inject_parent_item_ids(self, lines: List[Dict[str, Any]], record_uuid: str, item_ids: List[str]) -> List[Dict[str, Any]]:
+        """Inject Monday.com parent item IDs into lines before creating subitems"""
+        if not item_ids:
+            return lines
+            
+        # Use first item_id as parent (assuming 1 header per record_uuid)
+        parent_item_id = item_ids[0]
+        
+        # Add parent_item_id to each line record
+        for line in lines:
+            line['parent_item_id'] = parent_item_id
+        
+        self.logger.info(f"Injected parent_item_id {parent_item_id} into {len(lines)} lines for record_uuid: {record_uuid}")
+        return lines
+    
+    def _update_headers_delta_with_item_ids(self, record_uuid: str, item_ids: List[str]) -> None:
+        """Update ORDER_LIST_V2 (main table - DELTA-FREE) with Monday.com item IDs"""
+        if not item_ids:
+            return
+            
+        try:
+            # Use first item_id (assuming 1 header per record_uuid)
+            monday_item_id = item_ids[0]
+            
+            # Convert string ID to integer for BIGINT column
+            monday_item_id_int = int(monday_item_id)
+            
+            update_query = f"""
+            UPDATE [{self.headers_table}]
+            SET [monday_item_id] = {monday_item_id_int},
+                [sync_state] = 'SYNCED',
+                [sync_completed_at] = GETUTCDATE()
+            WHERE [record_uuid] = '{record_uuid}'
+            """
+            
+            with db.get_connection('orders') as connection:
+                cursor = connection.cursor()
+                cursor.execute(update_query)
+                connection.commit()
+                
+                rows_updated = cursor.rowcount
+                self.logger.info(f"Updated {rows_updated} headers in main table (DELTA-FREE) with item_id: {monday_item_id}")
+                
+        except Exception as e:
+            self.logger.exception(f"Failed to update headers with item IDs: {e}")
+            raise
+    
+    def _update_lines_delta_with_subitem_ids(self, record_uuid: str, subitem_ids: List[str]) -> None:
+        """Update ORDER_LIST_LINES (main table - DELTA-FREE) with Monday.com subitem IDs"""
+        if not subitem_ids:
+            return
+            
+        try:
+            # Get lines that need updating
+            lines = self._get_lines_by_record_uuid(record_uuid)
+            
+            if len(lines) != len(subitem_ids):
+                self.logger.warning(f"Mismatch: {len(lines)} lines vs {len(subitem_ids)} subitem IDs for record_uuid: {record_uuid}")
+            
+            # Update each line with corresponding subitem ID
+            for i, line in enumerate(lines):
+                if i < len(subitem_ids):
+                    lines_uuid = line.get('line_uuid')
+                    subitem_id = subitem_ids[i]
+                    
+                    update_query = f"""
+                    UPDATE [{self.lines_table}]
+                    SET [monday_subitem_id] = '{subitem_id}',
+                        [sync_state] = 'SYNCED',
+                        [sync_completed_at] = GETUTCDATE()
+                    WHERE [line_uuid] = '{lines_uuid}'
+                    """
+                    
+                    with db.get_connection('orders') as connection:
+                        cursor = connection.cursor()
+                        cursor.execute(update_query)
+                        connection.commit()
+                        
+                        self.logger.info(f"Updated line {lines_uuid} with monday_subitem_id: {subitem_id}")
+                        
+        except Exception as e:
+            self.logger.exception(f"Failed to update lines with subitem IDs: {e}")
+            raise
+    
+    def _propagate_sync_status_to_main_tables(self, record_uuid: str) -> None:
+        """DELTA-FREE Architecture: Status already written to main tables - this method is now a no-op"""
+        # In DELTA-free architecture, sync status is written directly to main tables
+        # This method is kept for backwards compatibility but does nothing
+        self.logger.info(f"DELTA-FREE: Sync status already written directly to main tables for record_uuid: {record_uuid}")
+        pass
     
     def _get_pending_headers(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         """
-        Get headers records pending Monday.com sync from ORDER_LIST_DELTA
+        Get headers records pending Monday.com sync from ORDER_LIST_V2 (main table - DELTA-FREE)
         """
-        # Build headers query for ORDER_LIST_DELTA
-        headers_query = self._build_headers_delta_query(limit)
+        # Build headers query for ORDER_LIST_V2 (main table)
+        headers_query = self._build_headers_query(limit)
         
         # DEBUG: Print the generated SQL query
         print("=" * 80)
-        print("DEBUG: HEADERS DELTA QUERY GENERATED")
+        print("DEBUG: HEADERS MAIN TABLE QUERY GENERATED (DELTA-FREE)")
         print("=" * 80)
         print(headers_query)
         print("=" * 80)
@@ -278,7 +482,7 @@ class SyncEngine:
                 columns = [column[0] for column in cursor.description]
                 records = [dict(zip(columns, row)) for row in cursor.fetchall()]
                 
-                self.logger.info(f"Retrieved {len(records)} headers from {self.headers_delta_table}")
+                self.logger.info(f"Retrieved {len(records)} headers from {self.headers_table}")
                 return records
                 
         except Exception as e:
@@ -287,14 +491,14 @@ class SyncEngine:
     
     def _get_pending_lines(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         """
-        Get lines records pending Monday.com sync from ORDER_LIST_LINES_DELTA
+        Get lines records pending Monday.com sync from ORDER_LIST_LINES (main table - DELTA-FREE)
         """
-        # Build lines query for ORDER_LIST_LINES_DELTA
-        lines_query = self._build_lines_delta_query(limit)
+        # Build lines query for ORDER_LIST_LINES (main table)
+        lines_query = self._build_lines_query(limit)
         
         # DEBUG: Print the generated SQL query
         print("=" * 80)
-        print("DEBUG: LINES DELTA QUERY GENERATED")
+        print("DEBUG: LINES MAIN TABLE QUERY GENERATED (DELTA-FREE)")
         print("=" * 80)
         print(lines_query)
         print("=" * 80)
@@ -307,31 +511,31 @@ class SyncEngine:
                 columns = [column[0] for column in cursor.description]
                 records = [dict(zip(columns, row)) for row in cursor.fetchall()]
                 
-                self.logger.info(f"Retrieved {len(records)} lines from {self.lines_delta_table}")
+                self.logger.info(f"Retrieved {len(records)} lines from {self.lines_table}")
                 return records
                 
         except Exception as e:
             self.logger.error(f"Failed to get pending lines: {e}")
             raise
     
-    def _build_headers_delta_query(self, limit: Optional[int] = None) -> str:
-        """Build DELTA query for pending headers from ORDER_LIST_DELTA"""
+    def _build_headers_query(self, limit: Optional[int] = None) -> str:
+        """Build query for pending headers from ORDER_LIST_V2 (main table - DELTA-FREE)"""
         
         # Get headers columns from TOML mapping
         headers_columns = self._get_headers_columns()
         columns_clause = ", ".join(headers_columns)
         
         # DEBUG: Print environment and column mapping info
-        print("DEBUG: Headers query configuration:")
+        print("DEBUG: Headers query configuration (DELTA-FREE):")
         print(f"  Environment: {self.environment}")
-        print(f"  Table: {self.headers_delta_table}")
+        print(f"  Table: {self.headers_table}")
         print(f"  Headers columns: {headers_columns}")
         
-        # Build WHERE clause for DELTA logic (headers use sync_state = 'NEW' or 'PENDING')
-        delta_clause = "([sync_state] = 'NEW' OR [sync_state] = 'PENDING')"
+        # Build WHERE clause for main table logic (sync_state = 'PENDING')
+        main_table_clause = "([sync_state] = 'PENDING')"
         
         # DEBUG: Print WHERE clause
-        print(f"DEBUG: Headers WHERE clause: {delta_clause}")
+        print(f"DEBUG: Headers WHERE clause: {main_table_clause}")
         
         # Build ORDER BY clause
         order_clause = "ORDER BY [AAG ORDER NUMBER]"
@@ -341,31 +545,31 @@ class SyncEngine:
         
         query = f"""
         SELECT {limit_clause} {columns_clause}
-        FROM [{self.headers_delta_table}]
-        WHERE {delta_clause}
+        FROM [{self.headers_table}]
+        WHERE {main_table_clause}
         {order_clause}
         """
         
         return query.strip()
     
-    def _build_lines_delta_query(self, limit: Optional[int] = None) -> str:
-        """Build DELTA query for pending lines from ORDER_LIST_LINES_DELTA"""
+    def _build_lines_query(self, limit: Optional[int] = None) -> str:
+        """Build query for pending lines from ORDER_LIST_LINES (main table - DELTA-FREE)"""
         
         # Get lines columns from TOML mapping
         lines_columns = self._get_lines_columns()
         columns_clause = ", ".join(lines_columns)
         
         # DEBUG: Print environment and column mapping info
-        print("DEBUG: Lines query configuration:")
+        print("DEBUG: Lines query configuration (DELTA-FREE):")
         print(f"  Environment: {self.environment}")
-        print(f"  Table: {self.lines_delta_table}")
+        print(f"  Table: {self.lines_table}")
         print(f"  Lines columns: {lines_columns}")
         
-        # Build WHERE clause for DELTA logic (lines use sync_state = 'PENDING')
-        delta_clause = "([sync_state] = 'PENDING')"
+        # Build WHERE clause for main table logic (sync_state = 'PENDING')
+        main_table_clause = "([sync_state] = 'PENDING')"
         
         # DEBUG: Print WHERE clause
-        print(f"DEBUG: Lines WHERE clause: {delta_clause}")
+        print(f"DEBUG: Lines WHERE clause: {main_table_clause}")
         
         # Build ORDER BY clause
         order_clause = "ORDER BY [record_uuid], [size_code]"
@@ -375,15 +579,15 @@ class SyncEngine:
         
         query = f"""
         SELECT {limit_clause} {columns_clause}
-        FROM [{self.lines_delta_table}]
-        WHERE {delta_clause}
+        FROM [{self.lines_table}]
+        WHERE {main_table_clause}
         {order_clause}
         """
         
         return query.strip()
     
     def _get_headers_columns(self) -> List[str]:
-        """Get headers columns from TOML monday.column_mapping.{env}.headers + sync columns"""
+        """Get headers columns from TOML monday.column_mapping.{env}.headers + sync columns (DELTA-FREE)"""
         headers_columns = set()
         
         # Get columns from environment-specific headers mapping
@@ -393,14 +597,18 @@ class SyncEngine:
                           .get('headers', {}))
         headers_columns.update(headers_mapping.keys())
         
-        # Add sync tracking columns that exist in ORDER_LIST_DELTA
-        sync_columns = ['sync_state', 'monday_item_id', 'created_at']
-        headers_columns.update(sync_columns)
+        # Add CRITICAL sync tracking columns from main table ORDER_LIST_V2
+        # These are REQUIRED for DELTA-FREE sync logic!
+        critical_columns = [
+            'record_uuid', 'action_type', 'sync_state', 'sync_pending_at',
+            'monday_item_id', 'sync_completed_at', 'created_at'
+        ]
+        headers_columns.update(critical_columns)
         
         return [f"[{col}]" for col in sorted(headers_columns)]
     
     def _get_lines_columns(self) -> List[str]:
-        """Get lines columns from TOML monday.column_mapping.{env}.lines + sync columns"""
+        """Get lines columns from TOML monday.column_mapping.{env}.lines + sync columns (DELTA-FREE)"""
         lines_columns = set()
         
         # Get columns from environment-specific lines mapping
@@ -410,243 +618,13 @@ class SyncEngine:
                         .get('lines', {}))
         lines_columns.update(lines_mapping.keys())
         
-        # Add sync tracking columns that exist in ORDER_LIST_LINES_DELTA
-        sync_columns = ['sync_state', 'parent_item_id', 'record_uuid', 'created_at']
-        lines_columns.update(sync_columns)
+        # Add CRITICAL sync tracking columns from main table ORDER_LIST_LINES
+        # These are REQUIRED for DELTA-FREE sync logic!
+        critical_columns = [
+            'line_uuid', 'record_uuid', 'action_type', 'sync_state',
+            'sync_pending_at', 'monday_item_id', 'monday_subitem_id',
+            'monday_parent_id', 'sync_completed_at', 'created_at'
+        ]
+        lines_columns.update(critical_columns)
         
         return [f"[{col}]" for col in sorted(lines_columns)]
-    
-    def _build_delta_query(self, limit: Optional[int] = None) -> str:
-        """Build DELTA query for pending records"""
-        
-        # Get required columns from TOML mapping
-        required_columns = self._get_required_columns()
-        columns_clause = ", ".join(required_columns)
-        
-        # DEBUG: Print environment and column mapping info
-        print("DEBUG: Environment and mapping configuration:")
-        print(f"  Environment: {self.environment}")
-        headers_mapping = (self.toml_config.get('monday', {})
-                          .get('column_mapping', {})
-                          .get(self.environment, {})
-                          .get('headers', {}))
-        lines_mapping = (self.toml_config.get('monday', {})
-                        .get('column_mapping', {})
-                        .get(self.environment, {})
-                        .get('lines', {}))
-        print(f"  Headers mapping: {headers_mapping}")
-        print(f"  Lines mapping: {lines_mapping}")
-        print(f"  Required columns: {required_columns}")
-        
-        # Build WHERE clause for DELTA logic
-        delta_clause = self._build_delta_where_clause()
-        
-        # DEBUG: Print WHERE clause
-        print("DEBUG: Delta WHERE clause:")
-        print(f"  {delta_clause}")
-        
-        # Build ORDER BY clause (ORDER_LIST_V2 is headers only, no LINE NUMBER)
-        order_clause = "ORDER BY [AAG ORDER NUMBER]"
-        
-        # Build LIMIT clause
-        limit_clause = f"TOP ({limit})" if limit else ""
-        
-        query = f"""
-        SELECT {limit_clause} {columns_clause}
-        FROM [{self.source_table}]
-        WHERE {delta_clause}
-        {order_clause}
-        """
-        
-        return query.strip()
-    
-    def _get_required_columns(self) -> List[str]:
-        """Get required columns from TOML column mappings ONLY - NO HARDCODING"""
-        required_columns = set()
-        
-        # Get columns from environment-specific headers mapping
-        headers_mapping = (self.toml_config.get('monday', {})
-                          .get('column_mapping', {})
-                          .get(self.environment, {})
-                          .get('headers', {}))
-        required_columns.update(headers_mapping.keys())
-        
-        # Get columns from environment-specific lines mapping
-        lines_mapping = (self.toml_config.get('monday', {})
-                        .get('column_mapping', {})
-                        .get(self.environment, {})
-                        .get('lines', {}))
-        required_columns.update(lines_mapping.keys())
-        
-        # Get essential columns from TOML database config
-        essential_columns = self.toml_config.get('database', {}).get('essential_columns', [])
-        required_columns.update(essential_columns)
-        
-        # Get sync tracking columns from TOML database config (ORDER_LIST_V2 actual columns)
-        sync_columns = self.toml_config.get('database', {}).get('sync_columns', [])
-        required_columns.update(sync_columns)
-        
-        return [f"[{col}]" for col in sorted(required_columns)]
-    
-    def _build_delta_where_clause(self) -> str:
-        """Build WHERE clause for pending records (ORDER_LIST_V2 with sync_state)"""
-        
-        # Get DELTA configuration
-        delta_config = self.sync_config.get('delta', {})
-        
-        conditions = []
-        
-        # Remove time-based filter - not needed for ORDER_LIST_V2
-        # Time-based DELTA is not used in this architecture
-        
-        # Status-based filtering using ORDER_LIST_V2 actual column name
-        sync_statuses = delta_config.get('sync_statuses', ['PENDING', 'ERROR'])
-        status_clause = "', '".join(sync_statuses)
-        status_condition = f"([sync_state] IS NULL OR [sync_state] IN ('{status_clause}'))"
-        conditions.append(status_condition)
-        print(f"DEBUG: Status condition: {status_condition}")
-        
-        # Customer filter (if specified)
-        customer_filter = delta_config.get('customer_filter')
-        if customer_filter:
-            customer_condition = f"[CUSTOMER NAME] = '{customer_filter}'"
-            conditions.append(customer_condition)
-            print(f"DEBUG: Customer condition: {customer_condition}")
-        
-        final_where = " AND ".join(conditions) if conditions else "1=1"
-        print(f"DEBUG: Final WHERE clause: {final_where}")
-        return final_where
-    
-    def _separate_headers_and_lines(self, records: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-        """Separate records into headers (items) and lines (subitems)"""
-        
-        headers = []
-        lines = []
-        
-        for record in records:
-            line_number = record.get('LINE NUMBER', 0)
-            
-            if line_number == 0 or line_number is None:
-                # This is a header record
-                headers.append(record)
-            else:
-                # This is a line record
-                lines.append(record)
-        
-        return headers, lines
-    
-    def _process_headers_sync(self, headers: List[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
-        """Synchronous wrapper for async header processing"""
-        import asyncio
-        return asyncio.run(self._process_headers(headers, dry_run))
-    
-    def _process_lines_sync(self, lines: List[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
-        """Synchronous wrapper for async line processing"""
-        import asyncio
-        return asyncio.run(self._process_lines(lines, dry_run))
-    
-    async def _process_headers(self, headers: List[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
-        """Process header records (create items and groups)"""
-        try:
-            # Step 1: Create groups if needed
-            groups_result = await self._create_groups_if_needed(headers, dry_run)
-            
-            # Step 2: Create items
-            items_result = self.monday_client.execute('create_items', headers, dry_run)
-            
-            return {
-                'success': items_result.get('success', False),
-                'records_processed': items_result.get('records_processed', 0),
-                'groups_created': groups_result.get('records_processed', 0),
-                'items_created': items_result.get('records_processed', 0),
-                'monday_ids': items_result.get('monday_ids', [])
-            }
-            
-        except Exception as e:
-            self.logger.exception(f"Failed to process headers: {e}")
-            return {
-                'success': False,
-                'error': str(e),
-                'records_processed': 0
-            }
-    
-    async def _process_lines(self, lines: List[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
-        """Process line records (create subitems)"""
-        try:
-            # Create subitems
-            subitems_result = self.monday_client.execute('create_subitems', lines, dry_run)
-            
-            return {
-                'success': subitems_result.get('success', False),
-                'records_processed': subitems_result.get('records_processed', 0),
-                'subitems_created': subitems_result.get('records_processed', 0),
-                'monday_ids': subitems_result.get('monday_ids', [])
-            }
-            
-        except Exception as e:
-            self.logger.exception(f"Failed to process lines: {e}")
-            return {
-                'success': False,
-                'error': str(e),
-                'records_processed': 0
-            }
-    
-    async def _create_groups_if_needed(self, headers: List[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
-        """Create Monday.com groups if they don't exist"""
-        
-        # Get unique groups needed
-        unique_groups = set()
-        for header in headers:
-            group_id = self.monday_client._get_group_id(header)
-            if group_id:
-                unique_groups.add(group_id)
-        
-        if not unique_groups:
-            return {'success': True, 'records_processed': 0}
-        
-        # Convert to group records
-        group_records = [{'group_name': group_name} for group_name in unique_groups]
-        
-        # Create groups
-        return self.monday_client.execute('create_groups', group_records, dry_run)
-    
-    def _update_sync_status(self, records: List[Dict[str, Any]], status: str) -> None:
-        """Update sync status in database"""
-        
-        if not records:
-            return
-        
-        try:
-            connection = db.get_connection('orders')  # Use 'orders' database
-            cursor = connection.cursor()
-            
-            # Build update query
-            order_numbers = [f"'{record['AAG ORDER NUMBER']}'" for record in records]
-            order_numbers_clause = ", ".join(order_numbers)
-            
-            update_query = f"""
-            UPDATE [{self.source_table}]
-            SET [sync_state] = '{status}',
-                [last_synced_at] = GETDATE()
-            WHERE [AAG ORDER NUMBER] IN ({order_numbers_clause})
-            """
-            
-            # DEBUG: Print the update SQL query
-            print("=" * 80)
-            print("DEBUG: UPDATE QUERY GENERATED")
-            print("=" * 80)
-            print(update_query)
-            print("=" * 80)
-            
-            cursor.execute(update_query)
-            connection.commit()
-            
-            rows_updated = cursor.rowcount
-            cursor.close()
-            connection.close()
-            
-            self.logger.info(f"Updated sync status to '{status}' for {rows_updated} records")
-            
-        except Exception as e:
-            self.logger.exception(f"Failed to update sync status: {e}")
-            raise

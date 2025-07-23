@@ -126,25 +126,26 @@ class SQLTemplateEngine:
             self.logger.exception(f"❌ Failed to render merge_headers SQL: {e}")
             raise
     
-    def render_unpivot_sizes_sql(self) -> str:
+    def render_unpivot_sizes_direct_sql(self) -> str:
         """
-        Render 004_unpivot_sizes SQL from Jinja2 template
+        Render unpivot_sizes_direct SQL from Jinja2 template (Simplified Architecture)
+        Uses direct MERGE to ORDER_LIST_LINES, eliminating staging table dependency
         
         Returns:
-            Generated SQL string for size unpivot operation
+            Generated SQL string for direct size unpivot operation
         """
         try:
-            template = self.jinja_env.get_template('unpivot_sizes.j2')
+            template = self.jinja_env.get_template('unpivot_sizes_direct.j2')
             context = self.get_template_context()
             
             sql = template.render(**context)
             
-            self.logger.info(f"✅ Rendered unpivot_sizes SQL: {len(context['size_columns'])} size columns")
+            self.logger.info(f"✅ Rendered unpivot_sizes_direct SQL: {len(context['size_columns'])} size columns (Direct MERGE)")
             
             return sql
             
         except Exception as e:
-            self.logger.exception(f"❌ Failed to render unpivot_sizes SQL: {e}")
+            self.logger.exception(f"❌ Failed to render unpivot_sizes_direct SQL: {e}")
             raise
     
     def render_merge_lines_sql(self) -> str:

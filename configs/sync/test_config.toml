@@ -1,0 +1,10 @@
+[database]
+target_db = "orders"
+
+[columns]
+item_name = "Item Name"
+group = "Group"
+
+[settings]
+batch_size = 15
+dry_run = true

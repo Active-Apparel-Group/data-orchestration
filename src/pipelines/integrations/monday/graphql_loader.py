@@ -39,7 +39,7 @@ class GraphQLLoader:
         if repo_root is None:
             repo_root = self._find_repo_root()
         
-        self.graphql_dir = repo_root / "sql" / "graphql"
+        self.graphql_dir = repo_root / "sql" / "graphql" / "monday"
         self.mutations = {}
         self.queries = {}
         

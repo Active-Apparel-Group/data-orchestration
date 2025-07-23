@@ -114,19 +114,21 @@ class DeltaSyncConfig:
     
     @property
     def source_lines_table(self) -> str:
-        """Staging table for size/quantity lines (environment-specific)"""
-        env_config = self._get_env_config()
-        return env_config.get('source_lines_table', 'swp_ORDER_LIST_LINES')
+        """DEPRECATED: Returns lines_table for simplified architecture (eliminated staging table)"""
+        # In simplified 2-template architecture, direct MERGE to lines_table eliminates staging
+        return self.lines_table
     
     @property
     def delta_table(self) -> str:
-        """Table for tracking header changes (ORDER_LIST_DELTA)"""
-        return self._config.get('delta_table', 'ORDER_LIST_DELTA')
+        """DEPRECATED: Returns target_table for backwards compatibility (DELTA-FREE architecture)"""
+        # In DELTA-free architecture, this returns the main table
+        return self.target_table
     
     @property
     def lines_delta_table(self) -> str:
-        """Table for tracking line changes (ORDER_LIST_LINES_DELTA)"""
-        return self._config.get('lines_delta_table', 'ORDER_LIST_LINES_DELTA')
+        """DEPRECATED: Returns lines_table for backwards compatibility (DELTA-FREE architecture)"""
+        # In DELTA-free architecture, this returns the main lines table
+        return self.lines_table
     
     @property
     def board_type(self) -> str:
@@ -154,8 +156,15 @@ class DeltaSyncConfig:
     @property
     def hash_columns(self) -> List[str]:
         """Columns used for hash-based change detection"""
-        hash_config = self._config.get('hash', {}).get('phase1', {})
-        return hash_config.get('columns', [])
+        # UPDATED: Try universal 'hash' section first, then fallback to 'hash.phase1'
+        hash_config = self._config.get('hash', {})
+        if 'columns' in hash_config:
+            # Universal hash section exists
+            return hash_config.get('columns', [])
+        else:
+            # Fallback to phase1 section for backward compatibility
+            phase_config = hash_config.get('phase1', {})
+            return phase_config.get('columns', [])
     
     @property
     def hash_algorithm(self) -> str:
@@ -165,19 +174,45 @@ class DeltaSyncConfig:
     # Monday.com Configuration (using environment-aware sections)
     @property
     def monday_board_id(self) -> int:
-        """Monday.com board ID for the current environment"""
+        """Monday.com items board ID for the current environment"""
         monday_config = self._config.get('monday', {}).get(self._environment, {})
         
-        # Try both naming conventions: items_board_id (new) and board_id (legacy)
-        board_id = monday_config.get('items_board_id') or monday_config.get('board_id')
+        # Get items board ID from environment-specific config
+        board_id = monday_config.get('board_id')
         
         # Fallback to legacy phase1 config if environment config not found
         if not board_id and not monday_config:
             monday_config = self._config.get('monday', {}).get('phase1', {})
             board_id = monday_config.get('board_id')
         
-        # Default to development board ID if still not found
-        return board_id or 9609317401
+        # Environment-specific defaults as fallback
+        defaults = {
+            'development': 9609317401,
+            'production': 8709134353
+        }
+        
+        return board_id or defaults.get(self._environment, defaults['development'])
+    
+    @property
+    def monday_subitems_board_id(self) -> int:
+        """Monday.com subitems board ID for the current environment"""
+        monday_config = self._config.get('monday', {}).get(self._environment, {})
+        
+        # Get subitems board ID from environment-specific config
+        subitem_board_id = monday_config.get('subitem_board_id')
+        
+        # Fallback to legacy phase1 config if environment config not found
+        if not subitem_board_id and not monday_config:
+            monday_config = self._config.get('monday', {}).get('phase1', {})
+            subitem_board_id = monday_config.get('subitem_board_id')
+        
+        # Environment-specific defaults as fallback
+        defaults = {
+            'development': 9609317948,
+            'production': 9200771505
+        }
+        
+        return subitem_board_id or defaults.get(self._environment, defaults['development'])
     
     @property
     def monday_group_id(self) -> str:
@@ -188,26 +223,41 @@ class DeltaSyncConfig:
     # Business Columns (adapted to actual TOML structure) 
     def get_business_columns(self) -> List[str]:
         """Get list of business columns from TOML configuration"""
-        # Get business columns from phase1 configuration
-        columns_config = self._config.get('columns', {}).get('phase1', {})
-        business_columns = columns_config.get('order_list', [])
+        # UPDATED: Use Monday.com column mappings like sync_engine.py does
+        # This provides the authoritative source of business columns
+        monday_headers = (self._config.get('monday', {})
+                         .get('column_mapping', {})
+                         .get(self._environment, {})
+                         .get('headers', {}))
         
-        # If no specific columns defined, use hash columns
-        if not business_columns:
-            business_columns = self.hash_columns
+        if monday_headers:
+            # Return all Monday.com column mapping keys as business columns (46 columns)
+            business_columns = list(monday_headers.keys())
+            self.logger.debug(f"Business columns from Monday.com mappings ({self._environment}): {len(business_columns)} columns")
+            return business_columns
+        else:
+            # FALLBACK: Use essential_columns from database section (backward compatibility)
+            business_columns = self._config.get('database', {}).get('essential_columns', [])
+            
+            # If still empty, use hash columns (original fallback)
+            if not business_columns:
+                business_columns = self.hash_columns
+                
+            self.logger.warning(f"Using fallback business columns ({len(business_columns)} columns) - Monday.com mappings not found")
             
         return business_columns
     
     # Utility Methods (simplified for actual TOML structure)
     def get_full_table_name(self, table_type: str) -> str:
-        """Get fully qualified table name from TOML configuration"""
+        """Get fully qualified table name from TOML configuration (DELTA-FREE)"""
         table_map = {
             'source': self.source_table,
             'target': self.target_table,
             'lines': self.lines_table,
             'source_lines': self.source_lines_table,
-            'delta': self.delta_table,
-            'lines_delta': self.lines_delta_table
+            # DELTA-FREE: DELTA table references now point to main tables
+            'delta': self.target_table,        # Backwards compatibility
+            'lines_delta': self.lines_table    # Backwards compatibility
         }
         
         table_name = table_map.get(table_type)
@@ -246,11 +296,19 @@ class DeltaSyncConfig:
             List of actual size column names from database (e.g., ['XS', 'S', 'M', 'L', 'XL', '[2T]', '[3T]', etc.])
         """
         try:
-            # Get size column configuration from TOML
-            size_config = self._config.get('size_detection', {}).get('phase1', {})
-            start_after = size_config.get('start_after', 'UNIT OF MEASURE')
-            end_before = size_config.get('end_before', 'TOTAL QTY')
-            max_sizes = size_config.get('max_sizes', 300)
+            # UPDATED: Get size column configuration from universal section first, then fallback to phase1
+            size_config = self._config.get('size_detection', {})
+            if 'start_after' in size_config:
+                # Universal size_detection section exists
+                start_after = size_config.get('start_after', 'UNIT OF MEASURE')
+                end_before = size_config.get('end_before', 'TOTAL QTY')
+                max_sizes = size_config.get('max_sizes', 300)
+            else:
+                # Fallback to phase1 section for backward compatibility
+                phase_config = size_config.get('phase1', {})
+                start_after = phase_config.get('start_after', 'UNIT OF MEASURE')
+                end_before = phase_config.get('end_before', 'TOTAL QTY')
+                max_sizes = phase_config.get('max_sizes', 300)
             
             # Get the actual source table name from environment-specific config
             source_table = self.source_table

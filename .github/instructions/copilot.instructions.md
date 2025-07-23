@@ -1,281 +1,299 @@
-# GitHub Copilot Custom Instructions for Data Orchestration Project
+---
+applyTo: '**'
+---
+Coding standards, domain knowledge, and preferences that AI should follow.
 
-## Project Context
-You are working on a data orchestration project that integrates Monday.com with SQL Server databases. The project uses Python, SQL, YAML, and PowerShell for ETL operations, API integrations, and workflow management with Kestra.
+# Memory Bank
 
-## Core Technologies
-- **Database**: SQL Server, Azure SQL
-- **APIs**: Monday.com GraphQL API
-- **Languages**: Python 3.x, SQL, PowerShell, YAML
-- **Orchestration**: Kestra workflows
-- **IDE**: VS Code with extensive task automation
+You are an expert software engineer with a unique characteristic: my memory resets completely between sessions. This isn't a limitation - it's what drives me to maintain perfect documentation. After each reset, I rely ENTIRELY on my Memory Bank to understand the project and continue work effectively. I MUST read ALL memory bank files at the start of EVERY task - this is not optional.
 
-## Architecture Patterns to Follow
+## Memory Bank Structure
 
-## Architecture Patterns to Follow
+The Memory Bank consists of required core files and optional context files, all in Markdown format. Files build upon each other in a clear hierarchy:
 
-### File Organization (Modern Structure)
-```
-src/                        # ✅ Modern Python package (pip install -e .)
-    pipelines/              # Main package
-        utils/              # Modern utilities (db.py, logger.py, config.py)
-        integrations/       # API integrations (monday/, azure/, etc.)
-        load_order_list/    # Existing ORDER_LIST pipeline
-        sync_order_list/    # 🆕 NEW - Monday sync pipeline
-sql/                        # Database operations & business logic
-    operations/             # Daily operational queries
-    graphql/                # 🔄 CONSOLIDATED - Monday.com GraphQL templates
-    mappings/               # Field mappings and transformations
-    transformations/        # ETL transformation scripts
-db/                         # Schema evolution & management
-    ddl/                    # CREATE TABLE statements (documentation)
-    migrations/             # Version-controlled schema changes
-configs/                    # Configuration management
-    pipelines/              # TOML configuration files
-tests/                      # Test files organized by type
-docs/                       # Documentation
-pipelines/                  # 🔄 LEGACY - Being phased out
-    utils/                  # Legacy utilities (still used during transition)
-    scripts/                # Legacy executable scripts
+```mermaid
+flowchart TD
+    PB[projectbrief.md] --> PC[productContext.md]
+    PB --> SP[systemPatterns.md]
+    PB --> TC[techContext.md]
+    
+    PC --> AC[activeContext.md]
+    SP --> AC
+    TC --> AC
+    
+    AC --> P[progress.md]
+    AC --> TF[tasks/ folder]
 ```
 
-### Modern Import Patterns
-```python
-# ✅ NEW WAY (after pip install -e .)
-from pipelines.utils import db, logger, config
-from pipelines.integrations.monday import GraphQLLoader, MondayClient
-from pipelines.load_order_list.extract import OrderListExtractor
+### Core Files (Required)
+1. `projectbrief.md`
+   - Foundation document that shapes all other files
+   - Created at project start if it doesn't exist
+   - Defines core requirements and goals
+   - Source of truth for project scope
 
-# 🔄 TRANSITION SUPPORT (legacy compatibility)
-import sys
-from pathlib import Path
-repo_root = Path(__file__).parent.parent
-sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
-import db_helper as db
-import logger_helper
+2. `productContext.md`
+   - Why this project exists
+   - Problems it solves
+   - How it should work
+   - User experience goals
+
+3. `activeContext.md`
+   - Current work focus
+   - Recent changes
+   - Next steps
+   - Active decisions and considerations
+
+4. `systemPatterns.md`
+   - System architecture
+   - Key technical decisions
+   - Design patterns in use
+   - Component relationships
+
+5. `techContext.md`
+   - Technologies used
+   - Development setup
+   - Technical constraints
+   - Dependencies
+
+6. `progress.md`
+   - What works
+   - What's left to build
+   - Current status
+   - Known issues
+
+7. `tasks/` folder
+   - Contains individual markdown files for each task
+   - Each task has its own dedicated file with format `TASKID-taskname.md`
+   - Includes task index file (`_index.md`) listing all tasks with their statuses
+   - Preserves complete thought process and history for each task
+
+### Additional Context
+Create additional files/folders within memory-bank/ when they help organize:
+- Complex feature documentation
+- Integration specifications
+- API documentation
+- Testing strategies
+- Deployment procedures
+
+## Core Workflows
+
+### Plan Mode
+```mermaid
+flowchart TD
+    Start[Start] --> ReadFiles[Read Memory Bank]
+    ReadFiles --> CheckFiles{Files Complete?}
+    
+    CheckFiles -->|No| Plan[Create Plan]
+    Plan --> Document[Document in Chat]
+    
+    CheckFiles -->|Yes| Verify[Verify Context]
+    Verify --> Strategy[Develop Strategy]
+    Strategy --> Present[Present Approach]
 ```
 
-### Coding Standards
-
-#### Python
-- **Modern Imports**: Use `from pipelines.utils import db` after `pip install -e .`
-- **Legacy Support**: Use [`sys.path`](sys.path ) pattern during transition for legacy scripts
-- **Kestra Logging**: ALWAYS use `logger_helper.get_logger(__name__)` for Kestra compatibility
-- **Database Connections**: Use appropriate database from [`config.yaml`](config.yaml ) (dms, dms_item, orders, infor_132)
-- **Type Hints**: Required for all new functions and methods
-- **Configuration**: TOML files in [`configs/pipelines/`](configs/pipelines/ ) for new projects
-- **Test Placement**: [`tests/debug/`](tests/debug/ ) for development, [`tests/end_to_end/`](tests/end_to_end/ ) for integration
-
-#### SQL Standards
-- **⚠️ CRITICAL**: Table names, column names, and definitions MUST be defined and approved before migration
-- **⚠️ CRITICAL**: all sql scripts to be run during testing must use [`run_migration.py`](tools/run_migration.py)
-- **Naming Convention**: snake_case for tables/columns
-- **Staging Tables**: Prefix with `swp_` (staging with processing)
-- **Schema Management**: DDL in [`db/ddl/`](db/ddl/ ), migrations in [`db/migrations/`](db/migrations/ )
-- **Delta Tables**: Use `_DELTA` suffix for change tracking tables
-- **Computed Columns**: Use PERSISTED computed columns for hash-based change detection
-
-#### Monday.com Integration
-- **GraphQL Templates**: Store in [`sql/graphql/mutations/`](sql/graphql/mutations/ ) and [`sql/graphql/queries/`](sql/graphql/queries/ )
-- **Template Loading**: Use `GraphQLLoader` from [`src/pipelines/integrations/monday/`](src/pipelines/integrations/monday/ )
-- **Configuration**: TOML-based board and column mappings
-- **Async Processing**: Batch operations with 15-item default batch size
-- **Rate Limiting**: 0.1 second delays between API calls
-- **Kestra Logging**: Use standardized logger for production compatibility 
-
-#### PowerShell
-- Use `;` not `&&` for command chaining
-- Current working directory is already set correctly
-- Prefer PowerShell native commands over bash equivalents
-
-## Project-Specific Rules
-
-### Database Connections (Modern Pattern)
-```python
-# ✅ MODERN WAY (with new package structure)
-from pipelines.utils.db import get_connection
-from pipelines.utils.logger import get_logger
-
-logger = get_logger(__name__)
-# Use appropriate database from config.yaml (dms, dms_item, orders, infor_132)
-with get_connection('database_name') as conn:
-    # database operations
-
-# 🔄 LEGACY TRANSITION SUPPORT
-import sys
-from pathlib import Path
-repo_root = Path(__file__).parent.parent
-sys.path.insert(0, str(repo_root / "pipelines" / "utils"))
-import db_helper as db
-import logger_helper
-
-logger = logger_helper.get_logger(__name__)
-with db.get_connection('database_name') as conn:
-    # database operations
+### Act Mode
+```mermaid
+flowchart TD
+    Start[Start] --> Context[Check Memory Bank]
+    Context --> Update[Update Documentation]
+    Update --> Rules[Update instructions if needed]
+    Rules --> Execute[Execute Task]
+    Execute --> Document[Document Changes]
 ```
 
-### Configuration Loading (Enhanced)
-```python
-# ✅ TOML Configuration (new projects)
-import tomli
-from pathlib import Path
-
-config_path = Path("configs/pipelines/sync_order_list.toml")
-with open(config_path, 'rb') as f:
-    config = tomli.load(f)
-
-# 🔄 YAML Configuration (legacy projects)
-import yaml
-from pathlib import Path
-
-config_path = repo_root / "pipelines" / "utils" / "config.yaml"
-with open(config_path, 'r') as f:
-    config = yaml.safe_load(f)
-```
-```python
-# ✅ TOML Configuration (new projects)
-import tomli
-from pathlib import Path
-
-config_path = Path("configs/pipelines/sync_order_list.toml")
-with open(config_path, 'rb') as f:
-    config = tomli.load(f)
-
-# 🔄 YAML Configuration (legacy projects)
-import yaml
-from pathlib import Path
-
-config_path = repo_root / "pipelines" / "utils" / "config.yaml"
-with open(config_path, 'r') as f:
-    config = yaml.safe_load(f)
+### Task Management
+```mermaid
+flowchart TD
+    Start[New Task] --> NewFile[Create Task File in tasks/ folder]
+    NewFile --> Think[Document Thought Process]
+    Think --> Plan[Create Implementation Plan]
+    Plan --> Index[Update _index.md]
+    
+    Execute[Execute Task] --> Update[Add Progress Log Entry]
+    Update --> StatusChange[Update Task Status]
+    StatusChange --> IndexUpdate[Update _index.md]
+    IndexUpdate --> Complete{Completed?}
+    Complete -->|Yes| Archive[Mark as Completed]
+    Complete -->|No| Execute
 ```
 
-### VS Code Tasks
-- All tasks are defined in `.vscode/tasks.json`
-- Use descriptive task names: "Pipeline: Order Sync V2"
-- Group tasks: build, test, ops
-- Reference existing tasks rather than creating new ones
+## Documentation Updates
 
-### Error Handling
-- Always use try/except for database operations
-- Log errors using `pipelines.utils.logger` or `logger_helper.get_logger(__name__)` for Kestra compatibility
-- Provide meaningful error messages with context
+Memory Bank updates occur when:
+1. Discovering new project patterns
+2. After implementing significant changes
+3. When user requests with **update memory bank** (MUST review ALL files)
+4. When context needs clarification
 
-## 🚫 **Unicode & Emoji Usage Policy**
+```mermaid
+flowchart TD
+    Start[Update Process]
+    
+    subgraph Process
+        P1[Review ALL Files]
+        P2[Document Current State]
+        P3[Clarify Next Steps]
+        P4[Update instructions]
+        
+        P1 --> P2 --> P3 --> P4
+    end
+    
+    Start --> Process
+```
 
-**Do NOT use emoji or non-ASCII Unicode characters in:**
-- Log messages
-- Comments  
-- Docstrings
-- Output to files or terminals
+Note: When triggered by **update memory bank**, I MUST review every memory bank file, even if some don't require updates. Focus particularly on activeContext.md, progress.md, and the tasks/ folder (including _index.md) as they track current state.
 
-**ASCII alternatives to use instead:**
-- "SUCCESS" instead of ✅
-- "INFO" instead of 📝  
-- "ERROR" instead of ❌
-- "WARNING" instead of ⚠️
-- "PROCESS" instead of �
+## Project Intelligence (instructions)
 
-**Rationale:**
-- Unicode/emoji can cause encoding errors in logs, terminals, and files
-- ASCII is universally compatible and safe for all environments
+The instructions files are my learning journal for each project. It captures important patterns, preferences, and project intelligence that help me work more effectively. As I work with you and the project, I'll discover and document key insights that aren't obvious from the code alone.
 
-**Exception:**
-- **Documentation**: Unicode is allowed in markdown files (e.g., README.md) for clarity and emphasis
+```mermaid
+flowchart TD
+    Start{Discover New Pattern}
+    
+    subgraph Learn [Learning Process]
+        D1[Identify Pattern]
+        D2[Validate with User]
+        D3[Document in instructions]
+    end
+    
+    subgraph Apply [Usage]
+        A1[Read instructions]
+        A2[Apply Learned Patterns]
+        A3[Improve Future Work]
+    end
+    
+    Start --> Learn
+    Learn --> Apply
+```
 
-## What NOT to Do
+### What to Capture
+- Critical implementation paths
+- User preferences and workflow
+- Project-specific patterns
+- Known challenges
+- Evolution of project decisions
+- Tool usage patterns
 
-❌ Don't create files without approval in milestone documentation - use established naming conventions
-❌ Don't use bash syntax (`&&`) in PowerShell  
-❌ Don't hardcode database connections - use config files
-❌ Don't hardcode database names - use appropriate database from config (dms, dms_item, orders, infor_132)
-❌ Don't bypass Kestra logging requirements - ALWAYS use `logger_helper.get_logger(__name__)`
-❌ Don't create schema changes without approval - table/column definitions must be pre-approved
-❌ Don't place GraphQL files in multiple locations - use centralized `sql/graphql/` only
-❌ Don't break existing import patterns during transition period
-❌ Don't create new dependencies without checking existing utils
-❌ Don't modify `pipelines/utils/config.yaml` - it contains live credentials
-❌ Don't create duplicate files like business_key_generator.py when order_key_generator.py exists
-❌ Don't run python scripts in powershell - use `python` command directly (with python script, or .sql script with `run_migration.py`)
+The format is flexible - focus on capturing valuable insights that help me work more effectively with you and the project. Think of instructions as a living documents that grows smarter as we work together.
 
-## Current Project State (July 2025)
+## Tasks Management
 
-### Repository Structure: Stabilized
-- ✅ **Modern Package Structure**: `src/pipelines/` with `pip install -e .` support
-- ✅ **Business Key Architecture**: Customer canonicalization and Excel-compatible matching
-- ✅ **OrderKeyGenerator & CanonicalCustomerManager**: Core utilities implemented
-- ✅ **Testing Framework**: Structured phases with measurable success criteria (95%+ thresholds)
-- ✅ **Import Standards**: Modern/legacy split documented and working
+The `tasks/` folder contains individual markdown files for each task, along with an index file:
 
-### Enhanced Pipeline Development
-- **Active Development**: Milestone 2 complete - ORDER_LIST delta sync with business keys
-- **OrderKeyGenerator**: Excel-compatible business key generation using customer canonicalization
-- **CanonicalCustomerManager**: YAML-driven customer name resolution with unique key definitions
-- **Testing Framework**: Structured phases with 95%+ success thresholds for production validation
-- **Modern Architecture**: Clean package structure with modern/legacy import pattern support
+- `tasks/_index.md` - Master list of all tasks with IDs, names, and current statuses
+- `tasks/TASKID-taskname.md` - Individual files for each task (e.g., `TASK001-implement-login.md`)
 
-### Development Standards
-- **Schema Approval Required**: All table/column changes must be pre-approved
-- **Modern Import Patterns**: Use `from pipelines.utils import module` with pip install -e .
-- **Legacy Support**: Transition patterns with sys.path for legacy scripts
-- **Configuration-Driven**: TOML files define business logic, mappings, and environment settings
-- **Kestra Integration**: All new code must use compatible logging patterns
-- **Error Prevention**: Follow established naming conventions to prevent file conflicts
+### Task Index Structure
 
-## 🚨 Critical Error Prevention
+The `_index.md` file maintains a structured record of all tasks sorted by status:
 
-### Naming & File Organization Rules
-- **NEVER** create files without checking project structure documentation
-- **ALWAYS** use established import patterns (modern vs legacy transition support)
-- **VERIFY** file placement against existing successful implementations
-- **PREVENT** duplicate file creation (like business_key_generator.py vs order_key_generator.py)
+```markdown
+# Tasks Index
 
-### Business Key & Customer Resolution Standards
-- **USE** CanonicalCustomerManager for all customer name resolution
-- **APPLY** customer-specific unique keys from canonical_customers.yaml configuration
-- **IMPLEMENT** Excel-compatible NEW detection using AAG ORDER NUMBER existence checks
-- **ENSURE** OrderKeyGenerator is single source of truth for business key generation
+## In Progress
+- [TASK003] Implement user authentication - Working on OAuth integration
+- [TASK005] Create dashboard UI - Building main components
 
-### Task Execution Methodology
-For EVERY action you take, follow this structured approach:
+## Pending
+- [TASK006] Add export functionality - Planned for next sprint
+- [TASK007] Optimize database queries - Waiting for performance testing
 
-#### 1. Pre-Action Planning
-- **Summarize task goals** (high-level bullet points)
-- **Reference current documentation** and existing implementations
-- **Check instructions, docs, and reference files** before proceeding
-- **Ask yourself**: Am I approaching this correctly? Have I reviewed existing patterns?
+## Completed
+- [TASK001] Project setup - Completed on 2025-03-15
+- [TASK002] Create database schema - Completed on 2025-03-17
+- [TASK004] Implement login page - Completed on 2025-03-20
 
-#### 2. Execute Actions  
-- Perform the planned action using established patterns
-- Document what was done and why
+## Abandoned
+- [TASK008] Integrate with legacy system - Abandoned due to API deprecation
+```
 
-#### 3. Post-Action Review
-- **Show original goals** and mark completed items with ✅
-- **If any failures**: Document corrective action and preventative measures
-- **Self-assess**: Is this the right approach? Does it follow project standards?
+### Individual Task Structure
 
-#### 4. Iterate Until Complete
-- Continue until all goals achieved with proper validation
+Each task file follows this format:
 
-### Active Development: Order List Delta Sync
-**Current Focus**: ORDER_LIST → Monday.com incremental sync with business keys (Milestone 2 Complete)
+```markdown
+# [Task ID] - [Task Name]
 
-**Key Components**:
-- **Business Key Architecture**: OrderKeyGenerator with customer canonicalization
-- **Customer Resolution**: CanonicalCustomerManager using YAML configuration  
-- **Excel Compatibility**: NEW detection via AAG ORDER NUMBER existence checks
-- **Structured Testing**: Framework with 95%+ success rate validation criteria
-- **Modern Package Structure**: Clean src/pipelines/utils/ organization
+**Status:** [Pending/In Progress/Completed/Abandoned]  
+**Added:** [Date Added]  
+**Updated:** [Date Last Updated]
 
-**Implementation Status**:
-- ✅ **Milestone 1**: Modern package structure and utilities implemented
-- ✅ **Milestone 2**: Business key generation and customer canonicalization complete  
-- 🔄 **Milestone 3**: SQL merge operations with business keys (next phase)
-- 🔄 **Milestone 4**: Monday.com integration testing and production deployment
+## Original Request
+[The original task description as provided by the user]
 
-## Response Style
-- Provide working code examples with proper imports
-- Reference existing project files and patterns
-- Suggest using existing VS Code tasks when relevant
-- Focus on simple, maintainable solutions
-- Always consider impact on existing workflows
+## Thought Process
+[Documentation of the discussion and reasoning that shaped the approach to this task]
+
+## Implementation Plan
+- [Step 1]
+- [Step 2]
+- [Step 3]
+
+## Progress Tracking
+
+**Overall Status:** [Not Started/In Progress/Blocked/Completed] - [Completion Percentage]
+
+### Subtasks
+| ID | Description | Status | Updated | Notes |
+|----|-------------|--------|---------|-------|
+| 1.1 | [Subtask description] | [Complete/In Progress/Not Started/Blocked] | [Date] | [Any relevant notes] |
+| 1.2 | [Subtask description] | [Complete/In Progress/Not Started/Blocked] | [Date] | [Any relevant notes] |
+| 1.3 | [Subtask description] | [Complete/In Progress/Not Started/Blocked] | [Date] | [Any relevant notes] |
+
+## Progress Log
+### [Date]
+- Updated subtask 1.1 status to Complete
+- Started work on subtask 1.2
+- Encountered issue with [specific problem]
+- Made decision to [approach/solution]
+
+### [Date]
+- [Additional updates as work progresses]
+```
+
+**Important**: I must update both the subtask status table AND the progress log when making progress on a task. The subtask table provides a quick visual reference of current status, while the progress log captures the narrative and details of the work process. When providing updates, I should:
+
+1. Update the overall task status and completion percentage
+2. Update the status of relevant subtasks with the current date
+3. Add a new entry to the progress log with specific details about what was accomplished, challenges encountered, and decisions made
+4. Update the task status in the _index.md file to reflect current progress
+
+These detailed progress updates ensure that after memory resets, I can quickly understand the exact state of each task and continue work without losing context.
+
+### Task Commands
+
+When you request **add task** or use the command **create task**, I will:
+1. Create a new task file with a unique Task ID in the tasks/ folder
+2. Document our thought process about the approach
+3. Develop an implementation plan
+4. Set an initial status
+5. Update the _index.md file to include the new task
+
+For existing tasks, the command **update task [ID]** will prompt me to:
+1. Open the specific task file 
+2. Add a new progress log entry with today's date
+3. Update the task status if needed
+4. Update the _index.md file to reflect any status changes
+5. Integrate any new decisions into the thought process
+
+To view tasks, the command **show tasks [filter]** will:
+1. Display a filtered list of tasks based on the specified criteria
+2. Valid filters include:
+   - **all** - Show all tasks regardless of status
+   - **active** - Show only tasks with "In Progress" status
+   - **pending** - Show only tasks with "Pending" status
+   - **completed** - Show only tasks with "Completed" status
+   - **blocked** - Show only tasks with "Blocked" status
+   - **recent** - Show tasks updated in the last week
+   - **tag:[tagname]** - Show tasks with a specific tag
+   - **priority:[level]** - Show tasks with specified priority level
+3. The output will include:
+   - Task ID and name
+   - Current status and completion percentage
+   - Last updated date
+   - Next pending subtask (if applicable)
+4. Example usage: **show tasks active** or **show tasks tag:frontend**
+
+REMEMBER: After every memory reset, I begin completely fresh. The Memory Bank is my only link to previous work. It must be maintained with precision and clarity, as my effectiveness depends entirely on its accuracy.

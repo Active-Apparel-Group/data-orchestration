@@ -1,0 +1,6 @@
+SELECT 
+    [CUSTOMER NAME],
+    COUNT(*) AS record_count,
+    COUNT(DISTINCT [SOURCE_CUSTOMER_NAME]) AS unique_source_names
+FROM [swp_ORDER_LIST]
+GROUP BY [CUSTOMER NAME];

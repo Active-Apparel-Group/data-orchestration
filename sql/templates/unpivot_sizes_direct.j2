@@ -1,0 +1,134 @@
+-- ================================================================
+-- unpivot_sizes_direct.j2 - Direct Size Unpivot Template (Simplified Architecture)
+-- ================================================================
+-- Purpose: UNPIVOT {{ size_columns|length }} size columns directly to ORDER_LIST_LINES
+-- Architecture: Simplified 2-Template Flow - Direct MERGE to main table
+-- Generated from: TOML size_detection configuration
+-- Target: {{ lines_table }} (direct MERGE, no staging table)
+-- Filter: sync_state = 'PENDING' (process pending sync records)
+-- Business Key: record_uuid + size_column_name (prevents duplicates)
+-- ================================================================
+
+DECLARE @StartTime DATETIME2 = GETUTCDATE();
+DECLARE @MergedCount INT = 0;
+DECLARE @NewRecords INT = 0;
+DECLARE @UpdatedRecords INT = 0;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+    
+    -- =============================================================
+    -- DIRECT MERGE: Size columns → ORDER_LIST_LINES (No Staging)
+    -- =============================================================
+    
+    MERGE {{ lines_table }} AS target
+    USING (
+        SELECT 
+            unpivoted.record_uuid,
+            unpivoted.size_code,
+            unpivoted.qty,
+            unpivoted.action_type,
+            CONVERT(CHAR(64), HASHBYTES('SHA2_256', 
+                CONCAT_WS('|', unpivoted.record_uuid, unpivoted.size_code, unpivoted.qty)), 2) as row_hash,
+            unpivoted.sync_state,
+            GETUTCDATE() as created_at,
+            GETUTCDATE() as updated_at
+        FROM (
+            SELECT 
+                record_uuid,
+                sync_state,
+                action_type,
+                size_code,
+                qty
+            FROM {{ target_table }}
+            UNPIVOT (
+                qty FOR size_code IN (
+                    {% for size in size_columns -%}
+                    [{{ size }}]{% if not loop.last %},{% endif %}
+                    {% endfor -%}
+                )
+            ) AS sizes
+        ) AS unpivoted
+        WHERE unpivoted.sync_state = 'PENDING'  -- Only process pending sync records
+        AND unpivoted.qty > 0  -- Exclude zero quantities
+    ) AS source
+    ON target.record_uuid = source.record_uuid 
+       AND target.size_code = source.size_code  -- Business key: record + size
+    
+    -- Handle NOT MATCHED records (INSERT) - Simplified to match working version
+    WHEN NOT MATCHED BY TARGET THEN
+        INSERT (
+            record_uuid, 
+            size_code, 
+            qty,
+            action_type,
+            row_hash,
+            sync_state,
+            created_at,
+            updated_at
+        )
+        VALUES (
+            source.record_uuid,
+            source.size_code,
+            source.qty,
+            source.action_type,
+            source.row_hash,
+            source.sync_state,
+            source.created_at,
+            source.updated_at
+        );
+    
+    -- Capture merge statistics
+    SET @MergedCount = @@ROWCOUNT;
+    
+    -- Get detailed statistics (approximation for reporting)
+    SELECT @NewRecords = COUNT(*) 
+    FROM {{ lines_table }} l
+    INNER JOIN {{ target_table }} h ON l.record_uuid = h.record_uuid
+    WHERE h.sync_state = 'PENDING' 
+    AND l.created_at >= @StartTime;
+    
+    SET @UpdatedRecords = @MergedCount - @NewRecords;
+    
+    COMMIT TRANSACTION;
+    
+    -- =============================================================
+    -- SUCCESS METRICS (Simplified Architecture)
+    -- =============================================================
+    
+    PRINT 'Direct Size Unpivot Complete (Simplified): {{ size_columns|length }} columns to {{ lines_table }}';
+    PRINT 'Architecture: Direct MERGE (No Staging Table)';
+    PRINT 'Execution Time: ' + CAST(DATEDIFF(SECOND, @StartTime, GETUTCDATE()) AS VARCHAR(10)) + ' seconds';
+    PRINT 'Lines Merged: ' + CAST(@MergedCount AS VARCHAR(10)) + ' (New: ' + CAST(@NewRecords AS VARCHAR(10)) + ', Updated: ' + CAST(@UpdatedRecords AS VARCHAR(10)) + ')';
+    
+    SELECT 
+        NEWID() AS execution_id,
+        @MergedCount AS records_affected,
+        @NewRecords AS new_records,
+        @UpdatedRecords AS updated_records,
+        {{ size_columns|length }} AS size_columns_processed,
+        'SUCCESS' AS status,
+        'Direct MERGE to {{ lines_table }}' AS operation_type,
+        GETUTCDATE() AS completed_at;
+
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+    
+    DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+    
+    PRINT 'Direct Size Unpivot Failed: ' + @ErrorMessage;
+    
+    SELECT 
+        NEWID() AS execution_id,
+        0 AS records_affected,
+        0 AS new_records,
+        0 AS updated_records,
+        0 AS size_columns_processed,
+        'FAILED' AS status,
+        @ErrorMessage AS error_message,
+        'Direct MERGE to {{ lines_table }}' AS operation_type,
+        GETUTCDATE() AS completed_at;
+    
+    RAISERROR(@ErrorMessage, 16, 1);
+END CATCH;

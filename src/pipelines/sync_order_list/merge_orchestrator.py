@@ -11,11 +11,16 @@ ARCHITECTURE APPROACH:
 - Template Engine Only: Uses SQLTemplateEngine.render_*() methods
 - Clean Import Patterns: Matches working integration tests
 
-BUSINESS FLOW:
+BUSINESS FLOW (Simplified 2-Template Architecture):
 1. Python: detect_new_orders() - preprocesses swp_ORDER_LIST_V2.sync_state
-2. Template: merge_headers.j2 - swp_ORDER_LIST_V2 → ORDER_LIST_V2 + OUTPUT to DELTA
-3. Template: unpivot_sizes.j2 - UNPIVOT dynamic size columns → ORDER_LIST_LINES
-4. Template: merge_lines.j2 - MERGE lines + OUTPUT to ORDER_LIST_LINES_DELTA
+2. Template: merge_headers.j2 - swp_ORDER_LIST_V2 → ORDER_LIST_V2 (headers)
+3. Template: unpivot_sizes_direct.j2 - DIRECT MERGE to ORDER_LIST_LINES (no staging)
+
+ARCHITECTURAL SIMPLIFICATION:
+- ✅ Eliminated swp_ORDER_LIST_LINES staging table
+- ✅ Reduced from 3-template to 2-template flow  
+- ✅ Direct MERGE operations prevent duplicate records
+- ✅ Business key: record_uuid + size_column_name
 
 CORRECTIVE ACTIONS APPLIED:
 - ✅ Removed ALL legacy methods
@@ -289,24 +294,22 @@ class MergeOrchestrator:
             # Step 1: Template-driven merge headers (swp_ORDER_LIST_V2 → ORDER_LIST_V2)
             headers_result = self._execute_template_merge_headers(dry_run)
             
-            # Step 2: Template-driven unpivot sizes (NEW/CHANGED headers → ORDER_LIST_LINES)
+            # Step 2: Template-driven direct unpivot sizes (NEW/CHANGED headers → ORDER_LIST_LINES)
+            # Simplified: Direct MERGE to ORDER_LIST_LINES (no staging table)
             if headers_result['success']:
-                sizes_result = self._execute_template_unpivot_sizes(dry_run)
+                sizes_result = self._execute_template_unpivot_sizes_direct(dry_run)
             else:
                 sizes_result = {'success': False, 'error': 'Headers merge failed', 'records_affected': 0}
             
-            # Step 3: Template-driven merge lines (lines → ORDER_LIST_LINES with delta tracking)  
-            if sizes_result['success']:
-                lines_result = self._execute_template_merge_lines(dry_run)
-            else:
-                lines_result = {'success': False, 'error': 'Sizes unpivot failed', 'records_affected': 0}
+            # Step 3: ELIMINATED - merge_lines.j2 no longer needed (direct MERGE handles this)
+            lines_result = {'success': True, 'records_affected': 0, 'operation': 'eliminated_by_direct_merge'}
             
-            # Compile overall results
+            # Compile overall results (2-template flow)
             overall_success = all([
                 preprocessing_result['success'],
                 headers_result['success'], 
-                sizes_result['success'], 
-                lines_result['success']
+                sizes_result['success']
+                # lines_result omitted - handled by direct merge
             ])
             
             total_time = time.time() - self.total_start_time
@@ -319,18 +322,20 @@ class MergeOrchestrator:
                 'preprocessing': preprocessing_result,
                 'operations': {
                     'merge_headers': headers_result,
-                    'unpivot_sizes': sizes_result, 
-                    'merge_lines': lines_result
+                    'unpivot_sizes_direct': sizes_result,  # Updated method name
+                    'merge_lines': lines_result  # Now shows elimination status
                 },
-                'template_validation': template_validation
+                'template_validation': template_validation,
+                'architecture': 'simplified_2_template_flow'
             }
             
             # Log final results
             if overall_success:
-                self.logger.info(f"✅ V2 template sequence completed successfully in {total_time:.2f}s")
+                self.logger.info(f"✅ Simplified V2 template sequence completed successfully in {total_time:.2f}s")
                 self.logger.info(f"📊 NEW orders detected: {preprocessing_result.get('new_orders', 0)}")
+                self.logger.info(f"🏗️  Architecture: 2-template flow (eliminated staging table)")
             else:
-                self.logger.error(f"❌ V2 template sequence failed after {total_time:.2f}s")
+                self.logger.error(f"❌ Simplified V2 template sequence failed after {total_time:.2f}s")
                 
             return result
             
@@ -402,9 +407,10 @@ class MergeOrchestrator:
                 'operation': 'merge_headers_template'
             }
     
-    def _execute_template_unpivot_sizes(self, dry_run: bool) -> Dict[str, Any]:
+    def _execute_template_unpivot_sizes_direct(self, dry_run: bool) -> Dict[str, Any]:
         """
-        Execute unpivot_sizes.j2 template using SQLTemplateEngine (Task 3.0 tested)
+        Execute unpivot_sizes_direct.j2 template using SQLTemplateEngine (Simplified Architecture)
+        Direct MERGE to ORDER_LIST_LINES eliminating staging table dependency
         
         Args:
             dry_run: If True, validate but don't execute
@@ -412,25 +418,26 @@ class MergeOrchestrator:
         Returns:
             Dictionary with operation results
         """
-        self.logger.info("📐 Step 2: Template Unpivot Sizes (Headers → ORDER_LIST_LINES)")
+        self.logger.info("📐 Step 2: Direct Template Unpivot Sizes (Headers → ORDER_LIST_LINES DIRECT)")
         
         start_time = time.time()
         
         try:
-            # Use ONLY tested template engine method
+            # Use new direct template engine method
             self.logger.info("Discovering size columns from swp_ORDER_LIST_V2 between 'UNIT OF MEASURE' and 'TOTAL QTY'")
-            unpivot_sql = self.sql_engine.render_unpivot_sizes_sql()
-            self.logger.info("✅ Rendered unpivot_sizes SQL: 245 size columns, 5 business columns")
+            unpivot_sql = self.sql_engine.render_unpivot_sizes_direct_sql()
+            self.logger.info("✅ Rendered unpivot_sizes_direct SQL: 245 size columns, direct MERGE")
             
             if dry_run:
-                self.logger.info("📝 DRY RUN: Would execute unpivot_sizes.j2 template")
-                self.logger.info(f"✅ Rendered unpivot_sizes SQL: {len(unpivot_sql)} characters")
+                self.logger.info("📝 DRY RUN: Would execute unpivot_sizes_direct.j2 template")
+                self.logger.info(f"✅ Rendered unpivot_sizes_direct SQL: {len(unpivot_sql)} characters")
                 return {
                     'success': True,
                     'records_affected': 0,
                     'duration_seconds': 0.1,
-                    'operation': 'unpivot_sizes_template',
+                    'operation': 'unpivot_sizes_direct_template',
                     'sql_length': len(unpivot_sql),
+                    'architecture': 'direct_merge_no_staging',
                     'dry_run': True
                 }
             
@@ -443,24 +450,27 @@ class MergeOrchestrator:
                 
             duration = time.time() - start_time
             
-            self.logger.info(f"✅ Sizes unpivoted via template: {records_affected} line records created in {duration:.2f}s")
+            self.logger.info(f"✅ Sizes merged directly via template: {records_affected} line records processed in {duration:.2f}s")
+            self.logger.info(f"🗂️  Eliminated staging table: Direct MERGE to ORDER_LIST_LINES")
             
             return {
                 'success': True,
                 'records_affected': records_affected,
                 'duration_seconds': round(duration, 2),
-                'operation': 'unpivot_sizes_template',
+                'operation': 'unpivot_sizes_direct_template',
+                'architecture': 'direct_merge_no_staging',
                 'sql_length': len(unpivot_sql)
             }
             
         except Exception as e:
             duration = time.time() - start_time
-            self.logger.exception(f"Template sizes unpivot failed: {e}")
+            self.logger.exception(f"Direct template sizes unpivot failed: {e}")
             return {
                 'success': False,
                 'error': str(e),
                 'duration_seconds': round(duration, 2),
-                'operation': 'unpivot_sizes_template'
+                'operation': 'unpivot_sizes_direct_template',
+                'architecture': 'direct_merge_no_staging'
             }
     
     def _execute_template_merge_lines(self, dry_run: bool) -> Dict[str, Any]:

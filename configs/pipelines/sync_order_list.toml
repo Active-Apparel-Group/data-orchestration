@@ -4,18 +4,20 @@
 # Use [phase] to track implementation progress
 # Use [environment.{mode}] to switch between dev/prod environments
 
-# DDL REFERENCE LINKS - Database Schema Documentation
+# DDL REFERENCE LINKS - Database Schema Documentation (Simplified Architecture)
 # ==================================================
 [ddl_references]
-# DELTA Tables (Primary sync targets) - Critical for sync_engine.py
-order_list_delta = "db/ddl/tables/orders/dbo_order_list_delta.sql"                  # 69 headers ready for sync
-order_list_lines_delta = "db/ddl/tables/orders/dbo_order_list_lines_delta.sql"      # 317 lines ready for sync
+# Main Tables (Primary sync targets with integrated sync columns)
+order_list_v2 = "db/ddl/tables/orders/dbo_order_list_v2.sql"                        # Development target table (with sync columns)
+order_list_lines = "db/ddl/tables/orders/dbo_order_list_lines.sql"                  # Lines table (with sync columns)
 
-# Source/Target Tables  
-order_list_v2 = "db/ddl/tables/orders/dbo_order_list_v2.sql"                        # Development target table
-order_list_lines = "db/ddl/tables/orders/dbo_order_list_lines.sql"                  # Lines staging table
+# Source/Staging Tables (Simplified - eliminated swp_order_list_lines)
 swp_order_list_v2 = "db/ddl/tables/orders/dbo_swp_order_list_v2.sql"                # Shadow/staging table
-swp_order_list_lines = "db/ddl/tables/orders/dbo_swp_order_list_lines.sql"          # Shadow lines table
+# swp_order_list_lines removed - direct MERGE to ORDER_LIST_LINES eliminates staging
+
+# Schema Enhancement Scripts (Task 19.1-19.2)
+sync_columns_v2 = "db/ddl/updates/task19_1_add_sync_columns_order_list_v2.sql"      # Sync columns added to ORDER_LIST_V2
+sync_columns_lines = "db/ddl/updates/task19_2_add_sync_columns_order_list_lines.sql" # Sync columns added to ORDER_LIST_LINES
 
 # Status/Tracking Tables
 monday_sync_status = "db/ddl/tables/orders/dbo_order_list_monday_sync_status.sql"  # Sync status tracking
@@ -25,33 +27,31 @@ sync_architecture = "docs/runbooks/sync_engine_toml_configuration.md"    # TOML 
 ddl_extraction = "tools/extract_ddl.py"                                 # DDL extraction utility
 
 [phase]
-# Track implementation progress
-current = "phase1_minimal"              # phase1_minimal, phase2_expanded, phase3_production, phase4_cutover
-description = "Single PO with minimal columns"
+# Track implementation progress - ARCHITECTURAL SIMPLIFICATION APPLIED
+current = "phase5b_simplified_architecture"     # Eliminated swp_ORDER_LIST_LINES staging table
+description = "2-template flow with direct MERGE operations"
+architecture_change = "Eliminated staging table, direct ORDER_LIST_V2 → ORDER_LIST_LINES flow"
 start_date = "2025-07-19"
-target_completion = "2025-07-22"
+target_completion = "2025-07-23"
+simplification_date = "2025-07-23"
 
 # ENVIRONMENT CONFIGURATION - Production Ready Structure
 # =====================================================
 
 [environment.development]
-# Development environment - uses shadow tables for safety
+# Development environment - simplified 2-template architecture
 source_table = "swp_ORDER_LIST_V2"              # Shadow staging table for development
-target_table = "ORDER_LIST_V2"                  # Shadow production table for development
-delta_table = "ORDER_LIST_DELTA"                # Headers DELTA table ✅
-lines_delta_table = "ORDER_LIST_LINES_DELTA"    # Lines DELTA table ✅
-lines_table = "ORDER_LIST_LINES"                # Lines table (shared)
-source_lines_table = "swp_ORDER_LIST_LINES"     # Shadow staging lines table for development
+target_table = "ORDER_LIST_V2"                  # Shadow production table for development (now with sync columns)
+lines_table = "ORDER_LIST_LINES"                # Lines table (shared, now with sync columns)
+# source_lines_table removed - direct MERGE to lines_table eliminates staging
 database = "orders"                             # Database name from config.yaml
 
 [environment.production]
-# Production environment - uses live production tables
+# Production environment - simplified 2-template architecture
 source_table = "swp_ORDER_LIST"                 # Production staging table
-target_table = "ORDER_LIST"                     # Live production table
-delta_table = "ORDER_LIST_DELTA"                # Same DELTA tables for both environments ✅
-lines_delta_table = "ORDER_LIST_LINES_DELTA"    # Same DELTA tables for both environments ✅
-lines_table = "ORDER_LIST_LINES"                # Lines table (shared)  
-source_lines_table = "swp_ORDER_LIST_LINES"     # Production staging lines table
+target_table = "ORDER_LIST"                     # Live production table (will have sync columns)
+lines_table = "ORDER_LIST_LINES"                # Lines table (shared, now with sync columns)  
+# source_lines_table removed - direct MERGE to lines_table eliminates staging
 database = "orders"                             # Database name from config.yaml
 
 # DATABASE CONFIGURATION
@@ -66,41 +66,50 @@ essential_columns = [
     "TOTAL QTY"                         # Quantity summary
 ]
 
-# Sync tracking columns (ORDER_LIST_V2 ACTUAL column names)
-sync_columns = [
-    "monday_item_id",                   # Monday.com item ID storage (lowercase!)
-    "sync_state",                       # Status tracking (PENDING/SYNCED/ERROR)
-    "last_synced_at"                    # Last sync timestamp
+# Sync tracking columns (Enhanced with Task 19.1-19.2 additions)
+sync_columns_headers = [
+    # ORDER_LIST_V2 sync columns
+    "action_type",                      # 'INSERT', 'UPDATE', 'DELETE'
+    "sync_state",                       # 'NEW', 'PENDING', 'SYNCED', 'ERROR'
+    "monday_item_id",                   # Monday.com item ID storage
+    "sync_attempted_at",                # Last sync attempt timestamp
+    "sync_completed_at",                # Last successful sync timestamp
+    "sync_error_message",               # Error message if sync failed
+    "retry_count",                      # Number of retry attempts
+    "created_at",                       # Record creation timestamp
+    "updated_at",                       # Record update timestamp
+    "row_hash"                          # Row hash for change detection
 ]
 
-# PHASE 1: MINIMAL VIABLE PIPELINE CONFIGURATION
-# ==============================================
+sync_columns_lines = [
+    # ORDER_LIST_LINES sync columns  
+    "action_type",                      # 'INSERT', 'UPDATE', 'DELETE'
+    "sync_state",                       # 'NEW', 'PENDING', 'SYNCED', 'ERROR'
+    "monday_item_id",                   # Monday.com item ID (legacy)
+    "monday_subitem_id",                # Monday.com subitem ID
+    "monday_parent_id",                 # Monday.com parent item ID reference
+    "sync_attempted_at",                # Last sync attempt timestamp
+    "sync_completed_at",                # Last successful sync timestamp
+    "sync_error_message",               # Error message if sync failed
+    "retry_count"                       # Number of retry attempts
+]
 
-[test_data.phase1]
+# TESTING CONFIGURATION
+# =====================
+[test_data]
 # Single customer, single PO for initial testing
 limit_customers = ["GREYSON"]
 limit_pos = ["4755"]
 limit_records = 10                      # Maximum records per test
 test_mode = true
 
-[columns.phase1]
-# MINIMAL COLUMN SET - Core business fields only
-# Focus: Prove the pipeline works end-to-end
-order_list = [
-    "AAG ORDER NUMBER",                 # Primary business key
-    "CUSTOMER NAME",                    # Customer identification
-    "PO NUMBER",                        # Purchase order reference
-    "CUSTOMER STYLE",                   # Product identification
-    "TOTAL QTY"                         # Quantity summary
-]
-
 # SIZE COLUMNS - Dynamic discovery between markers
-[size_detection.phase1]
+[size_detection]
 start_after = "UNIT OF MEASURE"        # Column that precedes size columns
 end_before = "TOTAL QTY"               # Column that follows size columns
-max_sizes = 300                        # Limit for phase 1 testing
+max_sizes = 300                        # Limit for testing
 
-[hash.phase1]
+[hash]
 # Change detection logic - minimal columns for testing
 columns = [
     "AAG ORDER NUMBER",
@@ -118,43 +127,251 @@ subitem_board_id = 9609317948           # Dev subitems board
 create_groups = true                    # Auto-create customer groups
 environment = "development"
 metadata_path = "configs/boards/board_9609317401_metadata.json"
+metadata_subitems_path = "configs/boards/board_9609317948_metadata.json"
 
 [monday.production]  
 # Production Monday.com boards
-board_id = 8709134353                   # Prod items board
+board_id = 9200517329                   # Prod items board
 subitem_board_id = 9200771505           # Prod subitems board
 create_groups = true                    # Auto-create customer groups
 environment = "production"
-metadata_path = "configs/boards/board_8709134353_metadata.json"
+metadata_path = "configs/boards/board_9200517329_metadata.json"
+metadata_subitems_path = "configs/boards/board_9200771505_metadata.json"
 
 # ENVIRONMENT-SPECIFIC MONDAY.COM CONFIGURATION
 # ===============================================
 
-# Column mapping - ORDER_LIST headers to Monday items (DEVELOPMENT)
+# ===== COMPREHENSIVE MONDAY.COM COLUMN MAPPINGS =====
+# Based on ORDER_LIST schema analysis and board metadata examination
+# Development Board: 9609317401 | Production Board: 9200517329
+# Success Gate: Expand from 5 basic columns to 25+ comprehensive business columns
+
+# Column mapping - ORDER_LIST headers to Monday items (DEVELOPMENT BOARD: 9609317401)
 [monday.column_mapping.development.headers]
-"AAG ORDER NUMBER" = "text123"         # Will be discovered from board metadata
-"CUSTOMER NAME" = "text456"             # Customer identification 
-"PO NUMBER" = "text789"
-"CUSTOMER STYLE" = "text101"
-"TOTAL QTY" = "numbers102"
+# === Core Order Information ===
+"AAG ORDER NUMBER" = "text_mkr5wya6"  # text - AAG ORDER NUMBER
+"PO NUMBER" = "text_mkr5ej2x"  # text - PO NUMBER
+"CUSTOMER NAME" = "dropdown_mkr542p2"  # dropdown - CUSTOMER
+"CUSTOMER ALT PO" = "text_mkrh94rx"  # text - CUSTOMER ALT PO
+"ORDER DATE PO RECEIVED" = "date_mkr5zp5"  # date - ORDER DATE PO RECEIVED
+"ORDER TYPE" = "dropdown_mkr518fc"  # dropdown - ORDER TYPE
+
+# === Product Details ===
+"CUSTOMER COLOUR DESCRIPTION" = "dropdown_mkr5677f"  # dropdown - COLOR
+"CUSTOMER STYLE" = "dropdown_mkr5tgaa"  # dropdown - STYLE
+"PATTERN ID" = "text_mkr5cz8m"  # text - PATTERN ID
+"STYLE DESCRIPTION" = "long_text_mkr5p0cf"  # long_text - STYLE DESCRIPTION
+"NOTES" = "long_text_mkr5hass"  # long_text - NOTES
+"UNIT OF MEASURE" = "color_mkr5yf27"  # status - UNIT OF MEASURE
+"ALIAS/RELATED ITEM" = "text_mkrhra2c"  # text - ALIAS RELATED ITEM
+
+
+# === Season and Planning ===
+"AAG SEASON" = "dropdown_mkr58de6"  # dropdown - AAG SEASON
+"CATEGORY" = "dropdown_mkr5s5n3"  # dropdown - CATEGORY
+"CUSTOMER SEASON" = "dropdown_mkr5rgs6"  # dropdown - CUSTOMER SEASON
+"DROP" = "dropdown_mkr5w5e"  # dropdown - DROP
+"RANGE / COLLECTION" = "long_text_mks0vs1p"  # long_text - RANGE / COLLECTION
+"AAG SEASON CODE" = "dropdown_mkr58de6"  # dropdown - AAG SEASON
+
+# === Dates and Timelines ===
+"DELIVERY TERMS" = "dropdown_mkr5kk5"  # dropdown - DELIVERY TERMS
+"DESTINATION WAREHOUSE" = "text_mkr5ps35"  # text - DESTINATION WAREHOUSE
+"PLANNED DELIVERY METHOD" = "text_mkr5wcpw"  # text - PLANNED DELIVERY METHOD
+"ETA CUSTOMER WAREHOUSE DATE" = "date_mkr554yz"  # dropdown - CUSTOMER REQ IN DC DATE
+"EX FACTORY DATE" = "date_mkr57811"  # date - CUSTOMER EX FACTORY DATE
+"Warehouse" = "text_mkr5ps35"  # text - DESTINATION WAREHOUSE
+
+# === Pricing and Financials ===
+"ADMINISTRATION FEE" = "numeric_mkr5k68"  # numbers - ADMINISTRATION FEE
+"CUSTOMER PRICE" = "numeric_mkr5cact"  # numbers - CUSTOMER PRICE
+"DDP US (USD)" = "numeric_mkr5js0x"  # numbers - DDP US (USD)
+"DESIGN FEE" = "numeric_mkr5h612"  # numbers - DESIGN FEE
+"DISCOUNT" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"EX WORKS (USD)" = "numeric_mkr5erhv"  # numbers - EX WORKS (USD)
+"FINAL FOB (USD)" = "numeric_mkr5nhr7"  # numbers - FINAL FOB (USD)
+"FINAL PRICES Y/N" = "text_mkr5ptvg"  # text - FINAL PRICES Y/N
+"FX CHARGE" = "numeric_mkr5gp6a"  # numbers - FX CHARGE
+"NOTES FOR PRICE" = "long_text_mkr5znxn"  # long_text - NOTES FOR PRICE
+"SMS PRICE USD" = "numeric_mkr58nvp"  # numbers - SMS PRICE USD
+"SURCHARGE FEE" = "numeric_mkr57cem"  # numbers - SURCHARGE FEE
+"US DUTY" = "numeric_mkr5ev2q"  # numbers - US DUTY
+"US DUTY RATE" = "numeric_mkr5r6at"  # numbers - US DUTY RATE
+"US TARIFF" = "numeric_mkr51ndy"  # numbers - US TARIFF
+"US TARIFF RATE" = "numeric_mkr55zg1"  # numbers - US TARIFF RATE
+
+# === Shipping and Logistics ===
+"DESTINATION" = "text_mkr5kbc6"  # text - DESTINATION
+"FREIGHT" = "numeric_mksfr0r2"  # numbers - FREIGHT
+"HANDLING" = "text_mkr5s3tm"  # text - HANDLING
+"HS CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE
+"UK FREIGHT" = "numeric_mksfr0r2"  # numbers - FREIGHT
 
 # Column mapping - ORDER_LIST_LINES to Monday subitems (DEVELOPMENT)
 [monday.column_mapping.development.lines]
-"size_code" = "text_size"
-"qty" = "numbers_qty"
+"size_code" = "dropdown_mkrak7qp"           # Size code for line items
+"qty" = "numeric_mkra7j8e"                  # ORDER QTY - Quantity per size
 
-# Column mapping - ORDER_LIST headers to Monday items (PRODUCTION)
+# Column mapping - ORDER_LIST headers to Monday items (PRODUCTION BOARD: 9200517329)
 [monday.column_mapping.production.headers]
-"AAG ORDER NUMBER" = "text_prod_001"   # Production column IDs (TBD from board metadata)
-"CUSTOMER NAME" = "text_prod_002"      # Customer identification
-"PO NUMBER" = "text_prod_003"
-"CUSTOMER STYLE" = "text_prod_004"
-"TOTAL QTY" = "numbers_prod_001"
+# === Core Order Information ===
+"AAG ORDER NUMBER" = "text_mkp6sfqv"        # AAG ORDER NUMBER
+"CUSTOMER" = "dropdown_mkp4ar5n"            # CUSTOMER (note: different from dev)
+"BULK PO" = "text_mkp43qv0"                 # BULK PO
+"BULK PO QTY" = "numeric_mkp4cb6t"          # BULK PO QTY
+"ORDER RECEIVED DATE" = "date_mkpcevxt"     # ORDER RECEIVED DATE (note: different from dev)
+"ORDER TYPE" = "dropdown_mkpc7ey8"          # ORDER TYPE
+
+# === Product Details ===
+"STYLE CODE" = "text_mkp4w7tj"              # STYLE CODE
+"STYLE DESCRIPTION" = "long_text_mkpervye"  # STYLE DESCRIPTION
+"Color" = "text_mkp41ze2"                   # Color (note: lowercase 'c')
+
+# === Season and Classification ===
+"SEASON" = "text_mkp47g7m"                  # SEASON
+"CUSTOMER SEASON" = "dropdown_mkp4kmtp"     # CUSTOMER SEASON
+"DROP" = "dropdown_mkpcj4ev"                # DROP
+"ACTIVE/WOVEN/SWIM/ACC/SEAMLESS" = "dropdown_mkp44k77" # Product classification
+"STYLE CATEGORY" = "dropdown_mkp4yr3v"      # STYLE CATEGORY
+"PRODUCT CAT" = "dropdown_mkpbbtkh"         # PRODUCT CAT
+
+# === Product Technical Details ===
+"Fabric Code" = "dropdown_mkp41kzc"         # Fabric Code
+"Fabric Type" = "dropdown_mkp4n679"         # Fabric Type
+"Fabric Lead Time" = "text_mkp4vncc"        # Fabric Lead Time
+"Fabric COO" = "text_mkp4wp81"              # Fabric COO
+
+# === Quantities and Production ===
+"CMP LS" = "numeric_mkp46xhm"               # CMP LS
+"CMP Partner" = "numeric_mkp6j2y1"          # CMP Partner
+"RM Freight Est." = "numeric_mkp4y0pe"      # RM Freight Est.
+"FOB (Partner)" = "numeric_mkp4rfg6"        # FOB (Partner)
+"Customer FOB (USD)" = "numeric_mkp4q1rv"   # Customer FOB (USD)
+
+# === Key Dates ===
+"ETA CUSTOMER WAREHOUSE DATE" = "date_mkp44k3t" # ETA CUSTOMER WAREHOUSE DATE
+"FABRIC DUE INTO LONGSON" = "date_mkp4vtz2" # FABRIC DUE INTO LONGSON
+"PC RM Ex-Factory Date" = "date_mkp57jk5"   # PC RM Ex-Factory Date
+"EX-FTY DATE (Original)" = "date_mkp44ntk"  # EX-FTY DATE (Original)
+"EX-FTY (Revised LS)" = "date_mkp4rbd7"     # EX-FTY (Revised LS)
+"EX-FTY (Partner PO)" = "date_mkp5qmw6"     # EX-FTY (Partner PO)
+
+# === Status Fields ===
+"PP Status" = "color_mkp4304j"              # PP Status
+"Fabric Status" = "color_mkp4apjg"          # Fabric Status
+"Trim Status" = "color_mkp43peb"            # Trim Status
+"IQC Status" = "color_mkp4hmsy"             # IQC Status
+"ALLOCATION STATUS" = "color_mkp4xd64"      # ALLOCATION STATUS
+"PRODUCTION STATUS" = "color_mkq0f90k"      # PRODUCTION STATUS
+
+# === Destination and Delivery ===
+"Destination" = "dropdown_mkp4gmn6"         # Destination
+"PLANNED DELIVERY METHOD" = "dropdown_mkp4wx2p" # PLANNED DELIVERY METHOD
+"Incoterms" = "dropdown_mkp4e51p"           # Incoterms
+"COUNTRY OF ORIGIN" = "dropdown_mkp4f6se"   # COUNTRY OF ORIGIN
+
+# === Planning and Resources ===
+"PLANNER" = "multiple_person_mkqfm1ea"      # PLANNER
+"CUSTOMER ALLOCATION" = "dropdown_mkpc44w5" # CUSTOMER ALLOCATION
+"FACTORY" = "dropdown_mkp43md8"             # FACTORY
+"Account Manager" = "multiple_person_mkqj1tpr" # Account Manager
+
+# === Additional Production Details ===
+"REMARK" = "text_mkp4m83f"                  # REMARK
+"Alias" = "text_mkpv68ar"                   # Alias
+"MO NUMBER" = "text_mkqjdxtf"               # MO NUMBER
+"MO RELEASE DATE" = "date_mkqj2rs5"         # MO RELEASE DATE
 
 # Column mapping - ORDER_LIST_LINES to Monday subitems (PRODUCTION)
 [monday.column_mapping.production.lines]
-"size_code" = "text_prod_size"         # Production subitem column IDs (TBD)
-"qty" = "numbers_prod_qty"
+"size_code" = "text_mkp_size_code"          # Production size code for line items
+"qty" = "numeric_mkp_qty"                   # Production quantity per size
+"customer_fob_usd" = "numeric_mkp4q1rv"     # Production line-level customer FOB
+"color" = "text_mkp41ze2"                   # Production line-level color
+"style_description" = "long_text_mkpervye"  # Production line-level style description
+
+# === SIZE COLUMN MAPPINGS (COMPREHENSIVE COVERAGE) ===
+# Based on ORDER_LIST schema analysis - covers all garment size variations
+[monday.column_mapping.size_mappings]
+# Standard adult sizes - Most common across all customers
+"XS" = "numeric_mkr5size_xs"
+"S" = "numeric_mkr5size_s"
+"M" = "numeric_mkr5size_m"
+"L" = "numeric_mkr5size_l"
+"XL" = "numeric_mkr5size_xl"
+"XXL" = "numeric_mkr5size_xxl"
+"XXXL" = "numeric_mkr5size_xxxl"
+
+# Extended adult sizes
+"1X" = "numeric_mkr5size_1x"
+"2X" = "numeric_mkr5size_2x"
+"2XL" = "numeric_mkr5size_2xl"
+"3X" = "numeric_mkr5size_3x"
+"3XL" = "numeric_mkr5size_3xl"
+"4X" = "numeric_mkr5size_4x"
+"4XL" = "numeric_mkr5size_4xl"
+
+# Numeric women's sizes
+"0" = "numeric_mkr5size_0"
+"1" = "numeric_mkr5size_1"
+"2" = "numeric_mkr5size_2"
+"4" = "numeric_mkr5size_4"
+"6" = "numeric_mkr5size_6"
+"8" = "numeric_mkr5size_8"
+"10" = "numeric_mkr5size_10"
+"12" = "numeric_mkr5size_12"
+"14" = "numeric_mkr5size_14"
+"16" = "numeric_mkr5size_16"
+"18" = "numeric_mkr5size_18"
+"20" = "numeric_mkr5size_20"
+"22" = "numeric_mkr5size_22"
+"24" = "numeric_mkr5size_24"
+
+# Men's waist/inseam sizes (common patterns)
+"30/30" = "numeric_mkr5size_30_30"
+"30/32" = "numeric_mkr5size_30_32"
+"31/30" = "numeric_mkr5size_31_30"
+"31/32" = "numeric_mkr5size_31_32"
+"32/30" = "numeric_mkr5size_32_30"
+"32/32" = "numeric_mkr5size_32_32"
+"32/34" = "numeric_mkr5size_32_34"
+"34/30" = "numeric_mkr5size_34_30"
+"34/32" = "numeric_mkr5size_34_32"
+"34/34" = "numeric_mkr5size_34_34"
+"36/30" = "numeric_mkr5size_36_30"
+"36/32" = "numeric_mkr5size_36_32"
+"36/34" = "numeric_mkr5size_36_34"
+"38/30" = "numeric_mkr5size_38_30"
+"38/32" = "numeric_mkr5size_38_32"
+"38/34" = "numeric_mkr5size_38_34"
+
+# Youth/children sizes
+"2T" = "numeric_mkr5size_2t"
+"3T" = "numeric_mkr5size_3t"
+"4T" = "numeric_mkr5size_4t"
+"5T" = "numeric_mkr5size_5t"
+"6T" = "numeric_mkr5size_6t"
+
+# Infant/toddler sizes
+"0-3M" = "numeric_mkr5size_0_3m"
+"3-6M" = "numeric_mkr5size_3_6m"
+"6-9M" = "numeric_mkr5size_6_9m"
+"9-12M" = "numeric_mkr5size_9_12m"
+"12-18M" = "numeric_mkr5size_12_18m"
+"18-24M" = "numeric_mkr5size_18_24m"
+
+# Youth age ranges
+"3-4 years" = "numeric_mkr5size_3_4y"
+"5-6 years" = "numeric_mkr5size_5_6y"
+"7-8 years" = "numeric_mkr5size_7_8y"
+"9-10 years" = "numeric_mkr5size_9_10y"
+"11-12 years" = "numeric_mkr5size_11_12y"
+"13-14 years" = "numeric_mkr5size_13_14y"
+
+# Special sizes
+"ONE SIZE" = "numeric_mkr5size_one_size"
+"OS" = "numeric_mkr5size_os"
+"One Sz" = "numeric_mkr5size_one_sz"
 
 # Monday.com Sync Configuration - TOML-Driven Architecture
 # ========================================================
@@ -218,8 +435,8 @@ auto_create_groups = true               # Create customer groups if missing
 store_groups_in_db = true               # Enhancement: maintain group registry in DB
 group_registry_table = "monday_board_groups"   # Future table for group management
 
-# Enhanced error handling with delta table retry - APPROVED
-error_recovery_method = "delta_table"   # Use PENDING/FAILED states in delta tables
+# Enhanced error handling with main table sync state - DELTA-FREE
+error_recovery_method = "main_table"    # Use PENDING/FAILED states in main tables (ORDER_LIST_V2, ORDER_LIST_LINES)
 max_retries = 3                         # Maximum retry attempts per record
 retry_backoff = "exponential"           # Exponential backoff (1s, 2s, 4s)
 
@@ -229,7 +446,7 @@ batch_size = 100                        # Records per batch (only if uuid insuff
 
 [sync.rejected_patterns] 
 # Explicitly rejected patterns from load_cms analysis
-staging_validation = false              # Delta tables replace staging approach
+staging_validation = false              # Direct main table approach (DELTA-FREE architecture)
 separate_staging_tables = false         # Use ORDER_LIST_V2/LINES directly
 
 # CURRENT IMPLEMENTATION FOCUS

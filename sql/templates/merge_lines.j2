@@ -1,9 +1,13 @@
+-- ===============================================================    WHERE sync_attempted_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'INSERT';
+    
+    SELECT @ChangedLinesCount = COUNT(*) FROM {{ lines_table }} 
+    WHERE sync_attempted_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'UPDATE';- merge_lines.j2 - Lines Merge Template (Jinja2) - Main Tables Only
 -- ================================================================
--- merge_lines.j2 - Lines Merge Template (Jinja2)
--- ================================================================
--- Purpose: MERGE {{ source_lines_table }} → {{ lines_table }} + OUTPUT to {{ lines_delta_table }}
+-- Purpose: MERGE {{ source_lines_table }} to {{ lines_table }} with direct sync tracking
+-- Architecture: Main Tables Only - Direct sync state management
 -- Generated from: TOML configuration
 -- Business Key: record_uuid + size_code combination
+-- Sync Columns: action_type, sync_state, sync_attempted_at in main table
 -- ================================================================
 
 DECLARE @StartTime DATETIME2 = GETUTCDATE();
@@ -23,14 +27,16 @@ BEGIN TRY
     ON target.record_uuid = source.record_uuid 
     AND target.size_code = source.size_code
     
-    -- INSERT: NEW lines
+    -- INSERT: NEW lines with sync state management
     WHEN NOT MATCHED BY TARGET THEN
         INSERT (
             record_uuid, 
             size_code, 
             qty,
             row_hash,
+            action_type,
             sync_state,
+            sync_attempted_at,
             created_at,
             updated_at
         )
@@ -39,43 +45,31 @@ BEGIN TRY
             source.size_code,
             source.qty,
             source.row_hash,
-            'NEW',
+            'INSERT',
+            'PENDING',
+            GETUTCDATE(),
             GETUTCDATE(),
             GETUTCDATE()
         )
     
-    -- UPDATE: Changed quantities
+    -- UPDATE: Changed quantities with sync state management
     WHEN MATCHED AND target.row_hash <> source.row_hash THEN
         UPDATE SET 
             qty = source.qty,
             row_hash = source.row_hash,
-            sync_state = 'CHANGED',
-            updated_at = GETUTCDATE()
-    
-    -- OUTPUT: Capture changes for delta tracking
-    OUTPUT
-        COALESCE(INSERTED.line_uuid, DELETED.line_uuid) AS line_uuid,
-        COALESCE(INSERTED.record_uuid, DELETED.record_uuid) AS record_uuid,
-        COALESCE(INSERTED.size_code, DELETED.size_code) AS size_code,
-        COALESCE(INSERTED.qty, DELETED.qty) AS qty,
-        $action AS action_type,
-        'PENDING' AS sync_state,
-        GETUTCDATE() AS created_at,
-        NULL AS monday_item_id,
-        NULL AS sync_completed_at
-    INTO {{ lines_delta_table }} (
-        line_uuid, record_uuid, size_code, qty, action_type,
-        sync_state, created_at, monday_item_id, sync_completed_at
-    );
+            action_type = 'UPDATE',
+            sync_state = 'PENDING',
+            sync_attempted_at = GETUTCDATE(),
+            updated_at = GETUTCDATE();
     
     SET @ProcessedCount = @@ROWCOUNT;
     
-    -- Count new vs changed lines
-    SELECT @NewLinesCount = COUNT(*) FROM {{ lines_delta_table }}
-    WHERE created_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'INSERT';
+    -- Count metrics from main table sync columns
+    SELECT @NewLinesCount = COUNT(*) FROM {{ lines_table }}
+    WHERE sync_pending_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'INSERT';
     
-    SELECT @ChangedLinesCount = COUNT(*) FROM {{ lines_delta_table }}
-    WHERE created_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'UPDATE';
+    SELECT @ChangedLinesCount = COUNT(*) FROM {{ lines_table }}
+    WHERE sync_pending_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'UPDATE';
     
     COMMIT TRANSACTION;
     
@@ -83,8 +77,9 @@ BEGIN TRY
     -- SUCCESS METRICS
     -- =============================================================
     
-    PRINT 'Lines Merge Complete: {{ lines_staging }} → {{ lines_table }}';
-    PRINT 'Binding Key: record_uuid (unified across ORDER_LIST, ORDER_LIST_LINES, and DELTA tables)';
+    PRINT 'Lines Merge Complete (Main Tables): {{ source_lines_table }} to {{ lines_table }}';
+    PRINT 'Direct Sync Tracking: No intermediate tables';
+    PRINT 'Binding Key: record_uuid (unified across ORDER_LIST and ORDER_LIST_LINES)';
     PRINT 'Total Processed: ' + CAST(@ProcessedCount AS VARCHAR(10));
     PRINT 'New Lines: ' + CAST(@NewLinesCount AS VARCHAR(10));
     PRINT 'Changed Lines: ' + CAST(@ChangedLinesCount AS VARCHAR(10));

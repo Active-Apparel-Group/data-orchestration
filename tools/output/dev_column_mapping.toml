@@ -1,0 +1,58 @@
+# Column mapping - ORDER_LIST headers to Monday items (DEVELOPMENT BOARD: 9609317401)
+[monday.column_mapping.development.headers]
+# === Core Order Information ===
+"AAG ORDER NUMBER" = "text_mkr5wya6"  # text - AAG ORDER NUMBER
+"AAG SEASON" = "dropdown_mkr58de6"  # dropdown - AAG SEASON
+"CUSTOMER ALT PO" = "text_mkrh94rx"  # text - CUSTOMER ALT PO
+"CUSTOMER PRICE" = "numeric_mkr5cact"  # numbers - CUSTOMER PRICE
+"CUSTOMER SEASON" = "dropdown_mkr5rgs6"  # dropdown - CUSTOMER SEASON
+"ORDER DATE PO RECEIVED" = "date_mkr5zp5"  # date - ORDER DATE PO RECEIVED
+"ORDER TYPE" = "dropdown_mkr518fc"  # dropdown - ORDER TYPE
+"PO NUMBER" = "text_mkr5ej2x"  # text - PO NUMBER
+"AAG SEASON CODE" = "dropdown_mkr58de6"  # dropdown - AAG SEASON (fuzzy: 0.80)
+"CUSTOMER CODE" = "numeric_mkr5cact"  # numbers - CUSTOMER PRICE (fuzzy: 0.81)
+
+# === Product Details ===
+"STYLE DESCRIPTION" = "long_text_mkr5p0cf"  # long_text - STYLE DESCRIPTION
+
+# === Dates ===
+"DESTINATION WAREHOUSE" = "text_mkr5ps35"  # text - DESTINATION WAREHOUSE
+
+# === Pricing ===
+"FINAL FOB (USD)" = "numeric_mkr5nhr7"  # numbers - FINAL FOB (USD)
+"FINAL PRICES Y/N" = "text_mkr5ptvg"  # text - FINAL PRICES Y/N
+"NOTES FOR PRICE" = "long_text_mkr5znxn"  # long_text - NOTES FOR PRICE
+"SMS PRICE USD" = "numeric_mkr58nvp"  # numbers - SMS PRICE USD
+"US DUTY" = "numeric_mkr5ev2q"  # numbers - US DUTY
+"US DUTY RATE" = "numeric_mkr5r6at"  # numbers - US DUTY RATE
+"US TARIFF" = "numeric_mkr51ndy"  # numbers - US TARIFF
+"US TARIFF RATE" = "numeric_mkr55zg1"  # numbers - US TARIFF RATE
+"CAN DUTY RATE" = "numeric_mkr5r6at"  # numbers - US DUTY RATE (fuzzy: 0.80)
+"UK DUTY" = "numeric_mkr5ev2q"  # numbers - US DUTY (fuzzy: 0.86)
+"UK DUTY RATE" = "numeric_mkr5r6at"  # numbers - US DUTY RATE (fuzzy: 0.92)
+
+# === Other ===
+"ADMINISTRATION FEE" = "numeric_mkr5k68"  # numbers - ADMINISTRATION FEE
+"CATEGORY" = "dropdown_mkr5s5n3"  # dropdown - CATEGORY
+"DDP US (USD)" = "numeric_mkr5js0x"  # numbers - DDP US (USD)
+"DELIVERY TERMS" = "dropdown_mkr5kk5"  # dropdown - DELIVERY TERMS
+"DESIGN FEE" = "numeric_mkr5h612"  # numbers - DESIGN FEE
+"DESTINATION" = "text_mkr5kbc6"  # text - DESTINATION
+"DISCOUNT" = "numeric_mkr56xx8"  # numbers - DISCOUNT
+"DROP" = "dropdown_mkr5w5e"  # dropdown - DROP
+"EX WORKS (USD)" = "numeric_mkr5erhv"  # numbers - EX WORKS (USD)
+"FREIGHT" = "numeric_mksfr0r2"  # numbers - FREIGHT
+"FX CHARGE" = "numeric_mkr5gp6a"  # numbers - FX CHARGE
+"HANDLING" = "text_mkr5s3tm"  # text - HANDLING
+"HS CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE
+"NOTES" = "long_text_mkr5hass"  # long_text - NOTES
+"PATTERN ID" = "text_mkr5cz8m"  # text - PATTERN ID
+"PLANNED DELIVERY METHOD" = "text_mkr5wcpw"  # text - PLANNED DELIVERY METHOD
+"RANGE / COLLECTION" = "long_text_mks0vs1p"  # long_text - RANGE / COLLECTION
+"SURCHARGE FEE" = "numeric_mkr57cem"  # numbers - SURCHARGE FEE
+"UNIT OF MEASURE" = "color_mkr5yf27"  # status - UNIT OF MEASURE
+"USA ONLY LSTP 75% EX WORKS" = "numeric_mkr5yne4"  # numbers - USA ONLY LSTP 75% EX WORKS
+"ALIAS/RELATED ITEM" = "text_mkrhra2c"  # text - ALIAS RELATED ITEM (fuzzy: 0.94)
+"DDP CAN (USD)" = "numeric_mkr5js0x"  # numbers - DDP US (USD) (fuzzy: 0.80)
+"DDP UK (USD)" = "numeric_mkr5js0x"  # numbers - DDP US (USD) (fuzzy: 0.92)
+"UK FREIGHT" = "numeric_mksfr0r2"  # numbers - FREIGHT (fuzzy: 0.82)

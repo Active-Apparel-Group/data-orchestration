@@ -140,6 +140,8 @@ class OrderListTransformer:
                 failed_customers.append(customer_name)
                 self.logger.info(f"   ❌ Failed: {e}")
         
+        
+        
         # Step 3: Atomic swap
         if successful_customers:
             self.logger.info(f"\n[STEP 3] Atomic swap: {self.staging_table} → {self.target_table}")

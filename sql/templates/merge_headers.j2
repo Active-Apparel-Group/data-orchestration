@@ -1,9 +1,11 @@
 -- ================================================================
--- merge_headers.j2 - V2 Header Merge Template (Jinja2)
+-- merge_headers.j2 - V2 Header Merge Template (Jinja2) - Main Tables Only
 -- ================================================================
--- Purpose: MERGE {{ source_table }} → {{ target_table }} + OUTPUT to {{ delta_table }}
+-- Purpose: MERGE {{ source_table }} to {{ target_table }} with direct sync tracking
+-- Architecture: Main Tables Only - Direct sync state management
 -- Generated from: TOML config + Python preprocessing
 -- Business Key: AAG ORDER NUMBER (Phase 1 - simple matching)
+-- Sync Columns: action_type, sync_state, sync_attempted_at in main table
 -- ================================================================
 
 DECLARE @StartTime DATETIME2 = GETUTCDATE();
@@ -39,7 +41,7 @@ BEGIN TRY
     ) AS source
     ON target.[AAG ORDER NUMBER] = source.[AAG ORDER NUMBER]  -- Business key matching
     
-    -- INSERT: NEW records
+    -- INSERT: NEW records with sync state management
     WHEN NOT MATCHED BY TARGET THEN
         INSERT (
             record_uuid,
@@ -51,7 +53,9 @@ BEGIN TRY
             [{{ size }}],
             {% endfor -%}
             row_hash,
+            action_type,
             sync_state,
+            sync_attempted_at,
             created_at,
             updated_at
         )
@@ -65,13 +69,15 @@ BEGIN TRY
             source.[{{ size }}],
             {% endfor -%}
             source.row_hash,
-            'NEW',
+            'INSERT',
+            'PENDING',
+            GETUTCDATE(),
             GETUTCDATE(),
             GETUTCDATE()
         )
     
-    -- UPDATE: Changed records (hash-based detection)
-    WHEN MATCHED AND target.row_hash <> source.row_hash THEN
+    -- UPDATE: Changed records (hybrid hash logic) - Supports NULL hash for NEW records
+    WHEN MATCHED AND (target.row_hash IS NULL OR target.row_hash <> source.row_hash) THEN
         UPDATE SET
             {% for column in business_columns if column != 'AAG ORDER NUMBER' -%}
             [{{ column }}] = source.[{{ column }}],
@@ -80,42 +86,24 @@ BEGIN TRY
             [{{ size }}] = source.[{{ size }}],
             {% endfor -%}
             row_hash = source.row_hash,
-            sync_state = 'CHANGED',
-            updated_at = GETUTCDATE()
-    
-    -- OUTPUT: Capture changes for delta tracking
-    OUTPUT 
-        COALESCE(INSERTED.record_uuid, DELETED.record_uuid) AS record_uuid,
-        $action AS action_type,
-        COALESCE(INSERTED.[AAG ORDER NUMBER], DELETED.[AAG ORDER NUMBER]) AS [AAG ORDER NUMBER],
-        {% for column in business_columns if column != 'AAG ORDER NUMBER' -%}
-        COALESCE(INSERTED.[{{ column }}], DELETED.[{{ column }}]) AS [{{ column }}],
-        {% endfor -%}
-        COALESCE(INSERTED.row_hash, DELETED.row_hash) AS row_hash,
-        COALESCE(INSERTED.sync_state, 'NEW') AS sync_state,
-        GETUTCDATE() AS created_at,
-        NULL AS monday_item_id,
-        NULL AS sync_completed_at
-    INTO {{ delta_table }} (
-        record_uuid, action_type, [AAG ORDER NUMBER],
-        {% for column in business_columns if column != 'AAG ORDER NUMBER' -%}
-        [{{ column }}],
-        {% endfor -%}
-        row_hash, sync_state, 
-        created_at, monday_item_id, sync_completed_at
-    );
+            -- Direct sync state management (no intermediate tables)
+            action_type = 'UPDATE',
+            sync_state = 'PENDING',
+            sync_attempted_at = GETUTCDATE(),
+            updated_at = GETUTCDATE();
     
     -- =============================================================
-    -- BATCH METRICS & VALIDATION
+    -- BATCH METRICS & VALIDATION  
     -- =============================================================
     
     SET @ProcessedCount = @@ROWCOUNT;
     
-    SELECT @NewCount = COUNT(*) FROM {{ delta_table }} 
-    WHERE created_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'INSERT';
+    -- Calculate metrics from main table sync columns
+    SELECT @NewCount = COUNT(*) FROM {{ target_table }} 
+    WHERE sync_attempted_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'INSERT';
     
-    SELECT @ChangedCount = COUNT(*) FROM {{ delta_table }} 
-    WHERE created_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'UPDATE';
+    SELECT @ChangedCount = COUNT(*) FROM {{ target_table }} 
+    WHERE sync_attempted_at >= DATEADD(MINUTE, -5, GETUTCDATE()) AND action_type = 'UPDATE';
     
     COMMIT TRANSACTION;
     
@@ -123,7 +111,8 @@ BEGIN TRY
     -- SUCCESS METRICS
     -- =============================================================
     
-    PRINT 'V2 Header Merge Complete: {{ source_table }} → {{ target_table }}';
+    PRINT 'V2 Header Merge Complete (Main Tables): {{ source_table }} to {{ target_table }}';
+    PRINT 'Direct Sync Tracking: No intermediate tables';
     PRINT 'Execution Time: ' + CAST(DATEDIFF(SECOND, @StartTime, GETUTCDATE()) AS VARCHAR(10)) + ' seconds';
     PRINT 'Total Processed: ' + CAST(@ProcessedCount AS VARCHAR(10));
     PRINT 'New Records: ' + CAST(@NewCount AS VARCHAR(10));

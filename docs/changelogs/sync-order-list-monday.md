@@ -1,5 +1,53 @@
 Absolutely! Here's a **complete, production-ready development plan** reflecting your latest design.
-This doc can be dropped into your repo### **Key Structural Decisions**
+This doc can be dropped into your repo
+
+---
+
+# 📦 ORDER_LIST → Monday.com Ultra-Lightweight Pipeline (TASK 12.0+ PLANNING)
+
+**Updated**: 2025-07-22 (Task 11.0 COMPLETED - Task 12.0+ Comprehensive Planning)  
+**Status**: HTTP API Implementation Complete - Production Readiness Planning Phase  
+**Architecture**: Ultra-lightweight 2-file core (400 lines) with complete record UUID cascade
+
+---
+
+## **CURRENT STATUS: TASK 11.0 COMPLETED - TASK 12.0+ PLANNING**
+
+### **✅ COMPLETED ACHIEVEMENTS**
+- **Ultra-Lightweight Architecture**: 2-file core implementation (sync_engine.py + monday_api_client.py) 
+- **Monday.com HTTP API**: aiohttp-based client with conservative rate limiting (25s timeouts, 100ms delays)
+- **Record UUID Cascade**: Complete atomic batch processing with customer/UUID grouping
+- **DELTA Table Architecture**: Headers (ORDER_LIST_DELTA) + Lines (ORDER_LIST_LINES_DELTA) operational
+- **GraphQL Templates**: 10 mutation + 4 query templates loaded successfully
+- **Conservative Batching**: Intelligent fallback strategies (15→5→1) with async concurrency limits
+- **Integration Tests**: All core functionality validated with real GREYSON PO 4755 data
+
+### **🚨 CRITICAL GAPS IDENTIFIED**
+- **Data Completeness**: Only 5 columns mapped vs 15-20 business columns needed for production value
+- **Column Mapping**: TOML configuration lacks Monday.com board metadata integration
+- **Group Validation**: Customer group creation workflow never tested end-to-end
+- **4-Table Sync**: Sync status propagation across DELTA → main tables needs comprehensive validation
+- **Production Environment**: Development-only testing, no production board configuration
+
+### **🎯 NEXT WAVE PRIORITIES**
+
+**PRIORITY 1 (CRITICAL BLOCKER)**: Task 13.0 TOML Column Mapping Expansion
+- **Current State**: configs/pipelines/sync_order_list.toml has only 5 basic columns
+- **Required**: Monday.com board metadata API to discover actual column IDs
+- **Success Gate**: 15-20 business columns mapped for production readiness
+- **Impact**: Without this, pipeline only syncs placeholder data with no business value
+
+**PRIORITY 2 (HIGH)**: Task 12.0 End-to-End Monday.com Integration Testing  
+- **Target**: Live integration with development board 9609317401
+- **Success Gate**: >95% sync success rate with real business data (not placeholders)
+- **Validation**: Items, subitems, and customer groups with proper hierarchy
+
+**PRIORITY 3 (PRODUCTION)**: Tasks 14.0-16.0 Production Readiness
+- **4-Table Sync Validation**: Complete audit trail across DELTA and main tables
+- **Production Board Config**: Board 8709134353 metadata and environment switching
+- **Cutover Planning**: Zero-downtime deployment with rollback procedures
+
+---### **Key Structural Decisions**
 
 **1. Schema vs Operations Separation**:
 - `db/migrations/## Integration with Repository Restructure
