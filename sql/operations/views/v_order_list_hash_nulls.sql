@@ -16,7 +16,7 @@ SELECT
             COALESCE([CUSTOMER ALT PO], ''),
             COALESCE([AAG SEASON], ''),
             COALESCE([CUSTOMER SEASON], ''),
-            COALESCE([ORDER DATE PO RECEIVED], ''),
+            COALESCE(CONVERT(VARCHAR(20), [ORDER DATE PO RECEIVED], 120), ''),
             COALESCE([CUSTOMER COLOUR DESCRIPTION], ''),
             COALESCE([TOTAL QTY], '')
         )

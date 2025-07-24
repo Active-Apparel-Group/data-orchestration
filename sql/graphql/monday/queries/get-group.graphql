@@ -1,5 +1,7 @@
 query GetGroup($boardId: ID!) {
   boards(ids: [$boardId]) {
+    id
+    name
     groups {
       id
       title

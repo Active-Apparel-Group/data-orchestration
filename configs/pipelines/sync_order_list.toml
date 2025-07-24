@@ -399,9 +399,9 @@ environment_aware = true                                 # Support dev/prod swit
 
 # Group creation strategies
 [monday.sync.groups]
-strategy = "season"                        # Create groups for customer season (CUSTOMER + SEASON)
-auto_create = true                         # Create groups if they don't exist
-map_to = "GroupMonday"                     # Maps to GroupMonday column in ORDER_LIST table
+strategy = "season"                                      # Create groups for customer season (CUSTOMER + SEASON)
+auto_create = true                                       # Create groups if they don't exist
+map_to = "group_name"                                    # Maps to group_name column in ORDER_LIST table
 
 # PHASE 2: EXPANDED TESTING CONFIGURATION (FUTURE)
 # ================================================

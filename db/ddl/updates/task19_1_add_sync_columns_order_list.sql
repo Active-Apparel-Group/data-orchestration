@@ -16,6 +16,8 @@ GO
 
 -- Add sync tracking columns to ORDER_LIST_V2
 ALTER TABLE [dbo].[ORDER_LIST] ADD
+    [group_name] NVARCHAR(255) NULL,  -- Monday.com group name for item
+    [group_id] NVARCHAR(128) NULL,      -- Monday.com group ID
     [action_type] VARCHAR(10) NULL,              -- 'INSERT', 'UPDATE', 'DELETE'
     --[sync_state] VARCHAR(10) NULL,               -- 'NEW', 'PENDING', 'SYNCED', 'ERROR'  
     --[monday_item_id] BIGINT NULL,                -- Monday.com item ID

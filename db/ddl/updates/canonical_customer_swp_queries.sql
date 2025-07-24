@@ -1,4 +1,6 @@
 
+Select distinct [CUSTOMER NAME], [PO NUMBER], [AAG SEASON], [CUSTOMER SEASON], [RANGE / COLLECTION], [DROP] from ORDER_LIST
+WHERE [CUSTOMER NAME] = 'GREYSON CLOTHIERS' AND [PO NUMBER] = '4755';
 
 Select * from canonical_customer_map
 
@@ -116,3 +118,15 @@ Select * from v_order_list_customer_name_fill
         COUNT(DISTINCT [SOURCE_CUSTOMER_NAME]) AS unique_source_names
     FROM [swp_ORDER_LIST]
     GROUP BY [CUSTOMER NAME]
+
+    -- update GroupMonday for all records
+    Update swp_ORDER_LIST
+        set group_name = 
+        case 
+            when [CUSTOMER SEASON] is not null
+                then CONCAT([CUSTOMER NAME], ' ', [CUSTOMER SEASON])
+            when [CUSTOMER SEASON] is null and [AAG SEASON] is not null
+                then CONCAT([CUSTOMER NAME], ' ', [AAG SEASON])
+            else [CUSTOMER NAME]
+        end
+    WHERE group_name IS NULL OR group_name = '';

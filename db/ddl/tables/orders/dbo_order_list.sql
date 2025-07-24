@@ -436,6 +436,11 @@ CREATE TABLE [dbo].[ORDER_LIST] (
     -- METADATA
     [_SOURCE_TABLE] NVARCHAR(255) NULL,  -- Coverage: 100.0%
 
+    -- Monday.com sync columns
+    -- NOTE: These columns are used for syncing with Monday.com and are populated by application logic
+    [group_name] NVARCHAR(255) NULL,  -- Monday.com group name for item
+    [group_id] NVARCHAR(128) NULL,      -- Monday.com group ID
+
     -- Delta sync columns (NEW - enable change detection and Monday.com sync)
     -- NOTE: row_hash populated by application logic using TOML configuration
     -- Hash algorithm and columns defined in sync_order_list.toml
