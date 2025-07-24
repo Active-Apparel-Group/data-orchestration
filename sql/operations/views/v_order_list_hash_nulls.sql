@@ -16,9 +16,12 @@ SELECT
             COALESCE([CUSTOMER ALT PO], ''),
             COALESCE([AAG SEASON], ''),
             COALESCE([CUSTOMER SEASON], ''),
-            COALESCE(CONVERT(VARCHAR(20), [ORDER DATE PO RECEIVED], 120), ''),
             COALESCE([CUSTOMER COLOUR DESCRIPTION], ''),
-            COALESCE([TOTAL QTY], '')
+            COALESCE([TOTAL QTY], 0) 
         )
     ), 2) AS [hash_ord_3_10]
-FROM [swp_ORDER_LIST];
+FROM [swp_ORDER_LIST]
+
+
+
+    

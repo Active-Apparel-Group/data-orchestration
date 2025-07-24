@@ -452,6 +452,7 @@ CREATE TABLE [dbo].[ORDER_LIST] (
     [sync_attempted_at] DATETIME2(7) NULL,       -- Last sync attempt timestamp
     [sync_completed_at] DATETIME2(7) NULL,       -- Last successful sync timestamp
     [sync_error_message] NVARCHAR(1000) NULL,   -- Error message if sync failed
+    [sync_pending_at] DATETIME2(7) NULL,     -- Timestamp when sync was marked as pending
     [retry_count] INT NULL DEFAULT 0,            -- Number of retry attempts
     
     -- Audit columns

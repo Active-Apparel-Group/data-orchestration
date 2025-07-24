@@ -67,14 +67,13 @@ Select * from v_order_list_customer_name_fill
                 COALESCE([CUSTOMER ALT PO], ''),
                 COALESCE([AAG SEASON], ''),
                 COALESCE([CUSTOMER SEASON], ''),
-                COALESCE([ORDER DATE PO RECEIVED], ''),
-                COALESCE([CUSTOMER COLOUR DESCRIPTION], ''),
                 COALESCE([TOTAL QTY], '')
             )
-        ), 2) AS [hash_ord_3_10]
+        ), 2) AS [hash_ord_3_10], *
     from [ORDER_LIST] swp
     WHERE _SOURCE_TABLE = 'xGREYSON_ORDER_LIST_RAW'
-    and swp.[CUSTOMER NAME] IS NULL OR LTRIM(RTRIM(swp.[CUSTOMER NAME])) = ''
+    and swp.[CUSTOMER NAME] IS NULL OR LTRIM(RTRIM(swp.[CUSTOMER NAME])) = '';
+
 
 
 -- new stored procs or functions in TRANSFORM.py
@@ -119,7 +118,7 @@ Select * from v_order_list_customer_name_fill
     FROM [swp_ORDER_LIST]
     GROUP BY [CUSTOMER NAME]
 
-    -- update GroupMonday for all records
+    -- update group_name for all records
     Update swp_ORDER_LIST
         set group_name = 
         case 
@@ -127,6 +126,51 @@ Select * from v_order_list_customer_name_fill
                 then CONCAT([CUSTOMER NAME], ' ', [CUSTOMER SEASON])
             when [CUSTOMER SEASON] is null and [AAG SEASON] is not null
                 then CONCAT([CUSTOMER NAME], ' ', [AAG SEASON])
-            else [CUSTOMER NAME]
+            else 'check'
         end
     WHERE group_name IS NULL OR group_name = '';
+
+    -- update group_id in swp_ORDER_LIST table
+    -- update using MON_Boards_Groups where group_name = group_name update group_id
+    Update swp_ORDER_LIST
+    SET group_id = mbg.group_id
+    FROM MON_Boards_Groups mbg
+    WHERE swp_ORDER_LIST.group_name = mbg.group_name;
+
+-- validation queries only ---
+
+    Select group_name, count(*) as record_count
+    from swp_ORDER_LIST
+    group by group_name;
+
+    Select [CUSTOMER NAME], group_name, [ORDER TYPE], 
+        sum([TOTAL QTY]) as total_qty, count(*) as record_count, 
+        max([ORDER DATE PO RECEIVED]) as max_order_date
+    from swp_ORDER_LIST
+    where group_name = 'check'
+    group by [CUSTOMER NAME], group_name, [ORDER TYPE]
+    order by [CUSTOMER NAME], group_name, [ORDER TYPE]; 
+
+    Select CONVERT(VARCHAR(32), HASHBYTES('MD5', 
+            CONCAT(
+                COALESCE([PLANNED DELIVERY METHOD], ''),
+                COALESCE([CUSTOMER STYLE], ''),
+                COALESCE([PO NUMBER], ''),
+                COALESCE([CUSTOMER ALT PO], ''),
+                COALESCE([AAG SEASON], ''),
+                COALESCE([CUSTOMER SEASON], ''),
+                COALESCE([CUSTOMER COLOUR DESCRIPTION], ''),
+                COALESCE([TOTAL QTY], 0)
+            )
+        ), 2) AS [hash_ord_3_10], * from swp_ORDER_LIST
+    where group_name = 'check'
+    and [CUSTOMER NAME] in ('TRACK SMITH', 'MACK WELDON', 'GREYSON')
+
+    Select group_name, count(*) as record_count
+    from swp_ORDER_LIST
+    group by group_name;
+
+    Select group_id, count(*) as record_count
+    from swp_ORDER_LIST
+    group by group_id;
+

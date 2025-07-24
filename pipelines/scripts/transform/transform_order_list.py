@@ -32,6 +32,8 @@ SQL_FILES = [
     "04_copy_customer_to_source_customer.sql",
     "05_update_canonical_customer_name.sql",
     "06_validate_canonical_mapping.sql",
+    "10_group_name_create.sql",
+    "11_group_name_match_existing.sql",
 ]
 
 # ─────────────────── Repository Root & Utils Import ───────────────────

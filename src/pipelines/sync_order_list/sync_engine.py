@@ -221,7 +221,7 @@ class SyncEngine:
     
     def _process_record_uuid_batch(self, record_uuid: str, headers: List[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
         """
-        Process a single record_uuid batch atomically:
+        Process a single record_uuid batch atomically with SINGLE DATABASE CONNECTION:
         1. Create groups (if needed)
         2. Create Monday.com items → get item_ids
         3. Update ORDER_LIST_V2 with monday_item_id (DELTA-FREE)
@@ -265,27 +265,36 @@ class SyncEngine:
             
             monday_item_ids = items_result.get('monday_ids', [])
             
-            # Step 3: Update ORDER_LIST_V2 with monday_item_id
-            self._update_headers_delta_with_item_ids(record_uuid, monday_item_ids)
-            
-            # Step 4: Get related lines for this record_uuid
-            related_lines = self._get_lines_by_record_uuid(record_uuid)
-            
-            if related_lines:
-                # Step 5: Inject parent_item_id into lines
-                lines_with_parent = self._inject_parent_item_ids(related_lines, record_uuid, monday_item_ids)
+            # DIRECT DATABASE CONNECTION (NO TRANSACTION NESTING)
+            connection = db.get_connection('orders')
+            try:
+                # Step 3: Update ORDER_LIST_V2 with monday_item_id
+                self._update_headers_delta_with_item_ids_conn(record_uuid, monday_item_ids, connection)
                 
-                # Step 6: Create Monday.com subitems
-                subitems_result = self.monday_client.execute('create_subitems', lines_with_parent, dry_run)
+                # Step 4: Get related lines for this record_uuid
+                related_lines = self._get_lines_by_record_uuid_conn(record_uuid, connection)
                 
-                if subitems_result.get('success', False):
-                    monday_subitem_ids = subitems_result.get('monday_ids', [])
+                if related_lines:
+                    # Step 5: Inject parent_item_id into lines
+                    lines_with_parent = self._inject_parent_item_ids(related_lines, record_uuid, monday_item_ids)
                     
-                    # Step 7: Update ORDER_LIST_LINES_DELTA with monday_item_id (subitems)
-                    self._update_lines_delta_with_subitem_ids(record_uuid, monday_subitem_ids)
-            
-            # Step 8: Propagate sync status to main tables
-            self._propagate_sync_status_to_main_tables(record_uuid)
+                    # Step 6: Create Monday.com subitems
+                    subitems_result = self.monday_client.execute('create_subitems', lines_with_parent, dry_run)
+                    
+                    if subitems_result.get('success', False):
+                        monday_subitem_ids = subitems_result.get('monday_ids', [])
+                        
+                        # Step 7: Update ORDER_LIST_LINES with monday_subitem_id (DIRECT CONNECTION)
+                        self._update_lines_delta_with_subitem_ids(record_uuid, monday_subitem_ids, connection)
+                
+                # Manual commit (NO AUTO-COMMIT TRANSACTION NESTING)
+                connection.commit()
+                
+            except Exception as e:
+                connection.rollback()
+                raise
+            finally:
+                connection.close()
             
             total_records = len(headers) + len(related_lines) if related_lines else len(headers)
             
@@ -346,6 +355,11 @@ class SyncEngine:
     
     def _get_lines_by_record_uuid(self, record_uuid: str) -> List[Dict[str, Any]]:
         """Get lines from ORDER_LIST_LINES (main table - DELTA-FREE) for specific record_uuid"""
+        with db.get_connection(self.db_key) as connection:
+            return self._get_lines_by_record_uuid_conn(record_uuid, connection)
+
+    def _get_lines_by_record_uuid_conn(self, record_uuid: str, connection) -> List[Dict[str, Any]]:
+        """Get lines from ORDER_LIST_LINES (main table - DELTA-FREE) for specific record_uuid - CONNECTION PASSING"""
         try:
             lines_query = f"""
             SELECT {', '.join(self._get_lines_columns())}
@@ -355,15 +369,14 @@ class SyncEngine:
             ORDER BY [size_code]
             """
             
-            with db.get_connection(self.db_key) as connection:
-                cursor = connection.cursor()
-                cursor.execute(lines_query)
-                
-                columns = [column[0] for column in cursor.description]
-                records = [dict(zip(columns, row)) for row in cursor.fetchall()]
-                
-                self.logger.info(f"Retrieved {len(records)} lines for record_uuid: {record_uuid}")
-                return records
+            cursor = connection.cursor()
+            cursor.execute(lines_query)
+            
+            columns = [column[0] for column in cursor.description]
+            records = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            
+            self.logger.info(f"Retrieved {len(records)} lines for record_uuid: {record_uuid}")
+            return records
                 
         except Exception as e:
             self.logger.error(f"Failed to get lines for record_uuid {record_uuid}: {e}")
@@ -386,6 +399,12 @@ class SyncEngine:
     
     def _update_headers_delta_with_item_ids(self, record_uuid: str, item_ids: List[str]) -> None:
         """Update ORDER_LIST_V2 (main table - DELTA-FREE) with Monday.com item IDs"""
+        with db.get_connection('orders') as connection:
+            self._update_headers_delta_with_item_ids_conn(record_uuid, item_ids, connection)
+            connection.commit()
+
+    def _update_headers_delta_with_item_ids_conn(self, record_uuid: str, item_ids: List[str], connection) -> None:
+        """Update ORDER_LIST_V2 (main table - DELTA-FREE) with Monday.com item IDs - CONNECTION PASSING"""
         if not item_ids:
             return
             
@@ -404,20 +423,19 @@ class SyncEngine:
             WHERE [record_uuid] = '{record_uuid}'
             """
             
-            with db.get_connection('orders') as connection:
-                cursor = connection.cursor()
-                cursor.execute(update_query)
-                connection.commit()
-                
-                rows_updated = cursor.rowcount
-                self.logger.info(f"Updated {rows_updated} headers in main table (DELTA-FREE) with item_id: {monday_item_id}")
+            cursor = connection.cursor()
+            cursor.execute(update_query)
+            # Don't commit here - let caller handle transaction
+            
+            rows_updated = cursor.rowcount
+            self.logger.info(f"Updated {rows_updated} headers in main table (DELTA-FREE) with item_id: {monday_item_id}")
                 
         except Exception as e:
             self.logger.exception(f"Failed to update headers with item IDs: {e}")
             raise
     
-    def _update_lines_delta_with_subitem_ids(self, record_uuid: str, subitem_ids: List[str]) -> None:
-        """Update ORDER_LIST_LINES (main table - DELTA-FREE) with Monday.com subitem IDs"""
+    def _update_lines_delta_with_subitem_ids(self, record_uuid: str, subitem_ids: List[str], connection=None) -> None:
+        """Update ORDER_LIST_LINES (main table - DELTA-FREE) with Monday.com subitem IDs - BATCH UPDATE"""
         if not subitem_ids:
             return
             
@@ -428,29 +446,58 @@ class SyncEngine:
             if len(lines) != len(subitem_ids):
                 self.logger.warning(f"Mismatch: {len(lines)} lines vs {len(subitem_ids)} subitem IDs for record_uuid: {record_uuid}")
             
-            # Update each line with corresponding subitem ID
+            if not lines:
+                self.logger.warning(f"No lines found for record_uuid: {record_uuid}")
+                return
+            
+            # Build batch UPDATE query using CASE statements (ELIMINATES NESTING)
+            case_statements = []
+            where_conditions = []
+            
             for i, line in enumerate(lines):
                 if i < len(subitem_ids):
                     lines_uuid = line.get('line_uuid')
                     subitem_id = subitem_ids[i]
                     
-                    update_query = f"""
-                    UPDATE [{self.lines_table}]
-                    SET [monday_subitem_id] = '{subitem_id}',
-                        [sync_state] = 'SYNCED',
-                        [sync_completed_at] = GETUTCDATE()
-                    WHERE [line_uuid] = '{lines_uuid}'
-                    """
+                    case_statements.append(f"WHEN '{lines_uuid}' THEN '{subitem_id}'")
+                    where_conditions.append(f"'{lines_uuid}'")
+            
+            if not case_statements:
+                self.logger.warning(f"No valid line updates to process for record_uuid: {record_uuid}")
+                return
+            
+            # Single batch UPDATE query (NO NESTED CONNECTIONS)
+            batch_update_query = f"""
+            UPDATE [{self.lines_table}]
+            SET [monday_subitem_id] = CASE [line_uuid]
+                    {' '.join(case_statements)}
+                    ELSE [monday_subitem_id] 
+                END,
+                [sync_state] = 'SYNCED',
+                [sync_completed_at] = GETUTCDATE()
+            WHERE [line_uuid] IN ({', '.join(where_conditions)})
+            """
+            
+            # Use provided connection or create new one (CONNECTION PASSING PATTERN)
+            if connection:
+                cursor = connection.cursor()
+                cursor.execute(batch_update_query)
+                # Don't commit here - let caller handle transaction
+                
+                rows_updated = cursor.rowcount
+                self.logger.info(f"Batch updated {rows_updated} lines with Monday.com subitem IDs for record_uuid: {record_uuid}")
+            else:
+                # Fallback to single connection (for standalone calls)
+                with db.get_connection('orders') as standalone_connection:
+                    cursor = standalone_connection.cursor()
+                    cursor.execute(batch_update_query)
+                    standalone_connection.commit()
                     
-                    with db.get_connection('orders') as connection:
-                        cursor = connection.cursor()
-                        cursor.execute(update_query)
-                        connection.commit()
-                        
-                        self.logger.info(f"Updated line {lines_uuid} with monday_subitem_id: {subitem_id}")
+                    rows_updated = cursor.rowcount
+                    self.logger.info(f"Batch updated {rows_updated} lines with Monday.com subitem IDs for record_uuid: {record_uuid}")
                         
         except Exception as e:
-            self.logger.exception(f"Failed to update lines with subitem IDs: {e}")
+            self.logger.error(f"Failed to update lines with subitem IDs: {e}")
             raise
     
     def _propagate_sync_status_to_main_tables(self, record_uuid: str) -> None:

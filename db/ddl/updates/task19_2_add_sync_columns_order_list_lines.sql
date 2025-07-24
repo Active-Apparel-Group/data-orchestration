@@ -27,16 +27,23 @@ WHERE TABLE_NAME = 'ORDER_LIST_LINES'
 ORDER BY ORDINAL_POSITION
 GO
 
+-- alter sync_state DEFAULT = 'NEW'
+ALTER TABLE [dbo].[ORDER_LIST_LINES] 
+    ADD CONSTRAINT [DF_ORDER_LIST_LINES_sync_state] DEFAULT 'NEW' FOR [sync_state]
+
 -- Add missing sync tracking columns to ORDER_LIST_LINES
 -- (Note: Some columns like sync_state, monday_item_id already exist)
 ALTER TABLE [dbo].[ORDER_LIST_LINES] ADD
+    [row_hash] CHAR(64) NULL,                    -- Row hash for change detection
+    [sync_state] VARCHAR(10) NULL,               -- 'NEW', 'PENDING', 'SYNCED', 'ERROR'  
     [action_type] VARCHAR(10) NULL,              -- 'INSERT', 'UPDATE', 'DELETE' 
-    [monday_subitem_id] BIGINT NULL,             -- Monday.com subitem ID (different from monday_item_id)
+    [monday_item_id] BIGINT NULL,                -- Monday.com item ID for subitem
     [monday_parent_id] BIGINT NULL,              -- Monday.com parent item ID reference
     [sync_attempted_at] DATETIME2(7) NULL,       -- Last sync attempt timestamp
     [sync_completed_at] DATETIME2(7) NULL,       -- Last successful sync timestamp
     [sync_error_message] NVARCHAR(1000) NULL,   -- Error message if sync failed
-    [retry_count] INT NULL DEFAULT 0             -- Number of retry attempts
+    [retry_count] INT NULL DEFAULT 0,             -- Number of retry attempts
+    [sync_pending_at] DATETIME2(7) NULL     -- Timestamp when sync was marked as pending
 GO
 
 -- Create indexes for efficient sync querying
@@ -68,6 +75,9 @@ BEGIN
     ALTER TABLE [dbo].[ORDER_LIST_LINES] 
     ADD CONSTRAINT [CK_ORDER_LIST_LINES_sync_state] 
     CHECK ([sync_state] IN ('NEW', 'PENDING', 'SYNCED', 'ERROR'))
+    
+    ALTER TABLE [dbo].[ORDER_LIST_LINES]
+    ADD CONSTRAINT [DF_ORDER_LIST_LINES_sync_state] DEFAULT 'NEW' FOR [sync_state]
 END
 GO
 
