@@ -98,7 +98,6 @@ def main():
 
     df = build_alias_df(yaml_data)
     logger.info(f"Rows in alias mapping (deduped): {len(df)}")
-    logger.info(f"Sample:\n{df.head(5)}")
 
     prepare_staging_table(df)
     load_to_staging(df)

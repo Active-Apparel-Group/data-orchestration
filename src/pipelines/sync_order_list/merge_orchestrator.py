@@ -304,12 +304,16 @@ class MergeOrchestrator:
             # Step 3: ELIMINATED - merge_lines.j2 no longer needed (direct MERGE handles this)
             lines_result = {'success': True, 'records_affected': 0, 'operation': 'eliminated_by_direct_merge'}
             
-            # Compile overall results (2-template flow)
+            # Step 4: Cancelled Order Validation (Task 19.14.4)
+            self.logger.info("🔍 Step 4: Production Cancelled Order Validation")
+            cancelled_validation_result = self.validate_cancelled_order_handling() if not dry_run else {'success': True, 'operation': 'cancelled_order_validation_dry_run'}
+            
+            # Compile overall results (2-template flow + validation)
             overall_success = all([
                 preprocessing_result['success'],
                 headers_result['success'], 
-                sizes_result['success']
-                # lines_result omitted - handled by direct merge
+                sizes_result['success'],
+                cancelled_validation_result['success']
             ])
             
             total_time = time.time() - self.total_start_time
@@ -323,7 +327,8 @@ class MergeOrchestrator:
                 'operations': {
                     'merge_headers': headers_result,
                     'unpivot_sizes_direct': sizes_result,  # Updated method name
-                    'merge_lines': lines_result  # Now shows elimination status
+                    'merge_lines': lines_result,  # Now shows elimination status
+                    'cancelled_order_validation': cancelled_validation_result  # Task 19.14.4
                 },
                 'template_validation': template_validation,
                 'architecture': 'simplified_2_template_flow'
@@ -334,8 +339,11 @@ class MergeOrchestrator:
                 self.logger.info(f"✅ Simplified V2 template sequence completed successfully in {total_time:.2f}s")
                 self.logger.info(f"📊 NEW orders detected: {preprocessing_result.get('new_orders', 0)}")
                 self.logger.info(f"🏗️  Architecture: 2-template flow (eliminated staging table)")
+                self.logger.info(f"🔍 Cancelled order validation: {'✅ PASSED' if cancelled_validation_result['success'] else '❌ FAILED'}")
             else:
                 self.logger.error(f"❌ Simplified V2 template sequence failed after {total_time:.2f}s")
+                if not cancelled_validation_result['success']:
+                    self.logger.error("❌ Cancelled order validation failed - check production pipeline logic")
                 
             return result
             
@@ -471,6 +479,143 @@ class MergeOrchestrator:
                 'duration_seconds': round(duration, 2),
                 'operation': 'unpivot_sizes_direct_template',
                 'architecture': 'direct_merge_no_staging'
+            }
+    
+    def validate_cancelled_order_handling(self, customer_name: str = None, po_number: str = None) -> Dict[str, Any]:
+        """
+        Validate cancelled order handling in production pipeline (Task 19.14.4)
+        Integrated into merge workflow - aligned with merge grouping/batching
+        Based on successful test_task19_data_merge_integration.py patterns
+        
+        Args:
+            customer_name: Optional customer filter for focused validation
+            po_number: Optional PO number filter for focused validation
+            
+        Returns:
+            Dictionary with cancelled order validation results
+        """
+        self.logger.info("🔍 Production Cancelled Order Validation (Task 19.14.4)")
+        
+        try:
+            with db.get_connection(self.config.database_connection) as conn:
+                # Build query with optional filters (aligned with merge logic)
+                where_clause = ""
+                params = []
+                
+                if customer_name:
+                    where_clause += " AND h.[CUSTOMER NAME] = ?"
+                    params.append(customer_name)
+                
+                if po_number:
+                    where_clause += " AND h.[PO NUMBER] = ?"
+                    params.append(po_number)
+                
+                # Validation query - matches successful test pattern and merge grouping
+                validation_query = f"""
+                SELECT 
+                    h.record_uuid,
+                    h.[AAG ORDER NUMBER],
+                    h.[ORDER TYPE],
+                    h.action_type as header_action_type,
+                    h.sync_state as header_sync_state,
+                    COUNT(l.line_uuid) as line_count,
+                    COUNT(CASE WHEN l.action_type = h.action_type THEN 1 END) as matching_action_type,
+                    COUNT(CASE WHEN l.sync_state = h.sync_state THEN 1 END) as matching_sync_state,
+                    CASE 
+                        WHEN h.[ORDER TYPE] = 'CANCELLED' THEN 'CANCELLED'
+                        WHEN h.[TOTAL QTY] = 0 THEN 'ZERO_QTY'
+                        ELSE 'ACTIVE'
+                    END as order_classification
+                FROM ORDER_LIST_V2 h
+                LEFT JOIN ORDER_LIST_LINES l ON h.record_uuid = l.record_uuid
+                WHERE h.[AAG ORDER NUMBER] IS NOT NULL {where_clause}
+                GROUP BY h.record_uuid, h.[AAG ORDER NUMBER], h.[ORDER TYPE], h.[TOTAL QTY], h.action_type, h.sync_state
+                ORDER BY h.[AAG ORDER NUMBER]
+                """
+                
+                # Execute validation query  
+                import pandas as pd
+                validation_result = pd.read_sql(validation_query, conn, params=params)
+                
+                # Calculate metrics - match successful test pattern
+                total_headers = len(validation_result)
+                
+                # Separate cancelled orders from active orders (KEY PATTERN FROM SUCCESSFUL TEST)
+                cancelled_orders = validation_result[validation_result['order_classification'] == 'CANCELLED']
+                active_orders = validation_result[validation_result['order_classification'] == 'ACTIVE']
+                
+                # Headers with lines calculation (MATCHES SUCCESSFUL TEST)
+                headers_with_lines = validation_result[validation_result['line_count'] > 0]
+                active_headers_with_lines = headers_with_lines[headers_with_lines['order_classification'] == 'ACTIVE']
+                
+                # Consistency validation - only for active orders with lines (SUCCESSFUL TEST PATTERN)
+                consistent_action_types = sum(1 for _, row in active_headers_with_lines.iterrows() 
+                                            if row['matching_action_type'] == row['line_count'])
+                consistent_sync_states = sum(1 for _, row in active_headers_with_lines.iterrows() 
+                                           if row['matching_sync_state'] == row['line_count'])
+                
+                # Calculate success metrics (MATCHES SUCCESSFUL TEST: 53/53 pattern)
+                total_active_headers_with_lines = len(active_headers_with_lines)
+                sync_consistency_success = (
+                    consistent_action_types == total_active_headers_with_lines and
+                    consistent_sync_states == total_active_headers_with_lines
+                ) if total_active_headers_with_lines > 0 else True
+                
+                # Cancelled order tracking (lines are allowed - normal business behavior)
+                cancelled_with_lines = cancelled_orders[cancelled_orders['line_count'] > 0]
+                
+                # Overall success based on sync consistency for active orders only
+                overall_success = sync_consistency_success
+                
+                # Comprehensive logging - matches successful test pattern
+                self.logger.info("📊 Cancelled Order Validation Results:")
+                self.logger.info(f"   Total headers: {total_headers}")
+                self.logger.info(f"   Active orders: {len(active_orders)}")
+                self.logger.info(f"   Cancelled orders: {len(cancelled_orders)}")
+                self.logger.info(f"   Headers with lines: {len(headers_with_lines)}")
+                self.logger.info(f"   Active headers with lines: {total_active_headers_with_lines}")
+                
+                # Sync consistency logging (KEY SUCCESS PATTERN)
+                if total_active_headers_with_lines > 0:
+                    action_type_rate = (consistent_action_types / total_active_headers_with_lines) * 100
+                    sync_state_rate = (consistent_sync_states / total_active_headers_with_lines) * 100
+                    
+                    self.logger.info(f"   Sync consistency (active orders only):")
+                    self.logger.info(f"     Action type: {consistent_action_types}/{total_active_headers_with_lines} ({action_type_rate:.1f}%)")
+                    self.logger.info(f"     Sync state: {consistent_sync_states}/{total_active_headers_with_lines} ({sync_state_rate:.1f}%)")
+                    self.logger.info(f"     Overall sync consistency: {'✅ PASS' if sync_consistency_success else '❌ FAIL'}")
+                
+                # Cancelled order information logging (informational only)
+                self.logger.info(f"   Cancelled order information:")
+                self.logger.info(f"     Cancelled orders with lines: {len(cancelled_with_lines)}")
+                self.logger.info(f"     Cancelled status: ✅ TRACKED (lines allowed)")
+                
+                # Overall validation result - success based on active order sync consistency only
+                self.logger.info(f"   Overall validation: {'✅ SUCCESS' if overall_success else '❌ FAILED'}")
+                
+                # Return comprehensive results
+                return {
+                    'success': overall_success,
+                    'total_headers': total_headers,
+                    'active_orders': len(active_orders),
+                    'cancelled_orders': len(cancelled_orders),
+                    'headers_with_lines': len(headers_with_lines),
+                    'active_headers_with_lines': total_active_headers_with_lines,
+                    'sync_consistency_success': sync_consistency_success,
+                    'consistent_action_types': consistent_action_types,
+                    'consistent_sync_states': consistent_sync_states,
+                    'cancelled_with_lines_count': len(cancelled_with_lines),
+                    'customer_filter': customer_name,
+                    'po_filter': po_number
+                }
+                
+        except Exception as e:
+            self.logger.exception(f"❌ Cancelled order validation failed: {e}")
+            return {
+                'success': False,
+                'error': str(e),
+                'customer_filter': customer_name,
+                'po_filter': po_number
             }
     
     def _execute_template_merge_lines(self, dry_run: bool) -> Dict[str, Any]:

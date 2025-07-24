@@ -61,11 +61,11 @@ During test planning, we set up a scenario with known new orders:
   WHERE sync_state IN ('NEW', 'PENDING') 
   ORDER BY customer_name, record_uuid;
 This picks up all headers that need syncing. For initial sync, that’s effectively the ‘NEW’ ones. We included ‘PENDING’ too to cover the scenario where a previous run may have partially processed them (though ideally, after headers are created, we flip them to ‘PENDING’ until lines are done, etc.).
-	•	Count Check: Added logging in SyncEngine to log the number of headers fetched for sync. In a dry-run scenario on dev data, it logged “69 headers pending sync”. This matched our expectation, confirming the detection logic was capturing all new orders (and it matched the number the upstream logic placed in delta).  
-	•	Subtask 4.1 & 4.2 Completed: The detection portion is in place, lines are set to pending, ready for testing.  
+	•	Count Check: Added logging in SyncEngine to log the number of headers fetched for sync. In a dry-run scenario on dev data, it logged “69 headers pending sync”. This matched our expectation, confirming the detection logic was capturing all new orders (and it matched the number the upstream logic placed in delta).
+	•	Subtask 4.1 & 4.2 Completed: The detection portion is in place, lines are set to pending, ready for testing.
 2025-01-11
-	•	Test New Order Detection: Wrote a test test_new_order_detection.py. The test ensures that after running the initial merge (Task002), when we call the SyncEngine’s method to get pending headers, we get a list of length 69 (given our known test scenario). It also cross-checks that each record_uuid in that list corresponds to a record in ORDER_LIST_DELTA with sync_state='NEW'.  
-	•	No False Positives: We also seeded the scenario with one order marked as synced (to simulate an old order). The detection logic correctly ignored it. This was done by manually updating one record’s state to ‘SYNCED’ and seeing that our query omitted it.  
-	•	Results: The test passed, confirming the detection logic is spot on. We have 100% accuracy in identifying new records to sync.  
-	•	Documentation: Added comments in the SyncEngine code to explain the state logic (i.e., NEW means not yet synced, PENDING might mean partially processed, SYNCED means fully done, FAILED would mean an error to retry manually).  
+	•	Test New Order Detection: Wrote a test test_new_order_detection.py. The test ensures that after running the initial merge (Task002), when we call the SyncEngine’s method to get pending headers, we get a list of length 69 (given our known test scenario). It also cross-checks that each record_uuid in that list corresponds to a record in ORDER_LIST_DELTA with sync_state='NEW'.
+	•	No False Positives: We also seeded the scenario with one order marked as synced (to simulate an old order). The detection logic correctly ignored it. This was done by manually updating one record’s state to ‘SYNCED’ and seeing that our query omitted it.
+	•	Results: The test passed, confirming the detection logic is spot on. We have 100% accuracy in identifying new records to sync.
+	•	Documentation: Added comments in the SyncEngine code to explain the state logic (i.e., NEW means not yet synced, PENDING might mean partially processed, SYNCED means fully done, FAILED would mean an error to retry manually).
 Completion: Task004 is done. The pipeline can now reliably pick out which orders need to be sent to Monday.com, which is fundamental for the next steps where we actually perform the sync.

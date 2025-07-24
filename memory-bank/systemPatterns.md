@@ -18,7 +18,8 @@ The pattern of using configuration and templates positions the system to handle 
 
 ### Coding Standards
 
-
+- **Creation of new files**:
+  - All new files and file names for production must be approved before implementation
 
 - **Python**:
   - Use modern imports: `from pipelines.utils import db` after `pip install -e .`.
