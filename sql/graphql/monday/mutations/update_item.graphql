@@ -1,9 +1,9 @@
-mutation UpdateItem($board_id: ID!, $item_id: ID!, $column_values: JSON!) {
+mutation UpdateItem($board_id: ID!, $item_id: ID!, $column_values: JSON!, $createLabelsIfMissing: Boolean) {
   change_multiple_column_values(
     board_id: $board_id
     item_id: $item_id
     column_values: $column_values
-    create_labels_if_missing: false
+    create_labels_if_missing: $createLabelsIfMissing
   ) {
     id
     name

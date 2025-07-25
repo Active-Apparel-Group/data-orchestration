@@ -1,0 +1,282 @@
+id: azure_sql_diagnostics_with_teams
+namespace: aag.admin
+
+variables:
+  db_server: "ross-db-srv-test"
+  db_name: "ORDERS"
+
+triggers:
+  - id: schedule_trigger
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 */2 * * *"   # Every 2 hours
+
+tasks:
+  # --- 1. Diagnostics Queries (always at least one row) ---
+  - id: db_size
+    type: io.kestra.plugin.jdbc.sqlserver.Queries
+    url: jdbc:sqlserver://{{ vars.db_server }}.database.windows.net:1433;encrypt=true;database={{ vars.db_name }}
+    username: "{{ secret('DB_ORDERS_USERNAME') }}"
+    password: "{{ secret('DB_ORDERS_PASSWORD') }}"
+    sql: |
+      SELECT
+        'db_size' AS check_name,
+        DB_NAME() AS database_name,
+        SUM(size) * 8 / 1024 AS total_size_mb,
+        51200 AS max_size_mb,  -- S2 example (50GB = 51200MB)
+        CASE
+          WHEN SUM(size) * 8 / 1024 > 51200 * 0.9 THEN 'WARNING'
+          ELSE 'OK'
+        END AS diagnosis,
+        CASE
+          WHEN SUM(size) * 8 / 1024 > 51200 * 0.9 THEN
+            CONCAT('Database size ', SUM(size) * 8 / 1024, ' MB is over 90% of quota ', 51200, ' MB')
+          ELSE
+            CONCAT('Database size is normal: ', SUM(size) * 8 / 1024, ' MB of ', 51200, ' MB')
+        END AS message
+      FROM sys.database_files
+      UNION ALL
+      SELECT
+        'db_size', DB_NAME(), NULL, 51200, 'OK', 'No rows found for sys.database_files, check ran.'
+      WHERE NOT EXISTS (SELECT 1 FROM sys.database_files);
+    fetchType: FETCH
+    store: true
+
+  - id: top_tables
+    type: io.kestra.plugin.jdbc.sqlserver.Queries
+    url: jdbc:sqlserver://{{ vars.db_server }}.database.windows.net:1433;encrypt=true;database={{ vars.db_name }}
+    username: "{{ secret('DB_ORDERS_USERNAME') }}"
+    password: "{{ secret('DB_ORDERS_PASSWORD') }}"
+    sql: |
+      SELECT TOP 10
+        'top_tables' AS check_name,
+        t.NAME AS table_name,
+        SUM(p.rows) AS row_count,
+        CASE
+          WHEN SUM(p.rows) > 10000000 THEN 'WARNING'
+          ELSE 'OK'
+        END AS diagnosis,
+        CASE
+          WHEN SUM(p.rows) > 10000000 THEN
+            CONCAT('Table ', t.NAME, ' has ', SUM(p.rows), ' rows (over 10 million)')
+          ELSE
+            CONCAT('Table ', t.NAME, ' has ', SUM(p.rows), ' rows')
+        END AS message
+      FROM sys.tables t
+      INNER JOIN sys.indexes i ON t.OBJECT_ID = i.object_id
+      INNER JOIN sys.partitions p ON i.object_id = p.OBJECT_ID AND i.index_id = p.index_id
+      WHERE t.is_ms_shipped = 0
+      GROUP BY t.Name
+      UNION ALL
+      SELECT
+        'top_tables', NULL, NULL, 'OK', 'No user tables found.'
+      WHERE NOT EXISTS (SELECT 1 FROM sys.tables WHERE is_ms_shipped = 0);
+    fetchType: FETCH
+    store: true
+
+  - id: long_running_sessions
+    type: io.kestra.plugin.jdbc.sqlserver.Queries
+    url: jdbc:sqlserver://{{ vars.db_server }}.database.windows.net:1433;encrypt=true;database={{ vars.db_name }}
+    username: "{{ secret('DB_ORDERS_USERNAME') }}"
+    password: "{{ secret('DB_ORDERS_PASSWORD') }}"
+    sql: |
+      SELECT
+        'long_running_sessions' AS check_name,
+        session_id,
+        status,
+        start_time,
+        command,
+        total_elapsed_time,
+        CASE
+          WHEN total_elapsed_time > 300000 THEN 'WARNING'
+          ELSE 'OK'
+        END AS diagnosis,
+        CASE
+          WHEN total_elapsed_time > 300000 THEN
+            CONCAT('Session running for ', total_elapsed_time, 'ms (over 5min)')
+          ELSE
+            CONCAT('Session running for ', total_elapsed_time, 'ms')
+        END AS message
+      FROM sys.dm_exec_requests
+      WHERE status = 'running'
+      UNION ALL
+      SELECT
+        'long_running_sessions', NULL, NULL, NULL, NULL, NULL, 'OK', 'No long running sessions.'
+      WHERE NOT EXISTS (SELECT 1 FROM sys.dm_exec_requests WHERE status = 'running');
+    fetchType: FETCH
+    store: true
+
+  - id: blocking_sessions
+    type: io.kestra.plugin.jdbc.sqlserver.Queries
+    url: jdbc:sqlserver://{{ vars.db_server }}.database.windows.net:1433;encrypt=true;database={{ vars.db_name }}
+    username: "{{ secret('DB_ORDERS_USERNAME') }}"
+    password: "{{ secret('DB_ORDERS_PASSWORD') }}"
+    sql: |
+      SELECT
+        'blocking_sessions' AS check_name,
+        r.session_id,
+        r.status,
+        r.start_time,
+        r.command,
+        r.blocking_session_id,
+        'WARNING' AS diagnosis,
+        CONCAT('Blocking session detected: session ', r.session_id, ' blocked by ', r.blocking_session_id) AS message
+      FROM sys.dm_exec_requests r
+      WHERE r.blocking_session_id IS NOT NULL
+      UNION ALL
+      SELECT
+        'blocking_sessions', NULL, NULL, NULL, NULL, NULL, 'OK', 'No blocking sessions.'
+      WHERE NOT EXISTS (SELECT 1 FROM sys.dm_exec_requests WHERE blocking_session_id IS NOT NULL);
+    fetchType: FETCH
+    store: true
+
+  - id: top_slow_queries
+    type: io.kestra.plugin.jdbc.sqlserver.Queries
+    url: jdbc:sqlserver://{{ vars.db_server }}.database.windows.net:1433;encrypt=true;database={{ vars.db_name }}
+    username: "{{ secret('DB_ORDERS_USERNAME') }}"
+    password: "{{ secret('DB_ORDERS_PASSWORD') }}"
+    sql: |
+      SELECT TOP 10
+        'top_slow_queries' AS check_name,
+        qt.query_sql_text,
+        qs.count_executions,
+        qs.avg_duration,
+        qs.last_execution_time,
+        CASE
+          WHEN qs.avg_duration > 10000 THEN 'WARNING'
+          ELSE 'OK'
+        END AS diagnosis,
+        CASE
+          WHEN qs.avg_duration > 10000 THEN
+            CONCAT('Query is slow: avg ', qs.avg_duration, ' ms')
+          ELSE
+            CONCAT('Query is normal: avg ', qs.avg_duration, ' ms')
+        END AS message
+      FROM sys.query_store_runtime_stats qs
+      JOIN sys.query_store_plan p ON qs.plan_id = p.plan_id
+      JOIN sys.query_store_query q ON p.query_id = q.query_id
+      JOIN sys.query_store_query_text qt ON q.query_text_id = qt.query_text_id
+      UNION ALL
+      SELECT
+        'top_slow_queries', NULL, NULL, NULL, NULL, 'OK', 'No slow queries found.'
+      WHERE NOT EXISTS (SELECT 1 FROM sys.query_store_runtime_stats);
+    fetchType: FETCH
+    store: true
+
+  # --- 2. Extract warnings/errors using JSONata ---
+  - id: db_size_warn
+    type: io.kestra.plugin.transform.jsonata.TransformItems
+    from: "{{ outputs.db_size.outputs[0].uri }}"
+    expression: |
+      $type($) = "array" ? $[diagnosis != "OK"] : (
+        $type($) = "object" and diagnosis != "OK" ? [$] : []
+      )
+
+  - id: top_tables_warn
+    type: io.kestra.plugin.transform.jsonata.TransformItems
+    from: "{{ outputs.top_tables.outputs[0].uri }}"
+    expression: |
+      $type($) = "array" ? $[diagnosis != "OK"] : (
+        $type($) = "object" and diagnosis != "OK" ? [$] : []
+      )
+
+  - id: long_running_sessions_warn
+    type: io.kestra.plugin.transform.jsonata.TransformItems
+    from: "{{ outputs.long_running_sessions.outputs[0].uri }}"
+    expression: |
+        $type($) = "array" ? $[diagnosis != "OK"] : (
+          $type($) = "object" and diagnosis != "OK" ? [$] : []
+        )
+
+  - id: blocking_sessions_warn
+    type: io.kestra.plugin.transform.jsonata.TransformItems
+    from: "{{ outputs.blocking_sessions.outputs[0].uri }}"
+    expression: |
+      $type($) = "array" ? $[diagnosis != "OK"] : (
+        $type($) = "object" and diagnosis != "OK" ? [$] : []
+      )
+
+  - id: top_slow_queries_warn
+    type: io.kestra.plugin.transform.jsonata.TransformItems
+    from: "{{ outputs.top_slow_queries.outputs[0].uri }}"
+    expression: |
+      $type($) = "array" ? $[diagnosis != "OK"] : (
+        $type($) = "object" and diagnosis != "OK" ? [$] : []
+      )
+
+  # --- 3. Write raw results to CSV (optional/audit) ---
+  - id: db_size_csv
+    type: io.kestra.plugin.serdes.csv.IonToCsv
+    from: "{{ outputs.db_size.outputs[0].uri }}"
+
+  - id: top_tables_csv
+    type: io.kestra.plugin.serdes.csv.IonToCsv
+    from: "{{ outputs.top_tables.outputs[0].uri }}"
+
+  - id: long_running_sessions_csv
+    type: io.kestra.plugin.serdes.csv.IonToCsv
+    from: "{{ outputs.long_running_sessions.outputs[0].uri }}"
+
+  - id: blocking_sessions_csv
+    type: io.kestra.plugin.serdes.csv.IonToCsv
+    from: "{{ outputs.blocking_sessions.outputs[0].uri }}"
+
+  - id: top_slow_queries_csv
+    type: io.kestra.plugin.serdes.csv.IonToCsv
+    from: "{{ outputs.top_slow_queries.outputs[0].uri }}"
+
+  # --- 4. Flag if any warnings ---
+  - id: any_warnings
+    type: io.kestra.plugin.core.output.OutputValues
+    values:
+      warn_db_size: "{{ outputs.db_size_warn.rows is defined and outputs.db_size_warn.rows ? outputs.db_size_warn.rows | length : 0 }}"
+      warn_top_tables: "{{ outputs.top_tables_warn.rows is defined and outputs.top_tables_warn.rows ? outputs.top_tables_warn.rows | length : 0 }}"
+      warn_long_running: "{{ outputs.long_running_sessions_warn.rows is defined and outputs.long_running_sessions_warn.rows ? outputs.long_running_sessions_warn.rows | length : 0 }}"
+      warn_blocking: "{{ outputs.blocking_sessions_warn.rows is defined and outputs.blocking_sessions_warn.rows ? outputs.blocking_sessions_warn.rows | length : 0 }}"
+      warn_slow_queries: "{{ outputs.top_slow_queries_warn.rows is defined and outputs.top_slow_queries_warn.rows ? outputs.top_slow_queries_warn.rows | length : 0 }}"
+      any_warning: >-
+        {{
+          (outputs.db_size_warn.rows is defined and outputs.db_size_warn.rows and outputs.db_size_warn.rows | length > 0)
+          or (outputs.top_tables_warn.rows is defined and outputs.top_tables_warn.rows and outputs.top_tables_warn.rows | length > 0)
+          or (outputs.long_running_sessions_warn.rows is defined and outputs.long_running_sessions_warn.rows and outputs.long_running_sessions_warn.rows | length > 0)
+          or (outputs.blocking_sessions_warn.rows is defined and outputs.blocking_sessions_warn.rows and outputs.blocking_sessions_warn.rows | length > 0)
+          or (outputs.top_slow_queries_warn.rows is defined and outputs.top_slow_queries_warn.rows and outputs.top_slow_queries_warn.rows | length > 0)
+        }}
+
+
+  # --- 5. Notify Teams only if warning exists ---
+  - id: notify_on_warning
+    type: io.kestra.plugin.core.flow.Switch
+    value: "{{ outputs.any_warnings.values.any_warning }}"
+    cases:
+      true:
+        - id: notify_teams
+          type: io.kestra.plugin.notifications.teams.TeamsIncomingWebhook
+          url: "https://prod-29.australiasoutheast.logic.azure.com:443/workflows/50ab2a662c9e4b688d926e1d59479440/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bzOwkchRz4a7uJT-7p6Xebnb5bINHsbyn4aXFJymINs"
+          payload: |
+            {
+              "@type": "MessageCard",
+              "@context": "http://schema.org/extensions",
+              "summary": "Azure SQL Diagnostics - Warning/Alert",
+              "title": "⚠️ Azure SQL Diagnostic Warning Detected",
+              "themeColor": "C50F1F",
+              "sections": [
+                { "text": "**Database Size Warnings**: {{ outputs.db_size_warn.rows }}" },
+                { "text": "**Table Size Warnings**: {{ outputs.top_tables_warn.rows }}" },
+                { "text": "**Long Running Session Warnings**: {{ outputs.long_running_sessions_warn.rows }}" },
+                { "text": "**Blocking Sessions**: {{ outputs.blocking_sessions_warn.rows }}" },
+                { "text": "**Slow Query Warnings**: {{ outputs.top_slow_queries_warn.rows }}" }
+              ],
+              "potentialAction": [
+                {
+                  "@type": "OpenUri",
+                  "name": "View in Kestra",
+                  "targets": [
+                    { "os": "default", "uri": "{{ kestra.url }}/ui/executions/{{ execution.id }}" }
+                  ]
+                }
+              ]
+            }
+      false:
+        - id: log_healthy
+          type: io.kestra.plugin.core.log.Log
+          message: "Diagnostics OK. No warnings detected."

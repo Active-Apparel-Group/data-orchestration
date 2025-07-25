@@ -40,16 +40,16 @@ simplification_date = "2025-07-23"
 
 [environment.development]
 # Development environment - simplified 2-template architecture
-source_table = "swp_ORDER_LIST_V2"              # Shadow staging table for development
-target_table = "ORDER_LIST_V2"                  # Shadow production table for development (now with sync columns)
+source_table = "swp_ORDER_LIST_SYNC"              # Shadow staging table for development
+target_table = "FACT_ORDER_LIST"                  # Shadow production table for development (now with sync columns)
 lines_table = "ORDER_LIST_LINES"                # Lines table (shared, now with sync columns)
 # source_lines_table removed - direct MERGE to lines_table eliminates staging
 database = "orders"                             # Database name from config.yaml
 
 [environment.production]
 # Production environment - simplified 2-template architecture
-source_table = "swp_ORDER_LIST"                 # Production staging table
-target_table = "ORDER_LIST"                     # Live production table (will have sync columns)
+source_table = "swp_ORDER_LIST_SYNC"                 # Production staging table
+target_table = "FACT_ORDER_LIST"                     # Live production table (will have sync columns)
 lines_table = "ORDER_LIST_LINES"                # Lines table (shared, now with sync columns)  
 # source_lines_table removed - direct MERGE to lines_table eliminates staging
 database = "orders"                             # Database name from config.yaml
@@ -141,6 +141,78 @@ metadata_subitems_path = "configs/boards/board_9200771505_metadata.json"
 # ENVIRONMENT-SPECIFIC MONDAY.COM CONFIGURATION
 # ===============================================
 
+# ===== DROPDOWN & GROUP MANAGEMENT CONFIGURATION =====
+# Based on memory-bank/tasks/_groups_dropdown.md design
+# Purpose: Solve Task 19.15.2 - Configure dropdown labels creation
+# Critical: AAG SEASON and CUSTOMER SEASON fields empty in Monday.com
+# Structure: [monday.{environment}.{item_type}.create_labels_if_missing]
+
+# DEVELOPMENT ENVIRONMENT DROPDOWN CONFIGURATION (Board ID: 9609317401)
+# ======================================================================
+
+[monday.development.headers.create_labels_if_missing]
+# Default policy for dropdown columns (conservative approach)
+default = false
+
+# Headers dropdown columns from [monday.column_mapping.development.headers]
+"dropdown_mkr542p2" = false             # CUSTOMER NAME - use existing customers only
+"dropdown_mkr518fc" = false             # ORDER TYPE - use existing order types only
+"dropdown_mkr5677f" = false             # COLOR - use existing colors only
+"dropdown_mkr5tgaa" = false             # STYLE - use existing styles only
+"dropdown_mkr58de6" = true              # AAG SEASON - auto-create season labels ⭐ CRITICAL
+"dropdown_mkr5s5n3" = false             # CATEGORY - use existing categories only
+"dropdown_mkr5rgs6" = true              # CUSTOMER SEASON - auto-create customer season labels ⭐ CRITICAL
+"dropdown_mkr5w5e" = false              # DROP - use existing drops only
+"dropdown_mkr5kk5" = false              # DELIVERY TERMS - use existing terms only
+"dropdown_mkr5k8yn" = false             # HS CODE - use existing codes only
+
+[monday.development.lines.create_labels_if_missing]
+# Default policy for subitem dropdown columns
+default = false
+
+# Lines dropdown columns from [monday.column_mapping.development.lines]
+"dropdown_mkrak7qp" = true              # size_code - auto-create size labels as needed
+
+# PRODUCTION ENVIRONMENT DROPDOWN CONFIGURATION (Board ID: 9200517329)
+# =====================================================================
+
+[monday.production.headers.create_labels_if_missing]
+# Default policy for dropdown columns (conservative approach)
+default = false
+
+# Headers dropdown columns from [monday.column_mapping.production.headers]
+"dropdown_mkp4ar5n" = false             # CUSTOMER - use existing customers only
+"dropdown_mkpc7ey8" = false             # ORDER TYPE - use existing order types only
+"dropdown_mkp4kmtp" = true              # CUSTOMER SEASON - auto-create customer season labels ⭐ CRITICAL
+"dropdown_mkpcj4ev" = false             # DROP - use existing drops only
+"dropdown_mkp44k77" = false             # ACTIVE/WOVEN/SWIM/ACC/SEAMLESS - use existing classifications only
+"dropdown_mkp4yr3v" = false             # STYLE CATEGORY - use existing categories only
+"dropdown_mkpbbtkh" = false             # PRODUCT CAT - use existing product categories only
+"dropdown_mkp41kzc" = false             # Fabric Code - use existing fabric codes only
+"dropdown_mkp4n679" = false             # Fabric Type - use existing fabric types only
+"dropdown_mkp4gmn6" = false             # Destination - use existing destinations only
+"dropdown_mkp4wx2p" = false             # PLANNED DELIVERY METHOD - use existing methods only
+"dropdown_mkp4e51p" = false             # Incoterms - use existing terms only
+"dropdown_mkp4f6se" = false             # COUNTRY OF ORIGIN - use existing countries only
+"dropdown_mkpc44w5" = false             # CUSTOMER ALLOCATION - use existing allocations only
+"dropdown_mkp43md8" = false             # FACTORY - use existing factories only
+
+[monday.production.lines.create_labels_if_missing]
+# Default policy for subitem dropdown columns
+default = false
+
+# Lines dropdown columns from [monday.column_mapping.production.lines]
+# Note: Production lines use text fields for size_code, no dropdowns to configure
+
+# GROUP CREATION CONFIGURATION (GLOBAL)
+# =====================================
+
+[monday.group_creation]
+# Group creation workflow configuration
+enabled = true                          # Enable automatic group creation
+create_before_items = true              # Critical: Create groups BEFORE items (solves Task 19.15.3)
+wait_for_completion = true              # Wait for group creation to complete before proceeding
+
 # ===== COMPREHENSIVE MONDAY.COM COLUMN MAPPINGS =====
 # Based on ORDER_LIST schema analysis and board metadata examination
 # Development Board: 9609317401 | Production Board: 9200517329
@@ -172,7 +244,6 @@ metadata_subitems_path = "configs/boards/board_9200771505_metadata.json"
 "CUSTOMER SEASON" = "dropdown_mkr5rgs6"  # dropdown - CUSTOMER SEASON
 "DROP" = "dropdown_mkr5w5e"  # dropdown - DROP
 "RANGE / COLLECTION" = "long_text_mks0vs1p"  # long_text - RANGE / COLLECTION
-"AAG SEASON CODE" = "dropdown_mkr58de6"  # dropdown - AAG SEASON
 
 # === Dates and Timelines ===
 "DELIVERY TERMS" = "dropdown_mkr5kk5"  # dropdown - DELIVERY TERMS

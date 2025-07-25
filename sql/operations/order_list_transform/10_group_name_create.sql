@@ -2,7 +2,7 @@
 
 -- update group_name for all records
 -- this will be used to validate and/or create groups in Customer Master Schedule Board when orders are loaded into Monday.com
-    Update swp_ORDER_LIST
+    Update swp_ORDER_LIST_SYNC
         set group_name = 
         case 
             when [CUSTOMER SEASON] is not null

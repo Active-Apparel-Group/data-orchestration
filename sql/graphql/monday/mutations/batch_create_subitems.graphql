@@ -4,6 +4,7 @@
 
 # Example of what this template generates (3 subitems batch):
 mutation BatchCreateSubitems(
+  $createLabelsIfMissing: Boolean,
   $item0_parentId: ID!,
   $item0_name: String!,
   $item0_columnValues: JSON,
@@ -18,7 +19,7 @@ mutation BatchCreateSubitems(
     parent_item_id: $item0_parentId,
     item_name: $item0_name,
     column_values: $item0_columnValues,
-    create_labels_if_missing: true
+    create_labels_if_missing: $createLabelsIfMissing
   ) {
     id
     name
@@ -31,7 +32,7 @@ mutation BatchCreateSubitems(
     parent_item_id: $item1_parentId,
     item_name: $item1_name,
     column_values: $item1_columnValues,
-    create_labels_if_missing: true
+    create_labels_if_missing: $createLabelsIfMissing
   ) {
     id
     name
@@ -44,7 +45,7 @@ mutation BatchCreateSubitems(
     parent_item_id: $item2_parentId,
     item_name: $item2_name,
     column_values: $item2_columnValues,
-    create_labels_if_missing: true
+    create_labels_if_missing: $createLabelsIfMissing
   ) {
     id
     name

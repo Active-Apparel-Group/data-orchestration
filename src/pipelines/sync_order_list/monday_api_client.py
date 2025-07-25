@@ -48,6 +48,9 @@ class MondayAPIClient:
         # Load TOML configuration
         self.toml_config = self._load_toml_config()
         
+        # Get environment from configuration
+        self.environment = self._get_environment()
+        
         # Initialize GraphQL loader
         self.graphql_loader = GraphQLLoader()
         
@@ -87,6 +90,200 @@ class MondayAPIClient:
         except Exception as e:
             self.logger.error(f"Failed to load TOML config from {self.config_path}: {e}")
             raise
+    
+    def _get_environment(self) -> str:
+        """Get current environment from config parser"""
+        from .config_parser import DeltaSyncConfig
+        delta_config = DeltaSyncConfig.from_toml(self.config_path)
+        return delta_config.environment
+
+    def _get_dropdown_config(self, item_type: str = "headers") -> Dict[str, bool]:
+        """
+        Get dropdown configuration for the current environment and item type.
+        
+        Args:
+            item_type: Either "headers" (for main items) or "lines" (for subitems)
+            
+        Returns:
+            Dict mapping column_id -> bool (whether to create labels if missing)
+        """
+        try:
+            config_path = f"monday.{self.environment}.{item_type}.create_labels_if_missing"
+            config_section = self.toml_config
+            
+            # Navigate to the nested configuration
+            for key in config_path.split('.'):
+                config_section = config_section.get(key, {})
+            
+            if not isinstance(config_section, dict):
+                self.logger.warning(f"No dropdown config found at {config_path}, using defaults")
+                return {"default": False}
+                
+            return config_section
+            
+        except Exception as e:
+            self.logger.error(f"Error reading dropdown config: {e}")
+            return {"default": False}
+    
+    def _should_create_labels_for_column(self, column_id: str, item_type: str = "headers") -> bool:
+        """
+        Determine if we should create labels for a specific column.
+        
+        Args:
+            column_id: Monday.com column ID (e.g., "dropdown_mkr58de6")
+            item_type: Either "headers" or "lines"
+            
+        Returns:
+            bool: Whether to create labels if missing for this column
+        """
+        dropdown_config = self._get_dropdown_config(item_type)
+        default_policy = dropdown_config.get("default", False)
+        return dropdown_config.get(column_id, default_policy)
+    
+    def _determine_create_labels_for_records(self, records: List[Dict], item_type: str = "headers") -> bool:
+        """
+        Determine if we should enable create_labels_if_missing for a batch of records.
+        Returns True if ANY column in ANY record needs label creation.
+        
+        Args:
+            records: List of records containing column data (already transformed with Monday.com column IDs)
+            item_type: Either "headers" or "lines"
+            
+        Returns:
+            bool: Whether to enable create_labels_if_missing for this batch
+        """
+        try:
+            # Get dropdown configuration for current environment and item type
+            dropdown_config, default = self._get_dropdown_config(item_type)
+            
+            if not dropdown_config:
+                self.logger.debug(f"No dropdown config found for {item_type}, using default: {default}")
+                return default
+            
+            # Check each record for dropdown columns that need label creation
+            for record in records:
+                for monday_column_id, value in record.items():
+                    # Only check dropdown columns with non-empty values
+                    if monday_column_id.startswith("dropdown_") and value and str(value).strip() and str(value).strip().lower() != 'none':
+                        should_create = dropdown_config.get(monday_column_id, default)
+                        if should_create:
+                            self.logger.info(f"Enabling create_labels_if_missing for column {monday_column_id}: '{value}'")
+                            return True
+            
+            self.logger.debug(f"No dropdown columns need label creation for {item_type}")
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Error determining create_labels setting: {e}")
+            return False
+    
+    def _get_dropdown_config(self, item_type: str) -> Dict[str, bool]:
+        """
+        Get environment-specific dropdown configuration for create_labels_if_missing
+        
+        Args:
+            item_type: 'headers' or 'lines'
+            
+        Returns:
+            Dict mapping column_id to boolean (should create labels if missing)
+        """
+        environment = self._get_environment()
+        
+        # Build config path: monday.{environment}.{item_type}.create_labels_if_missing
+        config_path = ['monday', environment, item_type, 'create_labels_if_missing']
+        
+        self.logger.debug(f"🔍 Looking for dropdown config at path: {config_path}")
+        
+        config_section = self.toml_config
+        for i, key in enumerate(config_path):
+            self.logger.debug(f"  Step {i+1}: Looking for key '{key}' in {type(config_section).__name__}")
+            if key in config_section:
+                config_section = config_section.get(key, {})
+                self.logger.debug(f"    ✅ Found: {type(config_section).__name__}")
+            else:
+                self.logger.debug(f"    ❌ Key '{key}' not found! Available keys: {list(config_section.keys()) if isinstance(config_section, dict) else 'Not a dict'}")
+                break
+        
+        if not config_section:
+            self.logger.debug(f"No dropdown config found for {environment}.{item_type}, using defaults")
+            return {}, False  # Return tuple with empty config and default False
+        
+        # Get default and column-specific settings
+        default = config_section.get('default', False)
+        dropdown_config = {}
+        
+        for column_id, should_create in config_section.items():
+            if column_id != 'default':  # Skip the default key
+                dropdown_config[column_id] = should_create
+        
+        self.logger.debug(f"✅ Dropdown config for {environment}.{item_type}: {len(dropdown_config)} columns, default={default}")
+        self.logger.debug(f"   Config contents: {dropdown_config}")
+        return dropdown_config, default
+    
+    def _should_create_labels_for_column(self, column_id: str, item_type: str) -> bool:
+        """
+        Determine if we should create labels for a specific column
+        
+        Args:
+            column_id: Monday.com column ID (e.g., 'dropdown_mkr58de6')
+            item_type: 'headers' or 'lines'
+            
+        Returns:
+            Boolean indicating whether to set create_labels_if_missing=true
+        """
+        dropdown_config, default = self._get_dropdown_config(item_type)
+        result = dropdown_config.get(column_id, default)
+        
+        if result:
+            self.logger.debug(f"✅ create_labels_if_missing=true for {column_id} ({item_type})")
+        
+        return result
+
+    def _determine_create_labels_for_record(self, record: Dict[str, Any], item_type: str = "headers") -> bool:
+        """
+        Determine if create_labels_if_missing should be enabled for this record.
+        Checks if ANY dropdown column in the record needs label creation based on TOML config.
+        
+        Args:
+            record: The data record being processed
+            item_type: Either "headers" or "lines"
+            
+        Returns:
+            bool: True if any dropdown column should create labels if missing
+        """
+        try:
+            # Get dropdown configuration for current environment and item type
+            config_section = f"{self.environment}.{item_type}.create_labels_if_missing"
+            dropdown_config = self._get_dropdown_config(config_section)
+            
+            if not dropdown_config:
+                self.logger.debug(f"No dropdown config found for {config_section}")
+                return False
+            
+            # Get column mappings for current environment
+            column_mapping = self.toml_config.get('monday', {}).get('column_mapping', {}).get(self.environment, {}).get(item_type, {})
+            
+            # Check each column in the record
+            for column_name, value in record.items():
+                if value is None or str(value).strip() == "":
+                    continue  # Skip empty values
+                    
+                # Get Monday.com column ID for this column
+                monday_column_id = column_mapping.get(column_name)
+                if not monday_column_id:
+                    continue  # Skip unmapped columns
+                    
+                # Check if this column is configured for label creation
+                should_create = dropdown_config.get(monday_column_id, dropdown_config.get('default', False))
+                if should_create:
+                    self.logger.debug(f"Column {column_name} ({monday_column_id}) needs label creation: {value}")
+                    return True
+            
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Error determining create_labels_if_missing: {str(e)}")
+            return False  # Conservative fallback
     
     def execute(self, operation_type: str, data: Union[Dict, List[Dict]], dry_run: bool = False) -> Dict[str, Any]:
         """
@@ -342,12 +539,17 @@ class MondayAPIClient:
             item_name = record.get('AAG ORDER NUMBER', 'Unknown Order')
             column_values = self._build_column_values(transformed_record)
             
+            # Determine create_labels_if_missing based on TOML configuration
+            create_labels = self._determine_create_labels_for_records([transformed_record], 'headers')
+            
             variables = {
                 'boardId': int(self.board_id),  # Monday.com expects integer for ID
                 'itemName': str(item_name),
-                'columnValues': column_values
+                'columnValues': column_values,
+                'createLabelsIfMissing': create_labels
             }
             
+            self.logger.debug(f"create_items variables: createLabelsIfMissing={create_labels}")
             return {'query': template, 'variables': variables}
             
         elif operation_type == 'create_subitems':
@@ -370,16 +572,81 @@ class MondayAPIClient:
                 # Build minimal column values for subitems
                 column_values = self._build_column_values(transformed_record)
                 
+                # Determine create_labels_if_missing based on TOML configuration for subitems
+                create_labels = self._determine_create_labels_for_records([transformed_record], 'lines')
+                
                 variables = {
                     'parentItemId': str(parent_item_id),  # Monday.com expects string for parent ID
                     'itemName': str(item_name),
-                    'columnValues': column_values
+                    'columnValues': column_values,
+                    'createLabelsIfMissing': create_labels
                 }
                 
                 return {'query': template, 'variables': variables}
             else:
                 # Batch subitems - build dynamic GraphQL
                 return self._build_batch_subitems_query(records, column_mappings)
+        
+        elif operation_type == 'update_items':
+            # UPDATE existing items
+            if len(records) > 1:
+                raise ValueError(f"Single item update operation expected, got {len(records)} records")
+            
+            record = records[0]
+            transformed_record = self._transform_record(record, column_mappings)
+            
+            template = self.graphql_loader.get_mutation("update_item")
+            
+            # Build variables for update_item
+            monday_item_id = record.get('monday_item_id')
+            if not monday_item_id:
+                raise ValueError("monday_item_id is required for update_items operation")
+            
+            column_values = self._build_column_values(transformed_record)
+            
+            # Determine create_labels_if_missing based on TOML configuration
+            create_labels = self._determine_create_labels_for_records([transformed_record], 'headers')
+            
+            variables = {
+                'board_id': str(self.board_id),        # Match GraphQL template
+                'item_id': str(monday_item_id),        # Match GraphQL template  
+                'column_values': column_values,        # Match GraphQL template
+                'createLabelsIfMissing': create_labels # Match GraphQL template
+            }
+            
+            self.logger.debug(f"update_items variables: board_id={self.board_id}, item_id={monday_item_id}, createLabelsIfMissing={create_labels}")
+            return {'query': template, 'variables': variables}
+            
+        elif operation_type == 'update_subitems':
+            if len(records) == 1:
+                # Single subitem update
+                record = records[0]
+                transformed_record = self._transform_record(record, column_mappings)
+                
+                template = self.graphql_loader.get_mutation("update_subitem")
+                
+                # Build variables for update_subitem
+                monday_subitem_id = record.get('monday_subitem_id')
+                if not monday_subitem_id:
+                    raise ValueError("monday_subitem_id is required for update_subitems operation")
+                
+                # Build minimal column values for subitems
+                column_values = self._build_column_values(transformed_record)
+                
+                # Determine create_labels_if_missing based on TOML configuration for subitems
+                create_labels = self._determine_create_labels_for_records([transformed_record], 'lines')
+                
+                variables = {
+                    'itemId': str(monday_subitem_id),  # Monday.com expects string for subitem ID
+                    'columnValues': column_values,
+                    'createLabelsIfMissing': create_labels
+                }
+                
+                return {'query': template, 'variables': variables}
+            else:
+                # Batch subitem updates - build dynamic GraphQL
+                return self._build_batch_subitem_updates_query(records, column_mappings)
+        
         else:
             # For other operations, fall back to template rendering (future enhancement)
             raise NotImplementedError(f"Operation {operation_type} not yet implemented for MVP")
@@ -402,12 +669,18 @@ class MondayAPIClient:
             
             self.logger.debug(f"Headers mapping for {operation_type} ({environment}): {len(headers_mapping)} columns found")
             return headers_mapping
-        else:
+        elif operation_type in ['create_subitems', 'update_subitems']:
             # For lines: environment-specific mapping
             lines_mapping = monday_mapping.get(environment, {}).get('lines', {})
             
             self.logger.debug(f"Lines mapping for {operation_type}: {len(lines_mapping)} columns found")
             return lines_mapping
+        else:
+            # Default to headers mapping for unknown operations
+            headers_mapping = monday_mapping.get(environment, {}).get('headers', {})
+            
+            self.logger.debug(f"Default headers mapping for {operation_type}: {len(headers_mapping)} columns found")
+            return headers_mapping
     
     def _transform_record(self, record: Dict[str, Any], mappings: Dict[str, str]) -> Dict[str, Any]:
         """Transform database record using TOML column mappings"""
@@ -451,21 +724,84 @@ class MondayAPIClient:
         # Use the transformed record (already mapped via TOML) instead of generic conversion
         # The record should already be transformed by _transform_record using TOML mappings
         for monday_column_id, value in record.items():
-            if value is not None and str(value).strip():
-                column_values[monday_column_id] = str(value)
+            # Log all dropdown columns before filtering
+            if monday_column_id.startswith("dropdown_"):
+                self.logger.info(f"🔍 Pre-filter dropdown {monday_column_id}: '{value}' (type: {type(value).__name__})")
+            
+            # Enhanced filtering: exclude None, empty strings, and string literal 'None'
+            if value is not None and str(value).strip() and str(value).strip().lower() != 'none':
+                # Format dropdown columns correctly for Monday.com API
+                if monday_column_id.startswith("dropdown_"):
+                    # Dropdown values must be formatted as {"labels": ["value"]}
+                    column_values[monday_column_id] = {"labels": [str(value)]}
+                    self.logger.info(f"🎯 Dropdown {monday_column_id}: '{value}' → {column_values[monday_column_id]}")
+                else:
+                    # Text/numeric columns can be strings
+                    column_values[monday_column_id] = str(value)
+            elif monday_column_id.startswith("dropdown_"):
+                self.logger.warning(f"⚠️  Dropdown {monday_column_id} FILTERED OUT: '{value}' (type: {type(value).__name__})")
         
-        self.logger.debug(f"Built column values: {len(column_values)} columns mapped")
+        self.logger.debug(f"Built column values: {len(column_values)} columns mapped (filtered 'None' values)")
         
         # Return as JSON string for GraphQL
         import json
         return json.dumps(column_values)
     
+    def _build_batch_subitem_updates_query(self, records: List[Dict[str, Any]], column_mappings: Dict[str, str]) -> Dict[str, Any]:
+        """Build dynamic batch GraphQL query for subitem updates"""
+        # Determine create_labels_if_missing based on TOML configuration for this batch
+        create_labels = self._determine_create_labels_for_records(records, 'lines')
+        
+        # Build variable definitions
+        var_definitions = ["$createLabelsIfMissing: Boolean"]
+        mutation_calls = []
+        variables = {"createLabelsIfMissing": create_labels}
+        
+        for i, record in enumerate(records):
+            # Variable definitions
+            var_definitions.append(f"$item{i}_itemId: ID!")
+            var_definitions.append(f"$item{i}_columnValues: JSON")
+            
+            # Transform record
+            transformed_record = self._transform_record(record, column_mappings)
+            
+            # Variables for this subitem
+            monday_subitem_id = record.get('monday_subitem_id')
+            if not monday_subitem_id:
+                raise ValueError(f"monday_subitem_id is required for update_subitems operation (record {i})")
+            
+            variables[f"item{i}_itemId"] = str(monday_subitem_id)
+            variables[f"item{i}_columnValues"] = self._build_column_values(transformed_record)
+            
+            # GraphQL mutation call
+            mutation_calls.append(f"""
+                item{i}: change_multiple_column_values(
+                    item_id: $item{i}_itemId,
+                    column_values: $item{i}_columnValues,
+                    create_labels_if_missing: $createLabelsIfMissing
+                ) {{
+                    id
+                }}
+            """.strip())
+        
+        # Build complete query
+        query = f"""
+        mutation UpdateBatchSubitems({', '.join(var_definitions)}) {{
+            {chr(10).join(mutation_calls)}
+        }}
+        """
+        
+        return {'query': query, 'variables': variables}
+    
     def _build_batch_subitems_query(self, records: List[Dict[str, Any]], column_mappings: Dict[str, str]) -> Dict[str, Any]:
         """Build dynamic batch GraphQL query for subitems"""
+        # Determine create_labels_if_missing based on TOML configuration for this batch
+        create_labels = self._determine_create_labels_for_records(records, 'lines')
+        
         # Build variable definitions
-        var_definitions = []
+        var_definitions = ["$createLabelsIfMissing: Boolean"]
         mutation_calls = []
-        variables = {}
+        variables = {"createLabelsIfMissing": create_labels}
         
         for i, record in enumerate(records):
             # Variable definitions
@@ -493,13 +829,13 @@ class MondayAPIClient:
             variables[f'item{i}_name'] = str(item_name)
             variables[f'item{i}_columnValues'] = column_values
             
-            # Build mutation call
+            # Build mutation call with dynamic createLabelsIfMissing
             mutation_calls.append(f"""
   create_subitem_{i}: create_subitem(
     parent_item_id: $item{i}_parentId,
     item_name: $item{i}_name,
     column_values: $item{i}_columnValues,
-    create_labels_if_missing: true
+    create_labels_if_missing: $createLabelsIfMissing
   ) {{
     id
     name
@@ -517,6 +853,7 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
 }}
         """.strip()
         
+        self.logger.debug(f"Batch subitems query: createLabelsIfMissing={create_labels}")
         return {'query': query, 'variables': variables}
     
     def _render_template(self, template: str, context: Dict[str, Any]) -> str:
@@ -563,7 +900,8 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
                 # Rate limiting: Small delay before request
                 await asyncio.sleep(0.01)  # 10ms baseline delay
                 
-                self.logger.debug(f"Making API call to Monday.com: {len(query)} chars, {len(variables)} variables")
+                variables_count = len(variables) if variables else 0
+                self.logger.debug(f"Making API call to Monday.com: {len(query)} chars, {variables_count} variables")
                 
                 async with session.post(self.api_url, json=payload, headers=headers) as response:
                     if response.status == 200:
@@ -649,6 +987,20 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
                 if 'create_group' in data and data['create_group']:
                     monday_id = data['create_group']['id']
                     self.logger.debug(f"Extracted group ID: {monday_id}")
+                    return int(monday_id)
+                    
+            elif operation_type == 'update_items':
+                # For item updates, look for change_multiple_column_values key
+                if 'change_multiple_column_values' in data and data['change_multiple_column_values']:
+                    monday_id = data['change_multiple_column_values']['id']
+                    self.logger.debug(f"Extracted updated item ID: {monday_id}")
+                    return int(monday_id)
+                    
+            elif operation_type == 'update_subitems':
+                # For subitem updates, look for change_multiple_column_values key
+                if 'change_multiple_column_values' in data and data['change_multiple_column_values']:
+                    monday_id = data['change_multiple_column_values']['id']
+                    self.logger.debug(f"Extracted updated subitem ID: {monday_id}")
                     return int(monday_id)
             
             self.logger.warning(f"No ID found in response data for {operation_type}: {data}")

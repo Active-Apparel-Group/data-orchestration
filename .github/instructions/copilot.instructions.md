@@ -178,6 +178,62 @@ flowchart TD
 
 The format is flexible - focus on capturing valuable insights that help me work more effectively with you and the project. Think of instructions as a living documents that grows smarter as we work together.
 
+# Content Templates
+
+### activeContext.md Template
+```markdown
+# Active Context
+
+## Current Work Focus
+**[Task ID - Task Name]**: [Brief description of current work and goals]
+
+## Recent Changes
+**[Date]**: **[Task ID] COMPLETED** - [One line achievement summary]
+**[Date]**: **[Task ID] COMPLETED** - [One line achievement summary]
+
+## Next Steps
+**Immediate Focus**: [Next task or action]
+- [Specific immediate goal]
+- [Approach or method]
+
+**Upcoming**: [Future task sequence overview]
+
+## Active Decisions and Considerations
+[Current blockers, decisions needed, or important context for ongoing work]
+```
+
+### progress.md Template
+```markdown
+# Progress
+
+## Current Status
+**Overall Project Status:** [X]% Complete - [Brief status summary]
+
+## What's Working
+- **[System/Feature]**: [Brief description of working capability]
+- **[System/Feature]**: [Brief description of working capability]
+
+## Timeline of Progress
+- **[Date]**: [Major milestone] - [Brief description]
+- **[Date]**: [Major milestone] - [Brief description]
+
+## What's Left to Build
+**Remaining Work**:
+- [High-level remaining tasks or features]
+
+## Known Issues and Risks
+- **[Issue]**: [Brief description and impact]
+```
+
+## Quality Checks
+
+Before updating memory bank files, verify:
+- [ ] No duplicate information between activeContext.md and progress.md
+- [ ] activeContext.md focuses only on current/immediate work
+- [ ] progress.md focuses only on project trajectory
+- [ ] File sizes remain within target ranges (30-40 and 50-60 lines)
+- [ ] All critical information preserved (no information loss)
+
 ## Tasks Management
 
 The `tasks/` folder contains individual markdown files for each task, along with an index file:
@@ -226,6 +282,15 @@ Each task file follows this format:
 ## Thought Process
 [Documentation of the discussion and reasoning that shaped the approach to this task]
 
+## Definition of Done
+
+- All code implementation tasks have a corresponding test/validation sub-task (integration testing is the default, unit tests by exception - but acceptable, the agent or developer should make this call and flag for review, e2e for end-to-end flows).
+- No implementation task is marked complete until the relevant test(s) pass and explicit success criteria (acceptance criteria) are met.
+- Business or user outcomes are validated with production-like data whenever feasible.
+- Every task and sub-task is cross-linked to the corresponding file and test for traceability.
+- All tests must pass in CI/CD prior to merging to main.
+- **All business-critical paths must be covered by integration tests.**
+
 ## Implementation Plan
 - [Step 1]
 - [Step 2]
@@ -241,6 +306,23 @@ Each task file follows this format:
 | 1.1 | [Subtask description] | [Complete/In Progress/Not Started/Blocked] | [Date] | [Any relevant notes] |
 | 1.2 | [Subtask description] | [Complete/In Progress/Not Started/Blocked] | [Date] | [Any relevant notes] |
 | 1.3 | [Subtask description] | [Complete/In Progress/Not Started/Blocked] | [Date] | [Any relevant notes] |
+
+## Relevant Files
+
+- `src/feature/file.py` - Brief description of why this file is relevant.
+- `tests/<task-name>/integration/test_feature.py` - Integration test for the main logic.
+- `tests/<task-name>/unit/test_component.py` - Unit test for isolated logic.
+- `tests/<task-name>/e2e/test_end_to_end.py` - End-to-end test for full flow.
+
+## Test Coverage Mapping
+
+| Implementation Task                | Test File                                             | Outcome Validated                                |
+|------------------------------------|-------------------------------------------------------|--------------------------------------------------|
+| merge_headers.j2                   | tests/order_list_delta_sync/integration/test_merge_headers.py | Dynamic size detection, SQL syntax               |
+| unpivot_sizes.j2                   | tests/order_list_delta_sync/integration/test_unpivot_sizes.py | All size columns unpivoted                       |
+| merge_lines.j2                     | tests/order_list_delta_sync/integration/test_merge_lines.py   | Delta output and business keys                   |
+| New Order Detection                | tests/order_list_delta_sync/integration/test_new_order_detection.py | New/existing order accuracy               |
+
 
 ## Progress Log
 ### [Date]

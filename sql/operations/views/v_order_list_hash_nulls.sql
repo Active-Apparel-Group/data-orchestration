@@ -20,7 +20,7 @@ SELECT
             COALESCE([TOTAL QTY], 0) 
         )
     ), 2) AS [hash_ord_3_10]
-FROM [swp_ORDER_LIST]
+FROM [swp_ORDER_LIST_SYNC]
 
 
 

@@ -59,6 +59,7 @@ class OrderListTransformer:
         self.db_key = "orders"
         self.target_table = "ORDER_LIST"
         self.staging_table = "swp_ORDER_LIST"  # Schema-aware naming
+        self.staging_table_sync = "swp_ORDER_LIST_SYNC"  # Sync table for Monday.com
         
         # Load YAML metadata using existing function
         yaml_path = repo_root / "pipelines" / "utils" / "order_list_schema.yml"
@@ -156,6 +157,30 @@ class OrderListTransformer:
                 self.logger.error(f"Atomic swap failed: {e}")
                 return {"success": False, "error": f"Atomic swap failed: {e}"}
         
+
+        # STEP 4: Create/refresh sync table for downstream consumers
+        self.logger.info(f"\n[STEP 4] Creating/Refreshing {self.staging_table_sync} table for downstream consumers")
+        sync_table_created = False
+        try:
+            db.execute(f"""
+                IF OBJECT_ID('{self.staging_table_sync}', 'U') IS NOT NULL
+                    DROP TABLE {self.staging_table_sync};
+            """, self.db_key)
+            self.logger.info(f"   ✅ Dropped existing {self.staging_table_sync}")
+        except Exception as e:
+            self.logger.info(f"   ⚠️  {self.staging_table_sync} did not exist or drop failed (safe to ignore if not present): {e}")
+        try:
+            db.execute(f"""
+                SELECT * INTO {self.staging_table_sync} FROM {self.target_table}
+            """, self.db_key)
+            self.logger.info(f"   ✅ Created {self.staging_table_sync} from {self.target_table}")
+            sync_table_created = True
+        except Exception as e:
+            self.logger.error(f"   ❌ Failed to create {self.staging_table_sync}: {e}")
+            sync_table_created = False
+
+
+
         duration = time.time() - start_time
         
         return {
@@ -166,7 +191,8 @@ class OrderListTransformer:
             "duration": duration,
             "successful_customers": successful_customers,
             "failed_customers": failed_customers,
-            "server_side_optimized": True
+            "server_side_optimized": True,
+            "sync_table_created": sync_table_created
         }
     
     def generate_direct_insert_sql(self, table_name: str) -> str:

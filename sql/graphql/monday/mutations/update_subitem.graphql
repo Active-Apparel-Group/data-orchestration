@@ -1,9 +1,10 @@
-mutation UpdateSubitem($board_id: ID!, $item_id: ID!, $subitem_id: ID!, $column_values: JSON!) {
+mutation UpdateSubitem($board_id: ID!, $item_id: ID!, $subitem_id: ID!, $column_values: JSON!, $createLabelsIfMissing: Boolean) {
   change_subitem_column_values(
     board_id: $board_id
     item_id: $item_id
     subitem_id: $subitem_id
     column_values: $column_values
+    create_labels_if_missing: $createLabelsIfMissing
   ) {
     id
     name

@@ -110,30 +110,36 @@ class SyncEngine:
         else:
             return 'development'  # Safe default
     
-    def run_sync(self, dry_run: bool = False, limit: Optional[int] = None) -> Dict[str, Any]:
+    def run_sync(self, dry_run: bool = False, limit: Optional[int] = None, action_types: List[str] = None) -> Dict[str, Any]:
         """
         Execute complete sync workflow with record_uuid cascade logic
+        Supports both INSERT and UPDATE operations
         
         Args:
             dry_run: If True, validate queries and API calls but don't execute
             limit: Optional limit on number of records to process
+            action_types: List of action types to process (e.g., ['INSERT', 'UPDATE'])
             
         Returns:
             Comprehensive sync results
         """
-        self.logger.info(f"Starting sync workflow (dry_run: {dry_run}, limit: {limit})")
+        # Default to INSERT operations for backwards compatibility
+        if action_types is None:
+            action_types = ['INSERT']
+            
+        self.logger.info(f"Starting sync workflow (dry_run: {dry_run}, limit: {limit}, action_types: {action_types})")
         
         sync_start_time = datetime.now()
         
         try:
             # Get pending headers from ORDER_LIST_V2 (main table - DELTA-FREE)
-            pending_headers = self._get_pending_headers(limit)
+            pending_headers = self._get_pending_headers(limit, action_types)
             
             if not pending_headers:
-                self.logger.info("No pending headers found for sync")
-                return {'success': True, 'synced': 0, 'message': 'No pending headers'}
+                self.logger.info(f"No pending headers found for sync (action_types: {action_types})")
+                return {'success': True, 'synced': 0, 'message': f'No pending headers for {action_types}'}
             
-            self.logger.info(f"Found {len(pending_headers)} pending headers for sync")
+            self.logger.info(f"Found {len(pending_headers)} pending headers for sync (action_types: {action_types})")
             
             # Group headers by customer and record_uuid for atomic processing
             customer_batches = self._group_by_customer_and_uuid(pending_headers)
@@ -175,6 +181,7 @@ class SyncEngine:
                 'failed_batches': len(all_results) - successful_batches,
                 'execution_time_seconds': sync_duration,
                 'sync_timestamp': sync_start_time,
+                'action_types': action_types,
                 'dry_run': dry_run,
                 'batch_results': all_results
             }
@@ -189,6 +196,7 @@ class SyncEngine:
                 'success': False,
                 'error': str(e),
                 'total_synced': 0,
+                'action_types': action_types,
                 'execution_time_seconds': sync_duration
             }
     
@@ -222,44 +230,64 @@ class SyncEngine:
     def _process_record_uuid_batch(self, record_uuid: str, headers: List[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
         """
         Process a single record_uuid batch atomically with SINGLE DATABASE CONNECTION:
+        Supports both INSERT and UPDATE operations based on action_type
         1. Create groups (if needed)
-        2. Create Monday.com items → get item_ids
-        3. Update ORDER_LIST_V2 with monday_item_id (DELTA-FREE)
-        4. Get related lines from ORDER_LIST_LINES (DELTA-FREE)
-        5. Inject parent_item_id into lines
-        6. Create Monday.com subitems → get subitem_ids
-        7. Update ORDER_LIST_LINES with monday_subitem_id (DELTA-FREE)
-        8. Sync status already written directly to main tables (no propagation needed)
+        2. For INSERT: Create Monday.com items → get item_ids
+        3. For UPDATE: Update Monday.com items using existing monday_item_id
+        4. Update ORDER_LIST_V2 with monday_item_id (DELTA-FREE)
+        5. Get related lines from ORDER_LIST_LINES (DELTA-FREE)
+        6. Inject parent_item_id into lines
+        7. For INSERT: Create Monday.com subitems → get subitem_ids
+        8. For UPDATE: Update Monday.com subitems using existing monday_subitem_id
+        9. Update ORDER_LIST_LINES with monday_subitem_id (DELTA-FREE)
+        10. Sync status already written directly to main tables (no propagation needed)
         """
         try:
             self.logger.info(f"Processing record_uuid batch: {record_uuid} ({len(headers)} headers)")
+            
+            # Determine operation type from headers
+            action_types = set(header.get('action_type', 'INSERT') for header in headers)
+            operation_type = list(action_types)[0] if len(action_types) == 1 else 'MIXED'
+            
+            self.logger.info(f"Batch operation type: {operation_type} (action_types: {action_types})")
             
             if dry_run:
                 return {
                     'success': True,
                     'record_uuid': record_uuid,
                     'records_synced': len(headers),
+                    'operation_type': operation_type,
                     'dry_run': True,
-                    'message': f'DRY RUN: Would process {len(headers)} headers'
+                    'message': f'DRY RUN: Would process {len(headers)} headers for {operation_type}'
                 }
             
-            # Step 1: Create groups if needed
+            # Step 1: Create groups if needed (for both INSERT and UPDATE)
             groups_result = self._create_groups_for_headers(headers, dry_run)
             if not groups_result.get('success', False):
                 return {
                     'success': False,
                     'record_uuid': record_uuid,
                     'error': 'Group creation failed',
+                    'operation_type': operation_type,
                     'records_synced': 0
                 }
             
-            # Step 2: Create Monday.com items
-            items_result = self.monday_client.execute('create_items', headers, dry_run)
+            # Step 2: Handle items based on operation type
+            if operation_type == 'UPDATE':
+                # For UPDATE: Update existing Monday.com items
+                items_result = self.monday_client.execute('update_items', headers, dry_run)
+                operation_name = 'Item update'
+            else:
+                # For INSERT: Create new Monday.com items
+                items_result = self.monday_client.execute('create_items', headers, dry_run)
+                operation_name = 'Item creation'
+            
             if not items_result.get('success', False):
                 return {
                     'success': False,
                     'record_uuid': record_uuid,
-                    'error': 'Item creation failed',
+                    'error': f'{operation_name} failed',
+                    'operation_type': operation_type,
                     'records_synced': 0
                 }
             
@@ -269,23 +297,42 @@ class SyncEngine:
             connection = db.get_connection('orders')
             try:
                 # Step 3: Update ORDER_LIST_V2 with monday_item_id
-                self._update_headers_delta_with_item_ids_conn(record_uuid, monday_item_ids, connection)
+                if operation_type == 'UPDATE':
+                    # For UPDATE: Don't update monday_item_id (it should stay the same)
+                    # Just update sync status to SYNCED
+                    self._update_sync_status_only_conn(record_uuid, connection)
+                else:
+                    # For INSERT: Update with new monday_item_id from API response
+                    self._update_headers_delta_with_item_ids_conn(record_uuid, monday_item_ids, connection)
                 
                 # Step 4: Get related lines for this record_uuid
                 related_lines = self._get_lines_by_record_uuid_conn(record_uuid, connection)
                 
                 if related_lines:
+                    # Determine line operation type
+                    line_action_types = set(line.get('action_type', 'INSERT') for line in related_lines)
+                    line_operation_type = list(line_action_types)[0] if len(line_action_types) == 1 else 'MIXED'
+                    
                     # Step 5: Inject parent_item_id into lines
                     lines_with_parent = self._inject_parent_item_ids(related_lines, record_uuid, monday_item_ids)
                     
-                    # Step 6: Create Monday.com subitems
-                    subitems_result = self.monday_client.execute('create_subitems', lines_with_parent, dry_run)
+                    # Step 6: Handle subitems based on operation type
+                    if line_operation_type == 'UPDATE':
+                        # For UPDATE: Update existing Monday.com subitems
+                        subitems_result = self.monday_client.execute('update_subitems', lines_with_parent, dry_run)
+                        subitem_operation_name = 'Subitem update'
+                    else:
+                        # For INSERT: Create new Monday.com subitems
+                        subitems_result = self.monday_client.execute('create_subitems', lines_with_parent, dry_run)
+                        subitem_operation_name = 'Subitem creation'
                     
                     if subitems_result.get('success', False):
                         monday_subitem_ids = subitems_result.get('monday_ids', [])
                         
                         # Step 7: Update ORDER_LIST_LINES with monday_subitem_id (DIRECT CONNECTION)
                         self._update_lines_delta_with_subitem_ids(record_uuid, monday_subitem_ids, connection)
+                    else:
+                        self.logger.warning(f"{subitem_operation_name} failed for record_uuid {record_uuid}")
                 
                 # Manual commit (NO AUTO-COMMIT TRANSACTION NESTING)
                 connection.commit()
@@ -304,6 +351,7 @@ class SyncEngine:
                 'records_synced': total_records,
                 'headers_synced': len(headers),
                 'lines_synced': len(related_lines) if related_lines else 0,
+                'operation_type': operation_type,
                 'monday_item_ids': monday_item_ids
             }
             
@@ -313,6 +361,7 @@ class SyncEngine:
                 'success': False,
                 'record_uuid': record_uuid,
                 'error': str(e),
+                'operation_type': operation_type if 'operation_type' in locals() else 'UNKNOWN',
                 'records_synced': 0
             }
     
@@ -433,6 +482,27 @@ class SyncEngine:
         except Exception as e:
             self.logger.exception(f"Failed to update headers with item IDs: {e}")
             raise
+
+    def _update_sync_status_only_conn(self, record_uuid: str, connection) -> None:
+        """Update sync status only for UPDATE operations (don't change monday_item_id)"""
+        try:
+            update_query = f"""
+            UPDATE [{self.headers_table}]
+            SET [sync_state] = 'SYNCED',
+                [sync_completed_at] = GETUTCDATE()
+            WHERE [record_uuid] = '{record_uuid}'
+            """
+            
+            cursor = connection.cursor()
+            cursor.execute(update_query)
+            # Don't commit here - let caller handle transaction
+            
+            rows_updated = cursor.rowcount
+            self.logger.info(f"Updated {rows_updated} headers sync status to SYNCED for UPDATE operation")
+                
+        except Exception as e:
+            self.logger.exception(f"Failed to update sync status: {e}")
+            raise
     
     def _update_lines_delta_with_subitem_ids(self, record_uuid: str, subitem_ids: List[str], connection=None) -> None:
         """Update ORDER_LIST_LINES (main table - DELTA-FREE) with Monday.com subitem IDs - BATCH UPDATE"""
@@ -507,12 +577,16 @@ class SyncEngine:
         self.logger.info(f"DELTA-FREE: Sync status already written directly to main tables for record_uuid: {record_uuid}")
         pass
     
-    def _get_pending_headers(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+    def _get_pending_headers(self, limit: Optional[int] = None, action_types: List[str] = None) -> List[Dict[str, Any]]:
         """
         Get headers records pending Monday.com sync from ORDER_LIST_V2 (main table - DELTA-FREE)
+        
+        Args:
+            limit: Optional limit on number of records
+            action_types: List of action types to filter by (e.g., ['INSERT', 'UPDATE'])
         """
         # Build headers query for ORDER_LIST_V2 (main table)
-        headers_query = self._build_headers_query(limit)
+        headers_query = self._build_headers_query(limit, action_types)
         
         # DEBUG: Print the generated SQL query
         print("=" * 80)
@@ -565,21 +639,27 @@ class SyncEngine:
             self.logger.error(f"Failed to get pending lines: {e}")
             raise
     
-    def _build_headers_query(self, limit: Optional[int] = None) -> str:
+    def _build_headers_query(self, limit: Optional[int] = None, action_types: List[str] = None) -> str:
         """Build query for pending headers from ORDER_LIST_V2 (main table - DELTA-FREE)"""
         
         # Get headers columns from TOML mapping
         headers_columns = self._get_headers_columns()
         columns_clause = ", ".join(headers_columns)
         
+        # Default to INSERT operations if no action types specified
+        if action_types is None:
+            action_types = ['INSERT']
+        
         # DEBUG: Print environment and column mapping info
         print("DEBUG: Headers query configuration (DELTA-FREE):")
         print(f"  Environment: {self.environment}")
         print(f"  Table: {self.headers_table}")
+        print(f"  Action types: {action_types}")
         print(f"  Headers columns: {headers_columns}")
         
-        # Build WHERE clause for main table logic (sync_state = 'PENDING')
-        main_table_clause = "([sync_state] = 'PENDING')"
+        # Build WHERE clause for main table logic (sync_state = 'PENDING' AND action_type IN (...))
+        action_type_clause = "', '".join(action_types)
+        main_table_clause = f"([sync_state] = 'PENDING' AND [action_type] IN ('{action_type_clause}'))"
         
         # DEBUG: Print WHERE clause
         print(f"DEBUG: Headers WHERE clause: {main_table_clause}")
