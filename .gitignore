@@ -81,7 +81,6 @@ logs/
 htmlcov/
 .tox/
 .nox/
-tests/
 
 # mypy
 .mypy_cache/

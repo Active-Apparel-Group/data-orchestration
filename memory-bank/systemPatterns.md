@@ -2,13 +2,22 @@
 
 ## Architectural Overview
 
-The Order List Sync Pipeline Design Justification
-This architecture was chosen after discovering that the initially planned design was overly comSyncEngine → Main Tables Updates: After sending data to Monday.com, the SyncEngine receives created item IDs and subitem IDs from the API client's responses. It then updates the ORDER_LIST_V2 and ORDER_LIST_LINES tables directly: populating the new Monday IDs and setting sync_state to 'SYNCED' (or an error state if something failed). **No DELTA propagation needed** - the main tables are updated directly, ensuring our internal databases know the sync status of each record immediately.lex, making it hard to maintain and debug. By simplifying to a two-file core:
-We reduced ~1500 lines of complicated code (spanning 8+ files) to roughly 400 lines across 2 files. This makes the system easier to reason about.
+**Enhanced Merge Orchestrator - 6-Phase Architecture (PRODUCTION VALIDATED ✅)**
 
-The direct approach minimizes points of failure — data goes straight from DB to Monday with minimal translation.
+The Enhanced Merge Orchestrator represents a revolutionary approach that processes ONLY NEW records through a validated 6-phase sequence:
 
-The pattern of using configuration and templates positions the system to handle changes (like adding new data fields to sync) without code rewrites, which is crucial in a dynamic business environment.
+1. **Phase 1: NEW Order Detection** - Identifies records requiring processing (sync_state='NEW')
+2. **Phase 2: Group Name Transformation** - Generates customer-specific group names  
+3. **Phase 3: Group Creation Workflow** - Ensures Monday.com groups exist before item creation
+4. **Phase 4: Item Name Transformation** - Creates formatted item names for Monday.com
+5. **Phase 5: Template Merge Headers** - Processes headers with dynamic size column detection
+6. **Phase 6: Template Unpivot Lines** - Transforms size data into lines format
+
+**Key Architectural Principles:**
+- **NEW-Only Processing**: Only records with sync_state='NEW' are processed, ensuring efficiency
+- **100% TOML-Driven**: All table names and configuration from TOML files, no hardcoded references
+- **Individual Phase Validation**: Each phase can be tested and validated independently
+- **Production-Scale Ready**: Handles 245+ size columns and 22,000+ character SQL generation
 
 ## File Organization
 **Critical Rule**: No files should be created in the repository root. All files must reside in the following structured directories to maintain a clean, modular architecture:

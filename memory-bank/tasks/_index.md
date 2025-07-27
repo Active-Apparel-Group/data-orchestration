@@ -1,11 +1,12 @@
 # Tasks Index
 
 ## In Progress
-- [TASK019_PHASE05](TASK019_PHASE05.md) Testing & Validation - **75% Complete** - Task 19.15 CRITICAL GAPS: group creation, dropdown validation needed
+- [TASK019_PHASE05](TASK019_PHASE05.md) Testing & Validation - **95% Complete** - E2E test framework complete, ready for production validation
+- [TASK020](TASK020%20-%20Implement%20Change%20Detection%20Logic.md) Implement Change Detection Logic - **PLANNING** Comprehensive technical architecture documented
+- [TASK021](TASK021_PRODUCTION_CUTOVER.md) Production Cutover Plan - **PLANNING** Production deployment readiness and pre-production checklist
 
 ## Pending
 - [TASK019_PHASE06](TASK019_PHASE06.md) DELTA Cleanup & Production Readiness - **BLOCKED** until Task 19.15 properly completed
-- [TASK020](TASK020%20-%20Implement%20Change%20Detection%20Logic.md) Implement Change Detection Logic - Handle UPDATE orders and cancelled order scenarios
 
 ## Completed
 - [TASK019_PHASE01](TASK019_PHASE01.md) Schema Updates - **COMPLETED** on 2025-07-23 - Added sync columns to main tables

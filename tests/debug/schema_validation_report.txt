@@ -1,0 +1,72 @@
+================================================================================
+SCHEMA VALIDATION AUDIT REPORT - MILESTONE 5
+================================================================================
+Generated: 2025-06-22
+Purpose: Identify YAML mapping vs DDL mismatches
+
+📊 SUMMARY STATISTICS
+----------------------------------------
+Total DDL Fields: 267
+Total YAML Fields: 8
+Exact Matches: 8
+Match Percentage: 100.0%
+
+⚠️  DDL Fields Not Referenced in YAML
+----------------------------------------
+These fields exist in DDL but aren't mapped (may be intentional):
+  📋 '0'
+  📋 '0-3M'
+  📋 '0w'
+  📋 '10'
+  📋 '10w'
+  📋 '12'
+  📋 '12-18M'
+  📋 '12w'
+  📋 '14'
+  📋 '16'
+  📋 '18'
+  📋 '18-24M'
+  📋 '1X'
+  📋 '2'
+  📋 '2/3'
+  📋 '20'
+  📋 '22'
+  📋 '24'
+  📋 '26'
+  📋 '27'
+  ... and 239 more
+
+✅ SUCCESSFUL MATCHES
+----------------------------------------
+  ✅ 'AAG ORDER NUMBER'
+  ✅ 'AAG SEASON'
+  ✅ 'CUSTOMER ALT PO'
+  ✅ 'CUSTOMER NAME'
+  ✅ 'CUSTOMER SEASON'
+  ✅ 'CUSTOMER STYLE'
+  ✅ 'EX FACTORY DATE'
+  ✅ 'TOTAL QTY'
+
+📋 SAMPLE ACTUAL DDL FIELDS
+----------------------------------------
+  📋 '0'
+  📋 '0-3M'
+  📋 '0w'
+  📋 '10'
+  📋 '10w'
+  📋 '12'
+  📋 '12-18M'
+  📋 '12w'
+  📋 '14'
+  📋 '16'
+  📋 '18'
+  📋 '18-24M'
+  📋 '1X'
+  📋 '2'
+  📋 '2/3'
+
+💡 RECOMMENDATIONS
+----------------------------------------
+3. ✅ Create automated validation
+   - Run this audit as part of CI/CD pipeline
+   - Prevent future schema drift

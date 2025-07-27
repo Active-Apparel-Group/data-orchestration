@@ -62,16 +62,29 @@ class SQLTemplateEngine:
         
         self.logger.info(f"SQL template engine initialized with templates from: {template_dir}")
     
-    def get_template_context(self) -> Dict[str, Any]:
+    def get_template_context(self, use_dynamic_merge_columns: bool = False) -> Dict[str, Any]:
         """
         Get complete template context from TOML configuration
+        
+        Args:
+            use_dynamic_merge_columns: If True, use dynamic stored procedure detection for business columns
+                                     If False, use Monday.com mappings (default for sync operations)
         
         Returns:
             Dictionary with all template variables for SQL generation
         """
         # Get dynamic size columns from TOML
         size_columns = self.config.get_dynamic_size_columns()
-        business_columns = self.config.get_business_columns()
+        
+        # Choose column detection method based on operation type
+        if use_dynamic_merge_columns:
+            # For MERGE operations: Use stored procedure to get matching columns
+            business_columns = self.config.get_business_columns(use_dynamic_detection=True)
+            self.logger.info(f"🔧 Using dynamic merge columns for template context: {len(business_columns)} columns")
+        else:
+            # For Monday.com sync: Use Monday.com mappings (preserves existing behavior)
+            business_columns = self.config.get_business_columns(use_dynamic_detection=False)
+            self.logger.debug(f"📋 Using Monday.com business columns for template context: {len(business_columns)} columns")
         
         # Table names with proper schema
         source_table = self.config.get_full_table_name('source')
@@ -95,6 +108,9 @@ class SQLTemplateEngine:
             'size_columns': size_columns,
             'hash_columns': self.config.hash_columns,
             
+            # Template Control Flags
+            'use_dynamic_merge_columns': use_dynamic_merge_columns,  # NEW: Control template logic
+            
             # Metadata
             'environment': self.config.board_type,
             'database': self.config.database_connection,
@@ -108,17 +124,18 @@ class SQLTemplateEngine:
     def render_merge_headers_sql(self) -> str:
         """
         Render 003_merge_headers SQL from Jinja2 template
+        Uses dynamic column detection for accurate MERGE operations
         
         Returns:
             Generated SQL string for header merge operation
         """
         try:
             template = self.jinja_env.get_template('merge_headers.j2')
-            context = self.get_template_context()
+            context = self.get_template_context(use_dynamic_merge_columns=True)  # Enable dynamic detection
             
             sql = template.render(**context)
             
-            self.logger.info(f"✅ Rendered merge_headers SQL: {len(context['size_columns'])} size columns, {len(context['business_columns'])} business columns")
+            self.logger.info(f"✅ Rendered merge_headers SQL: {len(context['size_columns'])} size columns, {len(context['business_columns'])} business columns (dynamic)")
             
             return sql
             

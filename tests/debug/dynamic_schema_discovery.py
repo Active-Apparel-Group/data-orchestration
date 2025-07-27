@@ -1,0 +1,693 @@
+#!/usr/bin/env python3
+"""
+Dynamic Schema Discovery for ORDER_LIST Consolidation
+====================================================
+
+Systematically test every column in customer tables to:
+1. Infer correct SQL Server data types
+2. Test insertion with incremental row counts (100, 1000, 10000+)
+3. Handle TDS protocol errors and type conversion issues
+4. Build dynamic schema YAML configuration
+5. Log failures and type adjustments
+
+This replaces hardcoded canonical schemas with data-driven discovery.
+"""
+import sys
+from pathlib import Path
+import yaml
+import pandas as pd
+import numpy as np
+from datetime import datetime
+from typing import Dict, List, Any, Optional, Tuple
+import re
+import json
+
+# Add project root for imports
+def find_repo_root():
+    current = Path(__file__).parent
+    while current != current.parent:
+        if (current / "utils").exists():
+            return current
+        current = current.parent
+    raise FileNotFoundError("Could not find repository root")
+
+repo_root = find_repo_root()
+sys.path.insert(0, str(repo_root / "utils"))
+
+import db_helper as db
+import logger_helper
+
+class DynamicSchemaDiscovery:
+    """
+    Discover optimal SQL Server schema by testing actual data
+    """
+    
+    def __init__(self, output_file: str = "dynamic_schema_config.yaml"):
+        self.logger = logger_helper.get_logger(__name__)
+        self.output_file = output_file
+        self.schema_config = {
+            'discovery_metadata': {
+                'timestamp': datetime.now().isoformat(),
+                'version': '1.0.0',
+                'description': 'Dynamically discovered schema for ORDER_LIST consolidation'
+            },
+            'tables': {},
+            'global_schema': {},
+            'failed_columns': {},
+            'type_adjustments': {}
+        }
+        
+        # Test increments for row count testing
+        self.test_increments = [100, 1000, 5000, 10000]
+    def sanitize_sql_identifier(self, identifier: str) -> str:
+        """
+        Sanitize a string to be a valid SQL identifier
+        - Remove special characters
+        - Replace spaces with underscores
+        - Ensure it starts with a letter
+        """
+        import re
+        # Replace special characters and spaces with underscores
+        sanitized = re.sub(r'[^a-zA-Z0-9_]', '_', identifier)
+        
+        # Remove consecutive underscores
+        sanitized = re.sub(r'_+', '_', sanitized)
+        
+        # Ensure it starts with a letter or underscore
+        if sanitized and sanitized[0].isdigit():
+            sanitized = f'col_{sanitized}'
+        
+        # Remove trailing underscores
+        sanitized = sanitized.strip('_')
+        
+        # Ensure it's not empty
+        if not sanitized:
+            sanitized = 'unknown_column'
+        
+        return sanitized
+
+        
+    def discover_all_customer_tables(self) -> List[str]:
+        """Get all customer ORDER_LIST tables"""
+        query = """
+        SELECT TABLE_NAME 
+        FROM INFORMATION_SCHEMA.TABLES 
+        WHERE TABLE_SCHEMA = 'dbo' 
+        AND TABLE_NAME LIKE 'x%ORDER_LIST'
+        AND TABLE_NAME NOT LIKE 'swp_%'
+        ORDER BY TABLE_NAME
+        """
+        
+        with db.get_connection('orders') as conn:
+            df = pd.read_sql(query, conn)
+        
+        tables = df['TABLE_NAME'].tolist()
+        self.logger.info(f"Discovered {len(tables)} customer tables: {tables}")
+        return tables
+    
+    def get_table_columns(self, table_name: str) -> List[Dict[str, Any]]:
+        """Get all columns for a table with metadata"""
+        query = """
+        SELECT 
+            COLUMN_NAME,
+            DATA_TYPE,
+            CHARACTER_MAXIMUM_LENGTH,
+            NUMERIC_PRECISION,
+            NUMERIC_SCALE,
+            IS_NULLABLE
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = ?
+        ORDER BY ORDINAL_POSITION
+        """
+        
+        with db.get_connection('orders') as conn:
+            df = pd.read_sql(query, conn, params=[table_name])
+        
+        columns = []
+        for _, row in df.iterrows():
+            columns.append({
+                'name': row['COLUMN_NAME'],
+                'sql_type': row['DATA_TYPE'],
+                'max_length': row['CHARACTER_MAXIMUM_LENGTH'],
+                'precision': row['NUMERIC_PRECISION'],
+                'scale': row['NUMERIC_SCALE'],
+                'nullable': row['IS_NULLABLE'] == 'YES'
+            })
+        
+        return columns
+    
+    def infer_column_type(self, series: pd.Series) -> Dict[str, Any]:
+        """Infer optimal SQL Server type for a pandas Series"""
+        result = {
+            'pandas_dtype': str(series.dtype),
+            'null_count': series.isnull().sum(),
+            'total_count': len(series),
+            'null_percentage': (series.isnull().sum() / len(series)) * 100,
+            'sample_values': series.dropna().head(5).tolist(),
+            'recommended_sql_type': 'NVARCHAR(MAX)',  # Default fallback
+            'type_confidence': 'low'
+        }
+        
+        # Skip if all nulls
+        if series.isnull().all():
+            result['recommended_sql_type'] = 'NVARCHAR(255)'
+            result['type_confidence'] = 'null_only'
+            return result
+        
+        non_null_series = series.dropna()
+        
+        # Try to infer numeric types first
+        if self._is_numeric_column(non_null_series):
+            return self._infer_numeric_type(non_null_series, result)
+        
+        # Try datetime
+        if self._is_datetime_column(non_null_series):
+            return self._infer_datetime_type(non_null_series, result)
+        
+        # Default to string type
+        return self._infer_string_type(non_null_series, result)
+    
+    def _is_numeric_column(self, series: pd.Series) -> bool:
+        """Check if column can be converted to numeric (robust: handles string 'nan', blanks, etc.)"""
+        try:
+            # Remove actual NaN/nulls and also string 'nan', blanks, etc.
+            non_null_series = series.dropna()
+            # Remove string 'nan', empty string, whitespace-only
+            cleaned = non_null_series[~non_null_series.astype(str).str.lower().isin(['nan', '', 'none', 'null'])]
+            if len(cleaned) == 0:
+                return False
+            numeric_series = pd.to_numeric(cleaned.astype(str), errors='coerce')
+            if len(numeric_series.dropna()) == 0:
+                return False
+            success_rate = (len(numeric_series.dropna()) / len(cleaned)) * 100
+            # If 80% or more of the NON-NULL, NON-blank values are numeric, consider it numeric
+            return success_rate >= 80
+        except Exception as e:
+            self.logger.warning(f"_is_numeric_column error: {e}")
+            return False
+    
+    def _infer_numeric_type(self, series: pd.Series, result: Dict[str, Any]) -> Dict[str, Any]:
+        """Infer specific numeric SQL type (robust: handles string 'nan', blanks, etc.)"""
+        try:
+            # Remove actual NaN/nulls and also string 'nan', blanks, etc.
+            non_null_series = series.dropna()
+            cleaned = non_null_series[~non_null_series.astype(str).str.lower().isin(['nan', '', 'none', 'null'])]
+            numeric_series = pd.to_numeric(cleaned.astype(str), errors='coerce').dropna()
+            if len(numeric_series) == 0:
+                result['recommended_sql_type'] = 'INT'  # Default for size columns
+                result['type_confidence'] = 'fallback'
+                return result
+            result['numeric_stats'] = {
+                'min_value': float(numeric_series.min()),
+                'max_value': float(numeric_series.max()),
+                'non_null_count': len(numeric_series)
+            }
+            # Check if all values are integers
+            if (numeric_series % 1 == 0).all():
+                max_val = numeric_series.max()
+                min_val = numeric_series.min()
+                if min_val >= -2147483648 and max_val <= 2147483647:
+                    result['recommended_sql_type'] = 'INT'
+                    result['type_confidence'] = 'high'
+                else:
+                    result['recommended_sql_type'] = 'BIGINT'
+                    result['type_confidence'] = 'high'
+            else:
+                # Has decimals - calculate precision needed
+                max_decimal_places = 0
+                max_total_digits = 0
+                for val in numeric_series:
+                    if not pd.isna(val):
+                        str_val = str(val)
+                        if '.' in str_val:
+                            before_decimal, after_decimal = str_val.split('.')
+                            decimal_places = len(after_decimal.rstrip('0'))
+                            total_digits = len(before_decimal.lstrip('-')) + decimal_places
+                        else:
+                            decimal_places = 0
+                            total_digits = len(str_val.lstrip('-'))
+                        max_decimal_places = max(max_decimal_places, decimal_places)
+                        max_total_digits = max(max_total_digits, total_digits)
+                # Cap at SQL Server limits
+                max_total_digits = min(max_total_digits, 38)
+                max_decimal_places = min(max_decimal_places, 20)
+                if max_decimal_places <= 4 and max_total_digits <= 18:
+                    result['recommended_sql_type'] = f'DECIMAL({max_total_digits},{max_decimal_places})'
+                    result['type_confidence'] = 'medium'
+                else:
+                    result['recommended_sql_type'] = 'FLOAT'
+                    result['type_confidence'] = 'medium'
+            result['numeric_stats'] = {
+                'min_value': numeric_series.min(),
+                'max_value': numeric_series.max(),
+                'mean_value': numeric_series.mean()
+            }
+        except Exception as e:
+            self.logger.warning(f"Error inferring numeric type: {e}")
+            result['recommended_sql_type'] = 'FLOAT'
+            result['type_confidence'] = 'fallback'
+        return result
+    
+    def _is_datetime_column(self, series: pd.Series) -> bool:
+        """Check if column can be converted to datetime"""
+        try:
+            datetime_series = pd.to_datetime(series.astype(str), errors='coerce')
+            success_rate = (1 - datetime_series.isnull().sum() / len(series)) * 100
+            return success_rate >= 80
+        except:
+            return False
+    
+    def _infer_datetime_type(self, series: pd.Series, result: Dict[str, Any]) -> Dict[str, Any]:
+        """Infer datetime SQL type"""
+        try:
+            datetime_series = pd.to_datetime(series.astype(str), errors='coerce').dropna()
+            
+            if len(datetime_series) == 0:
+                result['recommended_sql_type'] = 'DATETIME2'
+                return result
+            
+            # Check if all values are dates only (no time component)
+            has_time = any(dt.time() != datetime.min.time() for dt in datetime_series)
+            
+            if has_time:
+                result['recommended_sql_type'] = 'DATETIME2'
+            else:
+                result['recommended_sql_type'] = 'DATE'
+            
+            result['type_confidence'] = 'high'
+            result['datetime_stats'] = {
+                'min_date': datetime_series.min().isoformat(),
+                'max_date': datetime_series.max().isoformat(),
+                'has_time_component': has_time
+            }
+            
+        except Exception as e:
+            self.logger.warning(f"Error inferring datetime type: {e}")
+            result['recommended_sql_type'] = 'DATETIME2'
+            result['type_confidence'] = 'fallback'
+        
+        return result
+    
+    def _infer_string_type(self, series: pd.Series, result: Dict[str, Any]) -> Dict[str, Any]:
+        """Infer string SQL type"""
+        try:
+            string_series = series.astype(str)
+            max_length = string_series.str.len().max()
+            avg_length = string_series.str.len().mean()
+            
+            # Suggest appropriate VARCHAR size
+            if max_length <= 50:
+                suggested_length = 100
+            elif max_length <= 255:
+                suggested_length = 255
+            elif max_length <= 500:
+                suggested_length = 500
+            elif max_length <= 1000:
+                suggested_length = 1000
+            else:
+                suggested_length = None  # Use MAX
+            
+            if suggested_length:
+                result['recommended_sql_type'] = f'NVARCHAR({suggested_length})'
+            else:
+                result['recommended_sql_type'] = 'NVARCHAR(MAX)'
+            
+            result['type_confidence'] = 'medium'
+            result['string_stats'] = {
+                'max_length': max_length,
+                'avg_length': round(avg_length, 2),
+                'suggested_length': suggested_length
+            }
+            
+        except Exception as e:
+            self.logger.warning(f"Error inferring string type: {e}")
+            result['recommended_sql_type'] = 'NVARCHAR(MAX)'
+            result['type_confidence'] = 'fallback'
+        
+        return result
+    
+    def test_column_insertion(self, table_name: str, column_name: str, 
+                             sql_type: str, test_sizes: List[int]) -> Dict[str, Any]:
+        """Test inserting column data with different row counts"""
+        test_results = {
+            'column_name': column_name,
+            'sql_type': sql_type,
+            'test_results': {},
+            'final_status': 'unknown',
+            'errors': []
+        }
+        
+        for size in test_sizes:
+            self.logger.info(f"Testing {table_name}.{column_name} with {size} rows")
+            
+            try:
+                # Get sample data
+                query = f"SELECT TOP {size} [{column_name}] FROM [dbo].[{table_name}]"
+                
+                with db.get_connection('orders') as conn:
+                    df = pd.read_sql(query, conn)
+                
+                # Try to convert to SQL-compatible format
+                series = df[column_name]
+                converted_series = self._convert_series_for_sql(series, sql_type)
+                
+                # Create test table and insert
+                test_table_name = f'test_{self.sanitize_sql_identifier(column_name)}_{size}'
+                success = self._test_insert_to_temp_table(test_table_name, column_name, 
+                                                        sql_type, converted_series)
+                
+                test_results['test_results'][size] = {
+                    'success': success,
+                    'rows_tested': len(df),
+                    'null_count': series.isnull().sum()
+                }
+                
+                if not success:
+                    test_results['errors'].append(f"Failed at {size} rows")
+                    break
+                    
+            except Exception as e:
+                error_msg = str(e)
+                self.logger.error(f"Test failed for {column_name} at {size} rows: {error_msg}")
+                test_results['test_results'][size] = {
+                    'success': False,
+                    'error': error_msg
+                }
+                test_results['errors'].append(f"Exception at {size} rows: {error_msg}")
+                break
+        
+        # Determine final status
+        successful_tests = [r for r in test_results['test_results'].values() if r.get('success', False)]
+        if successful_tests:
+            max_successful_size = max([size for size, result in test_results['test_results'].items() 
+                                     if result.get('success', False)])
+            test_results['final_status'] = f'success_up_to_{max_successful_size}'
+        else:
+            test_results['final_status'] = 'failed_all_tests'
+        
+        return test_results
+    
+    def _convert_series_for_sql(self, series: pd.Series, sql_type: str) -> pd.Series:
+        """Convert pandas series to SQL-compatible format"""
+        if 'INT' in sql_type.upper():
+            return pd.to_numeric(series, errors='coerce').fillna(None).astype(object)
+        elif 'DECIMAL' in sql_type.upper() or 'FLOAT' in sql_type.upper():
+            numeric_series = pd.to_numeric(series, errors='coerce')
+            # Convert numpy NaN to None for SQL compatibility
+            return numeric_series.where(pd.notna(numeric_series), None)
+        elif 'DATE' in sql_type.upper():
+            return pd.to_datetime(series, errors='coerce').dt.date.where(pd.notna(series), None)
+        else:
+            # String type
+            return series.astype(str).where(pd.notna(series) & (series != ''), None)
+    
+    def _test_insert_to_temp_table(self, table_name: str, column_name: str, 
+                                  sql_type: str, data: pd.Series) -> bool:
+        """Create temp table and test insertion"""
+        try:
+            with db.get_connection('orders') as conn:
+                cursor = conn.cursor()
+                
+                # Drop table if exists
+                cursor.execute(f"IF OBJECT_ID('tempdb..#{table_name}') IS NOT NULL DROP TABLE #{table_name}")
+                
+                # Create temp table
+                create_sql = f"CREATE TABLE #{table_name} ([{column_name}] {sql_type})"
+                cursor.execute(create_sql)
+                
+                # Insert data
+                insert_sql = f"INSERT INTO #{table_name} ([{column_name}]) VALUES (?)"
+                
+                for value in data:
+                    cursor.execute(insert_sql, (value,))
+                
+                conn.commit()
+                
+                # Drop temp table
+                cursor.execute(f"DROP TABLE #{table_name}")
+                
+                return True
+                
+        except Exception as e:
+            self.logger.error(f"Insert test failed: {e}")
+            return False
+    
+    def analyze_table(self, table_name: str) -> Dict[str, Any]:
+        """Analyze a complete table and build schema"""
+        self.logger.info(f"Analyzing table: {table_name}")
+        
+        table_config = {
+            'table_name': table_name,
+            'analysis_timestamp': datetime.now().isoformat(),
+            'columns': {},
+            'summary': {
+                'total_columns': 0,
+                'successful_columns': 0,
+                'failed_columns': 0,
+                'needs_review': 0,
+                'skipped_empty': 0
+            }
+        }
+        
+        # Get all columns
+        columns = self.get_table_columns(table_name)
+        table_config['summary']['total_columns'] = len(columns)
+        
+        for column_info in columns:
+            column_name = column_info['name']
+            self.logger.info(f"Analyzing column: {table_name}.{column_name}")
+            
+            try:
+                # FAST PRE-CHECK: Get sample data for analysis
+                sample_query = f"SELECT TOP 1000 [{column_name}] FROM [dbo].[{table_name}]"
+                
+                with db.get_connection('orders') as conn:
+                    df = pd.read_sql(sample_query, conn)
+                
+                series = df[column_name]
+                
+                # QUICK SKIP CHECK: Skip if column is effectively empty
+                if self._should_skip_column(series, column_name):
+                    table_config['columns'][column_name] = {
+                        'skipped': True,
+                        'reason': 'Column effectively empty or all nulls',
+                        'final_recommendation': 'EXCLUDE_FROM_SCHEMA'
+                    }
+                    table_config['summary']['skipped_empty'] += 1
+                    self.logger.info(f"SKIPPED {column_name} - effectively empty")
+                    continue
+                
+                # Infer type
+                type_analysis = self.infer_column_type(series)
+                
+                # Test insertion with incremental sizes - but start small for speed
+                test_results = self.test_column_insertion(
+                    table_name, column_name, 
+                    type_analysis['recommended_sql_type'], 
+                    [100]  # Start with just 100 rows for speed
+                )
+                
+                # Store complete analysis
+                table_config['columns'][column_name] = {
+                    'original_sql_info': column_info,
+                    'type_analysis': type_analysis,
+                    'insertion_tests': test_results,
+                    'final_recommendation': self._make_final_recommendation(type_analysis, test_results)
+                }
+                
+                # Update summary
+                if test_results['final_status'].startswith('success'):
+                    table_config['summary']['successful_columns'] += 1
+                elif 'failed' in test_results['final_status']:
+                    table_config['summary']['failed_columns'] += 1
+                else:
+                    table_config['summary']['needs_review'] += 1
+                    
+            except Exception as e:
+                self.logger.error(f"Failed to analyze {table_name}.{column_name}: {e}")
+                table_config['columns'][column_name] = {
+                    'error': str(e),
+                    'final_recommendation': 'EXCLUDE_FROM_SCHEMA'
+                }
+                table_config['summary']['failed_columns'] += 1
+        
+        return table_config
+    
+    def _should_skip_column(self, series: pd.Series, column_name: str) -> bool:
+        """Fast check to skip columns that are effectively empty"""
+        # Skip if all nulls
+        if series.isnull().all():
+            return True
+        
+        # Skip if >95% nulls
+        null_percentage = (series.isnull().sum() / len(series)) * 100
+        if null_percentage > 95:
+            return True
+        
+        # Skip if all empty strings after converting to string
+        non_null_values = series.dropna().astype(str).str.strip()
+        if (non_null_values == '').all():
+            return True
+        
+        # Skip if fewer than 10 actual values
+        valid_values = non_null_values[non_null_values != '']
+        if len(valid_values) < 10:
+            return True
+        
+        return False
+    
+    def _make_final_recommendation(self, type_analysis: Dict[str, Any], 
+                                  test_results: Dict[str, Any]) -> Dict[str, Any]:
+        """Make final recommendation for column"""
+        recommendation = {
+            'include_in_schema': True,
+            'sql_type': type_analysis['recommended_sql_type'],
+            'confidence': type_analysis['type_confidence'],
+            'notes': []
+        }
+        
+        # Check test results
+        if test_results['final_status'] == 'failed_all_tests':
+            recommendation['include_in_schema'] = False
+            recommendation['notes'].append('Failed all insertion tests')
+        elif 'TDS' in str(test_results.get('errors', [])):
+            # TDS protocol error - try FLOAT instead of DECIMAL
+            if 'DECIMAL' in recommendation['sql_type']:
+                recommendation['sql_type'] = 'FLOAT'
+                recommendation['notes'].append('Changed DECIMAL to FLOAT due to TDS protocol issues')
+        
+        # High null percentage
+        if type_analysis['null_percentage'] > 90:
+            recommendation['notes'].append(f"High null percentage: {type_analysis['null_percentage']:.1f}%")
+        
+        # Low confidence
+        if type_analysis['type_confidence'] in ['low', 'fallback']:
+            recommendation['notes'].append('Low confidence in type inference')
+        
+        return recommendation
+    
+    def run_full_discovery(self) -> str:
+        """Run discovery on all customer tables"""
+        self.logger.info("Starting full schema discovery")
+        
+        tables = self.discover_all_customer_tables()
+        
+        for table_name in tables:
+            try:
+                table_config = self.analyze_table(table_name)
+                self.schema_config['tables'][table_name] = table_config
+                
+                # Update global schema with successful columns
+                for col_name, col_config in table_config['columns'].items():
+                    final_rec = col_config.get('final_recommendation', {})
+                    if final_rec.get('include_in_schema', False):
+                        sql_type = final_rec['sql_type']
+                        
+                        # Add to global schema or update if better
+                        if col_name not in self.schema_config['global_schema']:
+                            self.schema_config['global_schema'][col_name] = sql_type
+                        else:
+                            # Logic to choose best type if conflict
+                            existing_type = self.schema_config['global_schema'][col_name]
+                            self.schema_config['global_schema'][col_name] = self._resolve_type_conflict(
+                                existing_type, sql_type, col_name
+                            )
+                
+            except Exception as e:
+                self.logger.error(f"Failed to analyze table {table_name}: {e}")
+                self.schema_config['failed_columns'][table_name] = str(e)
+        
+        # Save results
+        output_path = Path(self.output_file)
+        with open(output_path, 'w') as f:
+            yaml.dump(self.schema_config, f, default_flow_style=False, sort_keys=False)
+        
+        self.logger.info(f"Schema discovery complete. Results saved to: {output_path}")
+        self._print_summary()
+        
+        return str(output_path)
+    
+    def _resolve_type_conflict(self, type1: str, type2: str, column_name: str) -> str:
+        """Resolve conflicts when same column has different types across tables"""
+        # Simple resolution - prefer more permissive type
+        type_hierarchy = {
+            'NVARCHAR(MAX)': 1000,
+            'NVARCHAR': 500,
+            'FLOAT': 300,
+            'DECIMAL': 200,
+            'BIGINT': 150,
+            'INT': 100,
+            'DATE': 80,
+            'DATETIME2': 90
+        }
+        
+        score1 = max([score for pattern, score in type_hierarchy.items() if pattern in type1], default=0)
+        score2 = max([score for pattern, score in type_hierarchy.items() if pattern in type2], default=0)
+        
+        chosen_type = type1 if score1 >= score2 else type2
+        
+        if type1 != type2:
+            if column_name not in self.schema_config['type_adjustments']:
+                self.schema_config['type_adjustments'][column_name] = []
+            self.schema_config['type_adjustments'][column_name].append({
+                'conflict': f'{type1} vs {type2}',
+                'chosen': chosen_type,
+                'timestamp': datetime.now().isoformat()
+            })
+        
+        return chosen_type
+    
+    def _print_summary(self):
+        """Print summary of discovery results"""
+        print("\n" + "="*80)
+        print("DYNAMIC SCHEMA DISCOVERY SUMMARY")
+        print("="*80)
+        
+        total_tables = len(self.schema_config['tables'])
+        total_global_columns = len(self.schema_config['global_schema'])
+        total_failed = len(self.schema_config['failed_columns'])
+        total_conflicts = len(self.schema_config['type_adjustments'])
+        
+        print(f"Tables Analyzed: {total_tables}")
+        print(f"Global Schema Columns: {total_global_columns}")
+        print(f"Failed Tables: {total_failed}")
+        print(f"Type Conflicts Resolved: {total_conflicts}")
+        
+        print(f"\nResults saved to: {self.output_file}")
+        print("="*80)
+
+def main():
+    """Run dynamic schema discovery on single table for testing"""
+    discovery = DynamicSchemaDiscovery("dynamic_schema_config.yaml")
+    
+    # Test with just one table first
+    test_table = "xGREYSON_ORDER_LIST"
+    discovery.logger.info(f"Testing schema discovery with single table: {test_table}")
+    
+    try:
+        table_config = discovery.analyze_table(test_table)
+        discovery.schema_config['tables'][test_table] = table_config
+        
+        # Update global schema with successful columns
+        for col_name, col_config in table_config['columns'].items():
+            final_rec = col_config.get('final_recommendation', {})
+            if final_rec.get('include_in_schema', False):
+                sql_type = final_rec['sql_type']
+                discovery.schema_config['global_schema'][col_name] = sql_type
+        
+        # Save results
+        output_path = Path(discovery.output_file)
+        with open(output_path, 'w') as f:
+            yaml.dump(discovery.schema_config, f, default_flow_style=False, sort_keys=False)
+        
+        discovery.logger.info(f"Single table analysis complete. Results saved to: {output_path}")
+        discovery._print_summary()
+        
+        print(f"\nSingle table schema discovery complete! Check: {output_path}")
+        
+    except Exception as e:
+        discovery.logger.error(f"Failed to analyze table {test_table}: {e}")
+        print(f"Error analyzing {test_table}: {e}")
+
+if __name__ == "__main__":
+    main()

@@ -16,6 +16,7 @@ GO
 
 -- Add sync tracking columns to ORDER_LIST_V2
 ALTER TABLE [dbo].[ORDER_LIST] ADD
+    [item_name] nvarchar(1000) NULL,       -- Monday.com item name
     --[sync_pending_at] DATETIME2(7) NULL,     -- Timestamp when sync was marked as pending
     [group_name] NVARCHAR(255) NULL,  -- Monday.com group name for item
     [group_id] NVARCHAR(128) NULL,      -- Monday.com group ID
@@ -30,6 +31,8 @@ ALTER TABLE [dbo].[ORDER_LIST] ADD
     --[updated_at] DATETIME2(7) NULL DEFAULT GETUTCDATE(),  -- Record update timestamp
     --[row_hash] CHAR(64) NULL                     -- Row hash for change detection
 GO
+
+
 
 -- Create index for efficient pending sync querying
 CREATE INDEX [IX_ORDER_LIST_V2_sync_pending_at] ON [dbo].[ORDER_LIST] ([sync_pending_at]) 

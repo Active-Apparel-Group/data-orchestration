@@ -1,4 +1,4 @@
--- ================================================================
+
 -- merge_headers.j2 - V2 Header Merge Template (Jinja2) - Main Tables Only
 -- ================================================================
 -- Purpose: MERGE {{ source_table }} to {{ target_table }} with direct sync tracking
@@ -25,12 +25,14 @@ BEGIN TRY
         SELECT 
             record_uuid,
             [AAG ORDER NUMBER],
-            {% for column in business_columns if column != 'AAG ORDER NUMBER' -%}
+            {% for column in business_columns if column not in ['AAG ORDER NUMBER', 'record_uuid', 'row_hash', 'sync_state', 'created_at', 'updated_at', 'action_type', 'sync_attempted_at', 'sync_completed_at', 'sync_error_message', 'retry_count', 'monday_item_id'] -%}
             [{{ column }}],
             {% endfor -%}
+            {% if not use_dynamic_merge_columns -%}
             {% for size in size_columns -%}
             [{{ size }}],
             {% endfor -%}
+            {% endif -%}
             row_hash,
             sync_state,
             created_at,
@@ -46,12 +48,14 @@ BEGIN TRY
         INSERT (
             record_uuid,
             [AAG ORDER NUMBER],
-            {% for column in business_columns if column != 'AAG ORDER NUMBER' -%}
+            {% for column in business_columns if column not in ['AAG ORDER NUMBER', 'record_uuid', 'row_hash', 'sync_state', 'created_at', 'updated_at', 'action_type', 'sync_attempted_at', 'sync_completed_at', 'sync_error_message', 'retry_count', 'monday_item_id'] -%}
             [{{ column }}],
             {% endfor -%}
+            {% if not use_dynamic_merge_columns -%}
             {% for size in size_columns -%}
             [{{ size }}],
             {% endfor -%}
+            {% endif -%}
             row_hash,
             action_type,
             sync_state,
@@ -62,12 +66,14 @@ BEGIN TRY
         VALUES (
             source.record_uuid,
             source.[AAG ORDER NUMBER],
-            {% for column in business_columns if column != 'AAG ORDER NUMBER' -%}
+            {% for column in business_columns if column not in ['AAG ORDER NUMBER', 'record_uuid', 'row_hash', 'sync_state', 'created_at', 'updated_at', 'action_type', 'sync_attempted_at', 'sync_completed_at', 'sync_error_message', 'retry_count', 'monday_item_id'] -%}
             source.[{{ column }}],
             {% endfor -%}
+            {% if not use_dynamic_merge_columns -%}
             {% for size in size_columns -%}
             source.[{{ size }}],
             {% endfor -%}
+            {% endif -%}
             source.row_hash,
             'INSERT',
             'PENDING',
@@ -79,12 +85,14 @@ BEGIN TRY
     -- UPDATE: Changed records (hybrid hash logic) - Supports NULL hash for NEW records
     WHEN MATCHED AND (target.row_hash IS NULL OR target.row_hash <> source.row_hash) THEN
         UPDATE SET
-            {% for column in business_columns if column != 'AAG ORDER NUMBER' -%}
+            {% for column in business_columns if column not in ['AAG ORDER NUMBER', 'record_uuid', 'row_hash', 'sync_state', 'created_at', 'updated_at', 'action_type', 'sync_attempted_at', 'sync_completed_at', 'sync_error_message', 'retry_count', 'monday_item_id'] -%}
             [{{ column }}] = source.[{{ column }}],
             {% endfor -%}
+            {% if not use_dynamic_merge_columns -%}
             {% for size in size_columns -%}
             [{{ size }}] = source.[{{ size }}],
             {% endfor -%}
+            {% endif -%}
             row_hash = source.row_hash,
             -- Direct sync state management (no intermediate tables)
             action_type = 'UPDATE',

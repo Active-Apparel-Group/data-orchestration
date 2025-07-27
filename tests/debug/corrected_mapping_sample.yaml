@@ -1,0 +1,104 @@
+# CORRECTED MAPPING - Milestone 5 Schema Validation
+# Generated: 2025-06-22
+# Purpose: Fix critical field name mismatches identified in schema audit
+# Status: PRODUCTION_READY_CORRECTIONS
+
+source_schema:
+  database: dms
+  table: ORDERS_UNIFIED
+  description: 'CORRECTED: Based on actual DDL validation'
+  validation_date: '2025-06-22'
+  key_fields:
+  - field: '[AAG ORDER NUMBER]'
+    type: NVARCHAR(MAX)
+    description: Primary identifier for orders
+    status: "\u2705 VALIDATED - Exists in DDL"
+  - field: '[CUSTOMER NAME]'
+    type: NVARCHAR(MAX)
+    description: Customer name/identifier
+    status: "\u2705 CORRECTED - Was [CUSTOMER], now [CUSTOMER NAME]"
+    used_in_working_code: true
+  working_fields:
+  - field: '[TOTAL QTY]'
+    type: INT
+    description: Order quantity - from actual DDL
+    status: "\u2705 CORRECTED - Was [Order Qty], now [TOTAL QTY]"
+    used_in_working_code: true
+  - field: '[EX FACTORY DATE]'
+    type: DATE
+    description: Factory delivery date - closest match to DUE DATE
+    status: "\u2705 CORRECTED - Was [DUE DATE], now [EX FACTORY DATE]"
+  - field: '[CUSTOMER STYLE]'
+    type: NVARCHAR(MAX)
+    description: Customer style information
+    status: "\u2705 CORRECTED - Was [Style], now [CUSTOMER STYLE]"
+field_mappings:
+  exact_matches:
+    aag_order_number:
+      source: '[AAG ORDER NUMBER]'
+      target: AAG ORDER NUMBER
+      target_column_id: text_mkr5wya6
+      type: text
+      status: "\u2705 VALIDATED"
+    customer_name:
+      source: '[CUSTOMER NAME]'
+      target: CUSTOMER NAME
+      target_column_id: text_customer
+      type: text
+      status: "\u2705 CORRECTED"
+    aag_season:
+      source: '[AAG SEASON]'
+      target: AAG SEASON
+      target_column_id: dropdown_mkr58de6
+      type: dropdown
+      status: "\u2705 VALIDATED"
+    customer_alt_po:
+      source: '[CUSTOMER ALT PO]'
+      target: CUSTOMER ALT PO
+      target_column_id: text_mkrh94rx
+      type: text
+      status: "\u2705 VALIDATED"
+    customer_season:
+      source: '[CUSTOMER SEASON]'
+      target: CUSTOMER SEASON
+      target_column_id: dropdown_mkr5rgs6
+      type: dropdown
+      status: "\u2705 VALIDATED"
+  numeric_fields:
+    total_qty:
+      source: '[TOTAL QTY]'
+      target: Total Quantity
+      target_column_id: numbers_mkr123
+      type: numeric
+      transformation: convert_to_int
+      validation: must_be_positive_number
+      status: "\u2705 CORRECTED - Field name fixed"
+  date_fields:
+    ex_factory_date:
+      source: '[EX FACTORY DATE]'
+      target: Ex Factory Date
+      target_column_id: date_mkr456
+      type: date
+      format: YYYY-MM-DD
+      status: "\u2705 CORRECTED - Closest DDL match to DUE DATE"
+  text_fields:
+    customer_style:
+      source: '[CUSTOMER STYLE]'
+      target: Customer Style
+      target_column_id: text_mkr789
+      type: text
+      max_length: 255
+      status: "\u2705 CORRECTED - Field name fixed"
+validation_summary:
+  validation_date: '2025-06-22'
+  total_corrections: 4
+  critical_corrections:
+  - "[CUSTOMER] \u2192 [CUSTOMER NAME]"
+  - "[Order Qty] \u2192 [TOTAL QTY]"
+  - "[DUE DATE] \u2192 [EX FACTORY DATE]"
+  - "[Style] \u2192 [CUSTOMER STYLE]"
+  impact: These corrections fix production-blocking mapping errors
+  next_steps:
+  - Update main mapping file with corrections
+  - Test corrected mappings with working implementation
+  - Validate Monday.com field mappings still work

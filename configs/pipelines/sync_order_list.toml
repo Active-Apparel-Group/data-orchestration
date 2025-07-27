@@ -27,13 +27,31 @@ sync_architecture = "docs/runbooks/sync_engine_toml_configuration.md"    # TOML 
 ddl_extraction = "tools/extract_ddl.py"                                 # DDL extraction utility
 
 [phase]
-# Track implementation progress - ARCHITECTURAL SIMPLIFICATION APPLIED
-current = "phase5b_simplified_architecture"     # Eliminated swp_ORDER_LIST_LINES staging table
-description = "2-template flow with direct MERGE operations"
-architecture_change = "Eliminated staging table, direct ORDER_LIST_V2 → ORDER_LIST_LINES flow"
-start_date = "2025-07-19"
-target_completion = "2025-07-23"
-simplification_date = "2025-07-23"
+# Track implementation progress - TASK 19.15.3 IMPLEMENTATION
+current = "phase5b_group_item_transformation"     # Group creation and item name transformation
+description = "Enhanced MergeOrchestrator with dynamic transformers"
+architecture_change = "Added GroupNameTransformer, ItemNameTransformer, GroupCreationManager"
+start_date = "2025-07-27"
+target_completion = "2025-07-29"
+transformation_date = "2025-07-27"
+
+# ENHANCED TRANSFORMATIONS - TASK 19.15.3
+# ========================================
+
+[database.group_name_transformation]
+enabled = true
+primary_columns = ["CUSTOMER NAME", "CUSTOMER SEASON"]
+fallback_columns = ["CUSTOMER NAME", "AAG SEASON"]
+separator = " "
+target_column = "group_name"
+fallback_value = "check"
+
+[database.item_name_transformation]
+enabled = true
+columns = ["CUSTOMER STYLE", "CUSTOMER COLOUR DESCRIPTION", "AAG ORDER NUMBER"]
+separator = ""  # Direct concatenation
+target_column = "item_name"
+null_handling = "skip_with_separator"
 
 # ENVIRONMENT CONFIGURATION - Production Ready Structure
 # =====================================================
@@ -63,7 +81,10 @@ essential_columns = [
     "CUSTOMER NAME",                    # Customer identification
     "PO NUMBER",                        # Purchase order reference
     "CUSTOMER STYLE",                   # Product identification  
-    "TOTAL QTY"                         # Quantity summary
+    "TOTAL QTY",                         # Quantity summary
+    "group_name",                        # Group name
+    "group_id",                          # Group ID
+    "item_name"                          # Item name
 ]
 
 # Sync tracking columns (Enhanced with Task 19.1-19.2 additions)
@@ -137,6 +158,19 @@ create_groups = true                    # Auto-create customer groups
 environment = "production"
 metadata_path = "configs/boards/board_9200517329_metadata.json"
 metadata_subitems_path = "configs/boards/board_9200771505_metadata.json"
+
+# GROUP CREATION & RATE LIMITING CONFIGURATION
+# ============================================
+
+[monday.groups]
+auto_create = true                      # Enable automatic group creation
+batch_creation = true                   # Use batch creation for efficiency
+
+[monday.rate_limits]
+group_batch_size = 5                    # Groups per batch (Monday.com API limit)
+delay_between_batches = 2.0             # Seconds between batch requests
+max_concurrent_batches = 1              # Serialize batch operations
+request_timeout = 30.0                  # API request timeout
 
 # ENVIRONMENT-SPECIFIC MONDAY.COM CONFIGURATION
 # ===============================================
@@ -286,80 +320,67 @@ wait_for_completion = true              # Wait for group creation to complete be
 # Column mapping - ORDER_LIST headers to Monday items (PRODUCTION BOARD: 9200517329)
 [monday.column_mapping.production.headers]
 # === Core Order Information ===
-"AAG ORDER NUMBER" = "text_mkp6sfqv"        # AAG ORDER NUMBER
-"CUSTOMER" = "dropdown_mkp4ar5n"            # CUSTOMER (note: different from dev)
-"BULK PO" = "text_mkp43qv0"                 # BULK PO
-"BULK PO QTY" = "numeric_mkp4cb6t"          # BULK PO QTY
-"ORDER RECEIVED DATE" = "date_mkpcevxt"     # ORDER RECEIVED DATE (note: different from dev)
-"ORDER TYPE" = "dropdown_mkpc7ey8"          # ORDER TYPE
+"AAG ORDER NUMBER"         = "text_mkr5wya6"    # text - AAG ORDER NUMBER
+"PO NUMBER"                = "text_mkr5ej2x"    # text - PO NUMBER
+"CUSTOMER NAME"            = "dropdown_mkr542p2" # dropdown - CUSTOMER
+"CUSTOMER ALT PO"          = "text_mkrh94rx"    # text - CUSTOMER ALT PO
+"ORDER DATE PO RECEIVED"   = "date_mkr5zp5"     # date - ORDER DATE PO RECEIVED
+"ORDER TYPE"               = "dropdown_mkr518fc" # dropdown - ORDER TYPE
 
 # === Product Details ===
-"STYLE CODE" = "text_mkp4w7tj"              # STYLE CODE
-"STYLE DESCRIPTION" = "long_text_mkpervye"  # STYLE DESCRIPTION
-"Color" = "text_mkp41ze2"                   # Color (note: lowercase 'c')
+"CUSTOMER COLOUR DESCRIPTION" = "dropdown_mkr5677f" # dropdown - COLOR
+"CUSTOMER STYLE"              = "dropdown_mkr5tgaa" # dropdown - STYLE
+"PATTERN ID"                  = "text_mkr5cz8m"     # text - PATTERN ID
+"STYLE DESCRIPTION"           = "long_text_mkr5p0cf" # long_text - STYLE DESCRIPTION
+"NOTES"                       = "long_text_mkr5hass" # long_text - NOTES
+"UNIT OF MEASURE"             = "color_mkr5yf27"     # status - UNIT OF MEASURE
+"ALIAS/RELATED ITEM"          = "text_mkrhra2c"      # text - ALIAS RELATED ITEM
 
-# === Season and Classification ===
-"SEASON" = "text_mkp47g7m"                  # SEASON
-"CUSTOMER SEASON" = "dropdown_mkp4kmtp"     # CUSTOMER SEASON
-"DROP" = "dropdown_mkpcj4ev"                # DROP
-"ACTIVE/WOVEN/SWIM/ACC/SEAMLESS" = "dropdown_mkp44k77" # Product classification
-"STYLE CATEGORY" = "dropdown_mkp4yr3v"      # STYLE CATEGORY
-"PRODUCT CAT" = "dropdown_mkpbbtkh"         # PRODUCT CAT
+# === Season and Planning ===
+"AAG SEASON"              = "dropdown_mkr58de6"  # dropdown - AAG SEASON
+"CATEGORY"                = "dropdown_mkr5s5n3"  # dropdown - CATEGORY
+"CUSTOMER SEASON"         = "dropdown_mkr5rgs6"  # dropdown - CUSTOMER SEASON
+"DROP"                    = "dropdown_mkr5w5e"   # dropdown - DROP
+"RANGE / COLLECTION"      = "long_text_mks0vs1p" # long_text - RANGE / COLLECTION
 
-# === Product Technical Details ===
-"Fabric Code" = "dropdown_mkp41kzc"         # Fabric Code
-"Fabric Type" = "dropdown_mkp4n679"         # Fabric Type
-"Fabric Lead Time" = "text_mkp4vncc"        # Fabric Lead Time
-"Fabric COO" = "text_mkp4wp81"              # Fabric COO
+# === Dates and Timelines ===
+"DELIVERY TERMS"             = "dropdown_mkr5kk5"   # dropdown - DELIVERY TERMS
+"DESTINATION WAREHOUSE"      = "text_mkr5ps35"      # text - DESTINATION WAREHOUSE
+"PLANNED DELIVERY METHOD"    = "text_mkr5wcpw"      # text - PLANNED DELIVERY METHOD
+"ETA CUSTOMER WAREHOUSE DATE"= "dropdown_mkr542p2"  # dropdown - CUSTOMER
+"EX FACTORY DATE"            = "date_mkr57811"      # date - CUSTOMER EX FACTORY DATE
+"Warehouse"                  = "text_mkr5ps35"      # text - DESTINATION WAREHOUSE
 
-# === Quantities and Production ===
-"CMP LS" = "numeric_mkp46xhm"               # CMP LS
-"CMP Partner" = "numeric_mkp6j2y1"          # CMP Partner
-"RM Freight Est." = "numeric_mkp4y0pe"      # RM Freight Est.
-"FOB (Partner)" = "numeric_mkp4rfg6"        # FOB (Partner)
-"Customer FOB (USD)" = "numeric_mkp4q1rv"   # Customer FOB (USD)
+# === Pricing and Financials ===
+"ADMINISTRATION FEE"     = "numeric_mkr5k68"    # numbers - ADMINISTRATION FEE
+"CUSTOMER PRICE"         = "numeric_mkr5cact"   # numbers - CUSTOMER PRICE
+"DDP US (USD)"           = "numeric_mkr5js0x"   # numbers - DDP US (USD)
+"DESIGN FEE"             = "numeric_mkr5h612"   # numbers - DESIGN FEE
+"DISCOUNT"               = "numeric_mkr56xx8"   # numbers - DISCOUNT
+"EX WORKS (USD)"         = "numeric_mkr5erhv"   # numbers - EX WORKS (USD)
+"FINAL FOB (USD)"        = "numeric_mkr5nhr7"   # numbers - FINAL FOB (USD)
+"FINAL PRICES Y/N"       = "text_mkr5ptvg"      # text - FINAL PRICES Y/N
+"FX CHARGE"              = "numeric_mkr5gp6a"   # numbers - FX CHARGE
+"NOTES FOR PRICE"        = "long_text_mkr5znxn" # long_text - NOTES FOR PRICE
+"SMS PRICE USD"          = "numeric_mkr58nvp"   # numbers - SMS PRICE USD
+"SURCHARGE FEE"          = "numeric_mkr57cem"   # numbers - SURCHARGE FEE
+"US DUTY"                = "numeric_mkr5ev2q"   # numbers - US DUTY
+"US DUTY RATE"           = "numeric_mkr5r6at"   # numbers - US DUTY RATE
+"US TARIFF"              = "numeric_mkr51ndy"   # numbers - US TARIFF
+"US TARIFF RATE"         = "numeric_mkr55zg1"   # numbers - US TARIFF RATE
 
-# === Key Dates ===
-"ETA CUSTOMER WAREHOUSE DATE" = "date_mkp44k3t" # ETA CUSTOMER WAREHOUSE DATE
-"FABRIC DUE INTO LONGSON" = "date_mkp4vtz2" # FABRIC DUE INTO LONGSON
-"PC RM Ex-Factory Date" = "date_mkp57jk5"   # PC RM Ex-Factory Date
-"EX-FTY DATE (Original)" = "date_mkp44ntk"  # EX-FTY DATE (Original)
-"EX-FTY (Revised LS)" = "date_mkp4rbd7"     # EX-FTY (Revised LS)
-"EX-FTY (Partner PO)" = "date_mkp5qmw6"     # EX-FTY (Partner PO)
+# === Shipping and Logistics ===
+"DESTINATION"            = "text_mkr5kbc6"      # text - DESTINATION
+"FREIGHT"                = "numeric_mksfr0r2"   # numbers - FREIGHT
+"HANDLING"               = "text_mkr5s3tm"      # text - HANDLING
+"HS CODE"                = "dropdown_mkr5k8yn"  # dropdown - HS CODE
+"UK FREIGHT"             = "numeric_mksfr0r2"   # numbers - FREIGHT
 
-# === Status Fields ===
-"PP Status" = "color_mkp4304j"              # PP Status
-"Fabric Status" = "color_mkp4apjg"          # Fabric Status
-"Trim Status" = "color_mkp43peb"            # Trim Status
-"IQC Status" = "color_mkp4hmsy"             # IQC Status
-"ALLOCATION STATUS" = "color_mkp4xd64"      # ALLOCATION STATUS
-"PRODUCTION STATUS" = "color_mkq0f90k"      # PRODUCTION STATUS
-
-# === Destination and Delivery ===
-"Destination" = "dropdown_mkp4gmn6"         # Destination
-"PLANNED DELIVERY METHOD" = "dropdown_mkp4wx2p" # PLANNED DELIVERY METHOD
-"Incoterms" = "dropdown_mkp4e51p"           # Incoterms
-"COUNTRY OF ORIGIN" = "dropdown_mkp4f6se"   # COUNTRY OF ORIGIN
-
-# === Planning and Resources ===
-"PLANNER" = "multiple_person_mkqfm1ea"      # PLANNER
-"CUSTOMER ALLOCATION" = "dropdown_mkpc44w5" # CUSTOMER ALLOCATION
-"FACTORY" = "dropdown_mkp43md8"             # FACTORY
-"Account Manager" = "multiple_person_mkqj1tpr" # Account Manager
-
-# === Additional Production Details ===
-"REMARK" = "text_mkp4m83f"                  # REMARK
-"Alias" = "text_mkpv68ar"                   # Alias
-"MO NUMBER" = "text_mkqjdxtf"               # MO NUMBER
-"MO RELEASE DATE" = "date_mkqj2rs5"         # MO RELEASE DATE
 
 # Column mapping - ORDER_LIST_LINES to Monday subitems (PRODUCTION)
 [monday.column_mapping.production.lines]
-"size_code" = "text_mkp_size_code"          # Production size code for line items
-"qty" = "numeric_mkp_qty"                   # Production quantity per size
-"customer_fob_usd" = "numeric_mkp4q1rv"     # Production line-level customer FOB
-"color" = "text_mkp41ze2"                   # Production line-level color
-"style_description" = "long_text_mkpervye"  # Production line-level style description
+"size_code" = "dropdown_mkrak7qp"          # Production size code for line items
+"qty" = "numeric_mkra7j8e"                   # Production quantity per size
 
 # === SIZE COLUMN MAPPINGS (COMPREHENSIVE COVERAGE) ===
 # Based on ORDER_LIST schema analysis - covers all garment size variations

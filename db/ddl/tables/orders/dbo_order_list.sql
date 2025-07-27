@@ -440,6 +440,7 @@ CREATE TABLE [dbo].[ORDER_LIST] (
     -- NOTE: These columns are used for syncing with Monday.com and are populated by application logic
     [group_name] NVARCHAR(255) NULL,  -- Monday.com group name for item
     [group_id] NVARCHAR(128) NULL,      -- Monday.com group ID
+    [item_name] nvarchar(1000) NULL,       -- Monday.com item name
 
     -- Delta sync columns (NEW - enable change detection and Monday.com sync)
     -- NOTE: row_hash populated by application logic using TOML configuration

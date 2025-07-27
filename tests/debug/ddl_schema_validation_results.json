@@ -1,0 +1,6533 @@
+{
+  "timestamp": "2025-06-22T20:17:44.809851",
+  "analysis": {
+    "coverage_metrics": {
+      "total_ddl_columns": 321,
+      "mapped_ddl_columns": 0,
+      "mapping_coverage_percent": 0.0,
+      "unmapped_ddl_columns_count": 321,
+      "total_monday_columns": 88,
+      "available_monday_columns_count": 88
+    },
+    "unmapped_ddl_columns": [
+      "0",
+      "0-3M",
+      "0w",
+      "10",
+      "10w",
+      "12",
+      "12-18M",
+      "12w",
+      "14",
+      "16",
+      "18",
+      "18-24M",
+      "1X",
+      "2",
+      "2/3",
+      "20",
+      "22",
+      "24",
+      "26",
+      "27",
+      "28",
+      "28-30L",
+      "29",
+      "2T",
+      "2X",
+      "2XL",
+      "2w",
+      "3-6M",
+      "30",
+      "30-30L",
+      "30-31L",
+      "30-32L",
+      "30/30",
+      "30/32",
+      "30X30",
+      "31",
+      "31-30L",
+      "31-31L",
+      "31-32L",
+      "31/30",
+      "31/32",
+      "31X30",
+      "32",
+      "32-30L",
+      "32-31L",
+      "32-32L",
+      "32/30",
+      "32/32",
+      "32/34",
+      "32/36",
+      "32C",
+      "32D",
+      "32DD",
+      "32DDD",
+      "32X30",
+      "33",
+      "33-30L",
+      "33-31L",
+      "33-32L",
+      "33/30",
+      "33/32",
+      "34",
+      "34-30L",
+      "34-31L",
+      "34-32L",
+      "34/30",
+      "34/32",
+      "34/34",
+      "34C",
+      "34D",
+      "34DD",
+      "34DDD",
+      "34X30",
+      "35",
+      "35-30L",
+      "35-31L",
+      "35-32L",
+      "35/30",
+      "35/32",
+      "36",
+      "36-30L",
+      "36-31L",
+      "36-32L",
+      "36/30",
+      "36/32",
+      "36/34",
+      "36C",
+      "36D",
+      "36DD",
+      "36DDD",
+      "36X30",
+      "38",
+      "38-30L",
+      "38-31L",
+      "38-32L",
+      "38/30",
+      "38/32",
+      "38/34",
+      "38/36",
+      "38C",
+      "38D",
+      "38DD",
+      "38DDD",
+      "38X30",
+      "3T",
+      "3X",
+      "3XL",
+      "4",
+      "4/5",
+      "40",
+      "40-30L",
+      "40-31L",
+      "40/30",
+      "40/32",
+      "40X30",
+      "42",
+      "44",
+      "46",
+      "48",
+      "4T",
+      "4X",
+      "4XL",
+      "4XT",
+      "4w",
+      "5",
+      "50",
+      "52",
+      "54",
+      "56",
+      "58",
+      "5T",
+      "6",
+      "6-9M",
+      "6/7",
+      "60",
+      "6T",
+      "6w",
+      "7",
+      "8",
+      "8w",
+      "9",
+      "9-12M",
+      "AAG ORDER NUMBER",
+      "AAG SEASON",
+      "AAG SEASON CODE",
+      "ACTIVE",
+      "ADD TO PLANNING",
+      "ADID",
+      "ADMINISTRATION FEE",
+      "ALIAS RELATED ITEM",
+      "ALIAS/RELATED ITEM",
+      "ALLOCATION (CHANNEL)",
+      "ALLOCATION STATUS",
+      "AQL INSPECTION",
+      "AQL TYPE",
+      "All",
+      "BUAR (BUSINESS AREA UNIT)",
+      "BULK AGREEMENT DESCRIPTION",
+      "BULK AGREEMENT NUMBER",
+      "CAN DUTY",
+      "CAN DUTY RATE",
+      "CATEGORY",
+      "CO NUMBER (ALLOCATION DISTRO)",
+      "CO NUMBER (INITIAL DISTRO)",
+      "CO NUMBER - ALLOCATION DISTRO",
+      "CO NUMBER - INITIAL DISTRO",
+      "COLLECTION DELIVERY",
+      "COLOR",
+      "CUSTOMER",
+      "CUSTOMER ALT PO",
+      "CUSTOMER CODE",
+      "CUSTOMER COLOUR DESCRIPTION",
+      "CUSTOMER EX FACTORY DATE",
+      "CUSTOMER NAME",
+      "CUSTOMER PRICE",
+      "CUSTOMER REQ IN DC DATE",
+      "CUSTOMER SEASON",
+      "CUSTOMER STYLE",
+      "CUSTOMER''S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS",
+      "DDP CAN (USD)",
+      "DDP UK (USD)",
+      "DDP US (USD)",
+      "DELIVERY CODE (MODL)",
+      "DELIVERY TERMS",
+      "DESIGN FEE",
+      "DESTINATION",
+      "DESTINATION WAREHOUSE",
+      "DISCOUNT",
+      "DROP",
+      "Delta",
+      "ETA CUSTOMER WAREHOUSE DATE",
+      "EX FACTORY DATE",
+      "EX WORKS (USD)",
+      "EX-FTY (Change Request)",
+      "EX-FTY (Forecast)",
+      "EX-FTY (Partner PO)",
+      "EX-FTY (Revised LS)",
+      "FABRIC ETA DATE",
+      "FABRIC STATUS",
+      "FABRIC TYPE CODE",
+      "FACILITY CODE",
+      "FACTORY",
+      "FACTORY COUNTRY",
+      "FCST CONSUMED QTY",
+      "FCST QTY",
+      "FINAL FOB (USD)",
+      "FINAL PRICES Y/N",
+      "FREIGHT",
+      "FX CHARGE",
+      "GENDER GROUP CODE",
+      "Group",
+      "HANDLING",
+      "HS CODE",
+      "INFOR COLOUR CODE",
+      "INFOR FABRIC TYPE CODE",
+      "INFOR GENDER GROUP CODE",
+      "INFOR ITEM GROUP CODE",
+      "INFOR ITEM TYPE CODE",
+      "INFOR MAKE/BUY CODE",
+      "INFOR PRODUCT GROUP CODE",
+      "ITEM GROUP CODE",
+      "ITEM TYPE CODE",
+      "Item ID",
+      "L",
+      "L(10-12)",
+      "L(14-16)",
+      "L/XL",
+      "Longson Alias",
+      "M",
+      "M(10-12)",
+      "M(8-10)",
+      "M/L",
+      "MAKE OR BUY",
+      "MAKE/BUY CODE",
+      "MO NUMBER",
+      "MONTH",
+      "Multiple Items",
+      "NOTES",
+      "NOTES FOR PRICE",
+      "Net Demand",
+      "ONE SIZE",
+      "ORDER DATE PO RECEIVED",
+      "ORDER QTY",
+      "ORDER STATUS",
+      "ORDER TYPE",
+      "ORIGINAL ALIAS/RELATED ITEM",
+      "ORTP (ORDER TYPE)",
+      "OS",
+      "PACKED QTY",
+      "PATTERN ID",
+      "PLANNED CUT DATE",
+      "PLANNED DELIVERY METHOD",
+      "PLANNER",
+      "PLANNER2",
+      "PLANNING BOARD",
+      "PNP",
+      "PO NUMBER",
+      "PPS CMT DUE",
+      "PPS CMT RCV",
+      "PPS STATUS",
+      "PRICING ALIAS/RELATED ITEM",
+      "PRICING NOTES",
+      "PRODUCT GROUP CODE",
+      "PRODUCTION QTY",
+      "PRODUCTION STATUS",
+      "PRODUCTION TYPE",
+      "PROMO GROUP / CAMPAIGN (HOT 30/GLOBAL EDIT",
+      "RANGE / COLLECTION",
+      "REQUESTED XFD STATUS",
+      "REVENUE (FOB)",
+      "S",
+      "S(6-8)",
+      "S/M",
+      "SHIPPED QTY",
+      "SHOP CODE",
+      "SHOP NAME",
+      "SMS PRICE USD",
+      "STYLE",
+      "STYLE DESCRIPTION",
+      "SURCHARGE FEE",
+      "Subitems",
+      "Sum of TOTAL QTY",
+      "TOTAL QTY",
+      "TRACKING NUMBER",
+      "TRIM ETA DATE",
+      "TRIM STATUS",
+      "Title",
+      "UK CIF",
+      "UK DUTY",
+      "UK DUTY RATE",
+      "UK FREIGHT",
+      "UK INSURANCE",
+      "UNIT OF MEASURE",
+      "US DUTY",
+      "US DUTY RATE",
+      "US TARIFF",
+      "US TARIFF RATE",
+      "USA ONLY LSTP 75% EX WORKS",
+      "UpdateDate",
+      "VALIDATION",
+      "VALIDATION2",
+      "VALIDATION3",
+      "VALIDATION4",
+      "Warehouse",
+      "XL",
+      "XS",
+      "XXL",
+      "XXS",
+      "XXXL",
+      "XXXS",
+      "matchAlias",
+      "stg_api_payload",
+      "stg_batch_id",
+      "stg_created_date",
+      "stg_customer_batch",
+      "stg_error_message",
+      "stg_id",
+      "stg_monday_item_id",
+      "stg_processed_date",
+      "stg_retry_count",
+      "stg_status"
+    ],
+    "available_monday_columns": [
+      "AAG ORDER NUMBER",
+      "AAG SEASON",
+      "ADD TO PLANNING",
+      "ADMINISTRATION FEE",
+      "ALIAS RELATED ITEM",
+      "ALLOCATION STATUS",
+      "AQL INSPECTION",
+      "AQL TYPE",
+      "CATEGORY",
+      "COLOR",
+      "CUSTOMER",
+      "CUSTOMER ALT PO",
+      "CUSTOMER EX FACTORY DATE",
+      "CUSTOMER PRICE",
+      "CUSTOMER REQ IN DC DATE",
+      "CUSTOMER SEASON",
+      "Created At",
+      "DDP US (USD)",
+      "DELIVERY TERMS",
+      "DESIGN FEE",
+      "DESTINATION",
+      "DESTINATION WAREHOUSE",
+      "DISCOUNT",
+      "DROP",
+      "EX WORKS (USD)",
+      "EX-FTY (Change Request)",
+      "EX-FTY (Forecast)",
+      "EX-FTY (Partner PO)",
+      "EX-FTY (Revised LS)",
+      "FABRIC ETA DATE",
+      "FABRIC STATUS",
+      "FACTORY",
+      "FACTORY COUNTRY",
+      "FCST CONSUMED QTY",
+      "FCST QTY",
+      "FINAL FOB (USD)",
+      "FINAL PRICES Y/N",
+      "FREIGHT",
+      "FX CHARGE",
+      "Group Title",
+      "HANDLING",
+      "HS CODE",
+      "Item ID",
+      "Item Name",
+      "Last updated",
+      "MO NUMBER",
+      "NOTES",
+      "NOTES FOR PRICE",
+      "Name",
+      "Net Demand",
+      "ORDER DATE PO RECEIVED",
+      "ORDER QTY",
+      "ORDER STATUS",
+      "ORDER TYPE",
+      "PACKED QTY",
+      "PATTERN ID",
+      "PLANNED CUT DATE",
+      "PLANNED DELIVERY METHOD",
+      "PLANNING BOARD",
+      "PO NUMBER",
+      "PPS CMT DUE",
+      "PPS CMT RCV",
+      "PPS STATUS",
+      "PRODUCTION QTY",
+      "PRODUCTION STATUS",
+      "PRODUCTION TYPE",
+      "QTY ORDERED",
+      "QTY PACKED",
+      "QTY SHIPPED",
+      "RANGE / COLLECTION",
+      "REQUESTED XFD STATUS",
+      "REVENUE (FOB)",
+      "SHIPPED QTY",
+      "SMS PRICE USD",
+      "STYLE",
+      "STYLE DESCRIPTION",
+      "SURCHARGE FEE",
+      "Subitems",
+      "TRIM ETA DATE",
+      "TRIM STATUS",
+      "UNIT OF MEASURE",
+      "US DUTY",
+      "US DUTY RATE",
+      "US TARIFF",
+      "US TARIFF RATE",
+      "USA ONLY LSTP 75% EX WORKS",
+      "Updated At",
+      "matchAlias"
+    ],
+    "mapped_fields": [],
+    "schema_alignment_issues": []
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "DELIVERY TERMS",
+      "target_field": "DELIVERY TERMS",
+      "monday_id": "dropdown_mkr5kk5",
+      "monday_type": "dropdown",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "matchAlias",
+      "target_field": "matchAlias",
+      "monday_id": "text_mkr61hpz",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PATTERN ID",
+      "target_field": "PATTERN ID",
+      "monday_id": "text_mkr5cz8m",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "TRIM STATUS",
+      "target_field": "TRIM STATUS",
+      "monday_id": "lookup_mkr52fpd",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PACKED QTY",
+      "target_field": "PACKED QTY",
+      "monday_id": "formula_mkrea5pd",
+      "monday_type": "formula",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "NOTES",
+      "target_field": "NOTES",
+      "monday_id": "long_text_mkr5hass",
+      "monday_type": "long_text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "DROP",
+      "target_field": "DROP",
+      "monday_id": "dropdown_mkr5w5e",
+      "monday_type": "dropdown",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "CUSTOMER SEASON",
+      "target_field": "CUSTOMER SEASON",
+      "monday_id": "dropdown_mkr5rgs6",
+      "monday_type": "dropdown",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "CUSTOMER",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "HS CODE",
+      "target_field": "HS CODE",
+      "monday_id": "dropdown_mkr5k8yn",
+      "monday_type": "dropdown",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "EX-FTY (Partner PO)",
+      "target_field": "EX-FTY (Partner PO)",
+      "monday_id": "lookup_mkr640ap",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "US DUTY RATE",
+      "target_field": "US DUTY RATE",
+      "monday_id": "numeric_mkr5r6at",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "UNIT OF MEASURE",
+      "target_field": "UNIT OF MEASURE",
+      "monday_id": "color_mkr5yf27",
+      "monday_type": "status",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "AQL TYPE",
+      "target_field": "AQL TYPE",
+      "monday_id": "lookup_mkr5jem9",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PLANNED DELIVERY METHOD",
+      "target_field": "PLANNED DELIVERY METHOD",
+      "monday_id": "text_mkr5wcpw",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "MO NUMBER",
+      "target_field": "MO NUMBER",
+      "monday_id": "lookup_mkr5ew17",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "ORDER STATUS",
+      "target_field": "ORDER STATUS",
+      "monday_id": "color_mkr5j5pp",
+      "monday_type": "status",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "Subitems",
+      "target_field": "Subitems",
+      "monday_id": "subtasks_mkr5c0kp",
+      "monday_type": "subtasks",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "CUSTOMER EX FACTORY DATE",
+      "target_field": "CUSTOMER EX FACTORY DATE",
+      "monday_id": "date_mkr57811",
+      "monday_type": "date",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "NOTES FOR PRICE",
+      "target_field": "NOTES FOR PRICE",
+      "monday_id": "long_text_mkr5znxn",
+      "monday_type": "long_text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "SHIPPED QTY",
+      "target_field": "SHIPPED QTY",
+      "monday_id": "formula_mkre5ce5",
+      "monday_type": "formula",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "DDP US (USD)",
+      "target_field": "DDP US (USD)",
+      "monday_id": "numeric_mkr5js0x",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "US DUTY",
+      "target_field": "US DUTY",
+      "monday_id": "numeric_mkr5ev2q",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "FINAL PRICES Y/N",
+      "target_field": "FINAL PRICES Y/N",
+      "monday_id": "text_mkr5ptvg",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PRODUCTION QTY",
+      "target_field": "PRODUCTION QTY",
+      "monday_id": "lookup_mkr5fkj1",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "FABRIC STATUS",
+      "target_field": "FABRIC STATUS",
+      "monday_id": "lookup_mkr5k4yj",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "DISCOUNT",
+      "target_field": "DISCOUNT",
+      "monday_id": "numeric_mkr56xx8",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PPS CMT RCV",
+      "target_field": "PPS CMT RCV",
+      "monday_id": "date_mkrvpbcr",
+      "monday_type": "date",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PRODUCTION STATUS",
+      "target_field": "PRODUCTION STATUS",
+      "monday_id": "lookup_mkr5aapc",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PO NUMBER",
+      "target_field": "PO NUMBER",
+      "monday_id": "text_mkr5ej2x",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "TRIM ETA DATE",
+      "target_field": "TRIM ETA DATE",
+      "monday_id": "lookup_mkr53kbm",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "ORDER TYPE",
+      "target_field": "ORDER TYPE",
+      "monday_id": "dropdown_mkr518fc",
+      "monday_type": "dropdown",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "FACTORY COUNTRY",
+      "target_field": "FACTORY COUNTRY",
+      "monday_id": "lookup_mkr5yabx",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "DESTINATION",
+      "target_field": "DESTINATION",
+      "monday_id": "text_mkr5kbc6",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "STYLE",
+      "target_field": "STYLE",
+      "monday_id": "dropdown_mkr5tgaa",
+      "monday_type": "dropdown",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "STYLE DESCRIPTION",
+      "target_field": "STYLE DESCRIPTION",
+      "monday_id": "long_text_mkr5p0cf",
+      "monday_type": "long_text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "ORDER DATE PO RECEIVED",
+      "target_field": "ORDER DATE PO RECEIVED",
+      "monday_id": "date_mkr5zp5",
+      "monday_type": "date",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "AQL INSPECTION",
+      "target_field": "AQL INSPECTION",
+      "monday_id": "lookup_mkr51rn0",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "ADD TO PLANNING",
+      "target_field": "ADD TO PLANNING",
+      "monday_id": "color_mkrerxrs",
+      "monday_type": "status",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PLANNED CUT DATE",
+      "target_field": "PLANNED CUT DATE",
+      "monday_id": "lookup_mkr5bnt8",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "ADMINISTRATION FEE",
+      "target_field": "ADMINISTRATION FEE",
+      "monday_id": "numeric_mkr5k68",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "CUSTOMER REQ IN DC DATE",
+      "target_field": "CUSTOMER REQ IN DC DATE",
+      "monday_id": "date_mkr554yz",
+      "monday_type": "date",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "FCST QTY",
+      "target_field": "FCST QTY",
+      "monday_id": "numeric_mkrb56rj",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PRODUCTION TYPE",
+      "target_field": "PRODUCTION TYPE",
+      "monday_id": "lookup_mkr5j8kx",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "HANDLING",
+      "target_field": "HANDLING",
+      "monday_id": "text_mkr5s3tm",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "SURCHARGE FEE",
+      "target_field": "SURCHARGE FEE",
+      "monday_id": "numeric_mkr57cem",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "REVENUE (FOB)",
+      "target_field": "REVENUE (FOB)",
+      "monday_id": "formula_mkrd937j",
+      "monday_type": "formula",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "EX-FTY (Change Request)",
+      "target_field": "EX-FTY (Change Request)",
+      "monday_id": "lookup_mkr6113x",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "Item ID",
+      "target_field": "Item ID",
+      "monday_id": "pulse_id_mkr5pb5q",
+      "monday_type": "item_id",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "FCST CONSUMED QTY",
+      "target_field": "FCST CONSUMED QTY",
+      "monday_id": "numeric_mkrbty8b",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PPS CMT DUE",
+      "target_field": "PPS CMT DUE",
+      "monday_id": "date_mkrvx550",
+      "monday_type": "date",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "FACTORY",
+      "target_field": "FACTORY",
+      "monday_id": "lookup_mkr55sr9",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "FX CHARGE",
+      "target_field": "FX CHARGE",
+      "monday_id": "numeric_mkr5gp6a",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "ALLOCATION STATUS",
+      "target_field": "ALLOCATION STATUS",
+      "monday_id": "lookup_mkr5hhjy",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "DESIGN FEE",
+      "target_field": "DESIGN FEE",
+      "monday_id": "numeric_mkr5h612",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "FREIGHT",
+      "target_field": "FREIGHT",
+      "monday_id": "text_mkr5kyf4",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "USA ONLY LSTP 75% EX WORKS",
+      "target_field": "USA ONLY LSTP 75% EX WORKS",
+      "monday_id": "numeric_mkr5yne4",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "DESTINATION WAREHOUSE",
+      "target_field": "DESTINATION WAREHOUSE",
+      "monday_id": "text_mkr5ps35",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "EX WORKS (USD)",
+      "target_field": "EX WORKS (USD)",
+      "monday_id": "numeric_mkr5erhv",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PPS STATUS",
+      "target_field": "PPS STATUS",
+      "monday_id": "color_mkrvzryf",
+      "monday_type": "status",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "CUSTOMER ALT PO",
+      "target_field": "CUSTOMER ALT PO",
+      "monday_id": "text_mkrh94rx",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "US TARIFF",
+      "target_field": "US TARIFF",
+      "monday_id": "numeric_mkr51ndy",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "FABRIC ETA DATE",
+      "target_field": "FABRIC ETA DATE",
+      "monday_id": "lookup_mkr5vk6m",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "Net Demand",
+      "target_field": "Net Demand",
+      "monday_id": "formula_mkrb53jx",
+      "monday_type": "formula",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "CUSTOMER PRICE",
+      "target_field": "CUSTOMER PRICE",
+      "monday_id": "numeric_mkr5cact",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "SMS PRICE USD",
+      "target_field": "SMS PRICE USD",
+      "monday_id": "numeric_mkr58nvp",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "PLANNING BOARD",
+      "target_field": "PLANNING BOARD",
+      "monday_id": "board_relation_mkr5cer8",
+      "monday_type": "board_relation",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "US TARIFF RATE",
+      "target_field": "US TARIFF RATE",
+      "monday_id": "numeric_mkr55zg1",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "REQUESTED XFD STATUS",
+      "target_field": "REQUESTED XFD STATUS",
+      "monday_id": "lookup_mkr6eatd",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "COLOR",
+      "target_field": "COLOR",
+      "monday_id": "dropdown_mkr5677f",
+      "monday_type": "dropdown",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "AAG ORDER NUMBER",
+      "target_field": "AAG ORDER NUMBER",
+      "monday_id": "text_mkr5wya6",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "AAG SEASON",
+      "target_field": "AAG SEASON",
+      "monday_id": "dropdown_mkr58de6",
+      "monday_type": "dropdown",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "ORDER QTY",
+      "target_field": "ORDER QTY",
+      "monday_id": "formula_mkre54dj",
+      "monday_type": "formula",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "RANGE / COLLECTION",
+      "target_field": "RANGE / COLLECTION",
+      "monday_id": "long_text_mks0vs1p",
+      "monday_type": "long_text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "EX-FTY (Forecast)",
+      "target_field": "EX-FTY (Forecast)",
+      "monday_id": "lookup_mkr6bhyv",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "CATEGORY",
+      "target_field": "CATEGORY",
+      "monday_id": "dropdown_mkr5s5n3",
+      "monday_type": "dropdown",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "FINAL FOB (USD)",
+      "target_field": "FINAL FOB (USD)",
+      "monday_id": "numeric_mkr5nhr7",
+      "monday_type": "numbers",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "EX-FTY (Revised LS)",
+      "target_field": "EX-FTY (Revised LS)",
+      "monday_id": "lookup_mkr5nd5t",
+      "monday_type": "mirror",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "HIGH",
+      "type": "exact_match",
+      "source_field": "ALIAS RELATED ITEM",
+      "target_field": "ALIAS RELATED ITEM",
+      "monday_id": "text_mkrhra2c",
+      "monday_type": "text",
+      "justification": "Exact field name match between DDL and Monday.com"
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AAG ORDER NUMBER",
+      "target_field": "AAG ORDER NUMBER",
+      "monday_id": "text_mkr5wya6",
+      "monday_type": "text",
+      "justification": "Similar field names: \"AAG ORDER NUMBER\" -> \"AAG ORDER NUMBER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER NAME",
+      "target_field": "Name",
+      "monday_id": "name",
+      "monday_type": "name",
+      "justification": "Similar field names: \"CUSTOMER NAME\" -> \"Name\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORDER DATE PO RECEIVED",
+      "target_field": "ORDER DATE PO RECEIVED",
+      "monday_id": "date_mkr5zp5",
+      "monday_type": "date",
+      "justification": "Similar field names: \"ORDER DATE PO RECEIVED\" -> \"ORDER DATE PO RECEIVED\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER ALT PO",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER ALT PO\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AAG SEASON",
+      "target_field": "AAG SEASON",
+      "monday_id": "dropdown_mkr58de6",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"AAG SEASON\" -> \"AAG SEASON\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER SEASON",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER SEASON\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DROP",
+      "target_field": "DROP",
+      "monday_id": "dropdown_mkr5w5e",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"DROP\" -> \"DROP\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "RANGE / COLLECTION",
+      "target_field": "RANGE / COLLECTION",
+      "monday_id": "long_text_mks0vs1p",
+      "monday_type": "long_text",
+      "justification": "Similar field names: \"RANGE / COLLECTION\" -> \"RANGE / COLLECTION\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CATEGORY",
+      "target_field": "CATEGORY",
+      "monday_id": "dropdown_mkr5s5n3",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CATEGORY\" -> \"CATEGORY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PATTERN ID",
+      "target_field": "PATTERN ID",
+      "monday_id": "text_mkr5cz8m",
+      "monday_type": "text",
+      "justification": "Similar field names: \"PATTERN ID\" -> \"PATTERN ID\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER STYLE",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER STYLE\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER''S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER''S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "All",
+      "target_field": "ALLOCATION STATUS",
+      "monday_id": "lookup_mkr5hhjy",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"All\" -> \"ALLOCATION STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER CODE",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER CODE\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PO NUMBER",
+      "target_field": "PO NUMBER",
+      "monday_id": "text_mkr5ej2x",
+      "monday_type": "text",
+      "justification": "Similar field names: \"PO NUMBER\" -> \"PO NUMBER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AAG SEASON CODE",
+      "target_field": "AAG SEASON",
+      "monday_id": "dropdown_mkr58de6",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"AAG SEASON CODE\" -> \"AAG SEASON\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "STYLE DESCRIPTION",
+      "target_field": "STYLE",
+      "monday_id": "dropdown_mkr5tgaa",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"STYLE DESCRIPTION\" -> \"STYLE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER COLOUR DESCRIPTION",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER COLOUR DESCRIPTION\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "UNIT OF MEASURE",
+      "target_field": "UNIT OF MEASURE",
+      "monday_id": "color_mkr5yf27",
+      "monday_type": "status",
+      "justification": "Similar field names: \"UNIT OF MEASURE\" -> \"UNIT OF MEASURE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "S",
+      "target_field": "Subitems",
+      "monday_id": "subtasks_mkr5c0kp",
+      "monday_type": "subtasks",
+      "justification": "Similar field names: \"S\" -> \"Subitems\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "M",
+      "target_field": "Name",
+      "monday_id": "name",
+      "monday_type": "name",
+      "justification": "Similar field names: \"M\" -> \"Name\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "L",
+      "target_field": "CUSTOMER ALT PO",
+      "monday_id": "text_mkrh94rx",
+      "monday_type": "text",
+      "justification": "Similar field names: \"L\" -> \"CUSTOMER ALT PO\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "5",
+      "target_field": "USA ONLY LSTP 75% EX WORKS",
+      "monday_id": "numeric_mkr5yne4",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"5\" -> \"USA ONLY LSTP 75% EX WORKS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "7",
+      "target_field": "USA ONLY LSTP 75% EX WORKS",
+      "monday_id": "numeric_mkr5yne4",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"7\" -> \"USA ONLY LSTP 75% EX WORKS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORDER TYPE",
+      "target_field": "ORDER TYPE",
+      "monday_id": "dropdown_mkr518fc",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"ORDER TYPE\" -> \"ORDER TYPE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DESTINATION",
+      "target_field": "DESTINATION",
+      "monday_id": "text_mkr5kbc6",
+      "monday_type": "text",
+      "justification": "Similar field names: \"DESTINATION\" -> \"DESTINATION\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DESTINATION WAREHOUSE",
+      "target_field": "DESTINATION",
+      "monday_id": "text_mkr5kbc6",
+      "monday_type": "text",
+      "justification": "Similar field names: \"DESTINATION WAREHOUSE\" -> \"DESTINATION\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "SHOP NAME",
+      "target_field": "Name",
+      "monday_id": "name",
+      "monday_type": "name",
+      "justification": "Similar field names: \"SHOP NAME\" -> \"Name\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ETA CUSTOMER WAREHOUSE DATE",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"ETA CUSTOMER WAREHOUSE DATE\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX FACTORY DATE",
+      "target_field": "CUSTOMER EX FACTORY DATE",
+      "monday_id": "date_mkr57811",
+      "monday_type": "date",
+      "justification": "Similar field names: \"EX FACTORY DATE\" -> \"CUSTOMER EX FACTORY DATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DELIVERY TERMS",
+      "target_field": "DELIVERY TERMS",
+      "monday_id": "dropdown_mkr5kk5",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"DELIVERY TERMS\" -> \"DELIVERY TERMS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PLANNED DELIVERY METHOD",
+      "target_field": "PLANNED DELIVERY METHOD",
+      "monday_id": "text_mkr5wcpw",
+      "monday_type": "text",
+      "justification": "Similar field names: \"PLANNED DELIVERY METHOD\" -> \"PLANNED DELIVERY METHOD\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "NOTES",
+      "target_field": "NOTES",
+      "monday_id": "long_text_mkr5hass",
+      "monday_type": "long_text",
+      "justification": "Similar field names: \"NOTES\" -> \"NOTES\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER PRICE",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER PRICE\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "USA ONLY LSTP 75% EX WORKS",
+      "target_field": "USA ONLY LSTP 75% EX WORKS",
+      "monday_id": "numeric_mkr5yne4",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"USA ONLY LSTP 75% EX WORKS\" -> \"USA ONLY LSTP 75% EX WORKS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX WORKS (USD)",
+      "target_field": "EX WORKS (USD)",
+      "monday_id": "numeric_mkr5erhv",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"EX WORKS (USD)\" -> \"EX WORKS (USD)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ADMINISTRATION FEE",
+      "target_field": "ADMINISTRATION FEE",
+      "monday_id": "numeric_mkr5k68",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"ADMINISTRATION FEE\" -> \"ADMINISTRATION FEE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DESIGN FEE",
+      "target_field": "DESIGN FEE",
+      "monday_id": "numeric_mkr5h612",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"DESIGN FEE\" -> \"DESIGN FEE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FX CHARGE",
+      "target_field": "FX CHARGE",
+      "monday_id": "numeric_mkr5gp6a",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"FX CHARGE\" -> \"FX CHARGE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "HANDLING",
+      "target_field": "HANDLING",
+      "monday_id": "text_mkr5s3tm",
+      "monday_type": "text",
+      "justification": "Similar field names: \"HANDLING\" -> \"HANDLING\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "SURCHARGE FEE",
+      "target_field": "SURCHARGE FEE",
+      "monday_id": "numeric_mkr57cem",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"SURCHARGE FEE\" -> \"SURCHARGE FEE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DISCOUNT",
+      "target_field": "DISCOUNT",
+      "monday_id": "numeric_mkr56xx8",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"DISCOUNT\" -> \"DISCOUNT\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FINAL FOB (USD)",
+      "target_field": "FINAL FOB (USD)",
+      "monday_id": "numeric_mkr5nhr7",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"FINAL FOB (USD)\" -> \"FINAL FOB (USD)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "HS CODE",
+      "target_field": "HS CODE",
+      "monday_id": "dropdown_mkr5k8yn",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"HS CODE\" -> \"HS CODE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US DUTY RATE",
+      "target_field": "US DUTY RATE",
+      "monday_id": "numeric_mkr5r6at",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US DUTY RATE\" -> \"US DUTY RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US DUTY",
+      "target_field": "US DUTY RATE",
+      "monday_id": "numeric_mkr5r6at",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US DUTY\" -> \"US DUTY RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FREIGHT",
+      "target_field": "FREIGHT",
+      "monday_id": "text_mkr5kyf4",
+      "monday_type": "text",
+      "justification": "Similar field names: \"FREIGHT\" -> \"FREIGHT\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US TARIFF RATE",
+      "target_field": "US TARIFF RATE",
+      "monday_id": "numeric_mkr55zg1",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US TARIFF RATE\" -> \"US TARIFF RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US TARIFF",
+      "target_field": "US TARIFF RATE",
+      "monday_id": "numeric_mkr55zg1",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US TARIFF\" -> \"US TARIFF RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DDP US (USD)",
+      "target_field": "DDP US (USD)",
+      "monday_id": "numeric_mkr5js0x",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"DDP US (USD)\" -> \"DDP US (USD)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "UK FREIGHT",
+      "target_field": "FREIGHT",
+      "monday_id": "text_mkr5kyf4",
+      "monday_type": "text",
+      "justification": "Similar field names: \"UK FREIGHT\" -> \"FREIGHT\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "SMS PRICE USD",
+      "target_field": "SMS PRICE USD",
+      "monday_id": "numeric_mkr58nvp",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"SMS PRICE USD\" -> \"SMS PRICE USD\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FINAL PRICES Y/N",
+      "target_field": "FINAL PRICES Y/N",
+      "monday_id": "text_mkr5ptvg",
+      "monday_type": "text",
+      "justification": "Similar field names: \"FINAL PRICES Y/N\" -> \"FINAL PRICES Y/N\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "NOTES FOR PRICE",
+      "target_field": "NOTES",
+      "monday_id": "long_text_mkr5hass",
+      "monday_type": "long_text",
+      "justification": "Similar field names: \"NOTES FOR PRICE\" -> \"NOTES\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PRICING NOTES",
+      "target_field": "NOTES",
+      "monday_id": "long_text_mkr5hass",
+      "monday_type": "long_text",
+      "justification": "Similar field names: \"PRICING NOTES\" -> \"NOTES\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Warehouse",
+      "target_field": "DESTINATION WAREHOUSE",
+      "monday_id": "text_mkr5ps35",
+      "monday_type": "text",
+      "justification": "Similar field names: \"Warehouse\" -> \"DESTINATION WAREHOUSE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORTP (ORDER TYPE)",
+      "target_field": "ORDER TYPE",
+      "monday_id": "dropdown_mkr518fc",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"ORTP (ORDER TYPE)\" -> \"ORDER TYPE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Title",
+      "target_field": "Group Title",
+      "monday_id": "__group_title",
+      "monday_type": "text",
+      "justification": "Similar field names: \"Title\" -> \"Group Title\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Group",
+      "target_field": "Group Title",
+      "monday_id": "__group_title",
+      "monday_type": "text",
+      "justification": "Similar field names: \"Group\" -> \"Group Title\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Subitems",
+      "target_field": "Subitems",
+      "monday_id": "subtasks_mkr5c0kp",
+      "monday_type": "subtasks",
+      "justification": "Similar field names: \"Subitems\" -> \"Subitems\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AAG ORDER NUMBER",
+      "target_field": "AAG ORDER NUMBER",
+      "monday_id": "text_mkr5wya6",
+      "monday_type": "text",
+      "justification": "Similar field names: \"AAG ORDER NUMBER\" -> \"AAG ORDER NUMBER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AAG SEASON",
+      "target_field": "AAG SEASON",
+      "monday_id": "dropdown_mkr58de6",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"AAG SEASON\" -> \"AAG SEASON\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORDER DATE PO RECEIVED",
+      "target_field": "ORDER DATE PO RECEIVED",
+      "monday_id": "date_mkr5zp5",
+      "monday_type": "date",
+      "justification": "Similar field names: \"ORDER DATE PO RECEIVED\" -> \"ORDER DATE PO RECEIVED\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER SEASON",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER SEASON\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DROP",
+      "target_field": "DROP",
+      "monday_id": "dropdown_mkr5w5e",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"DROP\" -> \"DROP\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PO NUMBER",
+      "target_field": "PO NUMBER",
+      "monday_id": "text_mkr5ej2x",
+      "monday_type": "text",
+      "justification": "Similar field names: \"PO NUMBER\" -> \"PO NUMBER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER ALT PO",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER ALT PO\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "STYLE",
+      "target_field": "STYLE",
+      "monday_id": "dropdown_mkr5tgaa",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"STYLE\" -> \"STYLE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "STYLE DESCRIPTION",
+      "target_field": "STYLE",
+      "monday_id": "dropdown_mkr5tgaa",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"STYLE DESCRIPTION\" -> \"STYLE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ALIAS RELATED ITEM",
+      "target_field": "ALIAS RELATED ITEM",
+      "monday_id": "text_mkrhra2c",
+      "monday_type": "text",
+      "justification": "Similar field names: \"ALIAS RELATED ITEM\" -> \"ALIAS RELATED ITEM\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "COLOR",
+      "target_field": "COLOR",
+      "monday_id": "dropdown_mkr5677f",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"COLOR\" -> \"COLOR\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CATEGORY",
+      "target_field": "CATEGORY",
+      "monday_id": "dropdown_mkr5s5n3",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CATEGORY\" -> \"CATEGORY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PATTERN ID",
+      "target_field": "PATTERN ID",
+      "monday_id": "text_mkr5cz8m",
+      "monday_type": "text",
+      "justification": "Similar field names: \"PATTERN ID\" -> \"PATTERN ID\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "UNIT OF MEASURE",
+      "target_field": "UNIT OF MEASURE",
+      "monday_id": "color_mkr5yf27",
+      "monday_type": "status",
+      "justification": "Similar field names: \"UNIT OF MEASURE\" -> \"UNIT OF MEASURE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FCST QTY",
+      "target_field": "FCST QTY",
+      "monday_id": "numeric_mkrb56rj",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"FCST QTY\" -> \"FCST QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FCST CONSUMED QTY",
+      "target_field": "FCST CONSUMED QTY",
+      "monday_id": "numeric_mkrbty8b",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"FCST CONSUMED QTY\" -> \"FCST CONSUMED QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORDER QTY",
+      "target_field": "ORDER QTY",
+      "monday_id": "formula_mkre54dj",
+      "monday_type": "formula",
+      "justification": "Similar field names: \"ORDER QTY\" -> \"ORDER QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PACKED QTY",
+      "target_field": "PACKED QTY",
+      "monday_id": "formula_mkrea5pd",
+      "monday_type": "formula",
+      "justification": "Similar field names: \"PACKED QTY\" -> \"PACKED QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "SHIPPED QTY",
+      "target_field": "SHIPPED QTY",
+      "monday_id": "formula_mkre5ce5",
+      "monday_type": "formula",
+      "justification": "Similar field names: \"SHIPPED QTY\" -> \"SHIPPED QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Net Demand",
+      "target_field": "Net Demand",
+      "monday_id": "formula_mkrb53jx",
+      "monday_type": "formula",
+      "justification": "Similar field names: \"Net Demand\" -> \"Net Demand\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORDER TYPE",
+      "target_field": "ORDER TYPE",
+      "monday_id": "dropdown_mkr518fc",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"ORDER TYPE\" -> \"ORDER TYPE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DESTINATION",
+      "target_field": "DESTINATION",
+      "monday_id": "text_mkr5kbc6",
+      "monday_type": "text",
+      "justification": "Similar field names: \"DESTINATION\" -> \"DESTINATION\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DESTINATION WAREHOUSE",
+      "target_field": "DESTINATION",
+      "monday_id": "text_mkr5kbc6",
+      "monday_type": "text",
+      "justification": "Similar field names: \"DESTINATION WAREHOUSE\" -> \"DESTINATION\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER REQ IN DC DATE",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER REQ IN DC DATE\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER EX FACTORY DATE",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER EX FACTORY DATE\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DELIVERY TERMS",
+      "target_field": "DELIVERY TERMS",
+      "monday_id": "dropdown_mkr5kk5",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"DELIVERY TERMS\" -> \"DELIVERY TERMS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PLANNED DELIVERY METHOD",
+      "target_field": "PLANNED DELIVERY METHOD",
+      "monday_id": "text_mkr5wcpw",
+      "monday_type": "text",
+      "justification": "Similar field names: \"PLANNED DELIVERY METHOD\" -> \"PLANNED DELIVERY METHOD\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "NOTES",
+      "target_field": "NOTES",
+      "monday_id": "long_text_mkr5hass",
+      "monday_type": "long_text",
+      "justification": "Similar field names: \"NOTES\" -> \"NOTES\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER PRICE",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER PRICE\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "USA ONLY LSTP 75% EX WORKS",
+      "target_field": "USA ONLY LSTP 75% EX WORKS",
+      "monday_id": "numeric_mkr5yne4",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"USA ONLY LSTP 75% EX WORKS\" -> \"USA ONLY LSTP 75% EX WORKS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX WORKS (USD)",
+      "target_field": "EX WORKS (USD)",
+      "monday_id": "numeric_mkr5erhv",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"EX WORKS (USD)\" -> \"EX WORKS (USD)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ADMINISTRATION FEE",
+      "target_field": "ADMINISTRATION FEE",
+      "monday_id": "numeric_mkr5k68",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"ADMINISTRATION FEE\" -> \"ADMINISTRATION FEE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DESIGN FEE",
+      "target_field": "DESIGN FEE",
+      "monday_id": "numeric_mkr5h612",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"DESIGN FEE\" -> \"DESIGN FEE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FX CHARGE",
+      "target_field": "FX CHARGE",
+      "monday_id": "numeric_mkr5gp6a",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"FX CHARGE\" -> \"FX CHARGE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "HANDLING",
+      "target_field": "HANDLING",
+      "monday_id": "text_mkr5s3tm",
+      "monday_type": "text",
+      "justification": "Similar field names: \"HANDLING\" -> \"HANDLING\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "SURCHARGE FEE",
+      "target_field": "SURCHARGE FEE",
+      "monday_id": "numeric_mkr57cem",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"SURCHARGE FEE\" -> \"SURCHARGE FEE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DISCOUNT",
+      "target_field": "DISCOUNT",
+      "monday_id": "numeric_mkr56xx8",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"DISCOUNT\" -> \"DISCOUNT\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FINAL FOB (USD)",
+      "target_field": "FINAL FOB (USD)",
+      "monday_id": "numeric_mkr5nhr7",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"FINAL FOB (USD)\" -> \"FINAL FOB (USD)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "HS CODE",
+      "target_field": "HS CODE",
+      "monday_id": "dropdown_mkr5k8yn",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"HS CODE\" -> \"HS CODE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US DUTY RATE",
+      "target_field": "US DUTY RATE",
+      "monday_id": "numeric_mkr5r6at",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US DUTY RATE\" -> \"US DUTY RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US DUTY",
+      "target_field": "US DUTY RATE",
+      "monday_id": "numeric_mkr5r6at",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US DUTY\" -> \"US DUTY RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FREIGHT",
+      "target_field": "FREIGHT",
+      "monday_id": "text_mkr5kyf4",
+      "monday_type": "text",
+      "justification": "Similar field names: \"FREIGHT\" -> \"FREIGHT\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US TARIFF RATE",
+      "target_field": "US TARIFF RATE",
+      "monday_id": "numeric_mkr55zg1",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US TARIFF RATE\" -> \"US TARIFF RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US TARIFF",
+      "target_field": "US TARIFF RATE",
+      "monday_id": "numeric_mkr55zg1",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US TARIFF\" -> \"US TARIFF RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DDP US (USD)",
+      "target_field": "DDP US (USD)",
+      "monday_id": "numeric_mkr5js0x",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"DDP US (USD)\" -> \"DDP US (USD)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "SMS PRICE USD",
+      "target_field": "SMS PRICE USD",
+      "monday_id": "numeric_mkr58nvp",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"SMS PRICE USD\" -> \"SMS PRICE USD\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FINAL PRICES Y/N",
+      "target_field": "FINAL PRICES Y/N",
+      "monday_id": "text_mkr5ptvg",
+      "monday_type": "text",
+      "justification": "Similar field names: \"FINAL PRICES Y/N\" -> \"FINAL PRICES Y/N\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "NOTES FOR PRICE",
+      "target_field": "NOTES",
+      "monday_id": "long_text_mkr5hass",
+      "monday_type": "long_text",
+      "justification": "Similar field names: \"NOTES FOR PRICE\" -> \"NOTES\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Item ID",
+      "target_field": "Item ID",
+      "monday_id": "pulse_id_mkr5pb5q",
+      "monday_type": "item_id",
+      "justification": "Similar field names: \"Item ID\" -> \"Item ID\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "matchAlias",
+      "target_field": "matchAlias",
+      "monday_id": "text_mkr61hpz",
+      "monday_type": "text",
+      "justification": "Similar field names: \"matchAlias\" -> \"matchAlias\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PLANNING BOARD",
+      "target_field": "PLANNING BOARD",
+      "monday_id": "board_relation_mkr5cer8",
+      "monday_type": "board_relation",
+      "justification": "Similar field names: \"PLANNING BOARD\" -> \"PLANNING BOARD\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "REQUESTED XFD STATUS",
+      "target_field": "REQUESTED XFD STATUS",
+      "monday_id": "lookup_mkr6eatd",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"REQUESTED XFD STATUS\" -> \"REQUESTED XFD STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX-FTY (Change Request)",
+      "target_field": "EX-FTY (Change Request)",
+      "monday_id": "lookup_mkr6113x",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"EX-FTY (Change Request)\" -> \"EX-FTY (Change Request)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX-FTY (Forecast)",
+      "target_field": "EX-FTY (Forecast)",
+      "monday_id": "lookup_mkr6bhyv",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"EX-FTY (Forecast)\" -> \"EX-FTY (Forecast)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX-FTY (Partner PO)",
+      "target_field": "EX-FTY (Partner PO)",
+      "monday_id": "lookup_mkr640ap",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"EX-FTY (Partner PO)\" -> \"EX-FTY (Partner PO)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX-FTY (Revised LS)",
+      "target_field": "EX-FTY (Revised LS)",
+      "monday_id": "lookup_mkr5nd5t",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"EX-FTY (Revised LS)\" -> \"EX-FTY (Revised LS)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PRODUCTION TYPE",
+      "target_field": "PRODUCTION TYPE",
+      "monday_id": "lookup_mkr5j8kx",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"PRODUCTION TYPE\" -> \"PRODUCTION TYPE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AQL INSPECTION",
+      "target_field": "AQL INSPECTION",
+      "monday_id": "lookup_mkr51rn0",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"AQL INSPECTION\" -> \"AQL INSPECTION\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AQL TYPE",
+      "target_field": "AQL TYPE",
+      "monday_id": "lookup_mkr5jem9",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"AQL TYPE\" -> \"AQL TYPE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PLANNED CUT DATE",
+      "target_field": "PLANNED CUT DATE",
+      "monday_id": "lookup_mkr5bnt8",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"PLANNED CUT DATE\" -> \"PLANNED CUT DATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "MO NUMBER",
+      "target_field": "MO NUMBER",
+      "monday_id": "lookup_mkr5ew17",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"MO NUMBER\" -> \"MO NUMBER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PRODUCTION STATUS",
+      "target_field": "PRODUCTION STATUS",
+      "monday_id": "lookup_mkr5aapc",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"PRODUCTION STATUS\" -> \"PRODUCTION STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FACTORY COUNTRY",
+      "target_field": "FACTORY COUNTRY",
+      "monday_id": "lookup_mkr5yabx",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"FACTORY COUNTRY\" -> \"FACTORY COUNTRY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FACTORY",
+      "target_field": "CUSTOMER EX FACTORY DATE",
+      "monday_id": "date_mkr57811",
+      "monday_type": "date",
+      "justification": "Similar field names: \"FACTORY\" -> \"CUSTOMER EX FACTORY DATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ALLOCATION STATUS",
+      "target_field": "ALLOCATION STATUS",
+      "monday_id": "lookup_mkr5hhjy",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"ALLOCATION STATUS\" -> \"ALLOCATION STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PRODUCTION QTY",
+      "target_field": "PRODUCTION QTY",
+      "monday_id": "lookup_mkr5fkj1",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"PRODUCTION QTY\" -> \"PRODUCTION QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "TRIM ETA DATE",
+      "target_field": "TRIM ETA DATE",
+      "monday_id": "lookup_mkr53kbm",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"TRIM ETA DATE\" -> \"TRIM ETA DATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FABRIC ETA DATE",
+      "target_field": "FABRIC ETA DATE",
+      "monday_id": "lookup_mkr5vk6m",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"FABRIC ETA DATE\" -> \"FABRIC ETA DATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "TRIM STATUS",
+      "target_field": "TRIM STATUS",
+      "monday_id": "lookup_mkr52fpd",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"TRIM STATUS\" -> \"TRIM STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ADD TO PLANNING",
+      "target_field": "ADD TO PLANNING",
+      "monday_id": "color_mkrerxrs",
+      "monday_type": "status",
+      "justification": "Similar field names: \"ADD TO PLANNING\" -> \"ADD TO PLANNING\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FABRIC STATUS",
+      "target_field": "FABRIC STATUS",
+      "monday_id": "lookup_mkr5k4yj",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"FABRIC STATUS\" -> \"FABRIC STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PPS STATUS",
+      "target_field": "PPS STATUS",
+      "monday_id": "color_mkrvzryf",
+      "monday_type": "status",
+      "justification": "Similar field names: \"PPS STATUS\" -> \"PPS STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PPS CMT DUE",
+      "target_field": "PPS CMT DUE",
+      "monday_id": "date_mkrvx550",
+      "monday_type": "date",
+      "justification": "Similar field names: \"PPS CMT DUE\" -> \"PPS CMT DUE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PPS CMT RCV",
+      "target_field": "PPS CMT RCV",
+      "monday_id": "date_mkrvpbcr",
+      "monday_type": "date",
+      "justification": "Similar field names: \"PPS CMT RCV\" -> \"PPS CMT RCV\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "REVENUE (FOB)",
+      "target_field": "REVENUE (FOB)",
+      "monday_id": "formula_mkrd937j",
+      "monday_type": "formula",
+      "justification": "Similar field names: \"REVENUE (FOB)\" -> \"REVENUE (FOB)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORDER STATUS",
+      "target_field": "ORDER STATUS",
+      "monday_id": "color_mkr5j5pp",
+      "monday_type": "status",
+      "justification": "Similar field names: \"ORDER STATUS\" -> \"ORDER STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "stg_customer_batch",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"stg_customer_batch\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Title",
+      "target_field": "Group Title",
+      "monday_id": "__group_title",
+      "monday_type": "text",
+      "justification": "Similar field names: \"Title\" -> \"Group Title\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Group",
+      "target_field": "Group Title",
+      "monday_id": "__group_title",
+      "monday_type": "text",
+      "justification": "Similar field names: \"Group\" -> \"Group Title\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Subitems",
+      "target_field": "Subitems",
+      "monday_id": "subtasks_mkr5c0kp",
+      "monday_type": "subtasks",
+      "justification": "Similar field names: \"Subitems\" -> \"Subitems\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AAG ORDER NUMBER",
+      "target_field": "AAG ORDER NUMBER",
+      "monday_id": "text_mkr5wya6",
+      "monday_type": "text",
+      "justification": "Similar field names: \"AAG ORDER NUMBER\" -> \"AAG ORDER NUMBER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AAG SEASON",
+      "target_field": "AAG SEASON",
+      "monday_id": "dropdown_mkr58de6",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"AAG SEASON\" -> \"AAG SEASON\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORDER DATE PO RECEIVED",
+      "target_field": "ORDER DATE PO RECEIVED",
+      "monday_id": "date_mkr5zp5",
+      "monday_type": "date",
+      "justification": "Similar field names: \"ORDER DATE PO RECEIVED\" -> \"ORDER DATE PO RECEIVED\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER SEASON",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER SEASON\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DROP",
+      "target_field": "DROP",
+      "monday_id": "dropdown_mkr5w5e",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"DROP\" -> \"DROP\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PO NUMBER",
+      "target_field": "PO NUMBER",
+      "monday_id": "text_mkr5ej2x",
+      "monday_type": "text",
+      "justification": "Similar field names: \"PO NUMBER\" -> \"PO NUMBER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER ALT PO",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER ALT PO\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "STYLE",
+      "target_field": "STYLE",
+      "monday_id": "dropdown_mkr5tgaa",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"STYLE\" -> \"STYLE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "STYLE DESCRIPTION",
+      "target_field": "STYLE",
+      "monday_id": "dropdown_mkr5tgaa",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"STYLE DESCRIPTION\" -> \"STYLE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ALIAS RELATED ITEM",
+      "target_field": "ALIAS RELATED ITEM",
+      "monday_id": "text_mkrhra2c",
+      "monday_type": "text",
+      "justification": "Similar field names: \"ALIAS RELATED ITEM\" -> \"ALIAS RELATED ITEM\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "COLOR",
+      "target_field": "COLOR",
+      "monday_id": "dropdown_mkr5677f",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"COLOR\" -> \"COLOR\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CATEGORY",
+      "target_field": "CATEGORY",
+      "monday_id": "dropdown_mkr5s5n3",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CATEGORY\" -> \"CATEGORY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PATTERN ID",
+      "target_field": "PATTERN ID",
+      "monday_id": "text_mkr5cz8m",
+      "monday_type": "text",
+      "justification": "Similar field names: \"PATTERN ID\" -> \"PATTERN ID\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "UNIT OF MEASURE",
+      "target_field": "UNIT OF MEASURE",
+      "monday_id": "color_mkr5yf27",
+      "monday_type": "status",
+      "justification": "Similar field names: \"UNIT OF MEASURE\" -> \"UNIT OF MEASURE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FCST QTY",
+      "target_field": "FCST QTY",
+      "monday_id": "numeric_mkrb56rj",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"FCST QTY\" -> \"FCST QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FCST CONSUMED QTY",
+      "target_field": "FCST CONSUMED QTY",
+      "monday_id": "numeric_mkrbty8b",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"FCST CONSUMED QTY\" -> \"FCST CONSUMED QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORDER QTY",
+      "target_field": "ORDER QTY",
+      "monday_id": "formula_mkre54dj",
+      "monday_type": "formula",
+      "justification": "Similar field names: \"ORDER QTY\" -> \"ORDER QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PACKED QTY",
+      "target_field": "PACKED QTY",
+      "monday_id": "formula_mkrea5pd",
+      "monday_type": "formula",
+      "justification": "Similar field names: \"PACKED QTY\" -> \"PACKED QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "SHIPPED QTY",
+      "target_field": "SHIPPED QTY",
+      "monday_id": "formula_mkre5ce5",
+      "monday_type": "formula",
+      "justification": "Similar field names: \"SHIPPED QTY\" -> \"SHIPPED QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Net Demand",
+      "target_field": "Net Demand",
+      "monday_id": "formula_mkrb53jx",
+      "monday_type": "formula",
+      "justification": "Similar field names: \"Net Demand\" -> \"Net Demand\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORDER TYPE",
+      "target_field": "ORDER TYPE",
+      "monday_id": "dropdown_mkr518fc",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"ORDER TYPE\" -> \"ORDER TYPE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DESTINATION",
+      "target_field": "DESTINATION",
+      "monday_id": "text_mkr5kbc6",
+      "monday_type": "text",
+      "justification": "Similar field names: \"DESTINATION\" -> \"DESTINATION\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DESTINATION WAREHOUSE",
+      "target_field": "DESTINATION",
+      "monday_id": "text_mkr5kbc6",
+      "monday_type": "text",
+      "justification": "Similar field names: \"DESTINATION WAREHOUSE\" -> \"DESTINATION\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER REQ IN DC DATE",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER REQ IN DC DATE\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER EX FACTORY DATE",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER EX FACTORY DATE\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DELIVERY TERMS",
+      "target_field": "DELIVERY TERMS",
+      "monday_id": "dropdown_mkr5kk5",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"DELIVERY TERMS\" -> \"DELIVERY TERMS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PLANNED DELIVERY METHOD",
+      "target_field": "PLANNED DELIVERY METHOD",
+      "monday_id": "text_mkr5wcpw",
+      "monday_type": "text",
+      "justification": "Similar field names: \"PLANNED DELIVERY METHOD\" -> \"PLANNED DELIVERY METHOD\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "NOTES",
+      "target_field": "NOTES",
+      "monday_id": "long_text_mkr5hass",
+      "monday_type": "long_text",
+      "justification": "Similar field names: \"NOTES\" -> \"NOTES\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "CUSTOMER PRICE",
+      "target_field": "CUSTOMER",
+      "monday_id": "dropdown_mkr542p2",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"CUSTOMER PRICE\" -> \"CUSTOMER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "USA ONLY LSTP 75% EX WORKS",
+      "target_field": "USA ONLY LSTP 75% EX WORKS",
+      "monday_id": "numeric_mkr5yne4",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"USA ONLY LSTP 75% EX WORKS\" -> \"USA ONLY LSTP 75% EX WORKS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX WORKS (USD)",
+      "target_field": "EX WORKS (USD)",
+      "monday_id": "numeric_mkr5erhv",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"EX WORKS (USD)\" -> \"EX WORKS (USD)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ADMINISTRATION FEE",
+      "target_field": "ADMINISTRATION FEE",
+      "monday_id": "numeric_mkr5k68",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"ADMINISTRATION FEE\" -> \"ADMINISTRATION FEE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DESIGN FEE",
+      "target_field": "DESIGN FEE",
+      "monday_id": "numeric_mkr5h612",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"DESIGN FEE\" -> \"DESIGN FEE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FX CHARGE",
+      "target_field": "FX CHARGE",
+      "monday_id": "numeric_mkr5gp6a",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"FX CHARGE\" -> \"FX CHARGE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "HANDLING",
+      "target_field": "HANDLING",
+      "monday_id": "text_mkr5s3tm",
+      "monday_type": "text",
+      "justification": "Similar field names: \"HANDLING\" -> \"HANDLING\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "SURCHARGE FEE",
+      "target_field": "SURCHARGE FEE",
+      "monday_id": "numeric_mkr57cem",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"SURCHARGE FEE\" -> \"SURCHARGE FEE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DISCOUNT",
+      "target_field": "DISCOUNT",
+      "monday_id": "numeric_mkr56xx8",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"DISCOUNT\" -> \"DISCOUNT\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FINAL FOB (USD)",
+      "target_field": "FINAL FOB (USD)",
+      "monday_id": "numeric_mkr5nhr7",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"FINAL FOB (USD)\" -> \"FINAL FOB (USD)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "HS CODE",
+      "target_field": "HS CODE",
+      "monday_id": "dropdown_mkr5k8yn",
+      "monday_type": "dropdown",
+      "justification": "Similar field names: \"HS CODE\" -> \"HS CODE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US DUTY RATE",
+      "target_field": "US DUTY RATE",
+      "monday_id": "numeric_mkr5r6at",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US DUTY RATE\" -> \"US DUTY RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US DUTY",
+      "target_field": "US DUTY RATE",
+      "monday_id": "numeric_mkr5r6at",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US DUTY\" -> \"US DUTY RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FREIGHT",
+      "target_field": "FREIGHT",
+      "monday_id": "text_mkr5kyf4",
+      "monday_type": "text",
+      "justification": "Similar field names: \"FREIGHT\" -> \"FREIGHT\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US TARIFF RATE",
+      "target_field": "US TARIFF RATE",
+      "monday_id": "numeric_mkr55zg1",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US TARIFF RATE\" -> \"US TARIFF RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "US TARIFF",
+      "target_field": "US TARIFF RATE",
+      "monday_id": "numeric_mkr55zg1",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"US TARIFF\" -> \"US TARIFF RATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "DDP US (USD)",
+      "target_field": "DDP US (USD)",
+      "monday_id": "numeric_mkr5js0x",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"DDP US (USD)\" -> \"DDP US (USD)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "SMS PRICE USD",
+      "target_field": "SMS PRICE USD",
+      "monday_id": "numeric_mkr58nvp",
+      "monday_type": "numbers",
+      "justification": "Similar field names: \"SMS PRICE USD\" -> \"SMS PRICE USD\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FINAL PRICES Y/N",
+      "target_field": "FINAL PRICES Y/N",
+      "monday_id": "text_mkr5ptvg",
+      "monday_type": "text",
+      "justification": "Similar field names: \"FINAL PRICES Y/N\" -> \"FINAL PRICES Y/N\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "NOTES FOR PRICE",
+      "target_field": "NOTES",
+      "monday_id": "long_text_mkr5hass",
+      "monday_type": "long_text",
+      "justification": "Similar field names: \"NOTES FOR PRICE\" -> \"NOTES\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "Item ID",
+      "target_field": "Item ID",
+      "monday_id": "pulse_id_mkr5pb5q",
+      "monday_type": "item_id",
+      "justification": "Similar field names: \"Item ID\" -> \"Item ID\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "matchAlias",
+      "target_field": "matchAlias",
+      "monday_id": "text_mkr61hpz",
+      "monday_type": "text",
+      "justification": "Similar field names: \"matchAlias\" -> \"matchAlias\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PLANNING BOARD",
+      "target_field": "PLANNING BOARD",
+      "monday_id": "board_relation_mkr5cer8",
+      "monday_type": "board_relation",
+      "justification": "Similar field names: \"PLANNING BOARD\" -> \"PLANNING BOARD\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "REQUESTED XFD STATUS",
+      "target_field": "REQUESTED XFD STATUS",
+      "monday_id": "lookup_mkr6eatd",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"REQUESTED XFD STATUS\" -> \"REQUESTED XFD STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX-FTY (Change Request)",
+      "target_field": "EX-FTY (Change Request)",
+      "monday_id": "lookup_mkr6113x",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"EX-FTY (Change Request)\" -> \"EX-FTY (Change Request)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX-FTY (Forecast)",
+      "target_field": "EX-FTY (Forecast)",
+      "monday_id": "lookup_mkr6bhyv",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"EX-FTY (Forecast)\" -> \"EX-FTY (Forecast)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX-FTY (Partner PO)",
+      "target_field": "EX-FTY (Partner PO)",
+      "monday_id": "lookup_mkr640ap",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"EX-FTY (Partner PO)\" -> \"EX-FTY (Partner PO)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "EX-FTY (Revised LS)",
+      "target_field": "EX-FTY (Revised LS)",
+      "monday_id": "lookup_mkr5nd5t",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"EX-FTY (Revised LS)\" -> \"EX-FTY (Revised LS)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PRODUCTION TYPE",
+      "target_field": "PRODUCTION TYPE",
+      "monday_id": "lookup_mkr5j8kx",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"PRODUCTION TYPE\" -> \"PRODUCTION TYPE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AQL INSPECTION",
+      "target_field": "AQL INSPECTION",
+      "monday_id": "lookup_mkr51rn0",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"AQL INSPECTION\" -> \"AQL INSPECTION\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "AQL TYPE",
+      "target_field": "AQL TYPE",
+      "monday_id": "lookup_mkr5jem9",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"AQL TYPE\" -> \"AQL TYPE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PLANNED CUT DATE",
+      "target_field": "PLANNED CUT DATE",
+      "monday_id": "lookup_mkr5bnt8",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"PLANNED CUT DATE\" -> \"PLANNED CUT DATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "MO NUMBER",
+      "target_field": "MO NUMBER",
+      "monday_id": "lookup_mkr5ew17",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"MO NUMBER\" -> \"MO NUMBER\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PRODUCTION STATUS",
+      "target_field": "PRODUCTION STATUS",
+      "monday_id": "lookup_mkr5aapc",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"PRODUCTION STATUS\" -> \"PRODUCTION STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FACTORY COUNTRY",
+      "target_field": "FACTORY COUNTRY",
+      "monday_id": "lookup_mkr5yabx",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"FACTORY COUNTRY\" -> \"FACTORY COUNTRY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FACTORY",
+      "target_field": "CUSTOMER EX FACTORY DATE",
+      "monday_id": "date_mkr57811",
+      "monday_type": "date",
+      "justification": "Similar field names: \"FACTORY\" -> \"CUSTOMER EX FACTORY DATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ALLOCATION STATUS",
+      "target_field": "ALLOCATION STATUS",
+      "monday_id": "lookup_mkr5hhjy",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"ALLOCATION STATUS\" -> \"ALLOCATION STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PRODUCTION QTY",
+      "target_field": "PRODUCTION QTY",
+      "monday_id": "lookup_mkr5fkj1",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"PRODUCTION QTY\" -> \"PRODUCTION QTY\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "TRIM ETA DATE",
+      "target_field": "TRIM ETA DATE",
+      "monday_id": "lookup_mkr53kbm",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"TRIM ETA DATE\" -> \"TRIM ETA DATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FABRIC ETA DATE",
+      "target_field": "FABRIC ETA DATE",
+      "monday_id": "lookup_mkr5vk6m",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"FABRIC ETA DATE\" -> \"FABRIC ETA DATE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "TRIM STATUS",
+      "target_field": "TRIM STATUS",
+      "monday_id": "lookup_mkr52fpd",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"TRIM STATUS\" -> \"TRIM STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ADD TO PLANNING",
+      "target_field": "ADD TO PLANNING",
+      "monday_id": "color_mkrerxrs",
+      "monday_type": "status",
+      "justification": "Similar field names: \"ADD TO PLANNING\" -> \"ADD TO PLANNING\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "FABRIC STATUS",
+      "target_field": "FABRIC STATUS",
+      "monday_id": "lookup_mkr5k4yj",
+      "monday_type": "mirror",
+      "justification": "Similar field names: \"FABRIC STATUS\" -> \"FABRIC STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PPS STATUS",
+      "target_field": "PPS STATUS",
+      "monday_id": "color_mkrvzryf",
+      "monday_type": "status",
+      "justification": "Similar field names: \"PPS STATUS\" -> \"PPS STATUS\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PPS CMT DUE",
+      "target_field": "PPS CMT DUE",
+      "monday_id": "date_mkrvx550",
+      "monday_type": "date",
+      "justification": "Similar field names: \"PPS CMT DUE\" -> \"PPS CMT DUE\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "PPS CMT RCV",
+      "target_field": "PPS CMT RCV",
+      "monday_id": "date_mkrvpbcr",
+      "monday_type": "date",
+      "justification": "Similar field names: \"PPS CMT RCV\" -> \"PPS CMT RCV\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "REVENUE (FOB)",
+      "target_field": "REVENUE (FOB)",
+      "monday_id": "formula_mkrd937j",
+      "monday_type": "formula",
+      "justification": "Similar field names: \"REVENUE (FOB)\" -> \"REVENUE (FOB)\""
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "similar_match",
+      "source_field": "ORDER STATUS",
+      "target_field": "ORDER STATUS",
+      "monday_id": "color_mkr5j5pp",
+      "monday_type": "status",
+      "justification": "Similar field names: \"ORDER STATUS\" -> \"ORDER STATUS\""
+    }
+  ],
+  "ddl_columns": [
+    {
+      "column_name": "AAG ORDER NUMBER",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CUSTOMER NAME",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ORDER DATE PO RECEIVED",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CUSTOMER ALT PO",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "AAG SEASON",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CUSTOMER SEASON",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "DROP",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "MONTH",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "RANGE / COLLECTION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "PROMO GROUP / CAMPAIGN (HOT 30/GLOBAL EDIT",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CATEGORY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "PATTERN ID",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "MAKE OR BUY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "PLANNER",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ORIGINAL ALIAS/RELATED ITEM",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "PRICING ALIAS/RELATED ITEM",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ALIAS/RELATED ITEM",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CUSTOMER STYLE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CUSTOMER''S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ACTIVE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "All",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "Multiple Items",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "FACILITY CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "BULK AGREEMENT NUMBER",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "Sum of TOTAL QTY",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "BULK AGREEMENT DESCRIPTION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CUSTOMER CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CO NUMBER - INITIAL DISTRO",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CO NUMBER (INITIAL DISTRO)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CO NUMBER (ALLOCATION DISTRO)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CO NUMBER - ALLOCATION DISTRO",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "PO NUMBER",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "AAG SEASON CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "INFOR MAKE/BUY CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "PLANNER2",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ITEM TYPE CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "INFOR ITEM TYPE CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "PRODUCT GROUP CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "MAKE/BUY CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "INFOR PRODUCT GROUP CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ITEM GROUP CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "STYLE DESCRIPTION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "INFOR ITEM GROUP CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "GENDER GROUP CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "INFOR GENDER GROUP CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "FABRIC TYPE CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "INFOR FABRIC TYPE CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CUSTOMER COLOUR DESCRIPTION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "UNIT OF MEASURE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "INFOR COLOUR CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "XXXS",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "XXS",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "XS",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "S",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "S/M",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "M",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "M/L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "L/XL",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "XL",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "XXL",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "XXXL",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "0",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "2",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "4",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "6",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "8",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "10",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "12",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "14",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "16",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "18",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "20",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "0-3M",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "3-6M",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "6-9M",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "9-12M",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "12-18M",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "18-24M",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "2T",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "3T",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "4T",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "5T",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "6T",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "30/30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "30/32",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32/30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32/32",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34/30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34/32",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36/30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36/32",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32C",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32D",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32DD",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34C",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34D",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34DD",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36C",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36D",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36DD",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "OS",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ONE SIZE",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "0w",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "10w",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "12w",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "1X",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "2/3",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "22",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "24",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "26",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "27",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "28",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "28-30L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "29",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "2w",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "2X",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "2XL",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "30-30L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "30-31L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "30-32L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "30X30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "31",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "31/30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "31/32",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "31-30L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "31-31L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "31-32L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "31X30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32/34",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32/36",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32-30L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32-31L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32-32L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32DDD",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "32X30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "33",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "33/30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "33/32",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "33-30L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "33-31L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "33-32L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34/34",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34-30L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34-31L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34-32L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34DDD",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "34X30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "35",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "35/30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "35/32",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "35-30L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "35-31L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "35-32L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36/34",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36-30L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36-31L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36-32L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36DDD",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "36X30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38/30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38/32",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38/34",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38/36",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38-30L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38-31L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38-32L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38C",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38D",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38DD",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38DDD",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "38X30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "3X",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "3XL",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "4/5",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "40",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "40/30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "40/32",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "40-30L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "40-31L",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "40X30",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "42",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "44",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "46",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "48",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "4w",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "4X",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "4XL",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "4XT",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "5",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "50",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "52",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "54",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "56",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "58",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "6/7",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "60",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "6w",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "7",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "8w",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "9",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "L(10-12)",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "L(14-16)",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "M(10-12)",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "M(8-10)",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "S(6-8)",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "TOTAL QTY",
+      "data_type": "INT",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ORDER TYPE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "DESTINATION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "DESTINATION WAREHOUSE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ALLOCATION (CHANNEL)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "SHOP NAME",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "COLLECTION DELIVERY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "SHOP CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "TRACKING NUMBER",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ETA CUSTOMER WAREHOUSE DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "EX FACTORY DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "DELIVERY TERMS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "PLANNED DELIVERY METHOD",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "DELIVERY CODE (MODL)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "NOTES",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "VALIDATION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "VALIDATION2",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "VALIDATION3",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "VALIDATION4",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CUSTOMER PRICE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "USA ONLY LSTP 75% EX WORKS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "EX WORKS (USD)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ADMINISTRATION FEE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "DESIGN FEE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "FX CHARGE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "HANDLING",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "PNP",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "SURCHARGE FEE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "DISCOUNT",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "FINAL FOB (USD)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "HS CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "US DUTY RATE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "US DUTY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "FREIGHT",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "US TARIFF RATE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "US TARIFF",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "DDP US (USD)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "UK DUTY RATE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "UK FREIGHT",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "UK INSURANCE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "UK CIF",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "UK DUTY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "DDP UK (USD)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CAN DUTY RATE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "CAN DUTY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "DDP CAN (USD)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "SMS PRICE USD",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "FINAL PRICES Y/N",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "NOTES FOR PRICE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "PRICING NOTES",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "Delta",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "Warehouse",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ORTP (ORDER TYPE)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "Longson Alias",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "BUAR (BUSINESS AREA UNIT)",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "ADID",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_ORDERS_UNIFIED_ddl.sql"
+    },
+    {
+      "column_name": "Title",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "UpdateDate",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "Group",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "Subitems",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER",
+      "data_type": "NVARCHAR(200)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "AAG ORDER NUMBER",
+      "data_type": "NVARCHAR(200)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "AAG SEASON",
+      "data_type": "NVARCHAR(200)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ORDER DATE PO RECEIVED",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER SEASON",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DROP",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PO NUMBER",
+      "data_type": "NVARCHAR(200)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER ALT PO",
+      "data_type": "NVARCHAR(200)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "STYLE",
+      "data_type": "NVARCHAR(200)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "STYLE DESCRIPTION",
+      "data_type": "NVARCHAR(500)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ALIAS RELATED ITEM",
+      "data_type": "NVARCHAR(200)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "COLOR",
+      "data_type": "NVARCHAR(200)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CATEGORY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PATTERN ID",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "UNIT OF MEASURE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FCST QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FCST CONSUMED QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ORDER QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PACKED QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "SHIPPED QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "Net Demand",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ORDER TYPE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DESTINATION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DESTINATION WAREHOUSE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER REQ IN DC DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER EX FACTORY DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DELIVERY TERMS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PLANNED DELIVERY METHOD",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "NOTES",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER PRICE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "USA ONLY LSTP 75% EX WORKS",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "EX WORKS (USD)",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ADMINISTRATION FEE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DESIGN FEE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FX CHARGE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "HANDLING",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "SURCHARGE FEE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DISCOUNT",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FINAL FOB (USD)",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "HS CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "US DUTY RATE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "US DUTY",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FREIGHT",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "US TARIFF RATE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "US TARIFF",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DDP US (USD)",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "SMS PRICE USD",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FINAL PRICES Y/N",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "NOTES FOR PRICE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "Item ID",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "matchAlias",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PLANNING BOARD",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "REQUESTED XFD STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "EX-FTY (Change Request)",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "EX-FTY (Forecast)",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "EX-FTY (Partner PO)",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "EX-FTY (Revised LS)",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PRODUCTION TYPE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "AQL INSPECTION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "AQL TYPE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PLANNED CUT DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "MO NUMBER",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PRODUCTION STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FACTORY COUNTRY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FACTORY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ALLOCATION STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PRODUCTION QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "TRIM ETA DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FABRIC ETA DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "TRIM STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ADD TO PLANNING",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FABRIC STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PPS STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PPS CMT DUE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PPS CMT RCV",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "REVENUE (FOB)",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ORDER STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "stg_id",
+      "data_type": "BIGINT",
+      "constraints": "IDENTITY(1",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "stg_batch_id",
+      "data_type": "UNIQUEIDENTIFIER",
+      "constraints": "NOT NULL DEFAULT NEWID()",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "stg_customer_batch",
+      "data_type": "NVARCHAR(100)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "stg_status",
+      "data_type": "NVARCHAR(50)",
+      "constraints": "DEFAULT 'PENDING'",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "stg_monday_item_id",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "stg_error_message",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "stg_api_payload",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "stg_retry_count",
+      "data_type": "INT",
+      "constraints": "DEFAULT 0",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "stg_created_date",
+      "data_type": "DATETIME2",
+      "constraints": "DEFAULT GETDATE()",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "stg_processed_date",
+      "data_type": "DATETIME2",
+      "constraints": "NULL",
+      "source_file": "stg_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "Title",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "UpdateDate",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "Group",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "Subitems",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "AAG ORDER NUMBER",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "AAG SEASON",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ORDER DATE PO RECEIVED",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER SEASON",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DROP",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PO NUMBER",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER ALT PO",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "STYLE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "STYLE DESCRIPTION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ALIAS RELATED ITEM",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "COLOR",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CATEGORY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PATTERN ID",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "UNIT OF MEASURE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FCST QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FCST CONSUMED QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ORDER QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PACKED QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "SHIPPED QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "Net Demand",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ORDER TYPE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DESTINATION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DESTINATION WAREHOUSE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER REQ IN DC DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER EX FACTORY DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DELIVERY TERMS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PLANNED DELIVERY METHOD",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "NOTES",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "CUSTOMER PRICE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "USA ONLY LSTP 75% EX WORKS",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "EX WORKS (USD)",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ADMINISTRATION FEE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DESIGN FEE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FX CHARGE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "HANDLING",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "SURCHARGE FEE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DISCOUNT",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FINAL FOB (USD)",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "HS CODE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "US DUTY RATE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "US DUTY",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FREIGHT",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "US TARIFF RATE",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "US TARIFF",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "DDP US (USD)",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "SMS PRICE USD",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FINAL PRICES Y/N",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "NOTES FOR PRICE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "Item ID",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "matchAlias",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PLANNING BOARD",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "REQUESTED XFD STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "EX-FTY (Change Request)",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "EX-FTY (Forecast)",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "EX-FTY (Partner PO)",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "EX-FTY (Revised LS)",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PRODUCTION TYPE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "AQL INSPECTION",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "AQL TYPE",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PLANNED CUT DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "MO NUMBER",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PRODUCTION STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FACTORY COUNTRY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FACTORY",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ALLOCATION STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PRODUCTION QTY",
+      "data_type": "BIGINT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "TRIM ETA DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FABRIC ETA DATE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "TRIM STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ADD TO PLANNING",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "FABRIC STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PPS STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PPS CMT DUE",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "PPS CMT RCV",
+      "data_type": "DATE",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "REVENUE (FOB)",
+      "data_type": "FLOAT",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    },
+    {
+      "column_name": "ORDER STATUS",
+      "data_type": "NVARCHAR(MAX)",
+      "constraints": "NULL",
+      "source_file": "dbo_mon_custmasterschedule.sql"
+    }
+  ],
+  "monday_columns": [
+    {
+      "monday_id": "name",
+      "monday_title": "Name",
+      "monday_type": "name",
+      "sql_column": "Name",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "subtasks_mkr5c0kp",
+      "monday_title": "Subitems",
+      "monday_type": "subtasks",
+      "sql_column": "Subitems",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkrbrdr1",
+      "monday_title": "QTY ORDERED",
+      "monday_type": "mirror",
+      "sql_column": "QTY ORDERED",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkrds06t",
+      "monday_title": "QTY SHIPPED",
+      "monday_type": "mirror",
+      "sql_column": "QTY SHIPPED",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkrdm6xp",
+      "monday_title": "QTY PACKED",
+      "monday_type": "mirror",
+      "sql_column": "QTY PACKED",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "dropdown_mkr542p2",
+      "monday_title": "CUSTOMER",
+      "monday_type": "dropdown",
+      "sql_column": "CUSTOMER",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkr5wya6",
+      "monday_title": "AAG ORDER NUMBER",
+      "monday_type": "text",
+      "sql_column": "AAG ORDER NUMBER",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "dropdown_mkr58de6",
+      "monday_title": "AAG SEASON",
+      "monday_type": "dropdown",
+      "sql_column": "AAG SEASON",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "dropdown_mkr5rgs6",
+      "monday_title": "CUSTOMER SEASON",
+      "monday_type": "dropdown",
+      "sql_column": "CUSTOMER SEASON",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "date_mkr5zp5",
+      "monday_title": "ORDER DATE PO RECEIVED",
+      "monday_type": "date",
+      "sql_column": "ORDER DATE PO RECEIVED",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "dropdown_mkr5w5e",
+      "monday_title": "DROP",
+      "monday_type": "dropdown",
+      "sql_column": "DROP",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkr5ej2x",
+      "monday_title": "PO NUMBER",
+      "monday_type": "text",
+      "sql_column": "PO NUMBER",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkrh94rx",
+      "monday_title": "CUSTOMER ALT PO",
+      "monday_type": "text",
+      "sql_column": "CUSTOMER ALT PO",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "dropdown_mkr5tgaa",
+      "monday_title": "STYLE",
+      "monday_type": "dropdown",
+      "sql_column": "STYLE",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkr5cz8m",
+      "monday_title": "PATTERN ID",
+      "monday_type": "text",
+      "sql_column": "PATTERN ID",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkrhra2c",
+      "monday_title": "ALIAS RELATED ITEM",
+      "monday_type": "text",
+      "sql_column": "ALIAS RELATED ITEM",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "long_text_mkr5p0cf",
+      "monday_title": "STYLE DESCRIPTION",
+      "monday_type": "long_text",
+      "sql_column": "STYLE DESCRIPTION",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "dropdown_mkr5677f",
+      "monday_title": "COLOR",
+      "monday_type": "dropdown",
+      "sql_column": "COLOR",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "dropdown_mkr5s5n3",
+      "monday_title": "CATEGORY",
+      "monday_type": "dropdown",
+      "sql_column": "CATEGORY",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "color_mkr5yf27",
+      "monday_title": "UNIT OF MEASURE",
+      "monday_type": "status",
+      "sql_column": "UNIT OF MEASURE",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "dropdown_mkr518fc",
+      "monday_title": "ORDER TYPE",
+      "monday_type": "dropdown",
+      "sql_column": "ORDER TYPE",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkr5kbc6",
+      "monday_title": "DESTINATION",
+      "monday_type": "text",
+      "sql_column": "DESTINATION",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkr5ps35",
+      "monday_title": "DESTINATION WAREHOUSE",
+      "monday_type": "text",
+      "sql_column": "DESTINATION WAREHOUSE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "date_mkr554yz",
+      "monday_title": "CUSTOMER REQ IN DC DATE",
+      "monday_type": "date",
+      "sql_column": "CUSTOMER REQ IN DC DATE",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "date_mkr57811",
+      "monday_title": "CUSTOMER EX FACTORY DATE",
+      "monday_type": "date",
+      "sql_column": "CUSTOMER EX FACTORY DATE",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "dropdown_mkr5kk5",
+      "monday_title": "DELIVERY TERMS",
+      "monday_type": "dropdown",
+      "sql_column": "DELIVERY TERMS",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkr5wcpw",
+      "monday_title": "PLANNED DELIVERY METHOD",
+      "monday_type": "text",
+      "sql_column": "PLANNED DELIVERY METHOD",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "long_text_mkr5hass",
+      "monday_title": "NOTES",
+      "monday_type": "long_text",
+      "sql_column": "NOTES",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr5cact",
+      "monday_title": "CUSTOMER PRICE",
+      "monday_type": "numbers",
+      "sql_column": "CUSTOMER PRICE",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr5yne4",
+      "monday_title": "USA ONLY LSTP 75% EX WORKS",
+      "monday_type": "numbers",
+      "sql_column": "USA ONLY LSTP 75% EX WORKS",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr5erhv",
+      "monday_title": "EX WORKS (USD)",
+      "monday_type": "numbers",
+      "sql_column": "EX WORKS (USD)",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr5k68",
+      "monday_title": "ADMINISTRATION FEE",
+      "monday_type": "numbers",
+      "sql_column": "ADMINISTRATION FEE",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr5h612",
+      "monday_title": "DESIGN FEE",
+      "monday_type": "numbers",
+      "sql_column": "DESIGN FEE",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr5gp6a",
+      "monday_title": "FX CHARGE",
+      "monday_type": "numbers",
+      "sql_column": "FX CHARGE",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkr5s3tm",
+      "monday_title": "HANDLING",
+      "monday_type": "text",
+      "sql_column": "HANDLING",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr57cem",
+      "monday_title": "SURCHARGE FEE",
+      "monday_type": "numbers",
+      "sql_column": "SURCHARGE FEE",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr56xx8",
+      "monday_title": "DISCOUNT",
+      "monday_type": "numbers",
+      "sql_column": "DISCOUNT",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr5nhr7",
+      "monday_title": "FINAL FOB (USD)",
+      "monday_type": "numbers",
+      "sql_column": "FINAL FOB (USD)",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "dropdown_mkr5k8yn",
+      "monday_title": "HS CODE",
+      "monday_type": "dropdown",
+      "sql_column": "HS CODE",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr5r6at",
+      "monday_title": "US DUTY RATE",
+      "monday_type": "numbers",
+      "sql_column": "US DUTY RATE",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr5ev2q",
+      "monday_title": "US DUTY",
+      "monday_type": "numbers",
+      "sql_column": "US DUTY",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkr5kyf4",
+      "monday_title": "FREIGHT",
+      "monday_type": "text",
+      "sql_column": "FREIGHT",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr55zg1",
+      "monday_title": "US TARIFF RATE",
+      "monday_type": "numbers",
+      "sql_column": "US TARIFF RATE",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr51ndy",
+      "monday_title": "US TARIFF",
+      "monday_type": "numbers",
+      "sql_column": "US TARIFF",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr5js0x",
+      "monday_title": "DDP US (USD)",
+      "monday_type": "numbers",
+      "sql_column": "DDP US (USD)",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkr58nvp",
+      "monday_title": "SMS PRICE USD",
+      "monday_type": "numbers",
+      "sql_column": "SMS PRICE USD",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkr5ptvg",
+      "monday_title": "FINAL PRICES Y/N",
+      "monday_type": "text",
+      "sql_column": "FINAL PRICES Y/N",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "long_text_mkr5znxn",
+      "monday_title": "NOTES FOR PRICE",
+      "monday_type": "long_text",
+      "sql_column": "NOTES FOR PRICE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "pulse_id_mkr5pb5q",
+      "monday_title": "Item ID",
+      "monday_type": "item_id",
+      "sql_column": "Item ID",
+      "sql_type": "BIGINT NOT NULL",
+      "extraction_field": "item_id",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "text_mkr61hpz",
+      "monday_title": "matchAlias",
+      "monday_type": "text",
+      "sql_column": "matchAlias",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "board_relation_mkr5cer8",
+      "monday_title": "PLANNING BOARD",
+      "monday_type": "board_relation",
+      "sql_column": "PLANNING BOARD",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr6113x",
+      "monday_title": "EX-FTY (Change Request)",
+      "monday_type": "mirror",
+      "sql_column": "EX-FTY (Change Request)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr6eatd",
+      "monday_title": "REQUESTED XFD STATUS",
+      "monday_type": "mirror",
+      "sql_column": "REQUESTED XFD STATUS",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr6bhyv",
+      "monday_title": "EX-FTY (Forecast)",
+      "monday_type": "mirror",
+      "sql_column": "EX-FTY (Forecast)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr640ap",
+      "monday_title": "EX-FTY (Partner PO)",
+      "monday_type": "mirror",
+      "sql_column": "EX-FTY (Partner PO)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5nd5t",
+      "monday_title": "EX-FTY (Revised LS)",
+      "monday_type": "mirror",
+      "sql_column": "EX-FTY (Revised LS)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5j8kx",
+      "monday_title": "PRODUCTION TYPE",
+      "monday_type": "mirror",
+      "sql_column": "PRODUCTION TYPE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr51rn0",
+      "monday_title": "AQL INSPECTION",
+      "monday_type": "mirror",
+      "sql_column": "AQL INSPECTION",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5jem9",
+      "monday_title": "AQL TYPE",
+      "monday_type": "mirror",
+      "sql_column": "AQL TYPE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5bnt8",
+      "monday_title": "PLANNED CUT DATE",
+      "monday_type": "mirror",
+      "sql_column": "PLANNED CUT DATE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5ew17",
+      "monday_title": "MO NUMBER",
+      "monday_type": "mirror",
+      "sql_column": "MO NUMBER",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5aapc",
+      "monday_title": "PRODUCTION STATUS",
+      "monday_type": "mirror",
+      "sql_column": "PRODUCTION STATUS",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5yabx",
+      "monday_title": "FACTORY COUNTRY",
+      "monday_type": "mirror",
+      "sql_column": "FACTORY COUNTRY",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr55sr9",
+      "monday_title": "FACTORY",
+      "monday_type": "mirror",
+      "sql_column": "FACTORY",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5hhjy",
+      "monday_title": "ALLOCATION STATUS",
+      "monday_type": "mirror",
+      "sql_column": "ALLOCATION STATUS",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5fkj1",
+      "monday_title": "PRODUCTION QTY",
+      "monday_type": "mirror",
+      "sql_column": "PRODUCTION QTY",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr53kbm",
+      "monday_title": "TRIM ETA DATE",
+      "monday_type": "mirror",
+      "sql_column": "TRIM ETA DATE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5vk6m",
+      "monday_title": "FABRIC ETA DATE",
+      "monday_type": "mirror",
+      "sql_column": "FABRIC ETA DATE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr52fpd",
+      "monday_title": "TRIM STATUS",
+      "monday_type": "mirror",
+      "sql_column": "TRIM STATUS",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "lookup_mkr5k4yj",
+      "monday_title": "FABRIC STATUS",
+      "monday_type": "mirror",
+      "sql_column": "FABRIC STATUS",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "color_mkr5j5pp",
+      "monday_title": "ORDER STATUS",
+      "monday_type": "status",
+      "sql_column": "ORDER STATUS",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkrb56rj",
+      "monday_title": "FCST QTY",
+      "monday_type": "numbers",
+      "sql_column": "FCST QTY",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "numeric_mkrbty8b",
+      "monday_title": "FCST CONSUMED QTY",
+      "monday_type": "numbers",
+      "sql_column": "FCST CONSUMED QTY",
+      "sql_type": "BIGINT",
+      "extraction_field": "number",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "formula_mkrb53jx",
+      "monday_title": "Net Demand",
+      "monday_type": "formula",
+      "sql_column": "Net Demand",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "formula_mkrd937j",
+      "monday_title": "REVENUE (FOB)",
+      "monday_type": "formula",
+      "sql_column": "REVENUE (FOB)",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "color_mkrerxrs",
+      "monday_title": "ADD TO PLANNING",
+      "monday_type": "status",
+      "sql_column": "ADD TO PLANNING",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "formula_mkre54dj",
+      "monday_title": "ORDER QTY",
+      "monday_type": "formula",
+      "sql_column": "ORDER QTY",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "formula_mkrea5pd",
+      "monday_title": "PACKED QTY",
+      "monday_type": "formula",
+      "sql_column": "PACKED QTY",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "formula_mkre5ce5",
+      "monday_title": "SHIPPED QTY",
+      "monday_type": "formula",
+      "sql_column": "SHIPPED QTY",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "date_mkrvx550",
+      "monday_title": "PPS CMT DUE",
+      "monday_type": "date",
+      "sql_column": "PPS CMT DUE",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "date_mkrvpbcr",
+      "monday_title": "PPS CMT RCV",
+      "monday_type": "date",
+      "sql_column": "PPS CMT RCV",
+      "sql_type": "DATE",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "color_mkrvzryf",
+      "monday_title": "PPS STATUS",
+      "monday_type": "status",
+      "sql_column": "PPS STATUS",
+      "sql_type": "NVARCHAR(100)",
+      "extraction_field": "label",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "long_text_mks0vs1p",
+      "monday_title": "RANGE / COLLECTION",
+      "monday_type": "long_text",
+      "sql_column": "RANGE / COLLECTION",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "pulse_updated_mks18te2",
+      "monday_title": "Last updated",
+      "monday_type": "last_updated",
+      "sql_column": "Last updated",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "is_system_field": false
+    },
+    {
+      "monday_id": "__item_name",
+      "monday_title": "Item Name",
+      "monday_type": "text",
+      "sql_column": "Item Name",
+      "sql_type": "NVARCHAR(500)",
+      "extraction_field": "text",
+      "is_system_field": true
+    },
+    {
+      "monday_id": "__group_title",
+      "monday_title": "Group Title",
+      "monday_type": "text",
+      "sql_column": "Group Title",
+      "sql_type": "NVARCHAR(200)",
+      "extraction_field": "text",
+      "is_system_field": true
+    },
+    {
+      "monday_id": "__updated_at",
+      "monday_title": "Updated At",
+      "monday_type": "datetime",
+      "sql_column": "Updated At",
+      "sql_type": "DATETIME2",
+      "extraction_field": "text",
+      "is_system_field": true
+    },
+    {
+      "monday_id": "__created_at",
+      "monday_title": "Created At",
+      "monday_type": "datetime",
+      "sql_column": "Created At",
+      "sql_type": "DATETIME2",
+      "extraction_field": "text",
+      "is_system_field": true
+    }
+  ]
+}

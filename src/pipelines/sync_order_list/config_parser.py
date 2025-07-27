@@ -89,6 +89,11 @@ class DeltaSyncConfig:
         """Current environment (development/production)"""
         return self._environment
     
+    @property
+    def config_dict(self) -> Dict[str, Any]:
+        """Full configuration dictionary for transformer access"""
+        return self._config
+    
     def _get_env_config(self) -> Dict[str, Any]:
         """Get environment-specific configuration section (nested TOML structure)"""
         return self._config.get('environment', {}).get(self._environment, {})
@@ -98,13 +103,13 @@ class DeltaSyncConfig:
     def source_table(self) -> str:
         """Source table name from environment-specific configuration"""
         env_config = self._get_env_config()
-        return env_config.get('source_table', 'swp_ORDER_LIST_V2')
+        return env_config.get('source_table', 'swp_ORDER_LIST_SYNC')
     
     @property
     def target_table(self) -> str:
         """Primary table for ORDER_LIST data (environment-specific)"""
         env_config = self._get_env_config()
-        return env_config.get('target_table', 'ORDER_LIST_V2')
+        return env_config.get('target_table', 'FACT_ORDER_LIST')
     
     @property
     def lines_table(self) -> str:
@@ -221,10 +226,22 @@ class DeltaSyncConfig:
         return monday_config.get('group_id', '')
     
     # Business Columns (adapted to actual TOML structure) 
-    def get_business_columns(self) -> List[str]:
-        """Get list of business columns from TOML configuration"""
-        # UPDATED: Use Monday.com column mappings like sync_engine.py does
-        # This provides the authoritative source of business columns
+    def get_business_columns(self, use_dynamic_detection: bool = False) -> List[str]:
+        """
+        Get list of business columns from TOML configuration or dynamic detection
+        
+        Args:
+            use_dynamic_detection: If True, use stored procedure to detect matching columns
+                                 If False, use Monday.com mappings or essential_columns
+        
+        Returns:
+            List of business column names for template generation
+        """
+        if use_dynamic_detection:
+            self.logger.info("🎯 Using dynamic column detection via stored procedure")
+            return self.get_dynamic_merge_columns()
+        
+        # EXISTING LOGIC: Monday.com mappings first, then fallbacks
         monday_headers = (self._config.get('monday', {})
                          .get('column_mapping', {})
                          .get(self._environment, {})
@@ -233,8 +250,22 @@ class DeltaSyncConfig:
         if monday_headers:
             # Return all Monday.com column mapping keys as business columns (46 columns)
             business_columns = list(monday_headers.keys())
-            self.logger.debug(f"Business columns from Monday.com mappings ({self._environment}): {len(business_columns)} columns")
-            return business_columns
+            
+            # ENHANCEMENT: Add transformation columns when enabled
+            transformation_columns = []
+            if self._config.get('database', {}).get('group_name_transformation', {}).get('enabled'):
+                transformation_columns.append('group_name')
+                if 'group_id' not in business_columns:  # Avoid duplicates
+                    transformation_columns.append('group_id')
+            
+            if self._config.get('database', {}).get('item_name_transformation', {}).get('enabled'):
+                transformation_columns.append('item_name')
+            
+            # Merge Monday.com + transformation columns
+            all_columns = business_columns + transformation_columns
+            
+            self.logger.debug(f"Business columns from Monday.com mappings + transformations ({self._environment}): {len(all_columns)} columns")
+            return all_columns
         else:
             # FALLBACK: Use essential_columns from database section (backward compatibility)
             business_columns = self._config.get('database', {}).get('essential_columns', [])
@@ -246,6 +277,50 @@ class DeltaSyncConfig:
             self.logger.warning(f"Using fallback business columns ({len(business_columns)} columns) - Monday.com mappings not found")
             
         return business_columns
+    
+    def get_dynamic_merge_columns(self) -> List[str]:
+        """
+        Get matching columns between source and target tables using stored procedure
+        
+        Returns:
+            List of column names that exist in both source and target tables
+            Excludes uniqueidentifier columns automatically
+        """
+        try:
+            from pipelines.utils import db
+            
+            # Get table names from environment config
+            source_table = self.source_table.split('.')[-1]  # Remove schema if present
+            target_table = self.target_table.split('.')[-1]  # Remove schema if present
+            
+            self.logger.info(f"🔍 Detecting matching columns between {source_table} and {target_table}")
+            
+            # Execute stored procedure to get matching columns
+            with db.get_connection(self.db_key) as connection:
+                cursor = connection.cursor()
+                
+                # Call the stored procedure
+                query = "EXEC sp_get_matching_columns ?, ?"
+                cursor.execute(query, (source_table, target_table))
+                
+                # Fetch results
+                results = cursor.fetchall()
+                cursor.close()
+                
+                # Extract column names from results
+                matching_columns = [row[0] for row in results]  # COLUMN_NAME is first column
+                
+                self.logger.info(f"✅ Found {len(matching_columns)} matching columns")
+                self.logger.debug(f"Matching columns: {matching_columns[:10]}..." if len(matching_columns) > 10 else f"Matching columns: {matching_columns}")
+                
+                return matching_columns
+                
+        except Exception as e:
+            self.logger.error(f"❌ Failed to get dynamic merge columns: {e}")
+            self.logger.warning("⚠️ Falling back to static business columns")
+            
+            # Fallback to existing business columns method
+            return self.get_business_columns()
     
     # Utility Methods (simplified for actual TOML structure)
     def get_full_table_name(self, table_type: str) -> str:
@@ -289,7 +364,7 @@ class DeltaSyncConfig:
 
     def get_dynamic_size_columns(self) -> List[str]:
         """
-        Get dynamic size columns from actual swp_ORDER_LIST_V2 table schema
+        Get dynamic size columns from actual source table schema (TOML-driven)
         Uses INFORMATION_SCHEMA to discover columns between markers
         
         Returns:
