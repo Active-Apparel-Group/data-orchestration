@@ -112,6 +112,11 @@ BEGIN
                  SET [ORDER TYPE] = ''RECEIVED''
                WHERE [ORDER TYPE] = ''ACTIVE'';');
 
+         /* Update Order Type */
+        PRINT 'Updating order type in ' + @tgt + ';';
+        EXEC (N'UPDATE ' + @tgt + '
+                 SET [ORDER TYPE] = ''CANCELLED''
+               WHERE [ORDER TYPE] = ''Cancelled'';');
       
 
         /* 6️⃣  Indexes -----------------------------------------*/
@@ -131,4 +136,3 @@ END
 GO
 
 
-EXEC dbo.usp_ORDER_LIST_PostStage_Clean; 

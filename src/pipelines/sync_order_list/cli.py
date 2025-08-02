@@ -60,7 +60,7 @@ class UltraLightweightSyncCLI:
     def sync_command(self, dry_run: bool = False, limit: Optional[int] = None, 
                      customer: Optional[str] = None, createitem_mode: str = 'batch',
                      skip_subitems: bool = False, retry_errors: bool = False,
-                     generate_report: bool = False) -> Dict[str, Any]:
+                     generate_report: bool = False, sequential: bool = False) -> Dict[str, Any]:
         """
         Enhanced sync command with customer processing and retry functionality.
         
@@ -72,6 +72,7 @@ class UltraLightweightSyncCLI:
             skip_subitems: If True, skip subitem creation for faster sync (groups/items only)
             retry_errors: If True, retry failed records before processing new ones
             generate_report: If True, generate customer summary report after processing
+            sequential: If True, process customers one at a time with isolated group creation
             
         Returns:
             Enhanced sync execution results including retry statistics and customer reports
@@ -109,16 +110,28 @@ class UltraLightweightSyncCLI:
             self.logger.info(f"✅ Enhanced Merge Orchestrator completed successfully")
             
             # STEP 2: Execute enhanced sync using sync engine
-            self.logger.info("🚀 STEP 2: Running Enhanced Monday.com Sync...")
-            result = self.sync_engine.run_sync(
-                dry_run=dry_run, 
-                limit=limit, 
-                createitem_mode=createitem_mode, 
-                skip_subitems=skip_subitems,
-                customer_name=customer,
-                retry_errors=retry_errors,
-                generate_report=generate_report
-            )
+            if sequential:
+                self.logger.info("🚀 STEP 2: Running Enhanced Monday.com Sync (Sequential Mode - Per Customer)...")
+                result = self.sync_engine.run_sync_per_customer_sequential(
+                    dry_run=dry_run, 
+                    limit=limit, 
+                    createitem_mode=createitem_mode, 
+                    skip_subitems=skip_subitems,
+                    customer_name=customer,
+                    retry_errors=retry_errors,
+                    generate_report=generate_report
+                )
+            else:
+                self.logger.info("🚀 STEP 2: Running Enhanced Monday.com Sync (Default Mode - Cross Customer)...")
+                result = self.sync_engine.run_sync(
+                    dry_run=dry_run, 
+                    limit=limit, 
+                    createitem_mode=createitem_mode, 
+                    skip_subitems=skip_subitems,
+                    customer_name=customer,
+                    retry_errors=retry_errors,
+                    generate_report=generate_report
+                )
             
             # Enhanced results logging
             if result['success']:
@@ -393,6 +406,8 @@ Examples:
                            help='Retry failed records before processing new ones (Fix #3: Retry Functionality)')
     sync_parser.add_argument('--generate-report', action='store_true',
                            help='Generate customer summary report after processing (requires --customer)')
+    sync_parser.add_argument('--sequential', action='store_true',
+                           help='Process customers one at a time with isolated group creation (vs cross-customer batch mode)')
     
     # Retry command
     retry_parser = subparsers.add_parser('retry', help='Retry failed records')
@@ -440,7 +455,8 @@ Examples:
                 createitem_mode=args.createitem,
                 skip_subitems=args.skip_subitems,
                 retry_errors=args.retry_errors,
-                generate_report=args.generate_report
+                generate_report=args.generate_report,
+                sequential=args.sequential
             )
         elif args.command == 'retry':
             dry_run = args.dry_run

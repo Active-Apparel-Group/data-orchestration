@@ -132,14 +132,15 @@ class SyncEngine:
     def _generate_sync_id(self) -> str:
         """
         Generate unique sync identifier for output organization (TASK027 Phase 1.2)
+        Enhanced: Better chronological sorting with YYYYMMDDHHMM prefix
         
         Returns:
-            Sync ID in format: SYNC-{UUID8}-{YYYYMMDD}
+            Sync ID in format: {YYYYMMDDHHMM}-SYNC-{UUID8}
         """
         import uuid
         sync_uuid = str(uuid.uuid4())[:8].upper()
-        sync_date = datetime.now().strftime("%Y%m%d")
-        sync_id = f"SYNC-{sync_uuid}-{sync_date}"
+        sync_timestamp = datetime.now().strftime("%Y%m%d%H%M")
+        sync_id = f"{sync_timestamp}-SYNC-{sync_uuid}"
         
         self.logger.info(f"🆔 Generated Sync ID: {sync_id}")
         return sync_id
@@ -217,10 +218,33 @@ class SyncEngine:
             f"**Timestamp**: {timestamp}",
             f"**Status**: {'✅ SUCCESS' if sync_results.get('success', False) else '❌ FAILED'}",
             f"",
+        ]
+        
+        # Add customer results table if available
+        if sync_results.get('per_customer_results'):
+            summary_lines.extend([
+                f"## Customer Results",
+                f"",
+                f"| Customer | Status | Records Processed | Number of Errors | Execution Time |",
+                f"|----------|--------|-------------------|------------------|----------------|",
+            ])
+            
+            for customer_name, customer_data in sync_results['per_customer_results'].items():
+                status_emoji = "✅ SUCCESS" if customer_data.get('success', False) else "❌ FAILED"
+                records_processed = customer_data.get('records_synced', 0)
+                errors = len(customer_data.get('batch_results', []))  # Count failed batches as errors
+                errors = sum(1 for batch in customer_data.get('batch_results', []) if not batch.get('success', True))
+                execution_time = f"{customer_data.get('execution_time', 0):.2f}s"
+                
+                summary_lines.append(f"| {customer_name} | {status_emoji} | {records_processed} | {errors} | {execution_time} |")
+            
+            summary_lines.append(f"")
+        
+        summary_lines.extend([
             f"## Performance Metrics",
             f"- **Records Processed**: {sync_results.get('total_synced', 0):,}",
             f"- **Execution Time**: {sync_results.get('execution_time_seconds', 0):.2f}s",
-        ]
+        ])
         
         # Add throughput if available
         if sync_results.get('total_synced', 0) > 0 and sync_results.get('execution_time_seconds', 0) > 0:
@@ -483,15 +507,24 @@ class SyncEngine:
                 enhanced_results['api_archival'] = {'status': 'skipped_for_performance', 'message': 'Run api_logging_archiver.py separately'}
             
             # Step 4: Generate customer report if requested (Fix #4: Customer Processing)
+            # TASK027 Phase 2.0: CRITICAL - Always generate customer reports, even on errors
             if generate_report:
-                if customer_name:
-                    # Generate report for specific customer
-                    self.logger.info(f"📊 Generating customer report for {customer_name}")
-                    enhanced_results['customer_report'] = self.generate_customer_processing_report(customer_name)
-                else:
-                    # Generate reports for all customers processed in this sync
-                    self.logger.info(f"📊 Generating customer reports for all processed customers")
-                    enhanced_results['customer_reports'] = self.generate_all_customer_reports()
+                try:
+                    if customer_name:
+                        # Generate report for specific customer
+                        self.logger.info(f"📊 Generating customer report for {customer_name}")
+                        enhanced_results['customer_report'] = self.generate_customer_processing_report(customer_name, enhanced_results)
+                    else:
+                        # Generate reports for all customers processed in this sync
+                        self.logger.info(f"📊 Generating customer reports for all processed customers")
+                        enhanced_results['customer_reports'] = self.generate_all_customer_reports(enhanced_results)
+                except Exception as report_error:
+                    self.logger.error(f"❌ Customer report generation failed: {report_error}")
+                    # Ensure we still have a report entry even if generation fails
+                    if customer_name:
+                        enhanced_results['customer_report'] = f"# {customer_name}\n\n❌ Report generation failed: {report_error}"
+                    else:
+                        enhanced_results['customer_reports'] = {'error': f"Report generation failed: {report_error}"}
             
             self.logger.info(f"✅ Enhanced sync completed! Total synced: {total_synced}, "
                            f"Successful batches: {successful_batches}/{len(all_results)}")
@@ -515,6 +548,11 @@ class SyncEngine:
                 'records_per_second': records_per_second,
                 'milestones': performance_log
             }
+            enhanced_results['processing_time'] = total_performance_time  # TASK027: Group summary compatibility
+            enhanced_results['successful_batches'] = successful_batches
+            enhanced_results['total_batches'] = len(all_results) if 'all_results' in locals() else 1
+            enhanced_results['success'] = successful_batches > 0  # TASK027 Phase 2: Fix sync status reporting
+            enhanced_results['total_synced'] = total_synced
             
             # TASK027 Phase 1.4: Persist executive summary to sync folder
             self._persist_executive_summary(sync_folder, enhanced_results)
@@ -530,6 +568,27 @@ class SyncEngine:
                 'execution_time_seconds': sync_duration,
                 'status': 'FAILED'
             })
+            
+            # TASK027 Phase 2.0: CRITICAL - Generate customer reports even when sync fails
+            if generate_report:
+                try:
+                    self.logger.info(f"📊 Generating customer report despite sync failure")
+                    if customer_name:
+                        enhanced_results['customer_report'] = self.generate_customer_processing_report(customer_name, enhanced_results)
+                    else:
+                        enhanced_results['customer_reports'] = self.generate_all_customer_reports(enhanced_results)
+                except Exception as report_error:
+                    self.logger.error(f"❌ Customer report generation failed during exception handling: {report_error}")
+                    # Ensure we still have a report entry
+                    if customer_name:
+                        enhanced_results['customer_report'] = f"# {customer_name}\n\n❌ Report generation failed: {report_error}"
+                    else:
+                        enhanced_results['customer_reports'] = {'error': f"Report generation failed: {report_error}"}
+            
+            # TASK027 Phase 1.4: Persist executive summary even on failure
+            if hasattr(self, 'sync_session_dir') and self.sync_session_dir:
+                self._persist_executive_summary(self.sync_session_dir, enhanced_results)
+            
             return enhanced_results
     
     def _group_by_customer_and_uuid(self, headers: List[Dict[str, Any]]) -> Dict[str, Dict[str, List[Dict[str, Any]]]]:
@@ -593,6 +652,250 @@ class SyncEngine:
                 
         self.logger.info(f"🚀 TRUE BATCH PROCESSING: {len(headers)} records in {len(all_batches)} batches (size: {batch_size})")
         return all_batches
+    
+    def run_sync_per_customer_sequential(self, dry_run: bool = False, limit: Optional[int] = None, action_types: List[str] = None, 
+                                       createitem_mode: str = 'batch', skip_subitems: bool = False, customer_name: Optional[str] = None,
+                                       retry_errors: bool = False, generate_report: bool = False) -> Dict[str, Any]:
+        """
+        EXPERIMENTAL: Per-Customer Sequential Sync Processing
+        
+        This method processes customers one at a time with isolated group creation:
+        1. Loop through each customer individually
+        2. Create groups for THIS customer only  
+        3. Process THIS customer's batches
+        4. Generate THIS customer's report immediately
+        5. Move to next customer
+        
+        Benefits:
+        - Customer isolation (failures don't affect other customers)
+        - Immediate per-customer reporting  
+        - Better debugging and error tracking
+        - Can skip problematic customers
+        
+        Args:
+            Same as run_sync() but with per-customer isolation
+            
+        Returns:
+            Enhanced results with per-customer breakdown
+        """
+        # Default to INSERT operations for backwards compatibility
+        if action_types is None:
+            action_types = ['INSERT']
+            
+        self.logger.info(f"🚀 EXPERIMENTAL: Per-Customer Sequential Sync Processing")
+        self.logger.info(f"   Dry run: {dry_run}, Limit: {limit}, Customer: {customer_name or 'ALL'}")
+        self.logger.info(f"   Action types: {action_types}, Mode: {createitem_mode}, Skip subitems: {skip_subitems}")
+        
+        sync_start_time = datetime.now()
+        
+        # TASK027 Phase 1: Initialize sync-based output organization
+        sync_id = self._generate_sync_id()
+        sync_folder = self._create_sync_folder_structure(sync_id)
+        
+        # Store sync session attributes for report generation
+        self.sync_id = sync_id
+        self.sync_session_dir = sync_folder
+        
+        # Enhanced result structure with per-customer tracking
+        enhanced_results = {
+            'status': 'STARTED',
+            'customer': customer_name or 'ALL',
+            'sync_id': sync_id,
+            'sync_folder': str(sync_folder),
+            'sync_timestamp': datetime.now().strftime("%Y%m%d_%H%M%S"),
+            'success': False,
+            'total_synced': 0,
+            'execution_time_seconds': 0,
+            'per_customer_results': {},  # NEW: Track each customer individually
+            'processing_mode': 'PER_CUSTOMER_SEQUENTIAL'
+        }
+        
+        try:
+            # Step 1: Determine customers to process
+            if customer_name:
+                customers_to_process = [customer_name]
+                self.logger.info(f"🎯 Single customer mode: {customer_name}")
+            else:
+                customers_to_process = self._get_customers_with_pending_records(action_types)
+                self.logger.info(f"🔄 Multi-customer sequential mode: {len(customers_to_process)} customers")
+                self.logger.info(f"   Customers: {', '.join(customers_to_process[:5])}{'...' if len(customers_to_process) > 5 else ''}")
+            
+            if not customers_to_process:
+                enhanced_results.update({
+                    'success': True,
+                    'total_synced': 0,
+                    'message': 'No customers with pending records found',
+                    'status': 'NO_CUSTOMERS'
+                })
+                return enhanced_results
+            
+            # Step 2: Process each customer sequentially with isolation
+            total_synced_all_customers = 0
+            successful_customers = 0
+            failed_customers = 0
+            
+            for current_customer in customers_to_process:
+                customer_start_time = datetime.now()
+                self.logger.info(f"🔄 [{current_customer}] Starting isolated customer processing...")
+                
+                try:
+                    # Phase 1: Get this customer's headers
+                    customer_headers = self._get_pending_headers(limit, action_types, current_customer)
+                    
+                    if not customer_headers:
+                        self.logger.info(f"📝 [{current_customer}] No pending headers found, skipping")
+                        enhanced_results['per_customer_results'][current_customer] = {
+                            'success': True,
+                            'status': 'NO_RECORDS',
+                            'records_synced': 0,
+                            'execution_time': 0,
+                            'message': 'No pending headers'
+                        }
+                        continue
+                    
+                    self.logger.info(f"📊 [{current_customer}] Found {len(customer_headers)} pending headers")
+                    
+                    # Phase 2: Create groups for THIS customer only (ISOLATION)
+                    self.logger.info(f"🏗️ [{current_customer}] Creating groups (isolated from other customers)")
+                    customer_groups_result = self._create_customer_groups(customer_headers, current_customer, dry_run)
+                    
+                    if not customer_groups_result.get('success', False):
+                        self.logger.error(f"❌ [{current_customer}] Group creation failed: {customer_groups_result.get('error')}")
+                        enhanced_results['per_customer_results'][current_customer] = {
+                            'success': False,
+                            'status': 'GROUP_CREATION_FAILED',
+                            'error': customer_groups_result.get('error'),
+                            'records_synced': 0,
+                            'execution_time': (datetime.now() - customer_start_time).total_seconds()
+                        }
+                        failed_customers += 1
+                        continue  # Skip to next customer (ISOLATION)
+                    
+                    groups_created = customer_groups_result.get('groups_created', 0)
+                    created_group_ids = customer_groups_result.get('created_group_ids', [])
+                    self.logger.info(f"✅ [{current_customer}] Created {groups_created} groups successfully: {created_group_ids}")
+                    
+                    # Phase 3: Process THIS customer's batches
+                    customer_batches = self._create_true_batch_groups(customer_headers, self.batch_size)
+                    self.logger.info(f"🚀 [{current_customer}] Processing {len(customer_batches)} batches")
+                    
+                    customer_results = []
+                    customer_synced = 0
+                    
+                    for batch_index, batch_records in enumerate(customer_batches, 1):
+                        try:
+                            # Groups already created, so skip group creation in batch processing
+                            batch_result = self._process_true_batch(batch_records, batch_index, dry_run,
+                                                                  createitem_mode=createitem_mode, skip_subitems=skip_subitems)
+                            customer_results.append(batch_result)
+                            
+                            if batch_result.get('success', False):
+                                customer_synced += batch_result.get('records_processed', 0)
+                                
+                        except Exception as batch_error:
+                            self.logger.error(f"❌ [{current_customer}] Batch {batch_index} failed: {batch_error}")
+                            customer_results.append({
+                                'success': False,
+                                'batch_number': batch_index,
+                                'error': str(batch_error),
+                                'records_processed': 0
+                            })
+                    
+                    # Phase 4: Calculate customer results
+                    customer_execution_time = (datetime.now() - customer_start_time).total_seconds()
+                    customer_successful_batches = len([r for r in customer_results if r.get('success', False)])
+                    customer_success = customer_successful_batches > 0
+                    
+                    # Store per-customer results
+                    enhanced_results['per_customer_results'][current_customer] = {
+                        'success': customer_success,
+                        'status': 'COMPLETED' if customer_success else 'FAILED',
+                        'records_synced': customer_synced,
+                        'execution_time': customer_execution_time,
+                        'batches_processed': len(customer_results),
+                        'successful_batches': customer_successful_batches,
+                        'groups_created': groups_created,
+                        'created_group_ids': created_group_ids,
+                        'group_creation_result': customer_groups_result,
+                        'batch_results': customer_results
+                    }
+                    
+                    # Phase 5: Generate report for THIS customer immediately
+                    if generate_report:
+                        try:
+                            customer_report = self.generate_customer_processing_report(current_customer, {
+                                'customer_summary': self._generate_customer_summary_data(customer_headers, customer_results, current_customer),
+                                'sync_id': sync_id,
+                                'sync_folder': sync_folder,
+                                'success': customer_success,  # Fix sync status reporting bug
+                                'successful_batches': customer_successful_batches,
+                                'total_batches': len(customer_results),
+                                'execution_time_seconds': customer_execution_time
+                            })
+                            enhanced_results['per_customer_results'][current_customer]['report_generated'] = True
+                            enhanced_results['per_customer_results'][current_customer]['report_path'] = customer_report
+                            self.logger.info(f"📊 [{current_customer}] Report generated: {customer_report}")
+                        except Exception as report_error:
+                            self.logger.error(f"❌ [{current_customer}] Report generation failed: {report_error}")
+                            enhanced_results['per_customer_results'][current_customer]['report_error'] = str(report_error)
+                    
+                    # Update totals
+                    total_synced_all_customers += customer_synced
+                    if customer_success:
+                        successful_customers += 1
+                        self.logger.info(f"✅ [{current_customer}] Completed successfully: {customer_synced} records in {customer_execution_time:.2f}s")
+                    else:
+                        failed_customers += 1
+                        self.logger.error(f"❌ [{current_customer}] Failed processing")
+                    
+                except Exception as customer_error:
+                    customer_execution_time = (datetime.now() - customer_start_time).total_seconds()
+                    self.logger.exception(f"❌ [{current_customer}] Unexpected error: {customer_error}")
+                    enhanced_results['per_customer_results'][current_customer] = {
+                        'success': False,
+                        'status': 'EXCEPTION',
+                        'error': str(customer_error),
+                        'records_synced': 0,
+                        'execution_time': customer_execution_time
+                    }
+                    failed_customers += 1
+            
+            # Step 3: Calculate final results
+            sync_duration = (datetime.now() - sync_start_time).total_seconds()
+            overall_success = successful_customers > 0
+            
+            enhanced_results.update({
+                'success': overall_success,
+                'total_synced': total_synced_all_customers,
+                'execution_time_seconds': sync_duration,
+                'customers_processed': len(customers_to_process),
+                'successful_customers': successful_customers,
+                'failed_customers': failed_customers,
+                'status': 'COMPLETED' if overall_success else 'FAILED'
+            })
+            
+            # Step 4: Persist executive summary
+            self._persist_executive_summary(sync_folder, enhanced_results)
+            
+            self.logger.info(f"✅ PER-CUSTOMER SEQUENTIAL SYNC COMPLETED:")
+            self.logger.info(f"   Total Records: {total_synced_all_customers}")
+            self.logger.info(f"   Customers: {successful_customers}/{len(customers_to_process)} successful") 
+            self.logger.info(f"   Duration: {sync_duration:.2f}s")
+            
+            return enhanced_results
+            
+        except Exception as e:
+            sync_duration = (datetime.now() - sync_start_time).total_seconds()
+            self.logger.exception(f"❌ Per-customer sequential sync failed: {e}")
+            
+            enhanced_results.update({
+                'success': False,
+                'error': str(e),
+                'execution_time_seconds': sync_duration,
+                'status': 'EXCEPTION'
+            })
+            
+            return enhanced_results
     
     def _process_true_batch(self, batch_records: List[Dict], batch_number: int, dry_run: bool, 
                            createitem_mode: str = 'batch', skip_subitems: bool = False) -> Dict[str, Any]:
@@ -934,6 +1237,9 @@ class SyncEngine:
         BINARY LOGIC: Handle group creation workflow for headers
         - group_id NOT NULL → VALIDATE (already exists)
         - group_id NULL → CREATE group → UPDATE database with returned group_id
+        
+        NOTE: This is the legacy cross-customer method. For per-customer isolation,
+        use _create_customer_groups() instead.
         """
         try:
             # Separate headers by group_id status
@@ -1029,6 +1335,144 @@ class SyncEngine:
             self.logger.exception(f"Failed to validate group_ids: {e}")
             return {'success': False, 'error': str(e)}
     
+    def _create_customer_groups(self, customer_headers: List[Dict[str, Any]], customer_name: str, dry_run: bool) -> Dict[str, Any]:
+        """
+        Per-Customer Group Creation: Isolated group creation for a specific customer
+        
+        This method creates groups only for the specified customer, providing:
+        1. Customer isolation - failures don't affect other customers
+        2. Immediate per-customer reporting
+        3. Better debugging and error tracking
+        4. Sequential customer processing capability
+        
+        Args:
+            customer_headers: Headers for this specific customer only
+            customer_name: Name of the customer for logging and reporting
+            dry_run: Whether this is a dry run execution
+            
+        Returns:
+            Dictionary with customer-specific group creation results
+        """
+        try:
+            if not customer_headers:
+                return {
+                    'success': True,
+                    'customer': customer_name,
+                    'groups_created': 0,
+                    'existing_groups': 0,
+                    'total_groups': 0,
+                    'message': f'No headers for customer {customer_name}'
+                }
+            
+            self.logger.info(f"🏗️ [{customer_name}] Creating groups for {len(customer_headers)} headers")
+            
+            # Use existing binary logic but with customer context
+            headers_with_group_id = []
+            headers_need_group_creation = []
+            existing_group_ids = set()
+            groups_to_create = {}  # {group_name: [headers]}
+            
+            for header in customer_headers:
+                group_id = header.get('group_id')
+                group_name = header.get('group_name')
+                
+                if group_id:
+                    # BINARY: group_id exists → validate and use
+                    headers_with_group_id.append(header)
+                    existing_group_ids.add(group_id)
+                elif group_name:
+                    # BINARY: group_id NULL → needs creation
+                    headers_need_group_creation.append(header)
+                    if group_name not in groups_to_create:
+                        groups_to_create[group_name] = []
+                    groups_to_create[group_name].append(header)
+                else:
+                    # ERROR: No group_name to create group from
+                    aag_order = header.get('AAG ORDER NUMBER', 'unknown')
+                    self.logger.error(f"❌ [{customer_name}] Header missing both group_id AND group_name: {aag_order}")
+                    return {
+                        'success': False,
+                        'customer': customer_name,
+                        'error': f'Header missing both group_id AND group_name: {aag_order}'
+                    }
+            
+            self.logger.info(f"📊 [{customer_name}] Group Status: {len(headers_with_group_id)} existing, {len(headers_need_group_creation)} need creation")
+            
+            # Handle group creation for headers missing group_id
+            groups_created_count = 0
+            created_group_ids = []
+            
+            if groups_to_create and not dry_run:
+                self.logger.info(f"🏗️ [{customer_name}] Creating {len(groups_to_create)} groups: {list(groups_to_create.keys())}")
+                
+                # Create records for Monday.com API call
+                group_records = [{'group_name': group_name} for group_name in groups_to_create.keys()]
+                
+                # Call Monday.com API to create groups
+                create_result = self.monday_client.execute('create_groups', group_records, dry_run=False)
+                
+                if not create_result.get('success', False):
+                    self.logger.error(f"❌ [{customer_name}] Group creation failed: {create_result.get('error', 'Unknown error')}")
+                    return {
+                        'success': False,
+                        'customer': customer_name,
+                        'error': f"Group creation failed: {create_result.get('error', 'Unknown error')}"
+                    }
+                
+                # Extract created group IDs and update database
+                created_group_ids = create_result.get('monday_ids', [])
+                if len(created_group_ids) != len(groups_to_create):
+                    self.logger.error(f"❌ [{customer_name}] Group ID mismatch: expected {len(groups_to_create)}, got {len(created_group_ids)}")
+                    return {
+                        'success': False,
+                        'customer': customer_name,
+                        'error': f"Group ID count mismatch: expected {len(groups_to_create)}, got {len(created_group_ids)}"
+                    }
+                
+                # Update database with new group_ids
+                total_records_updated = 0
+                for i, (group_name, headers_for_group) in enumerate(groups_to_create.items()):
+                    new_group_id = created_group_ids[i]
+                    self.logger.info(f"🆔 [{customer_name}] Updating database: '{group_name}' → {new_group_id}")
+                    
+                    # 🎯 CRITICAL FIX: Update ALL pending records with this group_name for this customer
+                    records_updated = self._update_all_pending_records_with_group_name(customer_name, group_name, new_group_id)
+                    total_records_updated += records_updated
+                    
+                    # Also update in-memory headers for immediate use in current batch
+                    for header in headers_for_group:
+                        header['group_id'] = new_group_id
+                
+                self.logger.info(f"🎯 [{customer_name}] Database update complete: {total_records_updated} total records updated across {len(created_group_ids)} groups")
+                groups_created_count = len(created_group_ids)
+                existing_group_ids.update(created_group_ids)
+            
+            elif groups_to_create and dry_run:
+                self.logger.info(f"📝 [{customer_name}] DRY RUN: Would create {len(groups_to_create)} groups: {list(groups_to_create.keys())}")
+                groups_created_count = len(groups_to_create)
+            
+            total_groups = len(existing_group_ids) + groups_created_count
+            self.logger.info(f"✅ [{customer_name}] All headers have group_ids: {total_groups} unique groups")
+            
+            return {
+                'success': True,
+                'customer': customer_name,
+                'groups_created': groups_created_count,
+                'existing_groups': len(headers_with_group_id),
+                'total_groups': total_groups,
+                'created_group_ids': created_group_ids,
+                'group_names_created': list(groups_to_create.keys()) if groups_to_create else [],
+                'message': f'[{customer_name}] Binary logic: {groups_created_count} created, {len(headers_with_group_id)} existing'
+            }
+            
+        except Exception as e:
+            self.logger.exception(f"❌ [{customer_name}] Failed to create customer groups: {e}")
+            return {
+                'success': False,
+                'customer': customer_name,
+                'error': str(e)
+            }
+    
     def _update_database_group_id(self, record_uuid: str, group_id: str) -> bool:
         """Update FACT_ORDER_LIST with new group_id for given record_uuid"""
         try:
@@ -1055,6 +1499,46 @@ class SyncEngine:
         except Exception as e:
             self.logger.error(f"❌ Failed to update group_id for {record_uuid}: {e}")
             return False
+
+    def _update_all_pending_records_with_group_name(self, customer_name: str, group_name: str, group_id: str) -> int:
+        """
+        🎯 CRITICAL FIX: Update ALL pending records with matching customer + group_name
+        
+        This addresses the duplicate group creation issue where only the current batch records
+        get updated with group_id, leaving other pending records with NULL group_id.
+        
+        Args:
+            customer_name: Customer name to filter records
+            group_name: Group name to match for update
+            group_id: Monday.com group ID to set
+            
+        Returns:
+            int: Number of records updated
+        """
+        try:
+            with db.get_connection(self.db_key) as connection:
+                cursor = connection.cursor()
+                
+                update_sql = """
+                UPDATE [FACT_ORDER_LIST]
+                SET [group_id] = ?,
+                    [updated_at] = GETUTCDATE()
+                WHERE [CUSTOMER NAME] = ? 
+                  AND [group_name] = ?
+                  AND ([group_id] IS NULL OR [group_id] = '')
+                  AND [sync_state] IN ('NEW', 'PENDING')
+                """
+                
+                cursor.execute(update_sql, (group_id, customer_name, group_name))
+                rows_updated = cursor.rowcount
+                
+                self.logger.info(f"🎯 Updated group_id for {rows_updated} pending records: {customer_name} → {group_name} → {group_id}")
+                cursor.close()
+                return rows_updated
+                
+        except Exception as e:
+            self.logger.error(f"❌ Failed to update pending records for {customer_name}/{group_name}: {e}")
+            return 0
     
     def _store_group_ids_to_database(self, group_names: set, group_ids: List[str], group_data: Dict[str, Any]) -> None:
         """Store Monday.com group IDs back to database after group creation"""
@@ -1973,11 +2457,14 @@ class SyncEngine:
         
         return reset_stats
     
-    def generate_customer_processing_report(self, customer_name: str) -> str:
+    def generate_customer_processing_report(self, customer_name: str, sync_session_data: Dict[str, Any] = None) -> str:
         """
         Generate markdown summary report for customer processing results (Fix #4: Customer Processing).
+        TASK027 Phase 2: Enhanced with sync session context and metrics.
         
         Creates comprehensive customer-focused report with:
+        - TASK027 Phase 2.4: Sync session context (Sync ID, timestamp, processing metrics)
+        - TASK027 Phase 2.2: Sync session statistics (API operations, timing, batch success rates)
         - Processing success/failure metrics
         - Error breakdown by category
         - Group distribution analysis
@@ -1985,9 +2472,10 @@ class SyncEngine:
         
         Args:
             customer_name: Customer to generate report for
+            sync_session_data: Current sync session data including performance metrics and batch results
             
         Returns:
-            str: Markdown formatted customer processing report
+            str: Markdown formatted customer processing report with sync context
         """
         try:
             with db.get_connection(self.db_key) as connection:
@@ -1996,18 +2484,47 @@ class SyncEngine:
                 archiver = APILoggingArchiver(self.config)
                 
                 cursor = connection.cursor()
-                report = archiver.generate_customer_summary_report(cursor, customer_name)
+                
+                # TASK027 Phase 2: Enhanced report with sync session context
+                report = archiver.generate_enhanced_customer_summary_report(
+                    cursor, 
+                    customer_name, 
+                    sync_session_data,
+                    self.sync_id if hasattr(self, 'sync_id') else None,
+                    self.sync_session_dir if hasattr(self, 'sync_session_dir') else None
+                )
                 cursor.close()
+                
+                # TASK027 Phase 2.0: Save report to sync-specific customer_reports folder
+                if hasattr(self, 'sync_session_dir') and self.sync_session_dir:
+                    report_path = self.sync_session_dir / "customer_reports" / f"{customer_name.lower().replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+                    report_path.write_text(report, encoding='utf-8')
+                    self.logger.info(f"📄 Customer report saved: {report_path}")
                 
                 return report
                 
         except Exception as e:
             self.logger.error(f"❌ Report generation failed: {e}")
-            return f"# {customer_name}\n\n❌ Report generation failed: {e}"
+            error_report = f"# {customer_name} - Sync Report\n\n❌ Report generation failed: {e}"
+            
+            # TASK027 Phase 2.0: Still save error report to sync folder
+            if hasattr(self, 'sync_session_dir') and self.sync_session_dir:
+                try:
+                    report_path = self.sync_session_dir / "customer_reports" / f"{customer_name.lower().replace(' ', '_')}_error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+                    report_path.write_text(error_report, encoding='utf-8')
+                    self.logger.info(f"📄 Error report saved: {report_path}")
+                except Exception as save_error:
+                    self.logger.error(f"❌ Failed to save error report: {save_error}")
+            
+            return error_report
     
-    def generate_all_customer_reports(self) -> dict:
+    def generate_all_customer_reports(self, sync_session_data: Dict[str, Any] = None) -> dict:
         """
         Generate markdown summary reports for all customers processed in current sync.
+        TASK027 Phase 2: Enhanced with sync session context.
+        
+        Args:
+            sync_session_data: Current sync session data including performance metrics and batch results
         
         Returns:
             dict: Dictionary with customer names as keys and report content as values
@@ -2037,7 +2554,7 @@ class SyncEngine:
                 # Generate report for each customer
                 for customer_name in customers:
                     try:
-                        report = self.generate_customer_processing_report(customer_name)
+                        report = self.generate_customer_processing_report(customer_name, sync_session_data)
                         customer_reports[customer_name] = report
                         self.logger.info(f"✅ Report generated for {customer_name}")
                     except Exception as e:
