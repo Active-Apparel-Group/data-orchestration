@@ -1,2 +1,5 @@
 UPDATE [swp_ORDER_LIST_SYNC]
 SET [SOURCE_CUSTOMER_NAME] = [CUSTOMER NAME];
+
+
+Select count(*) from [swp_ORDER_LIST_SYNC] where [SOURCE_CUSTOMER_NAME] is null

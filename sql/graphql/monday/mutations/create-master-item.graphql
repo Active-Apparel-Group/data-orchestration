@@ -1,6 +1,7 @@
-mutation CreateMasterItem($boardId: ID!, $itemName: String!, $columnValues: JSON!, $createLabelsIfMissing: Boolean) {
+mutation CreateMasterItem($boardId: ID!, $groupId: String, $itemName: String!, $columnValues: JSON!, $createLabelsIfMissing: Boolean) {
   create_item(
     board_id: $boardId
+    group_id: $groupId
     item_name: $itemName
     column_values: $columnValues
     create_labels_if_missing: $createLabelsIfMissing

@@ -221,20 +221,6 @@
       "custom_extraction_field": null
     },
     {
-      "monday_id": "multiple_person_mkq9hsfy",
-      "monday_title": "Allocation Owner",
-      "monday_type": "people",
-      "sql_column": "Allocation Owner",
-      "sql_type": "NVARCHAR(255)",
-      "extraction_field": "text",
-      "nullable": true,
-      "is_system_field": false,
-      "conversion_logic": null,
-      "exclude": false,
-      "custom_sql_type": null,
-      "custom_extraction_field": null
-    },
-    {
       "monday_id": "date_mkq9j8a1",
       "monday_title": "Allocation Due",
       "monday_type": "date",
@@ -249,24 +235,10 @@
       "custom_extraction_field": null
     },
     {
-      "monday_id": "multiple_person_mkp61vv4",
-      "monday_title": "Raise PO",
-      "monday_type": "people",
-      "sql_column": "Raise PO",
-      "sql_type": "NVARCHAR(255)",
-      "extraction_field": "text",
-      "nullable": true,
-      "is_system_field": false,
-      "conversion_logic": null,
-      "exclude": false,
-      "custom_sql_type": null,
-      "custom_extraction_field": null
-    },
-    {
       "monday_id": "person",
-      "monday_title": "Approve PO",
+      "monday_title": "Planner",
       "monday_type": "people",
-      "sql_column": "Approve PO",
+      "sql_column": "Planner",
       "sql_type": "NVARCHAR(255)",
       "extraction_field": "text",
       "nullable": true,
@@ -529,10 +501,10 @@
       "custom_extraction_field": null
     },
     {
-      "monday_id": "multiple_person_mkrdcbm",
-      "monday_title": "Prepare TP",
+      "monday_id": "multiple_person_mktddsc",
+      "monday_title": "Account Manager",
       "monday_type": "people",
-      "sql_column": "Prepare TP",
+      "sql_column": "Account Manager",
       "sql_type": "NVARCHAR(255)",
       "extraction_field": "text",
       "nullable": true,

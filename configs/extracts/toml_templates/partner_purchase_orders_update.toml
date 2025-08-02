@@ -1,0 +1,107 @@
+# OPUS Universal Monday.com Update Configuration
+# Generated from: board_8738178586_metadata.json
+# Generated at: 2025-08-01 14:40:58
+# Board: Partner Purchase Orders (8738178586)
+
+[metadata]
+board_id = 8738178586
+board_name = "Partner Purchase Orders"
+table_name = "MON_PartnerPurchaseOrders"
+database = "orders"
+update_type = "batch_item_updates"
+description = "Update Partner Purchase Orders items with latest data"
+
+[query_config]
+# SQL query to get update data
+query = """
+# TODO: Add your SQL query here
+# SELECT
+#     [Item ID] as monday_item_id,
+#     -- Add your columns here
+# FROM your_table
+# WHERE your_conditions
+"""
+
+# Column mapping configuration
+item_id_column = "monday_item_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+# Name
+"name" = "Name"
+# Subitems
+"subtasks_mkpsd5x9" = "Subitems"
+# Allocation Progress tracking
+"lookup_mksabaeq" = "Allocation Progress tracking"
+# REV
+"numeric_mkp661g1" = "REV"
+# PO File
+"file_mkp6gzx2" = "PO File"
+# Supporting Files
+"file_mkpjbwnb" = "Supporting Files"
+# Units
+"numeric_mkp6bezx" = "Units"
+# Currency
+"dropdown_mkp6rzay" = "Currency"
+# PO Value
+"numeric_mkp6aeph" = "PO Value"
+# Bulk PO Qty
+"lookup_mkp7jcsj" = "Bulk PO Qty"
+# Partner Factory
+"board_relation_mkp6fje1" = "Partner Factory"
+# Payment Method
+"lookup_mktayp2f" = "Payment Method"
+# Payment Terms
+"lookup_mktajmq3" = "Payment Terms"
+# Legal Entity
+"lookup_mkp6dtxt" = "Legal Entity"
+# Factory Country
+"lookup_mkp6vhke" = "Factory Country"
+# Factory Location
+"lookup_mkp6nr1n" = "Factory Location"
+# ALLOCATION STATUS
+"color_mkq9dv1z" = "ALLOCATION STATUS"
+# Allocation Due
+"date_mkq9j8a1" = "Allocation Due"
+# Owner
+"person" = "Owner"
+# PO Approval Status
+"status" = "PO Approval Status"
+# PO Status
+"color_mkp6rbcw" = "PO Status"
+# PO Approved Date
+"date_mkp61j9t" = "PO Approved Date"
+# PO Raised Date
+"date4" = "PO Raised Date"
+# link Style COO Plan
+"board_relation_mkp6dzaf" = "link Style COO Plan"
+# PO Value Planning Board
+"lookup_mkrdr8p2" = "PO Value Planning Board"
+# stat
+"lookup_mkr4d825" = "stat"
+# CMP Partner
+"lookup_mkpdqcab" = "CMP Partner"
+# CMP LS
+"lookup_mkpdb3ym" = "CMP LS"
+# LS % of Partner
+"formula_mkpdpg8r" = "LS % of Partner"
+# CMP Diff (USD)
+"formula_mkpvzp46" = "CMP Diff (USD)"
+# CMP Per Garment
+"formula_mkpv7ha" = "CMP Per Garment"
+# CUSTOMER
+"dropdown_mkq1mtg8" = "CUSTOMER"
+# COO Planning Allocations
+"board_relation_mkq9fbkm" = "COO Planning Allocations"
+# Item ID
+"pulse_id_mkqfx6fr" = "Item ID"
+# ID
+"pulse_id_mkqfvwg1" = "ID"
+# Contract ID
+"long_text_mkqfx8e1" = "Contract ID"
+# TP Issue Date
+"date_mkrdnv8y" = "TP Issue Date"
+# Partner Payment
+"board_relation_mktakt2h" = "Partner Payment"
+# Account Manager
+"multiple_person_mktddsc" = "Account Manager"

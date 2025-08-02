@@ -1,6 +1,20 @@
 # Tech Context
 
-## Technologies and Frameworks
+## Technologies and FrameIn summary, the tech context of this project is centered on a Python-based ETL-like process, using web APIs and SQL, configured via external files, and aligned with our existing data engineering frameworks. The choices made keep the solution efficient and maintainable given our team's skill set and the technologies at hand.
+
+## Performance Optimization Context (2025-08-01)
+
+**✅ CRITICAL FIXES COMPLETE:**
+- **Batch Processing Validated**: TRUE BATCH PROCESSING confirmed working with proper dropdown configuration handling
+- **Dropdown Configuration**: TOML settings properly respected, createLabelsIfMissing working correctly
+- **Report Generation**: Customer processing reports generating without database schema errors
+- **Code Quality**: Verbose logging cleaned up, essential operation tracking maintained
+
+**NEXT PHASE OPTIMIZATION OPPORTUNITIES:**
+- **Default Batch Mode**: Change sync_engine.py default from 'single' to 'batch' mode for production efficiency
+- **Logging Optimization**: Convert None value warnings to DEBUG level to reduce I/O overhead
+- **Performance Monitoring**: Add timing instrumentation between operations for production monitoring
+- **Target Performance**: <1 second per record achievable with optimized default configuration
 
 - **Programming Language:** Python 3.x is used for the pipeline implementation. Python was chosen for its ease of scripting, rich ecosystem (for things like HTTP requests, database access, etc.), and alignment with the rest of our data engineering stack.
 - **Database:** The source order data resides in a SQL database (Microsoft SQL Server). We use SQL queries (including complex SQL templated via Jinja2) to interact with the `ORDER_LIST` tables and delta tables. Python’s DB-API (via a library like `pyodbc` or an ORM if any) is used to execute queries.

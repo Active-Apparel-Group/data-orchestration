@@ -32,7 +32,7 @@ sys.path.insert(0, str(repo_root / "pipelines" / "utils"))  # pipelines/utils ON
 import logger_helper
 
 CODEGEN_DIR = Path(__file__).parent
-BOARDS_DIR = CODEGEN_DIR.parent.parent / "configs" / "boards"
+BOARDS_DIR = CODEGEN_DIR.parent.parent / "configs" / "extracts" / "boards"
 
 # Initialize logger for Kestra/VS Code compatibility
 logger = logger_helper.get_logger(__name__)

@@ -15,6 +15,15 @@ CREATE TABLE [dbo].[ORDER_LIST_LINES] (
     [parent_item_id] BIGINT NULL,
     [created_at] DATETIME2 NULL DEFAULT (getutcdate()),
     [updated_at] DATETIME2 NULL DEFAULT (getutcdate()),
+
+    -- logging
+    [api_request_payload] NVARCHAR(MAX) NULL,
+    [api_response_payload] NVARCHAR(MAX) NULL,
+    [api_request_timestamp] DATETIME2 NULL,
+    [api_response_timestamp] DATETIME2 NULL,
+    [api_operation_type] NVARCHAR(50) NULL,
+    [api_status] NVARCHAR(20) NULL,
+    
     CONSTRAINT [PK_ORDER_LIST_LINES] PRIMARY KEY ([line_uuid])
 );
 

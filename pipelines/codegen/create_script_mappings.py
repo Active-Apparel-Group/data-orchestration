@@ -202,12 +202,12 @@ def main():
                 data = json.loads(args.input.read_text(encoding="utf-8"))
                 board_name = data.get("board_name", "board").lower().replace(" ", "_")
                 # Create the templates directory if it doesn't exist
-                templates_dir = Path("configs/updates/templates")
+                templates_dir = Path("configs/extracts/toml_templates")
                 templates_dir.mkdir(parents=True, exist_ok=True)
                 out = templates_dir / f"{board_name}_update.toml"
             except:
                 # Fallback to templates directory with generic name
-                templates_dir = Path("configs/updates/templates")
+                templates_dir = Path("configs/extracts/toml_templates")
                 templates_dir.mkdir(parents=True, exist_ok=True)
                 out = templates_dir / args.input.with_suffix(".toml").name
         

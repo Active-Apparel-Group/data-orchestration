@@ -40,8 +40,10 @@ INDEX_COLUMNS = [
     ["AAG ORDER NUMBER"],
     ["PO NUMBER"],
     ["CUSTOMER NAME"],
+    ["SOURCE_CUSTOMER_NAME"],
     ["CUSTOMER STYLE"],
     ["AAG SEASON"],
+    ["ORDER TYPE"],
     ["CUSTOMER SEASON"],
     ["AAG ORDER NUMBER", "PO NUMBER"],  # Composite index for common queries
 ]
@@ -110,7 +112,7 @@ def refresh_sync_table(source_table="ORDER_LIST", sync_table="swp_ORDER_LIST_SYN
     try:
         logger.info(f"   Creating {sync_table} from {source_table} ...")
         db.execute(f"""
-            SELECT * INTO {sync_table} FROM {source_table} WHERE [CUSTOMER NAME] like 'GREYSON%' AND [PO NUMBER] = '4755' ;
+            SELECT * INTO {sync_table} FROM {source_table} -- WHERE [CUSTOMER NAME] like 'GREYSON%' AND [PO NUMBER] = '4755' ;
         """, db_key)
         logger.info(f"   ✅ Created {sync_table} from {source_table}")
         return True

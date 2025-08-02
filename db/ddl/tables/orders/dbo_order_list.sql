@@ -455,6 +455,14 @@ CREATE TABLE [dbo].[ORDER_LIST] (
     [sync_error_message] NVARCHAR(1000) NULL,   -- Error message if sync failed
     [sync_pending_at] DATETIME2(7) NULL,     -- Timestamp when sync was marked as pending
     [retry_count] INT NULL DEFAULT 0,            -- Number of retry attempts
+
+    -- logging
+    [api_request_payload] NVARCHAR(MAX) NULL,
+    [api_response_payload] NVARCHAR(MAX) NULL,
+    [api_request_timestamp] DATETIME2 NULL,
+    [api_response_timestamp] DATETIME2 NULL,
+    [api_operation_type] NVARCHAR(50) NULL,
+    [api_status] NVARCHAR(20) NULL,
     
     -- Audit columns
     created_at          DATETIME2 DEFAULT GETUTCDATE(),

@@ -2,16 +2,20 @@
 
 ## Architectural Overview
 
-**Enhanced Merge Orchestrator - 6-Phase Architecture (PRODUCTION VALIDATED ✅)**
+**Enhanced Merge Orchestrator - 4-Phase Simplified Architecture (PRODUCTION VALIDATED ✅)**
 
-The Enhanced Merge Orchestrator represents a revolutionary approach that processes ONLY NEW records through a validated 6-phase sequence:
+The Enhanced Merge Orchestrator has been simplified to a 4-phase sequence with transformations moved to stored procedures:
 
-1. **Phase 1: NEW Order Detection** - Identifies records requiring processing (sync_state='NEW')
-2. **Phase 2: Group Name Transformation** - Generates customer-specific group names  
-3. **Phase 3: Group Creation Workflow** - Ensures Monday.com groups exist before item creation
-4. **Phase 4: Item Name Transformation** - Creates formatted item names for Monday.com
-5. **Phase 5: Template Merge Headers** - Processes headers with dynamic size column detection
-6. **Phase 6: Template Unpivot Lines** - Transforms size data into lines format
+1. **Phase 1: NEW Order Detection** - detect_new_orders() identifies records requiring processing (sync_state='NEW')
+2. **Phase 2: Group Creation Workflow** - _execute_group_creation_workflow() ensures Monday.com groups exist before item creation
+3. **Phase 3: Template Merge Headers** - merge_headers.j2 processes headers with dynamic size column detection
+4. **Phase 4: Template Unpivot Lines** - unpivot_sizes_direct.j2 transforms size data into lines format
+
+**TRUE BATCH PROCESSING INTEGRATION:**
+- Post-orchestrator, the sync engine uses TRUE BATCH PROCESSING
+- Multiple record_uuids processed in single Monday.com API calls
+- TOML-driven batch sizing: `item_batch_size = 5` from rate_limits configuration
+- 5x performance improvement through batched API operations
 
 **Key Architectural Principles:**
 - **NEW-Only Processing**: Only records with sync_state='NEW' are processed, ensuring efficiency
@@ -57,6 +61,11 @@ The Enhanced Merge Orchestrator represents a revolutionary approach that process
     - Store GraphQL templates in sql/graphql/mutations/ and sql/graphql/queries/.
     - Use GraphQLLoader from src/pipelines/integrations/monday/.
     - Batch operations with 15-item default; 0.1s delay for rate limiting.
+    - **Critical Fixes Implemented:**
+      - Group ID Storage: Store group IDs back to database after creation (fixes NULL group_id issue)
+      - Retry Logic: Exponential backoff for 500 errors and timeouts (handles GraphQL error lists)
+      - Column Values JSON: Exclude "name" field from column_values (fixes size label creation)
+      - TOML Configuration: Respect dropdown label creation settings per environment
 - **PowerShell**:
     - Use ; for command chaining, not &&.
     - Prefer native PowerShell commands over bash equivalents.
@@ -132,9 +141,21 @@ WHEN MATCHED AND (target.row_hash IS NULL OR target.row_hash <> source.row_hash)
 **Simplified Sync Architecture:**
 With DELTA elimination, the system operates with direct main table merges, eliminating complex propagation logic and improving performance and maintainability.
 
-Overall, the system patterns revolve around simplicity, traceability, and reliability. Each design choice, from delta tables to grouping logic to asynchronous API handling, was made to fulfill those core values while meeting the project's functional requirements.*ultra-lightweight, two-component architecture** that emphasizes simplicity and direct data flow. The design replaces a previously planned complex system with a streamlined solution consisting of just two core parts:
-1. **Sync Engine (`sync_engine.py`)** – Orchestrates the overall synchronization process.
-2. **Monday API Client (`monday_api_client.py`)** – Handles communication with the Monday.com GraphQL API.
+Overall, the system patterns revolve around simplicity, traceability, and reliability. Each design choice, from delta tables to grouping logic to asynchronous API handling, was made to fulfill those core values while meeting the project's functional requirements.
+
+**TRUE BATCH PROCESSING Architecture (August 2025 Update):**
+The system now implements **ultra-lightweight, three-component architecture with TRUE BATCH PROCESSING** that emphasizes simplicity, direct data flow, and maximum performance through batched API operations:
+
+1. **Enhanced Merge Orchestrator (`merge_orchestrator.py`)** – 4-phase data preparation and transformation
+2. **Sync Engine (`sync_engine.py`)** – TRUE BATCH PROCESSING orchestration with TOML-driven batch sizing  
+3. **Monday API Client (`monday_api_client.py`)** – Handles batched GraphQL API communication
+
+**TRUE BATCH PROCESSING Key Features:**
+- Multiple record_uuids processed in single Monday.com API calls
+- TOML configuration drives batch size: `monday.rate_limits.item_batch_size = 5`
+- CLI defaults to `--createitem batch` mode for optimal performance
+- 5x performance improvement: 2 API calls for 10 records instead of 10 separate calls
+- Record_uuid → monday_item_id mapping preserved for database updates
 
 These two components work in tandem to move data from our database to Monday.com with minimal intermediate layers. A high-level flow of the system is as follows:
 

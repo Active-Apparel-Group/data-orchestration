@@ -24,6 +24,10 @@ WITH status_cte AS (
         coalesce([Sewing WIP], 0) as "QTY WIP SEW",
         coalesce([Finishing WIP], 0) as "QTY WIP FIN",
         coalesce([defect_number], 0) as "QTY SCRAP",
+        coalesce([cut_number], 0) as "QTY CUT",
+        coalesce([sew_number], 0) as "QTY SEW",
+        coalesce([finish_number], 0) as "QTY FINISH",
+        coalesce([prep_number], 0) as "Precut Quantity", 
         CASE
             WHEN LOWER(state) LIKE '%closed%' THEN 6
             WHEN cut_number > 0 AND sew_number = 0 THEN 5
@@ -60,6 +64,10 @@ ranked AS (
         [QTY WIP SEW],
         [QTY WIP FIN],
         [QTY SCRAP],
+        [QTY CUT],
+        [QTY SEW],
+        [QTY FINISH],
+        [Precut Quantity],
         ROW_NUMBER() OVER (
             PARTITION BY MO_Number
             ORDER BY status_rank DESC
@@ -80,6 +88,11 @@ SELECT
     r.[QTY WIP SEW],
     r.[QTY WIP FIN],
     r.[QTY SCRAP],
+    r.[QTY SCRAP],
+    r.[QTY CUT],
+    r.[QTY SEW],
+    r.[QTY FINISH],
+    r.[Precut Quantity],
     p.[PRODUCTION STATUS] AS existing_status
 FROM ranked r
 JOIN dbo.MON_COO_Planning p
@@ -241,6 +254,12 @@ item_id_column = "monday_item_id"
 "text_mks1v729" = "SCAN Finished Month"
 "dropdown_mks113q1" = "MES MO Status"
 "dropdown_mks1ny7b" = "GSD Source"
+# QTY CUT
+"numeric_mktbwjf1" = "QTY CUT"
+# QTY SEW
+"numeric_mktb1dd3" = "QTY SEW"
+# QTY FINISH
+"numeric_mktbg5e4" = "QTY FINISH"
 
 
 [validation]

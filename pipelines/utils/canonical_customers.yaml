@@ -407,7 +407,7 @@ customers:
     - ORDER TYPE
     - ALIAS/RELATED ITEM
     - CUSTOMER ALT PO
-- canonical: FARADAY LABS, INC (LAMBS)
+- canonical: GET LAMBS
   status: review
   packed_products: ''
   shipped: ''

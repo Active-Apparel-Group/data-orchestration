@@ -34,9 +34,9 @@ ARCHITECTURAL SIMPLIFICATION MAINTAINED:
 """
 
 import sys
+import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
-import time
 
 # Clean import pattern matching working integration tests
 repo_root = Path(__file__).parent.parent.parent.parent
@@ -81,237 +81,20 @@ class EnhancedMergeOrchestrator:
         
         # Log transformer status
         self.logger.info(f"EnhancedMergeOrchestrator initialized")
-        self.logger.info(f"  GroupNameTransformer: {'enabled' if self._is_group_transformation_enabled() else 'disabled'}")
-        self.logger.info(f"  ItemNameTransformer: {'enabled' if self._is_item_transformation_enabled() else 'disabled'}")
+        self.logger.info(f"  Group Creation Workflow: {'enabled' if self._is_group_creation_enabled() else 'disabled'}")
+        self.logger.info(f"  Group/Item name transformations: moved to stored procedure")
     
-    # ========================================
-    # DATA PREPARATION METHODS (SQL Steps 1-6, 12)
-    # ========================================
-    
-    def _execute_data_preparation_sequence(self, cursor, dry_run: bool = False) -> Dict[str, Any]:
-        """
-        Execute SQL operations steps 1-6 for data cleaning and canonical mapping
-        Critical for Phase 0 foundation - includes canonical customer name resolution
-        """
-        try:
-            self.logger.info("🧹 Executing data preparation sequence (SQL steps 1-6)...")
-            
-            # SQL operations in correct order
-            sql_operations = [
-                ("01_delete_null_rows.sql", "Delete records with NULL critical fields"),
-                ("02_filldown_customer_name.sql", "Fill down customer names for grouped records"),
-                ("03_check_customer_name_blanks.sql", "Validate customer name completeness"), 
-                ("04_copy_customer_to_source_customer.sql", "Backup original customer names"),
-                ("05_update_canonical_customer_name.sql", "Apply canonical customer mapping (GREYSON CLOTHIERS→GREYSON)"),
-                ("06_validate_canonical_mapping.sql", "Verify canonical mapping accuracy")
-            ]
-            
-            sql_base_path = Path(__file__).parent.parent.parent.parent / "sql" / "operations" / "order_list_transform"
-            results = []
-            
-            for sql_file, description in sql_operations:
-                self.logger.info(f"   🔧 {description} ({sql_file})")
-                
-                sql_path = sql_base_path / sql_file
-                if not sql_path.exists():
-                    raise FileNotFoundError(f"SQL file not found: {sql_path}")
-                
-                with open(sql_path, 'r', encoding='utf-8') as f:
-                    sql_content = f.read().strip()
-                
-                if dry_run:
-                    self.logger.info(f"      [DRY RUN] Would execute: {sql_file}")
-                    results.append({
-                        'file': sql_file,
-                        'description': description,
-                        'dry_run': True,
-                        'sql_length': len(sql_content)
-                    })
-                else:
-                    # Execute SQL
-                    if sql_content.upper().strip().startswith("SELECT"):
-                        # Validation query - check results
-                        cursor.execute(sql_content)
-                        validation_result = cursor.fetchall()
-                        self.logger.info(f"      ✅ Validation completed: {len(validation_result)} result rows")
-                        results.append({
-                            'file': sql_file,
-                            'description': description,
-                            'executed': True,
-                            'validation_rows': len(validation_result),
-                            'sql_length': len(sql_content)
-                        })
-                    else:
-                        # Data modification query
-                        cursor.execute(sql_content)
-                        rows_affected = cursor.rowcount
-                        self.logger.info(f"      ✅ Executed: {rows_affected} rows affected")
-                        results.append({
-                            'file': sql_file,
-                            'description': description,
-                            'executed': True,
-                            'rows_affected': rows_affected,
-                            'sql_length': len(sql_content)
-                        })
-            
-            total_files = len(sql_operations)
-            self.logger.info(f"✅ Data preparation sequence complete: {total_files} operations")
-            
-            return {
-                'success': True,
-                'operations_completed': total_files,
-                'results': results,
-                'message': f"Data preparation sequence completed successfully ({total_files} operations)"
-            }
-            
-        except Exception as e:
-            self.logger.error(f"❌ Data preparation sequence failed: {e}")
-            return {
-                'success': False,
-                'error': str(e),
-                'message': f"Data preparation sequence failed: {e}"
-            }
-    
-    def _execute_business_logic_preparation(self, cursor, dry_run: bool = False) -> Dict[str, Any]:
-        """
-        Execute SQL operation step 12 for business logic preparation
-        """
-        try:
-            self.logger.info("🎯 Executing business logic preparation (SQL step 12)...")
-            
-            sql_file = "12_update_order_type.sql"
-            description = "Update order types based on business rules"
-            
-            sql_base_path = Path(__file__).parent.parent.parent.parent / "sql" / "operations" / "order_list_transform"
-            sql_path = sql_base_path / sql_file
-            
-            if not sql_path.exists():
-                raise FileNotFoundError(f"SQL file not found: {sql_path}")
-            
-            with open(sql_path, 'r', encoding='utf-8') as f:
-                sql_content = f.read().strip()
-            
-            if dry_run:
-                self.logger.info(f"   [DRY RUN] Would execute: {sql_file}")
-                return {
-                    'success': True,
-                    'file': sql_file,
-                    'description': description,
-                    'dry_run': True,
-                    'sql_length': len(sql_content)
-                }
-            else:
-                # Execute business logic SQL
-                cursor.execute(sql_content)
-                rows_affected = cursor.rowcount
-                self.logger.info(f"   ✅ Business logic executed: {rows_affected} rows affected")
-                
-                return {
-                    'success': True,
-                    'file': sql_file,
-                    'description': description,
-                    'executed': True,
-                    'rows_affected': rows_affected,
-                    'sql_length': len(sql_content)
-                }
-                
-        except Exception as e:
-            self.logger.error(f"❌ Business logic preparation failed: {e}")
-            return {
-                'success': False,
-                'error': str(e),
-                'message': f"Business logic preparation failed: {e}"
-            }
+
 
     # ========================================
-    # CONSOLIDATED TRANSFORMATION METHODS
+    # GROUP CREATION WORKFLOW (ONLY REMAINING TRANSFORMATION)
     # ========================================
     
-    def _is_group_transformation_enabled(self) -> bool:
-        """Check if group name transformation is enabled."""
-        return self.transformation_config.get('database', {}).get('group_name_transformation', {}).get('enabled', False)
+    def _is_group_creation_enabled(self) -> bool:
+        """Check if group creation workflow is enabled."""
+        return self.transformation_config.get('monday', {}).get('groups', {}).get('auto_create', True)
     
-    def _is_item_transformation_enabled(self) -> bool:
-        """Check if item name transformation is enabled."""
-        return self.transformation_config.get('database', {}).get('item_name_transformation', {}).get('enabled', False)
-    
-    def _execute_group_name_transformation(self, cursor, dry_run: bool = False) -> Dict[str, Any]:
-        """
-        Execute group name transformation: CUSTOMER NAME + SEASON → group_name
-        Consolidated from GroupNameTransformer into single method.
-        """
-        if not self._is_group_transformation_enabled():
-            return {"success": True, "message": "Group name transformation disabled", "sql_length": 0}
-        
-        try:
-            group_config = self.transformation_config.get('database', {}).get('group_name_transformation', {})
-            
-            primary_cols = group_config['primary_columns']
-            fallback_cols = group_config['fallback_columns'] 
-            separator = group_config['separator']
-            target_col = group_config['target_column']
-            fallback_value = group_config.get('fallback_value', 'check')
-            
-            # Build CASE statement SQL
-            primary_concat = f"CONCAT([{primary_cols[0]}], '{separator}', [{primary_cols[1]}])"
-            fallback_concat = f"CONCAT([{fallback_cols[0]}], '{separator}', [{fallback_cols[1]}])"
-            
-            sql = f"""
-            UPDATE [{self.config.target_table}]
-            SET [{target_col}] = CASE
-                WHEN [{primary_cols[1]}] IS NOT NULL THEN {primary_concat}
-                WHEN [{primary_cols[1]}] IS NULL AND [{fallback_cols[1]}] IS NOT NULL THEN {fallback_concat}
-                ELSE '{fallback_value}'
-            END;
-            """
-            
-            if not dry_run:
-                cursor.execute(sql)
-                
-            self.logger.info(f"Group name transformation completed - SQL length: {len(sql)}")
-            return {"success": True, "sql_length": len(sql), "pattern": f"{primary_cols[0]} + {separator} + {primary_cols[1]}"}
-            
-        except Exception as e:
-            self.logger.error(f"Group name transformation failed: {e}")
-            return {"success": False, "error": str(e)}
-    
-    def _execute_item_name_transformation(self, cursor, dry_run: bool = False) -> Dict[str, Any]:
-        """
-        Execute item name transformation: CUSTOMER STYLE + COLOR + AAG ORDER → item_name
-        Consolidated from ItemNameTransformer into single method.
-        """
-        if not self._is_item_transformation_enabled():
-            return {"success": True, "message": "Item name transformation disabled", "sql_length": 0}
-        
-        try:
-            item_config = self.transformation_config.get('database', {}).get('item_name_transformation', {})
-            
-            columns = item_config['columns']
-            target_col = item_config['target_column']
-            separator = item_config.get('separator', '')
-            
-            # Build concatenation expression
-            if separator:
-                concat_parts = [f"ISNULL([{col}], '')" for col in columns]
-                concat_expression = f"CONCAT({', '.join(concat_parts)})"
-            else:
-                concat_expression = " + ".join([f"ISNULL([{col}], '')" for col in columns])
-            
-            sql = f"""
-            UPDATE [{self.config.target_table}]
-            SET [{target_col}] = {concat_expression}
-            WHERE [{columns[0]}] IS NOT NULL OR [{columns[1]}] IS NOT NULL OR [{columns[2]}] IS NOT NULL;
-            """
-            
-            if not dry_run:
-                cursor.execute(sql)
-                
-            self.logger.info(f"Item name transformation completed - SQL length: {len(sql)}")
-            return {"success": True, "sql_length": len(sql), "format": " + ".join(columns)}
-            
-        except Exception as e:
-            self.logger.error(f"Item name transformation failed: {e}")
-            return {"success": False, "error": str(e)}
+
     
     def _execute_group_creation_workflow(self, cursor, dry_run: bool = False, board_id: str = None) -> Dict[str, Any]:
         """
@@ -389,7 +172,7 @@ class EnhancedMergeOrchestrator:
         return new_groups
     
     def _create_groups_batch(self, cursor, group_names: List[str], board_id: str) -> int:
-        """Create groups via Monday.com API and update database."""
+        """Create groups via Monday.com API in TRUE batches and update database atomically."""
         batch_size = self.transformation_config.get('monday', {}).get('rate_limits', {}).get('group_batch_size', 5)
         delay = self.transformation_config.get('monday', {}).get('rate_limits', {}).get('delay_between_batches', 2.0)
         
@@ -402,31 +185,103 @@ class EnhancedMergeOrchestrator:
             
             self.logger.info(f"Creating batch {batch_number}/{total_batches}: {len(batch)} groups")
             
-            for group_name in batch:
-                try:
-                    # Mock group creation for now (replace with actual Monday.com API call)
-                    group_id = f"mock_group_{hash(group_name) % 100000}"
+            try:
+                # 🎯 FIX 1: Create ALL groups in batch via single Monday.com API call
+                if self.monday_client:
+                    # Create all groups in the batch with single API call
+                    group_records = [{'group_name': name} for name in batch]
+                    result = self.monday_client.execute('create_groups', group_records, dry_run=False)
                     
-                    # Update database
-                    insert_query = """
-                    INSERT INTO [MON_Boards_Groups] ([board_id], [group_id], [group_name], [created_date])
-                    VALUES (?, ?, ?, GETDATE())
-                    """
-                    cursor.execute(insert_query, [board_id, group_id, group_name])
-                    created_count += 1
+                    if result.get('success') and result.get('monday_ids'):
+                        monday_ids = result['monday_ids']
+                        self.logger.info(f"✅ Created {len(monday_ids)} Monday.com groups in batch")
+                        
+                        # 🎯 FIX 2: Atomic database updates for the entire batch
+                        for group_name, group_id in zip(batch, monday_ids):
+                            # Update MON_Boards_Groups table
+                            insert_query = """
+                            INSERT INTO [MON_Boards_Groups] ([board_id], [group_id], [group_name], [created_date])
+                            VALUES (?, ?, ?, GETDATE())
+                            """
+                            cursor.execute(insert_query, [board_id, group_id, group_name])
+                            
+                            # 🎯 FIX 3: Update ALL matching records with the group_id
+                            update_query = """
+                            UPDATE [{target_table}] 
+                            SET [group_id] = ?
+                            WHERE [group_name] = ? 
+                              AND [sync_state] = 'PENDING'
+                              AND [group_id] IS NULL
+                            """.format(target_table=self.config.target_table)
+                            
+                            cursor.execute(update_query, [group_id, group_name])
+                            updated_records = cursor.rowcount
+                            
+                            self.logger.info(f"🔗 Linked {updated_records} records to group '{group_name}' (ID: {group_id})")
+                            created_count += 1
+                    else:
+                        self.logger.error(f"❌ Failed to create Monday.com batch: {result.get('error', 'Unknown error')}")
+                        # Fall back to individual creation for this batch only
+                        for group_name in batch:
+                            try:
+                                single_result = self.monday_client.execute('create_groups', [{'group_name': group_name}], dry_run=False)
+                                if single_result.get('success') and single_result.get('monday_ids'):
+                                    group_id = single_result['monday_ids'][0]
+                                    self._update_single_group(cursor, board_id, group_id, group_name)
+                                    created_count += 1
+                            except Exception as e:
+                                self.logger.error(f"Error creating individual group '{group_name}': {e}")
+                else:
+                    # Mock batch creation for development/testing environments
+                    self.logger.info(f"🧪 Mock creating {len(batch)} groups in batch")
+                    for group_name in batch:
+                        group_id = f"mock_group_{hash(group_name) % 100000}"
+                        self._update_single_group(cursor, board_id, group_id, group_name)
+                        created_count += 1
                     
-                except Exception as e:
-                    self.logger.error(f"Error creating group '{group_name}': {e}")
-            
-            # Rate limiting
+            except Exception as e:
+                self.logger.error(f"Batch creation failed for batch {batch_number}: {e}")
+                # Continue with next batch instead of failing completely
+                
+            # Rate limiting between batches
             if batch_number < total_batches:
                 time.sleep(delay)
         
         return created_count
     
+    def _update_single_group(self, cursor, board_id: str, group_id: str, group_name: str):
+        """Helper method to update database for a single group."""
+        # Update MON_Boards_Groups table
+        insert_query = """
+        INSERT INTO [MON_Boards_Groups] ([board_id], [group_id], [group_name], [created_date])
+        VALUES (?, ?, ?, GETDATE())
+        """
+        cursor.execute(insert_query, [board_id, group_id, group_name])
+        
+        # Update ORDER_LIST records with the group_id
+        update_query = """
+        UPDATE [{target_table}] 
+        SET [group_id] = ?
+        WHERE [group_name] = ? 
+          AND [sync_state] = 'PENDING'
+          AND [group_id] IS NULL
+        """.format(target_table=self.config.target_table)
+        
+        cursor.execute(update_query, [group_id, group_name])
+        updated_records = cursor.rowcount
+        
+        self.logger.info(f"🔗 Linked {updated_records} records to group '{group_name}' (ID: {group_id})")
+    
     def execute_enhanced_merge_sequence(self, dry_run: bool = False, board_id: Optional[str] = None) -> Dict[str, Any]:
         """
-        Execute complete 6-phase enhanced merge sequence with transformations
+        Execute complete 4-phase enhanced merge sequence with group creation workflow
+        
+        Phase 1: NEW Order Detection - AAG ORDER NUMBER existence check
+        Phase 2: Group Creation Workflow - Smart Monday.com group detection and batch creation  
+        Phase 3: Template Merge Headers - Source → target table (headers with transformations)
+        Phase 4: Template Unpivot Lines - Direct MERGE to ORDER_LIST_LINES (no staging)
+        
+        Note: Group name and item name transformations moved to stored procedure
         
         Args:
             dry_run: If True, validate operations but don't execute
@@ -435,7 +290,7 @@ class EnhancedMergeOrchestrator:
         Returns:
             Dictionary with comprehensive operation results
         """
-        self.logger.info("🚀 Starting Enhanced Delta Merge Sequence (6-Phase Architecture)")
+        self.logger.info("🚀 Starting Enhanced Delta Merge Sequence (4-Phase Architecture)")
         self.total_start_time = time.time()
         
         try:
@@ -444,35 +299,25 @@ class EnhancedMergeOrchestrator:
                 
                 # No separate GroupCreationManager - logic consolidated into methods
                 
-                # Phase 1: Data Preparation (NEW order detection)
+                # Phase 1: NEW Order Detection (renamed from previous Phase 2)
                 phase1_result = self.detect_new_orders()
                 if not phase1_result.get('success', False):
-                    return self._format_error_result(phase1_result, "Phase 1 - Data Preparation")
+                    return self._format_error_result(phase1_result, "Phase 1 - NEW Order Detection")
                 
-                # Phase 2: Group Name Transformation (NEW)
-                phase2_result = self._execute_group_name_transformation(cursor, dry_run)
+                # Phase 2: Group Creation Workflow (transformations moved to stored procedure)
+                phase2_result = self._execute_group_creation_workflow(cursor, dry_run, board_id)
                 if not phase2_result.get('success', False):
-                    return self._format_error_result(phase2_result, "Phase 2 - Group Name Transformation")
+                    return self._format_error_result(phase2_result, "Phase 2 - Group Creation Workflow")
                 
-                # Phase 3: Group Creation (NEW)
-                phase3_result = self._execute_group_creation_workflow(cursor, dry_run, board_id)
+                # Phase 3: Template Merge Headers (enhanced with transformations)
+                phase3_result = self._execute_template_merge_headers(dry_run)
                 if not phase3_result.get('success', False):
-                    return self._format_error_result(phase3_result, "Phase 3 - Group Creation")
+                    return self._format_error_result(phase3_result, "Phase 3 - Template Merge Headers")
                 
-                # Phase 4: Item Name Transformation (NEW)
-                phase4_result = self._execute_item_name_transformation(cursor, dry_run)
+                # Phase 4: Template Unpivot Lines (direct merge to ORDER_LIST_LINES)
+                phase4_result = self._execute_template_unpivot_sizes_direct(dry_run)
                 if not phase4_result.get('success', False):
-                    return self._format_error_result(phase4_result, "Phase 4 - Item Name Transformation")
-                
-                # Phase 5: Template Merge Headers (EXISTING - enhanced with transformations)
-                phase5_result = self._execute_template_merge_headers(dry_run)
-                if not phase5_result.get('success', False):
-                    return self._format_error_result(phase5_result, "Phase 5 - Template Merge Headers")
-                
-                # Phase 6: Template Unpivot Lines (EXISTING)
-                phase6_result = self._execute_template_unpivot_lines(dry_run)
-                if not phase6_result.get('success', False):
-                    return self._format_error_result(phase6_result, "Phase 6 - Template Unpivot Lines")
+                    return self._format_error_result(phase4_result, "Phase 4 - Template Unpivot Lines")
                 
                 # Commit transaction if not dry run
                 if not dry_run:
@@ -488,21 +333,17 @@ class EnhancedMergeOrchestrator:
                 
                 return {
                     'success': True,
-                    'message': 'Enhanced 6-phase merge sequence completed successfully',
+                    'message': 'Enhanced 4-phase merge sequence completed successfully',
                     'dry_run': dry_run,
                     'total_duration_seconds': total_duration,
                     'phases': {
-                        'phase1_data_preparation': phase1_result,
-                        'phase2_group_name_transformation': phase2_result,
-                        'phase3_group_creation': phase3_result,
-                        'phase4_item_name_transformation': phase4_result,
-                        'phase5_template_merge_headers': phase5_result,
-                        'phase6_template_unpivot_lines': phase6_result
+                        'phase1_new_order_detection': phase1_result,
+                        'phase2_group_creation_workflow': phase2_result,
+                        'phase3_template_merge_headers': phase3_result,
+                        'phase4_template_unpivot_lines': phase4_result
                     },
                     'transformations_enabled': {
-                        'group_name': self._is_group_transformation_enabled(),
-                        'item_name': self.item_name_transformer.is_enabled(),
-                        'group_creation': self.group_creation_manager.is_enabled() if self.group_creation_manager else False
+                        'group_creation': self.transformation_config.get('monday', {}).get('groups', {}).get('auto_create', True)
                     }
                 }
                 
@@ -535,7 +376,7 @@ class EnhancedMergeOrchestrator:
         2. Query all records from source table 
         3. Compare AAG ORDER NUMBERs to classify as NEW or EXISTING
         4. Update source table sync_state column based on classification
-        5. Provide comprehensive logging including GREYSON PO 4755 validation
+        5. Provide comprehensive logging with production data validation
         
         Returns:
             Dictionary with detection results and statistics
@@ -567,7 +408,10 @@ class EnhancedMergeOrchestrator:
                 # Step 3: Classify records as NEW or EXISTING
                 new_orders = []
                 existing_orders_list = []
-                greyson_4755_new = []
+                # Track new orders by customer for production reporting
+                customer_stats = {}
+                new_count = 0
+                existing_count = 0
                 
                 for record in source_records:
                     record_uuid, aag_order_number, customer_name, po_number = record
@@ -580,15 +424,14 @@ class EnhancedMergeOrchestrator:
                             'customer_name': customer_name,
                             'po_number': po_number
                         })
+                        new_count += 1
                         
-                        # Special tracking for GREYSON PO 4755
-                        if customer_name and 'GREYSON' in str(customer_name).upper() and po_number and '4755' in str(po_number):
-                            greyson_4755_new.append({
-                                'record_uuid': record_uuid,
-                                'aag_order_number': aag_order_number,
-                                'customer_name': customer_name,
-                                'po_number': po_number
-                            })
+                        # Track by customer for production reporting
+                        customer_key = str(customer_name).upper() if customer_name else 'UNKNOWN'
+                        if customer_key not in customer_stats:
+                            customer_stats[customer_key] = {'new': 0, 'existing': 0}
+                        customer_stats[customer_key]['new'] += 1
+                        
                     else:
                         existing_orders_list.append({
                             'record_uuid': record_uuid,
@@ -596,29 +439,54 @@ class EnhancedMergeOrchestrator:
                             'customer_name': customer_name,
                             'po_number': po_number
                         })
+                        existing_count += 1
+                        
+                        # Track by customer for production reporting
+                        customer_key = str(customer_name).upper() if customer_name else 'UNKNOWN'
+                        if customer_key not in customer_stats:
+                            customer_stats[customer_key] = {'new': 0, 'existing': 0}
+                        customer_stats[customer_key]['existing'] += 1
                 
                 # Step 4: Update sync_state in source table based on classification
                 update_count = 0
+                batch_size = 1000  # SQL Server parameter limit safety
+                
                 if new_orders or existing_orders_list:
                     # Batch update NEW orders
                     if new_orders:
                         new_uuids = [order['record_uuid'] for order in new_orders]
-                        update_new_query = f"""
-                        UPDATE {self.config.source_table}
-                        SET sync_state = 'NEW', updated_at = GETUTCDATE()
-                        WHERE record_uuid IN ({','.join(['?' for _ in new_uuids])})
-                        """
-                        cursor.execute(update_new_query, new_uuids)
+                        total_batches = (len(new_uuids) + batch_size - 1) // batch_size
+                        self.logger.info(f"   Updating {len(new_uuids)} NEW orders in batches of {batch_size} ({total_batches} batches)")
+                        
+                        for i in range(0, len(new_uuids), batch_size):
+                            batch_uuids = new_uuids[i:i + batch_size]
+                            batch_num = i//batch_size + 1
+                            
+                            update_new_query = f"""
+                            UPDATE {self.config.source_table}
+                            SET sync_state = 'NEW', updated_at = GETUTCDATE()
+                            WHERE record_uuid IN ({','.join(['?' for _ in batch_uuids])})
+                            """
+                            cursor.execute(update_new_query, batch_uuids)
+                            self.logger.info(f"   ✅ NEW batch {batch_num}/{total_batches}: Updated {len(batch_uuids)} records")
                         
                     # Batch update EXISTING orders
                     if existing_orders_list:
                         existing_uuids = [order['record_uuid'] for order in existing_orders_list]
-                        update_existing_query = f"""
-                        UPDATE {self.config.source_table}
-                        SET sync_state = 'EXISTING', updated_at = GETUTCDATE()
-                        WHERE record_uuid IN ({','.join(['?' for _ in existing_uuids])})
-                        """
-                        cursor.execute(update_existing_query, existing_uuids)
+                        total_batches = (len(existing_uuids) + batch_size - 1) // batch_size
+                        self.logger.info(f"   Updating {len(existing_uuids)} EXISTING orders in batches of {batch_size} ({total_batches} batches)")
+                        
+                        for i in range(0, len(existing_uuids), batch_size):
+                            batch_uuids = existing_uuids[i:i + batch_size]
+                            batch_num = i//batch_size + 1
+                            
+                            update_existing_query = f"""
+                            UPDATE {self.config.source_table}
+                            SET sync_state = 'EXISTING', updated_at = GETUTCDATE()
+                            WHERE record_uuid IN ({','.join(['?' for _ in batch_uuids])})
+                            """
+                            cursor.execute(update_existing_query, batch_uuids)
+                            self.logger.info(f"   ✅ EXISTING batch {batch_num}/{total_batches}: Updated {len(batch_uuids)} records")
                     
                     conn.commit()
                     update_count = len(new_orders) + len(existing_orders_list)
@@ -634,13 +502,11 @@ class EnhancedMergeOrchestrator:
                 self.logger.info(f"   ⚡ Updated records: {update_count}")
                 self.logger.info(f"   ⏱️ Duration: {duration:.2f}s")
                 
-                # GREYSON PO 4755 specific validation
-                if greyson_4755_new:
-                    self.logger.info(f"   🏷️ GREYSON PO 4755 NEW orders: {len(greyson_4755_new)}")
-                    for order in greyson_4755_new:
-                        self.logger.info(f"     → {order['aag_order_number']} | {order['customer_name']} | {order['po_number']}")
-                else:
-                    self.logger.info("   🏷️ GREYSON PO 4755 NEW orders: 0")
+                # Production customer breakdown reporting
+                self.logger.info("   📊 Customer breakdown:")
+                for customer, stats in sorted(customer_stats.items()):
+                    total_customer = stats['new'] + stats['existing']
+                    self.logger.info(f"     → {customer}: {total_customer} orders (New: {stats['new']}, Existing: {stats['existing']})")
                 
                 # Calculate accuracy (should be >95%)
                 accuracy = (update_count / len(source_records)) * 100 if source_records else 100
@@ -652,8 +518,7 @@ class EnhancedMergeOrchestrator:
                     'existing_orders': len(existing_orders_list),
                     'existing_in_target': len(existing_orders),
                     'updated_records': update_count,
-                    'greyson_4755_new_count': len(greyson_4755_new),
-                    'greyson_4755_details': greyson_4755_new,
+                    'customer_breakdown': customer_stats,
                     'accuracy_percentage': round(accuracy, 2),
                     'duration_seconds': round(duration, 2),
                     'operation': 'detect_new_orders'
@@ -943,7 +808,7 @@ class EnhancedMergeOrchestrator:
         """
         Validate cancelled order handling in production pipeline (Task 19.14.4)
         Integrated into merge workflow - aligned with merge grouping/batching
-        Based on successful test_task19_data_merge_integration.py patterns
+        Based on production cancelled order handling patterns
         
         Args:
             customer_name: Optional customer filter for focused validation

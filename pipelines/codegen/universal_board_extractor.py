@@ -233,7 +233,7 @@ def get_conversion_logic(monday_type: str) -> str:
 
 def save_metadata_file(metadata: Dict[str, Any], board_id: int) -> Path:
     """Save metadata to JSON file"""
-    metadata_dir = repo_root / "configs" / "boards"
+    metadata_dir = repo_root / "configs" / "extracts" / "boards"
     metadata_dir.mkdir(parents=True, exist_ok=True)
     
     metadata_file = metadata_dir / f"board_{board_id}_metadata.json"

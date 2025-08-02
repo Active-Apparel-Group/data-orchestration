@@ -225,6 +225,57 @@ class DeltaSyncConfig:
         monday_config = self._config.get('monday', {}).get(self._environment, {})
         return monday_config.get('group_id', '')
     
+    # Rate Limits Configuration (NEW - from monday.rate_limits)
+    @property
+    def group_batch_size(self) -> int:
+        """Monday.com group batch size from rate_limits configuration"""
+        return self._config.get('monday', {}).get('rate_limits', {}).get('group_batch_size', 5)
+    
+    @property
+    def item_batch_size(self) -> int:
+        """Monday.com item batch size from rate_limits configuration (defaults to group_batch_size)"""
+        return self._config.get('monday', {}).get('rate_limits', {}).get('item_batch_size', self.group_batch_size)
+    
+    @property
+    def delay_between_batches(self) -> float:
+        """Delay between batch requests in seconds"""
+        return self._config.get('monday', {}).get('rate_limits', {}).get('delay_between_batches', 2.0)
+    
+    @property
+    def max_concurrent_batches(self) -> int:
+        """Maximum concurrent batches"""
+        return self._config.get('monday', {}).get('rate_limits', {}).get('max_concurrent_batches', 1)
+    
+    @property
+    def request_timeout(self) -> float:
+        """API request timeout in seconds"""
+        return self._config.get('monday', {}).get('rate_limits', {}).get('request_timeout', 30.0)
+
+    # Test Data Configuration (for multi-customer testing)
+    @property
+    def limit_customers(self) -> List[str]:
+        """List of customers to limit testing to (empty list = all customers)"""
+        test_data = self._config.get('test_data', {})
+        return test_data.get('limit_customers', [])
+    
+    @property
+    def limit_pos(self) -> List[str]:
+        """List of PO numbers to limit testing to (empty list = all POs)"""
+        test_data = self._config.get('test_data', {})
+        return test_data.get('limit_pos', [])
+    
+    @property
+    def limit_records(self) -> int:
+        """Maximum number of records per test (0 = no limit)"""
+        test_data = self._config.get('test_data', {})
+        return test_data.get('limit_records', 0)
+    
+    @property
+    def test_mode(self) -> bool:
+        """Whether testing mode is enabled"""
+        test_data = self._config.get('test_data', {})
+        return test_data.get('test_mode', False)
+    
     # Business Columns (adapted to actual TOML structure) 
     def get_business_columns(self, use_dynamic_detection: bool = False) -> List[str]:
         """

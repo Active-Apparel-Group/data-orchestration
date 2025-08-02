@@ -1,12 +1,12 @@
 # OPUS Universal Monday.com Update Configuration
-# Generated from: board_9200517329_metadata.json
-# Generated at: 2025-07-02 08:11:32
-# Board: Customer Master Schedule (9200517329)
+# Generated from: board_9609317401_metadata.json
+# Generated at: 2025-08-01 16:03:01
+# Board: Customer Master Schedule (9609317401)
 
 [metadata]
-board_id = 9200517329
+board_id = 9609317401
 board_name = "Customer Master Schedule"
-table_name = "MON_CustMasterSchedule"
+table_name = "MON_CustomerMasterSchedule"
 database = "orders"
 update_type = "batch_item_updates"
 description = "Update Customer Master Schedule items with latest data"
@@ -24,16 +24,6 @@ query = """
 
 # Column mapping configuration
 item_id_column = "monday_item_id"
-
-[validation]
-required_fields = ["monday_item_id", "board_id"]
-max_batch_size = 15  # Process 15 records per API call
-timeout_seconds = 300
-
-[retry_config]
-max_retries = 3
-retry_delay_seconds = 5
-backoff_multiplier = 2
 
 [column_mapping]
 # Monday.com column_id -> SQL query column mapping
@@ -66,7 +56,7 @@ backoff_multiplier = 2
 # CUSTOMER ALT PO
 "text_mkrh94rx" = "CUSTOMER ALT PO"
 # STYLE
-"dropdown_mkr5tgaa" = "STYLE"
+"text_mktdechp" = "STYLE"
 # PATTERN ID
 "text_mkr5cz8m" = "PATTERN ID"
 # ALIAS RELATED ITEM
@@ -74,7 +64,7 @@ backoff_multiplier = 2
 # STYLE DESCRIPTION
 "long_text_mkr5p0cf" = "STYLE DESCRIPTION"
 # COLOR
-"dropdown_mkr5677f" = "COLOR"
+"long_text_mktdy7re" = "COLOR"
 # CATEGORY
 "dropdown_mkr5s5n3" = "CATEGORY"
 # UNIT OF MEASURE
@@ -114,7 +104,7 @@ backoff_multiplier = 2
 # FINAL FOB (USD)
 "numeric_mkr5nhr7" = "FINAL FOB (USD)"
 # HS CODE
-"dropdown_mkr5k8yn" = "HS CODE"
+"long_text_mktdz0g" = "HS CODE"
 # US DUTY RATE
 "numeric_mkr5r6at" = "US DUTY RATE"
 # US DUTY
@@ -189,12 +179,6 @@ backoff_multiplier = 2
 "formula_mkrd937j" = "REVENUE (FOB)"
 # ADD TO PLANNING
 "color_mkrerxrs" = "ADD TO PLANNING"
-# ORDER QTY
-"formula_mkre54dj" = "ORDER QTY"
-# PACKED QTY
-"formula_mkrea5pd" = "PACKED QTY"
-# SHIPPED QTY
-"formula_mkre5ce5" = "SHIPPED QTY"
 # PPS CMT DUE
 "date_mkrvx550" = "PPS CMT DUE"
 # PPS CMT RCV
@@ -205,3 +189,11 @@ backoff_multiplier = 2
 "long_text_mks0vs1p" = "RANGE / COLLECTION"
 # Last updated
 "pulse_updated_mks8qpqh" = "Last updated"
+# ORDER QTY
+"numeric_mktb1d19" = "ORDER QTY"
+# PACKED QTY
+"numeric_mktb14eh" = "PACKED QTY"
+# SHIPPED QTY
+"numeric_mktb1k33" = "SHIPPED QTY"
+# CUSTOMER COLOR CODE
+"long_text_mktdjzcg" = "CUSTOMER COLOR CODE"

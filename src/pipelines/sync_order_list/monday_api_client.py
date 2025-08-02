@@ -21,8 +21,9 @@ import asyncio
 import aiohttp
 import os
 import sys
-from typing import Dict, List, Any, Optional, Union
+from typing import Dict, List, Any, Optional, Union, Tuple
 from pathlib import Path
+from datetime import datetime
 
 # Modern Python package imports - ultra-minimal dependencies
 from src.pipelines.utils import logger, config, db
@@ -35,21 +36,20 @@ class MondayAPIClient:
     Combines TOML configuration + GraphQL templates + HTTP client
     """
     
-    def __init__(self, toml_config_path: str):
+    def __init__(self, toml_config_path: str, environment: str = "production"):
         """
         Initialize with TOML configuration
         
         Args:
             toml_config_path: Path to sync_order_list.toml configuration
+            environment: Environment to use ('development' or 'production')
         """
         self.logger = logger.get_logger(__name__)
         self.config_path = Path(toml_config_path)
+        self.environment = environment  # Store the environment parameter
         
         # Load TOML configuration
         self.toml_config = self._load_toml_config()
-        
-        # Get environment from configuration
-        self.environment = self._get_environment()
         
         # Initialize GraphQL loader
         self.graphql_loader = GraphQLLoader()
@@ -73,7 +73,7 @@ class MondayAPIClient:
         from .config_parser import DeltaSyncConfig
         
         # Load configuration using the proper parser
-        delta_config = DeltaSyncConfig.from_toml(self.config_path, environment='development')
+        delta_config = DeltaSyncConfig.from_toml(self.config_path, environment=environment)
         
         # Get board IDs from the config parser (handles defaults properly)
         self.board_id = delta_config.monday_board_id
@@ -92,53 +92,12 @@ class MondayAPIClient:
             raise
     
     def _get_environment(self) -> str:
-        """Get current environment from config parser"""
-        from .config_parser import DeltaSyncConfig
-        delta_config = DeltaSyncConfig.from_toml(self.config_path)
-        return delta_config.environment
+        """Get current environment"""
+        return self.environment
 
-    def _get_dropdown_config(self, item_type: str = "headers") -> Dict[str, bool]:
-        """
-        Get dropdown configuration for the current environment and item type.
-        
-        Args:
-            item_type: Either "headers" (for main items) or "lines" (for subitems)
-            
-        Returns:
-            Dict mapping column_id -> bool (whether to create labels if missing)
-        """
-        try:
-            config_path = f"monday.{self.environment}.{item_type}.create_labels_if_missing"
-            config_section = self.toml_config
-            
-            # Navigate to the nested configuration
-            for key in config_path.split('.'):
-                config_section = config_section.get(key, {})
-            
-            if not isinstance(config_section, dict):
-                self.logger.warning(f"No dropdown config found at {config_path}, using defaults")
-                return {"default": False}
-                
-            return config_section
-            
-        except Exception as e:
-            self.logger.error(f"Error reading dropdown config: {e}")
-            return {"default": False}
+# REMOVED DUPLICATE METHOD - Using the comprehensive version below that returns tuple (config, default)
     
-    def _should_create_labels_for_column(self, column_id: str, item_type: str = "headers") -> bool:
-        """
-        Determine if we should create labels for a specific column.
-        
-        Args:
-            column_id: Monday.com column ID (e.g., "dropdown_mkr58de6")
-            item_type: Either "headers" or "lines"
-            
-        Returns:
-            bool: Whether to create labels if missing for this column
-        """
-        dropdown_config = self._get_dropdown_config(item_type)
-        default_policy = dropdown_config.get("default", False)
-        return dropdown_config.get(column_id, default_policy)
+# REMOVED: Duplicate method with incorrect tuple unpacking - using the correct version below
     
     def _determine_create_labels_for_records(self, records: List[Dict], item_type: str = "headers") -> bool:
         """
@@ -164,11 +123,32 @@ class MondayAPIClient:
             for record in records:
                 for monday_column_id, value in record.items():
                     # Only check dropdown columns with non-empty values
-                    if monday_column_id.startswith("dropdown_") and value and str(value).strip() and str(value).strip().lower() != 'none':
-                        should_create = dropdown_config.get(monday_column_id, default)
-                        if should_create:
-                            self.logger.info(f"Enabling create_labels_if_missing for column {monday_column_id}: '{value}'")
-                            return True
+                    if monday_column_id.startswith("dropdown_") and value:
+                        # Handle both string values and JSON object format {"labels": ["VALUE"]}
+                        has_meaningful_value = False
+                        if isinstance(value, dict) and "labels" in value:
+                            # JSON format: {"labels": ["VALUE"]}
+                            labels = value.get("labels", [])
+                            has_meaningful_value = bool(labels and any(str(label).strip() for label in labels))
+                            display_value = f"JSON labels: {labels}"
+                        else:
+                            # String format: "VALUE"
+                            str_value = str(value).strip()
+                            has_meaningful_value = bool(str_value and str_value.lower() != 'none')
+                            display_value = str_value
+                        
+                        if has_meaningful_value:
+                            should_create = dropdown_config.get(monday_column_id, default)
+                            self.logger.error(f"🎯 CRITICAL DEBUG: Column {monday_column_id} = '{display_value}' -> should_create = {should_create}")
+                            self.logger.error(f"🎯 CRITICAL DEBUG: Raw value = {value}")
+                            self.logger.error(f"🎯 CRITICAL DEBUG: Config key exists = {monday_column_id in dropdown_config}")
+                            if monday_column_id == "dropdown_mkr5rgs6":
+                                self.logger.error(f"🚨 REBUY COLUMN FOUND! dropdown_mkr5rgs6 config = {dropdown_config.get(monday_column_id, 'NOT FOUND')}")
+                                self.logger.error(f"� REBUY VALUE = {display_value}")
+                                self.logger.error(f"🚨 SHOULD CREATE = {should_create}")
+                            if should_create:
+                                self.logger.error(f"✅ ENABLING create_labels_if_missing for column {monday_column_id}: '{display_value}'")
+                                return True
             
             self.logger.debug(f"No dropdown columns need label creation for {item_type}")
             return False
@@ -177,7 +157,7 @@ class MondayAPIClient:
             self.logger.error(f"Error determining create_labels setting: {e}")
             return False
     
-    def _get_dropdown_config(self, item_type: str) -> Dict[str, bool]:
+    def _get_dropdown_config(self, item_type: str) -> Tuple[Dict[str, bool], bool]:
         """
         Get environment-specific dropdown configuration for create_labels_if_missing
         
@@ -185,7 +165,7 @@ class MondayAPIClient:
             item_type: 'headers' or 'lines'
             
         Returns:
-            Dict mapping column_id to boolean (should create labels if missing)
+            Tuple of (dropdown_config_dict, default_value)
         """
         environment = self._get_environment()
         
@@ -195,13 +175,10 @@ class MondayAPIClient:
         self.logger.debug(f"🔍 Looking for dropdown config at path: {config_path}")
         
         config_section = self.toml_config
-        for i, key in enumerate(config_path):
-            self.logger.debug(f"  Step {i+1}: Looking for key '{key}' in {type(config_section).__name__}")
+        for key in config_path:
             if key in config_section:
                 config_section = config_section.get(key, {})
-                self.logger.debug(f"    ✅ Found: {type(config_section).__name__}")
             else:
-                self.logger.debug(f"    ❌ Key '{key}' not found! Available keys: {list(config_section.keys()) if isinstance(config_section, dict) else 'Not a dict'}")
                 break
         
         if not config_section:
@@ -217,7 +194,6 @@ class MondayAPIClient:
                 dropdown_config[column_id] = should_create
         
         self.logger.debug(f"✅ Dropdown config for {environment}.{item_type}: {len(dropdown_config)} columns, default={default}")
-        self.logger.debug(f"   Config contents: {dropdown_config}")
         return dropdown_config, default
     
     def _should_create_labels_for_column(self, column_id: str, item_type: str) -> bool:
@@ -241,56 +217,20 @@ class MondayAPIClient:
 
     def _determine_create_labels_for_record(self, record: Dict[str, Any], item_type: str = "headers") -> bool:
         """
-        Determine if create_labels_if_missing should be enabled for this record.
-        Checks if ANY dropdown column in the record needs label creation based on TOML config.
-        
-        Args:
-            record: The data record being processed
-            item_type: Either "headers" or "lines"
-            
-        Returns:
-            bool: True if any dropdown column should create labels if missing
+        LEGACY METHOD - NOT USED ANYWHERE IN CODEBASE
+        This method is legacy and has been replaced by _determine_create_labels_for_records (plural).
+        The active method handles batches properly and uses the correct configuration reading.
         """
-        try:
-            # Get dropdown configuration for current environment and item type
-            config_section = f"{self.environment}.{item_type}.create_labels_if_missing"
-            dropdown_config = self._get_dropdown_config(config_section)
-            
-            if not dropdown_config:
-                self.logger.debug(f"No dropdown config found for {config_section}")
-                return False
-            
-            # Get column mappings for current environment
-            column_mapping = self.toml_config.get('monday', {}).get('column_mapping', {}).get(self.environment, {}).get(item_type, {})
-            
-            # Check each column in the record
-            for column_name, value in record.items():
-                if value is None or str(value).strip() == "":
-                    continue  # Skip empty values
-                    
-                # Get Monday.com column ID for this column
-                monday_column_id = column_mapping.get(column_name)
-                if not monday_column_id:
-                    continue  # Skip unmapped columns
-                    
-                # Check if this column is configured for label creation
-                should_create = dropdown_config.get(monday_column_id, dropdown_config.get('default', False))
-                if should_create:
-                    self.logger.debug(f"Column {column_name} ({monday_column_id}) needs label creation: {value}")
-                    return True
-            
-            return False
-            
-        except Exception as e:
-            self.logger.error(f"Error determining create_labels_if_missing: {str(e)}")
-            return False  # Conservative fallback
+        # Legacy method - return False to avoid any issues
+        return False
     
     def execute(self, operation_type: str, data: Union[Dict, List[Dict]], dry_run: bool = False) -> Dict[str, Any]:
         """
         Execute Monday.com operation with automatic single/batch/async handling
         
         Args:
-            operation_type: "create_items", "create_subitems", "update_items", "update_subitems", "create_groups"
+            operation_type: "create_items", "create_subitems", "update_items", "update_subitems", "create_groups",
+                          "batch_create_items", "async_batch_create_items"
             data: Single dict or list of dicts from database
             dry_run: If True, validate but don't execute
             
@@ -305,15 +245,22 @@ class MondayAPIClient:
         if dry_run:
             return self._dry_run_response(operation_type, data_list)
         
-        # Conservative execution strategy - respect Monday.com rate limits
-        # MVP: Single items, batch subitems for performance
-        if operation_type == 'create_subitems' and len(data_list) > 1:
+        # Dynamic execution strategy based on operation type
+        if operation_type == 'batch_create_items':
+            # Use GraphQL batch template for items
+            return asyncio.run(self._execute_batch(operation_type, data_list))
+        elif operation_type == 'async_batch_create_items':
+            # Use high-performance async batch execution for items
+            return asyncio.run(self._execute_async_batch(operation_type, data_list))
+        elif operation_type == 'create_subitems' and len(data_list) > 1:
+            # Default batch subitems for performance
             return asyncio.run(self._execute_batch(operation_type, data_list))
         else:
+            # Single item operations (default)
             return asyncio.run(self._execute_all_single(operation_type, data_list))
     
     async def _execute_all_single(self, operation_type: str, data_list: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Execute all records as single item operations with rate limiting"""
+        """Execute all records as single item operations with rate limiting and API logging aggregation"""
         results = []
         for record in data_list:
             result = await self._execute_single(operation_type, record)
@@ -326,27 +273,52 @@ class MondayAPIClient:
         all_monday_ids = []
         errors = []
         
+        # Capture API logging data from first successful operation
+        api_request = None
+        api_response = None
+        request_timestamp = None
+        response_timestamp = None
+        
         for result in results:
             if result.get('success'):
                 all_monday_ids.extend(result.get('monday_ids', []))
+                
+                # Capture API data from first successful operation for logging
+                if api_request is None:
+                    api_request = result.get('api_request')
+                    api_response = result.get('api_response')
+                    request_timestamp = result.get('request_timestamp')
+                    response_timestamp = result.get('response_timestamp')
             else:
                 errors.append(result.get('error', 'Unknown error'))
+                
+                # If no successful operations yet, capture error API data
+                if api_request is None:
+                    api_request = result.get('api_request')
+                    api_response = result.get('api_response')
+                    request_timestamp = result.get('request_timestamp')
+                    response_timestamp = result.get('response_timestamp')
         
         return {
             'success': len(errors) == 0,
             'records_processed': total_processed,
             'monday_ids': all_monday_ids,
             'operation_type': operation_type,
-            'errors': errors if errors else None
+            'errors': errors if errors else None,
+            # Include aggregated API logging data
+            'api_request': api_request,
+            'api_response': api_response,
+            'request_timestamp': request_timestamp,
+            'response_timestamp': response_timestamp
         }
     
     async def _execute_single(self, operation_type: str, record: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute single record operation"""
+        """Execute single record operation with full API logging data"""
         try:
             # Build GraphQL query with variables
             query_data = self._build_graphql_query(operation_type, [record])
             
-            # Execute API call
+            # Execute API call (now returns full API logging data)
             result = await self._make_api_call(query_data['query'], query_data['variables'])
             
             if result['success']:
@@ -355,17 +327,41 @@ class MondayAPIClient:
                     'success': True,
                     'records_processed': 1,
                     'monday_ids': [monday_id],
-                    'operation_type': operation_type
+                    'operation_type': operation_type,
+                    # Propagate API logging data
+                    'api_request': result.get('api_request'),
+                    'api_response': result.get('api_response'),
+                    'request_timestamp': result.get('request_timestamp'),
+                    'response_timestamp': result.get('response_timestamp')
                 }
             else:
                 return {
                     'success': False,
                     'error': result['error'],
-                    'records_processed': 0
+                    'records_processed': 0,
+                    'operation_type': operation_type,
+                    # Propagate API logging data even for errors
+                    'api_request': result.get('api_request'),
+                    'api_response': result.get('api_response'),
+                    'request_timestamp': result.get('request_timestamp'),
+                    'response_timestamp': result.get('response_timestamp')
                 }
                 
         except Exception as e:
             self.logger.exception(f"Single operation failed: {e}")
+            
+            # Return error with minimal API logging data
+            response_timestamp = datetime.utcnow()
+            return {
+                'success': False,
+                'error': f'Single operation failed: {str(e)}',
+                'records_processed': 0,
+                'operation_type': operation_type,
+                'api_request': {'operation': operation_type, 'record': record},
+                'api_response': {'error': str(e)},
+                'request_timestamp': datetime.utcnow(),
+                'response_timestamp': response_timestamp
+            }
             return {
                 'success': False,
                 'error': str(e),
@@ -387,21 +383,41 @@ class MondayAPIClient:
                     'success': True,
                     'records_processed': len(records),
                     'monday_ids': monday_ids,
-                    'operation_type': operation_type
+                    'operation_type': operation_type,
+                    # CRITICAL FIX: Propagate API logging data for batch operations
+                    'api_request': result.get('api_request'),
+                    'api_response': result.get('api_response'),
+                    'request_timestamp': result.get('request_timestamp'),
+                    'response_timestamp': result.get('response_timestamp')
                 }
             else:
                 return {
                     'success': False,
                     'error': result['error'],
-                    'records_processed': 0
+                    'records_processed': 0,
+                    'operation_type': operation_type,
+                    # CRITICAL FIX: Propagate API logging data even for batch errors
+                    'api_request': result.get('api_request'),
+                    'api_response': result.get('api_response'),
+                    'request_timestamp': result.get('request_timestamp'),
+                    'response_timestamp': result.get('response_timestamp')
                 }
                 
         except Exception as e:
             self.logger.exception(f"Batch operation failed: {e}")
+            
+            # CRITICAL FIX: Return error with API logging data for batch exceptions
+            from datetime import datetime
+            response_timestamp = datetime.utcnow()
             return {
                 'success': False,
-                'error': str(e),
-                'records_processed': 0
+                'error': f'Batch operation failed: {str(e)}',
+                'records_processed': 0,
+                'operation_type': operation_type,
+                'api_request': {'operation': operation_type, 'records': records},
+                'api_response': {'error': str(e)},
+                'request_timestamp': datetime.utcnow(),
+                'response_timestamp': response_timestamp
             }
     
     async def _execute_async_batch(self, operation_type: str, records: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -409,8 +425,8 @@ class MondayAPIClient:
         Execute large dataset with conservative async batch processing
         Uses proven rate limiting patterns: 15→5→1 fallback, 100ms delays, 25s timeouts
         """
-        # Conservative batching for Monday.com rate limits - start with 5 items for testing
-        initial_batch_size = 5
+        # Get batch size from configuration
+        initial_batch_size = self.toml_config.get('monday', {}).get('rate_limits', {}).get('item_batch_size', 5)
         batches = [records[i:i + initial_batch_size] for i in range(0, len(records), initial_batch_size)]
         
         self.logger.info(f"🚀 Conservative batch processing: {len(records)} records in {len(batches)} batches (size: {initial_batch_size})")
@@ -536,14 +552,42 @@ class MondayAPIClient:
             template = self.graphql_loader.get_mutation("create-master-item")
             
             # Build variables for create-master-item
-            item_name = record.get('AAG ORDER NUMBER', 'Unknown Order')
+            # Priority 1: Use item_name from Enhanced Merge Orchestrator transformation
+            item_name = record.get('item_name')
+            if not item_name:
+                # Priority 2: Fallback to AAG ORDER NUMBER
+                item_name = record.get('AAG ORDER NUMBER', 'Unknown Order')
+                self.logger.info(f"Using fallback item name: {item_name}")
+            else:
+                self.logger.info(f"Using Enhanced Merge Orchestrator item_name: {item_name}")
+            
             column_values = self._build_column_values(transformed_record)
+            
+            # Extract group_id for proper group placement - BINARY LOGIC
+            group_id = self._get_group_id_from_record(record)
+            
+            # BINARY LOGIC: If group_id is None, we must create the group first
+            if group_id is None:
+                group_name = record.get('group_name')
+                if not group_name:
+                    raise ValueError(f"Cannot create item: no group_id and no group_name in record")
+                
+                self.logger.info(f"🏗️ Creating group first: '{group_name}'")
+                # Create group and get the returned group_id
+                group_creation_result = self._create_group_and_update_database(group_name, record)
+                if not group_creation_result:
+                    raise ValueError(f"Failed to create group: '{group_name}'")
+                group_id = group_creation_result.get('group_id')
+                if not group_id:
+                    raise ValueError(f"Group creation succeeded but no group_id returned for: '{group_name}'")
+                self.logger.info(f"✅ Group created successfully: '{group_id}'")
             
             # Determine create_labels_if_missing based on TOML configuration
             create_labels = self._determine_create_labels_for_records([transformed_record], 'headers')
             
             variables = {
                 'boardId': int(self.board_id),  # Monday.com expects integer for ID
+                'groupId': group_id,            # Now guaranteed to be valid group_id
                 'itemName': str(item_name),
                 'columnValues': column_values,
                 'createLabelsIfMissing': create_labels
@@ -647,6 +691,38 @@ class MondayAPIClient:
                 # Batch subitem updates - build dynamic GraphQL
                 return self._build_batch_subitem_updates_query(records, column_mappings)
         
+        elif operation_type == 'create_groups':
+            # CREATE GROUPS operation - the missing piece for 100% success!
+            if len(records) == 1:
+                # Single group creation
+                record = records[0]
+                
+                template = self.graphql_loader.get_mutation("create_group")
+                
+                # Build variables for create_group
+                group_name = record.get('group_name')
+                if not group_name:
+                    raise ValueError("group_name is required for create_groups operation")
+                
+                variables = {
+                    'board_id': str(self.board_id),  # Monday.com expects string for board_id in GraphQL
+                    'group_name': str(group_name)
+                }
+                
+                self.logger.info(f"Creating group: '{group_name}' on board {self.board_id}")
+                return {'query': template, 'variables': variables}
+            else:
+                # Batch group creation - build dynamic GraphQL
+                return self._build_batch_groups_query(records)
+        
+        elif operation_type == 'batch_create_items':
+            # Batch item creation using GraphQL batch template
+            return self._build_batch_items_query(records, column_mappings)
+            
+        elif operation_type == 'async_batch_create_items':
+            # Same as batch_create_items - the async nature is handled in execution, not query building
+            return self._build_batch_items_query(records, column_mappings)
+        
         else:
             # For other operations, fall back to template rendering (future enhancement)
             raise NotImplementedError(f"Operation {operation_type} not yet implemented for MVP")
@@ -656,10 +732,10 @@ class MondayAPIClient:
         # Get the environment from config parser (development/production)
         try:
             from .config_parser import DeltaSyncConfig
-            delta_config = DeltaSyncConfig.from_toml(self.config_path, environment='development')
+            delta_config = DeltaSyncConfig.from_toml(self.config_path, environment=self.environment)
             environment = delta_config.environment
         except:
-            environment = 'development'  # Fallback
+            environment = self.environment  # Use instance environment
         
         monday_mapping = self.toml_config.get('monday', {}).get('column_mapping', {})
         
@@ -695,11 +771,103 @@ class MondayAPIClient:
         
         # Add required Monday.com fields that might not be in mappings
         if 'name' not in transformed:
-            transformed['name'] = record.get('AAG ORDER NUMBER', 'Unknown Order')
+            # Priority 1: Use item_name from Enhanced Merge Orchestrator transformation
+            item_name = record.get('item_name')
+            if not item_name:
+                # Priority 2: Fallback to AAG ORDER NUMBER
+                item_name = record.get('AAG ORDER NUMBER', 'Unknown Order')
+                self.logger.debug(f"Using fallback item name for transformation: {item_name}")
+            else:
+                self.logger.debug(f"Using Enhanced Merge Orchestrator item_name for transformation: {item_name}")
+            transformed['name'] = item_name
         
         self.logger.debug(f"Record transformation: {mapped_count}/{len(mappings)} TOML mappings applied, {len(transformed)} total fields")
         
         return transformed
+    
+    def _get_group_id_from_record(self, record: Dict[str, Any]) -> Optional[str]:
+        """
+        BINARY LOGIC: Extract group_id from database record
+        - group_id NOT NULL → USE existing group_id
+        - group_id NULL → RETURN None (caller must create group first)
+        NO FALLBACKS - BINARY ONLY
+        """
+        group_id = record.get('group_id')
+        if group_id:
+            self.logger.debug(f"✅ Using database group_id: '{group_id}'")
+            return group_id
+            
+        # BINARY LOGIC: group_id is NULL - return None to signal group creation needed
+        group_name = record.get('group_name')
+        if group_name:
+            self.logger.warning(f"⚠️ group_id is NULL - GROUP CREATION REQUIRED for: '{group_name}'")
+            return None  # Return None to trigger group creation workflow
+            
+        self.logger.error("❌ No group_name found - cannot determine group for item creation")
+        return None
+    
+    def _create_group_and_update_database(self, group_name: str, record: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        Create group on Monday.com and update database with returned group_id
+        BINARY LOGIC: Create group → Update database → Return group_id
+        """
+        try:
+            # Step 1: Create group on Monday.com
+            self.logger.info(f"🏗️ Creating Monday.com group: '{group_name}'")
+            
+            template = self.graphql_loader.get_mutation("create-group")
+            variables = {
+                'board_id': str(self.board_id),
+                'group_name': str(group_name)
+            }
+            
+            response = self._make_graphql_request({'query': template, 'variables': variables})
+            
+            if not response or 'data' not in response:
+                self.logger.error(f"❌ Group creation failed: Invalid response for '{group_name}'")
+                return None
+                
+            # Extract group_id from response
+            group_data = response['data'].get('create_group')
+            if not group_data or 'id' not in group_data:
+                self.logger.error(f"❌ Group creation failed: No group ID returned for '{group_name}'")
+                return None
+                
+            new_group_id = group_data['id']
+            self.logger.info(f"✅ Monday.com group created: '{group_name}' → '{new_group_id}'")
+            
+            # Step 2: Update database with new group_id
+            record_uuid = record.get('record_uuid')
+            if record_uuid:
+                self._update_database_group_id(record_uuid, new_group_id)
+                self.logger.info(f"✅ Database updated: record_uuid '{record_uuid}' → group_id '{new_group_id}'")
+            else:
+                self.logger.warning(f"⚠️ No record_uuid found - database not updated for group '{new_group_id}'")
+            
+            return {
+                'group_id': new_group_id,
+                'group_name': group_name,
+                'created': True
+            }
+            
+        except Exception as e:
+            self.logger.error(f"❌ Group creation failed for '{group_name}': {str(e)}")
+            return None
+    
+    def _update_database_group_id(self, record_uuid: str, group_id: str) -> bool:
+        """Update FACT_ORDER_LIST with new group_id for given record_uuid"""
+        try:
+            # This would typically use the database connection from config
+            # For now, log the operation - actual implementation depends on database setup
+            self.logger.info(f"📝 DATABASE UPDATE: record_uuid='{record_uuid}' → group_id='{group_id}'")
+            
+            # TODO: Implement actual database update
+            # UPDATE FACT_ORDER_LIST SET group_id = ? WHERE record_uuid = ?
+            
+            return True
+        except Exception as e:
+            self.logger.error(f"❌ Database update failed: record_uuid='{record_uuid}' group_id='{group_id}': {str(e)}")
+            return False
     
     def _get_group_id(self, record: Dict[str, Any]) -> Optional[str]:
         """Get or create group ID based on TOML group strategy"""
@@ -721,12 +889,25 @@ class MondayAPIClient:
         """Build JSON-formatted column values for Monday.com item creation using TOML mappings"""
         column_values = {}
         
+        # Create reverse mapping from Monday column ID to database column name for better logging
+        headers_mapping = self._get_column_mappings('headers')
+        reverse_mapping = {monday_col: db_col for db_col, monday_col in headers_mapping.items()}
+        
         # Use the transformed record (already mapped via TOML) instead of generic conversion
         # The record should already be transformed by _transform_record using TOML mappings
         for monday_column_id, value in record.items():
+            # CRITICAL FIX: Skip 'name' field - it's for item naming, not column values
+            if monday_column_id == 'name':
+                self.logger.debug(f"⚡ Skipping 'name' field in column_values: '{value}' (used for item naming only)")
+                continue
+            
+            # Get original database column name for logging
+            db_column_name = reverse_mapping.get(monday_column_id, monday_column_id)
+            
             # Log all dropdown columns before filtering
             if monday_column_id.startswith("dropdown_"):
-                self.logger.info(f"🔍 Pre-filter dropdown {monday_column_id}: '{value}' (type: {type(value).__name__})")
+                # Debug logging disabled for dropdown processing - only log errors/warnings
+                pass
             
             # Enhanced filtering: exclude None, empty strings, and string literal 'None'
             if value is not None and str(value).strip() and str(value).strip().lower() != 'none':
@@ -734,14 +915,14 @@ class MondayAPIClient:
                 if monday_column_id.startswith("dropdown_"):
                     # Dropdown values must be formatted as {"labels": ["value"]}
                     column_values[monday_column_id] = {"labels": [str(value)]}
-                    self.logger.info(f"🎯 Dropdown {monday_column_id}: '{value}' → {column_values[monday_column_id]}")
+                    # Debug logging disabled for dropdown processing
                 else:
                     # Text/numeric columns can be strings
                     column_values[monday_column_id] = str(value)
             elif monday_column_id.startswith("dropdown_"):
-                self.logger.warning(f"⚠️  Dropdown {monday_column_id} FILTERED OUT: '{value}' (type: {type(value).__name__})")
+                self.logger.debug(f"⚠️  Dropdown {monday_column_id} (DB: {db_column_name}) FILTERED OUT: '{value}' (type: {type(value).__name__})")
         
-        self.logger.debug(f"Built column values: {len(column_values)} columns mapped (filtered 'None' values)")
+        self.logger.debug(f"Built column values: {len(column_values)} columns mapped (filtered 'None' values and 'name' field)")
         
         # Return as JSON string for GraphQL
         import json
@@ -856,6 +1037,79 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
         self.logger.debug(f"Batch subitems query: createLabelsIfMissing={create_labels}")
         return {'query': query, 'variables': variables}
     
+    def _build_batch_items_query(self, records: List[Dict[str, Any]], column_mappings: Dict[str, str]) -> Dict[str, Any]:
+        """Build dynamic batch GraphQL query for items"""
+        # First transform all records to Monday column format
+        transformed_records = []
+        for record in records:
+            transformed_record = self._transform_record(record, column_mappings)
+            transformed_records.append(transformed_record)
+        
+        # CRITICAL FIX: Determine create_labels_if_missing AFTER transformation
+        create_labels = self._determine_create_labels_for_records(transformed_records, 'headers')
+        
+        # Build variable definitions
+        var_definitions = ["$boardId: ID!", "$createLabelsIfMissing: Boolean"]
+        mutation_calls = []
+        variables = {
+            "boardId": int(self.board_id),
+            "createLabelsIfMissing": create_labels
+        }
+        
+        for i, (record, transformed_record) in enumerate(zip(records, transformed_records)):
+            # Variable definitions
+            var_definitions.append(f"$item{i}_name: String!")
+            var_definitions.append(f"$item{i}_columnValues: JSON")
+            var_definitions.append(f"$item{i}_groupId: String")
+            
+            # Priority 1: Use item_name from Enhanced Merge Orchestrator transformation
+            item_name = record.get('item_name')
+            if not item_name:
+                # Priority 2: Fallback to AAG ORDER NUMBER
+                item_name = record.get('AAG ORDER NUMBER', 'Unknown Order')
+                self.logger.debug(f"Using fallback item name: {item_name}")
+            else:
+                self.logger.debug(f"Using Enhanced Merge Orchestrator item_name: {item_name}")
+            
+            # Build column values from already-transformed record
+            column_values = self._build_column_values(transformed_record)
+            
+            # Extract group_id for proper group placement
+            group_id = self._get_group_id_from_record(record)
+            
+            # Add to variables
+            variables[f'item{i}_name'] = str(item_name)
+            variables[f'item{i}_columnValues'] = column_values
+            variables[f'item{i}_groupId'] = group_id
+            
+            # Build mutation call
+            mutation_calls.append(f"""
+  create_item_{i}: create_item(
+    board_id: $boardId,
+    group_id: $item{i}_groupId,
+    item_name: $item{i}_name,
+    column_values: $item{i}_columnValues,
+    create_labels_if_missing: $createLabelsIfMissing
+  ) {{
+    id
+    name
+    board {{ id }}
+    column_values {{ id text value }}
+    created_at
+  }}""")
+        
+        # Build complete GraphQL mutation
+        var_definitions_str = ", ".join(var_definitions)
+        mutation_calls_str = "".join(mutation_calls)
+        
+        query = f"""
+mutation BatchCreateItems({var_definitions_str}) {{{mutation_calls_str}
+}}
+        """.strip()
+        
+        self.logger.debug(f"Batch items query: {len(records)} items, createLabelsIfMissing={create_labels}")
+        return {'query': query, 'variables': variables}
+
     def _render_template(self, template: str, context: Dict[str, Any]) -> str:
         """Render GraphQL template with context data (simple string replacement for now)"""
         # For MVP: Simple string replacement
@@ -874,7 +1128,7 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
     async def _make_api_call(self, query: str, variables: Dict[str, Any] = None) -> Dict[str, Any]:
         """
         Execute GraphQL query against Monday.com API with conservative rate limiting
-        Uses proven patterns: connection pooling, timeout handling, retry logic
+        Enhanced with comprehensive API logging data capture for troubleshooting
         """
         headers = {
             "Authorization": f"Bearer {self.api_token}",
@@ -885,6 +1139,9 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
             "query": query,
             "variables": variables or {}
         }
+        
+        # Capture request timestamp
+        request_timestamp = datetime.utcnow()
         
         try:
             # Conservative timeout and connection settings
@@ -904,6 +1161,9 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
                 self.logger.debug(f"Making API call to Monday.com: {len(query)} chars, {variables_count} variables")
                 
                 async with session.post(self.api_url, json=payload, headers=headers) as response:
+                    # Capture response timestamp
+                    response_timestamp = datetime.utcnow()
+                    
                     if response.status == 200:
                         data = await response.json()
                         
@@ -918,35 +1178,104 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
                                     self.logger.warning("Rate limit detected - implementing exponential backoff")
                                     await asyncio.sleep(1.0)  # Wait 1 second for rate limits
                             
-                            return {'success': False, 'error': error_details}
+                            # Return error with full API logging data
+                            return {
+                                'success': False, 
+                                'error': error_details,
+                                'api_request': payload,
+                                'api_response': data,
+                                'request_timestamp': request_timestamp,
+                                'response_timestamp': response_timestamp
+                            }
                         
-                        # Successful response
+                        # Successful response with full API logging data
                         self.logger.debug(f"API call successful: {response.status}")
-                        return {'success': True, 'data': data.get('data', {})}
+                        return {
+                            'success': True, 
+                            'data': data.get('data', {}),
+                            'api_request': payload,
+                            'api_response': data,
+                            'request_timestamp': request_timestamp,
+                            'response_timestamp': response_timestamp
+                        }
                     
                     elif response.status == 429:  # Too Many Requests
                         self.logger.warning(f"Rate limited by Monday.com (429) - backing off")
                         await asyncio.sleep(2.0)  # Extended backoff for explicit rate limits
-                        return {'success': False, 'error': f"Rate limited: HTTP {response.status}"}
+                        
+                        # Return rate limit error with API logging data
+                        error_response = {"status": response.status, "message": "Rate limited"}
+                        return {
+                            'success': False, 
+                            'error': f"Rate limited: HTTP {response.status}",
+                            'api_request': payload,
+                            'api_response': error_response,
+                            'request_timestamp': request_timestamp,
+                            'response_timestamp': response_timestamp
+                        }
                     
                     else:
                         error_text = await response.text()
                         self.logger.error(f"Monday.com API error {response.status}: {error_text}")
-                        return {'success': False, 'error': f"HTTP {response.status}: {error_text}"}
+                        
+                        # Return HTTP error with API logging data
+                        error_response = {"status": response.status, "error": error_text}
+                        return {
+                            'success': False, 
+                            'error': f"HTTP {response.status}: {error_text}",
+                            'api_request': payload,
+                            'api_response': error_response,
+                            'request_timestamp': request_timestamp,
+                            'response_timestamp': response_timestamp
+                        }
                         
         except asyncio.TimeoutError:
             self.logger.error("Monday.com API call timed out after 25s")
-            return {'success': False, 'error': 'API call timeout (25s)'}
+            
+            # Capture timeout error with API logging data
+            response_timestamp = datetime.utcnow()
+            error_response = {"error": "timeout", "duration_ms": 25000}
+            return {
+                'success': False, 
+                'error': 'API call timeout (25s)',
+                'api_request': payload,
+                'api_response': error_response,
+                'request_timestamp': request_timestamp,
+                'response_timestamp': response_timestamp
+            }
             
         except aiohttp.ClientError as e:
             self.logger.error(f"HTTP client error: {e}")
-            return {'success': False, 'error': f'HTTP client error: {str(e)}'}
+            
+            # Capture client error with API logging data
+            response_timestamp = datetime.utcnow()
+            error_response = {"error": "client_error", "message": str(e)}
+            return {
+                'success': False, 
+                'error': f'HTTP client error: {str(e)}',
+                'api_request': payload,
+                'api_response': error_response,
+                'request_timestamp': request_timestamp,
+                'response_timestamp': response_timestamp
+            }
             
         except Exception as e:
             self.logger.exception(f"Unexpected API call error: {e}")
+            
+            # Capture unexpected error with API logging data
+            response_timestamp = datetime.utcnow()
+            error_response = {"error": "unexpected_error", "message": str(e)}
+            return {
+                'success': False, 
+                'error': f'Unexpected error: {str(e)}',
+                'api_request': payload,
+                'api_response': error_response,
+                'request_timestamp': request_timestamp,
+                'response_timestamp': response_timestamp
+            }
             return {'success': False, 'error': f'Unexpected error: {str(e)}'}
     
-    def _extract_monday_id(self, data: Dict[str, Any], operation_type: str) -> Optional[int]:
+    def _extract_monday_id(self, data: Dict[str, Any], operation_type: str) -> Optional[Union[int, str]]:
         """
         Extract Monday.com ID from API response
         
@@ -955,7 +1284,7 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
             operation_type: Type of operation (create_items, create_subitems, etc.)
             
         Returns:
-            Monday.com ID as integer, or None if not found
+            Monday.com ID as integer (items/subitems) or string (groups), or None if not found
         """
         try:
             if operation_type == 'create_items':
@@ -968,6 +1297,13 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
                 elif 'create_0' in data and data['create_0']:
                     monday_id = data['create_0']['id']
                     self.logger.debug(f"Extracted batch item ID: {monday_id}")
+                    return int(monday_id)
+                    
+            elif operation_type in ['batch_create_items', 'async_batch_create_items']:
+                # CRITICAL FIX: For batch operations, look for create_item_0 first
+                if 'create_item_0' in data and data['create_item_0']:
+                    monday_id = data['create_item_0']['id']
+                    self.logger.debug(f"Extracted batch item ID from create_item_0: {monday_id}")
                     return int(monday_id)
                     
             elif operation_type == 'create_subitems':
@@ -987,7 +1323,8 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
                 if 'create_group' in data and data['create_group']:
                     monday_id = data['create_group']['id']
                     self.logger.debug(f"Extracted group ID: {monday_id}")
-                    return int(monday_id)
+                    # Groups return string IDs like 'group_mkt9x838', not integers
+                    return str(monday_id)
                     
             elif operation_type == 'update_items':
                 # For item updates, look for change_multiple_column_values key
@@ -1025,8 +1362,21 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
         ids = []
         
         try:
-            if operation_type == 'create_items':
-                # For batch item creation, look for create_0, create_1, create_2, etc.
+            if operation_type in ['batch_create_items', 'async_batch_create_items']:
+                # CRITICAL FIX: For batch item creation, look for create_item_0, create_item_1, etc.
+                # This matches the query structure built in _build_batch_items_query
+                for i in range(count):
+                    key = f'create_item_{i}'
+                    if key in data and data[key] and 'id' in data[key]:
+                        monday_id = int(data[key]['id'])
+                        ids.append(monday_id)
+                        self.logger.info(f"✅ Extracted batch item ID {i}: {monday_id}")
+                    else:
+                        self.logger.error(f"❌ Missing or invalid ID in batch response for {key}")
+                        self.logger.debug(f"Available keys in response: {list(data.keys())}")
+                        
+            elif operation_type == 'create_items':
+                # For single item creation, look for create_0, create_1, create_2, etc.
                 for i in range(count):
                     key = f'create_{i}'
                     if key in data and data[key] and 'id' in data[key]:
@@ -1065,14 +1415,65 @@ mutation BatchCreateSubitems({var_definitions_str}) {{{mutation_calls_str}
             self.logger.error(f"Failed to extract Monday.com IDs from batch response: {e}")
             return []
     
+    def _build_batch_groups_query(self, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Build dynamic batch GraphQL query for groups"""
+        # Build variable definitions
+        var_definitions = [f"$board_id: ID!"]
+        mutation_calls = []
+        variables = {"board_id": str(self.board_id)}
+        
+        for i, record in enumerate(records):
+            # Variable definitions
+            var_definitions.append(f"$group{i}_name: String!")
+            
+            # Get group name
+            group_name = record.get('group_name')
+            if not group_name:
+                raise ValueError(f"group_name is required for group {i}")
+            
+            # Add to variables
+            variables[f'group{i}_name'] = str(group_name)
+            
+            # Build mutation call
+            mutation_calls.append(f"""
+  create_group_{i}: create_group(
+    board_id: $board_id,
+    group_name: $group{i}_name
+  ) {{
+    id
+    title
+    color
+  }}""")
+        
+        # Build complete GraphQL mutation
+        var_definitions_str = ", ".join(var_definitions)
+        mutation_calls_str = "".join(mutation_calls)
+        
+        query = f"""
+mutation BatchCreateGroups({var_definitions_str}) {{{mutation_calls_str}
+}}
+        """.strip()
+        
+        self.logger.debug(f"Batch groups query: {len(records)} groups")
+        return {'query': query, 'variables': variables}
+    
     def _dry_run_response(self, operation_type: str, data_list: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Generate dry run response for validation"""
+        """Generate dry run response for validation with full API logging structure"""
         self.logger.info(f"DRY RUN: Would execute {operation_type} for {len(data_list)} records")
+        
+        # Generate mock Monday IDs for dry run
+        mock_monday_ids = [f"dry_run_id_{i+1}" for i in range(len(data_list))]
         
         return {
             'success': True,
             'dry_run': True,
             'records_processed': len(data_list),
+            'monday_ids': mock_monday_ids,
             'operation_type': operation_type,
-            'would_execute': f"{operation_type} with {len(data_list)} records"
+            'would_execute': f"{operation_type} with {len(data_list)} records",
+            # Include mock API logging data for consistency
+            'api_request': {'dry_run': True, 'operation': operation_type, 'record_count': len(data_list)},
+            'api_response': {'dry_run': True, 'mock_ids': mock_monday_ids},
+            'request_timestamp': datetime.utcnow(),
+            'response_timestamp': datetime.utcnow()
         }

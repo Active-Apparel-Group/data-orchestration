@@ -3,7 +3,7 @@
   "board_name": "Customer Master Schedule",
   "table_name": "MON_CustomerMasterSchedule",
   "database": "orders",
-  "discovered_at": "2025-07-17T17:00:09.976644",
+  "discovered_at": "2025-08-01T16:03:00.865388",
   "item_terminology": {
     "name": "Order",
     "overwrite_name": ""
@@ -206,11 +206,11 @@
       "custom_extraction_field": null
     },
     {
-      "monday_id": "dropdown_mkr5tgaa",
+      "monday_id": "text_mktdechp",
       "monday_title": "STYLE",
-      "monday_type": "dropdown",
+      "monday_type": "text",
       "sql_column": "STYLE",
-      "sql_type": "NVARCHAR(100)",
+      "sql_type": "NVARCHAR(MAX)",
       "extraction_field": "text",
       "nullable": true,
       "is_system_field": false,
@@ -262,11 +262,11 @@
       "custom_extraction_field": null
     },
     {
-      "monday_id": "dropdown_mkr5677f",
+      "monday_id": "long_text_mktdy7re",
       "monday_title": "COLOR",
-      "monday_type": "dropdown",
+      "monday_type": "long_text",
       "sql_column": "COLOR",
-      "sql_type": "NVARCHAR(100)",
+      "sql_type": "NVARCHAR(MAX)",
       "extraction_field": "text",
       "nullable": true,
       "is_system_field": false,
@@ -542,11 +542,11 @@
       "custom_extraction_field": null
     },
     {
-      "monday_id": "dropdown_mkr5k8yn",
+      "monday_id": "long_text_mktdz0g",
       "monday_title": "HS CODE",
-      "monday_type": "dropdown",
+      "monday_type": "long_text",
       "sql_column": "HS CODE",
-      "sql_type": "NVARCHAR(100)",
+      "sql_type": "NVARCHAR(MAX)",
       "extraction_field": "text",
       "nullable": true,
       "is_system_field": false,
@@ -1014,8 +1014,8 @@
       "is_system_field": false,
       "conversion_logic": "safe_numeric_convert(extract_value(cv))",
       "exclude": false,
-      "custom_sql_type": null,
-      "custom_extraction_field": null
+      "custom_sql_type": "BIGINT",
+      "custom_extraction_field": "safe_numeric_convert(extract_value(cv))"
     },
     {
       "monday_id": "numeric_mkrbty8b",
@@ -1028,8 +1028,8 @@
       "is_system_field": false,
       "conversion_logic": "safe_numeric_convert(extract_value(cv))",
       "exclude": false,
-      "custom_sql_type": null,
-      "custom_extraction_field": null
+      "custom_sql_type": "BIGINT",
+      "custom_extraction_field": "safe_numeric_convert(extract_value(cv))"
     },
     {
       "monday_id": "formula_mkrb53jx",
@@ -1066,48 +1066,6 @@
       "sql_column": "ADD TO PLANNING",
       "sql_type": "NVARCHAR(100)",
       "extraction_field": "label",
-      "nullable": true,
-      "is_system_field": false,
-      "conversion_logic": null,
-      "exclude": false,
-      "custom_sql_type": null,
-      "custom_extraction_field": null
-    },
-    {
-      "monday_id": "formula_mkre54dj",
-      "monday_title": "ORDER QTY",
-      "monday_type": "formula",
-      "sql_column": "ORDER QTY",
-      "sql_type": "NVARCHAR(MAX)",
-      "extraction_field": "display_value",
-      "nullable": true,
-      "is_system_field": false,
-      "conversion_logic": null,
-      "exclude": false,
-      "custom_sql_type": null,
-      "custom_extraction_field": null
-    },
-    {
-      "monday_id": "formula_mkrea5pd",
-      "monday_title": "PACKED QTY",
-      "monday_type": "formula",
-      "sql_column": "PACKED QTY",
-      "sql_type": "NVARCHAR(MAX)",
-      "extraction_field": "display_value",
-      "nullable": true,
-      "is_system_field": false,
-      "conversion_logic": null,
-      "exclude": false,
-      "custom_sql_type": null,
-      "custom_extraction_field": null
-    },
-    {
-      "monday_id": "formula_mkre5ce5",
-      "monday_title": "SHIPPED QTY",
-      "monday_type": "formula",
-      "sql_column": "SHIPPED QTY",
-      "sql_type": "NVARCHAR(MAX)",
-      "extraction_field": "display_value",
       "nullable": true,
       "is_system_field": false,
       "conversion_logic": null,
@@ -1184,6 +1142,62 @@
       "exclude": false,
       "custom_sql_type": null,
       "custom_extraction_field": null
+    },
+    {
+      "monday_id": "numeric_mktb1d19",
+      "monday_title": "ORDER QTY",
+      "monday_type": "numbers",
+      "sql_column": "ORDER QTY",
+      "sql_type": "DECIMAL(18,2)",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))",
+      "exclude": false,
+      "custom_sql_type": "BIGINT",
+      "custom_extraction_field": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mktb14eh",
+      "monday_title": "PACKED QTY",
+      "monday_type": "numbers",
+      "sql_column": "PACKED QTY",
+      "sql_type": "DECIMAL(18,2)",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))",
+      "exclude": false,
+      "custom_sql_type": "BIGINT",
+      "custom_extraction_field": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "numeric_mktb1k33",
+      "monday_title": "SHIPPED QTY",
+      "monday_type": "numbers",
+      "sql_column": "SHIPPED QTY",
+      "sql_type": "DECIMAL(18,2)",
+      "extraction_field": "number",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": "safe_numeric_convert(extract_value(cv))",
+      "exclude": false,
+      "custom_sql_type": "BIGINT",
+      "custom_extraction_field": "safe_numeric_convert(extract_value(cv))"
+    },
+    {
+      "monday_id": "long_text_mktdjzcg",
+      "monday_title": "CUSTOMER COLOR CODE",
+      "monday_type": "long_text",
+      "sql_column": "CUSTOMER COLOR CODE",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null,
+      "exclude": false,
+      "custom_sql_type": null,
+      "custom_extraction_field": null
     }
   ],
   "global_defaults": {
@@ -1196,7 +1210,7 @@
   },
   "metadata": {
     "description": null,
-    "items_count": 0,
+    "items_count": 1673,
     "discovery_version": "2.0"
   }
 }

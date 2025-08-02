@@ -56,7 +56,7 @@ null_handling = "skip_with_separator"
 # ENVIRONMENT CONFIGURATION - Production Ready Structure
 # =====================================================
 
-[environment.development]
+[environment.production]
 # Development environment - simplified 2-template architecture
 source_table = "swp_ORDER_LIST_SYNC"              # Shadow staging table for development
 target_table = "FACT_ORDER_LIST"                  # Shadow production table for development (now with sync columns)
@@ -64,7 +64,7 @@ lines_table = "ORDER_LIST_LINES"                # Lines table (shared, now with 
 # source_lines_table removed - direct MERGE to lines_table eliminates staging
 database = "orders"                             # Database name from config.yaml
 
-[environment.production]
+[environment.development]
 # Production environment - simplified 2-template architecture
 source_table = "swp_ORDER_LIST_SYNC"                 # Production staging table
 target_table = "FACT_ORDER_LIST"                     # Live production table (will have sync columns)
@@ -118,11 +118,16 @@ sync_columns_lines = [
 # TESTING CONFIGURATION
 # =====================
 [test_data]
-# Single customer, single PO for initial testing
-limit_customers = ["GREYSON"]
-limit_pos = ["4755"]
-limit_records = 10                      # Maximum records per test
+# Multi-customer testing - 2 customers with confirmed data
+limit_customers = ["ACTIVELY BLACK", "AESCAPE"]
+limit_pos = ["AB0001", "1191"]
+limit_records = 100                     # Maximum records per test
 test_mode = true
+
+# Test data breakdown (REAL DATA):
+# - ACTIVELY BLACK: 14 records available
+# - AESCAPE: 44 records available  
+# - GREYSON: 5,279 records available (using PO 5397)
 
 # SIZE COLUMNS - Dynamic discovery between markers
 [size_detection]
@@ -141,7 +146,7 @@ columns = [
 ]
 algorithm = "SHA2_256"
 
-[monday.development]
+[monday.production]
 # Development Monday.com boards  
 board_id = 9609317401                   # Dev items board
 subitem_board_id = 9609317948           # Dev subitems board
@@ -150,7 +155,7 @@ environment = "development"
 metadata_path = "configs/boards/board_9609317401_metadata.json"
 metadata_subitems_path = "configs/boards/board_9609317948_metadata.json"
 
-[monday.production]  
+[monday.development]  
 # Production Monday.com boards
 board_id = 9200517329                   # Prod items board
 subitem_board_id = 9200771505           # Prod subitems board
@@ -168,6 +173,7 @@ batch_creation = true                   # Use batch creation for efficiency
 
 [monday.rate_limits]
 group_batch_size = 5                    # Groups per batch (Monday.com API limit)
+item_batch_size = 5                     # Items per batch for true batch processing
 delay_between_batches = 2.0             # Seconds between batch requests
 max_concurrent_batches = 1              # Serialize batch operations
 request_timeout = 30.0                  # API request timeout
@@ -184,37 +190,34 @@ request_timeout = 30.0                  # API request timeout
 # DEVELOPMENT ENVIRONMENT DROPDOWN CONFIGURATION (Board ID: 9609317401)
 # ======================================================================
 
-[monday.development.headers.create_labels_if_missing]
-# Default policy for dropdown columns (conservative approach)
-default = false
-
-# Headers dropdown columns from [monday.column_mapping.development.headers]
-"dropdown_mkr542p2" = false             # CUSTOMER NAME - use existing customers only
-"dropdown_mkr518fc" = false             # ORDER TYPE - use existing order types only
-"dropdown_mkr5677f" = false             # COLOR - use existing colors only
-"dropdown_mkr5tgaa" = false             # STYLE - use existing styles only
-"dropdown_mkr58de6" = true              # AAG SEASON - auto-create season labels ⭐ CRITICAL
-"dropdown_mkr5s5n3" = false             # CATEGORY - use existing categories only
-"dropdown_mkr5rgs6" = true              # CUSTOMER SEASON - auto-create customer season labels ⭐ CRITICAL
-"dropdown_mkr5w5e" = false              # DROP - use existing drops only
-"dropdown_mkr5kk5" = false              # DELIVERY TERMS - use existing terms only
-"dropdown_mkr5k8yn" = false             # HS CODE - use existing codes only
-
-[monday.development.lines.create_labels_if_missing]
-# Default policy for subitem dropdown columns
-default = false
-
-# Lines dropdown columns from [monday.column_mapping.development.lines]
-"dropdown_mkrak7qp" = true              # size_code - auto-create size labels as needed
-
-# PRODUCTION ENVIRONMENT DROPDOWN CONFIGURATION (Board ID: 9200517329)
-# =====================================================================
-
 [monday.production.headers.create_labels_if_missing]
 # Default policy for dropdown columns (conservative approach)
 default = false
 
 # Headers dropdown columns from [monday.column_mapping.production.headers]
+"dropdown_mkr542p2" = false             # CUSTOMER NAME - use existing customers only
+"dropdown_mkr518fc" = false             # ORDER TYPE - use existing order types only
+"dropdown_mkr58de6" = true              # AAG SEASON - auto-create season labels ⭐ CRITICAL
+"dropdown_mkr5s5n3" = true              # CATEGORY - use existing categories only
+"dropdown_mkr5rgs6" = true              # CUSTOMER SEASON - auto-create customer season labels ⭐ CRITICAL
+"dropdown_mkr5w5e" = true              # DROP - use existing drops only
+"dropdown_mkr5kk5" = true              # DELIVERY TERMS - use existing terms only
+
+[monday.production.lines.create_labels_if_missing]
+# Default policy for subitem dropdown columns
+default = false
+
+# Lines dropdown columns from [monday.column_mapping.production.lines]
+"dropdown_mkrak7qp" = true              # size_code - auto-create size labels as needed
+
+# PRODUCTION ENVIRONMENT DROPDOWN CONFIGURATION (Board ID: 9200517329)
+# =====================================================================
+
+[monday.development.headers.create_labels_if_missing]
+# Default policy for dropdown columns (conservative approach)
+default = false
+
+# Headers dropdown columns from [monday.column_mapping.development.headers]
 "dropdown_mkp4ar5n" = false             # CUSTOMER - use existing customers only
 "dropdown_mkpc7ey8" = false             # ORDER TYPE - use existing order types only
 "dropdown_mkp4kmtp" = true              # CUSTOMER SEASON - auto-create customer season labels ⭐ CRITICAL
@@ -231,11 +234,11 @@ default = false
 "dropdown_mkpc44w5" = false             # CUSTOMER ALLOCATION - use existing allocations only
 "dropdown_mkp43md8" = false             # FACTORY - use existing factories only
 
-[monday.production.lines.create_labels_if_missing]
+[monday.development.lines.create_labels_if_missing]
 # Default policy for subitem dropdown columns
 default = false
 
-# Lines dropdown columns from [monday.column_mapping.production.lines]
+# Lines dropdown columns from [monday.column_mapping.development.lines]
 # Note: Production lines use text fields for size_code, no dropdowns to configure
 
 # GROUP CREATION CONFIGURATION (GLOBAL)
@@ -253,7 +256,7 @@ wait_for_completion = true              # Wait for group creation to complete be
 # Success Gate: Expand from 5 basic columns to 25+ comprehensive business columns
 
 # Column mapping - ORDER_LIST headers to Monday items (DEVELOPMENT BOARD: 9609317401)
-[monday.column_mapping.development.headers]
+[monday.column_mapping.production.headers]
 # === Core Order Information ===
 "AAG ORDER NUMBER" = "text_mkr5wya6"  # text - AAG ORDER NUMBER
 "PO NUMBER" = "text_mkr5ej2x"  # text - PO NUMBER
@@ -263,14 +266,14 @@ wait_for_completion = true              # Wait for group creation to complete be
 "ORDER TYPE" = "dropdown_mkr518fc"  # dropdown - ORDER TYPE
 
 # === Product Details ===
-"CUSTOMER COLOUR DESCRIPTION" = "dropdown_mkr5677f"  # dropdown - COLOR
-"CUSTOMER STYLE" = "dropdown_mkr5tgaa"  # dropdown - STYLE
+"CUSTOMER COLOUR DESCRIPTION" = "long_text_mktdy7re"  # long_text - COLOR
+"CUSTOMER'S COLOUR CODE (CUSTOM FIELD) CUSTOMER PROVIDES THIS" = "long_text_mktdjzcg"  # long_text - CUSTOMER COLOR CODE
+"CUSTOMER STYLE" = "text_mktdechp"  # text - STYLE
 "PATTERN ID" = "text_mkr5cz8m"  # text - PATTERN ID
 "STYLE DESCRIPTION" = "long_text_mkr5p0cf"  # long_text - STYLE DESCRIPTION
 "NOTES" = "long_text_mkr5hass"  # long_text - NOTES
 "UNIT OF MEASURE" = "color_mkr5yf27"  # status - UNIT OF MEASURE
 "ALIAS/RELATED ITEM" = "text_mkrhra2c"  # text - ALIAS RELATED ITEM
-
 
 # === Season and Planning ===
 "AAG SEASON" = "dropdown_mkr58de6"  # dropdown - AAG SEASON
@@ -286,6 +289,9 @@ wait_for_completion = true              # Wait for group creation to complete be
 "ETA CUSTOMER WAREHOUSE DATE" = "date_mkr554yz"  # dropdown - CUSTOMER REQ IN DC DATE
 "EX FACTORY DATE" = "date_mkr57811"  # date - CUSTOMER EX FACTORY DATE
 "Warehouse" = "text_mkr5ps35"  # text - DESTINATION WAREHOUSE
+
+# === Quantities ===
+"TOTAL QTY" = "numeric_mktb1d19" #numeric - ORDER QTY
 
 # === Pricing and Financials ===
 "ADMINISTRATION FEE" = "numeric_mkr5k68"  # numbers - ADMINISTRATION FEE
@@ -309,16 +315,16 @@ wait_for_completion = true              # Wait for group creation to complete be
 "DESTINATION" = "text_mkr5kbc6"  # text - DESTINATION
 "FREIGHT" = "numeric_mksfr0r2"  # numbers - FREIGHT
 "HANDLING" = "text_mkr5s3tm"  # text - HANDLING
-"HS CODE" = "dropdown_mkr5k8yn"  # dropdown - HS CODE
+"HS CODE" = "long_text_mktdz0g"  # long_text - HS CODE
 "UK FREIGHT" = "numeric_mksfr0r2"  # numbers - FREIGHT
 
 # Column mapping - ORDER_LIST_LINES to Monday subitems (DEVELOPMENT)
-[monday.column_mapping.development.lines]
+[monday.column_mapping.production.lines]
 "size_code" = "dropdown_mkrak7qp"           # Size code for line items
 "qty" = "numeric_mkra7j8e"                  # ORDER QTY - Quantity per size
 
 # Column mapping - ORDER_LIST headers to Monday items (PRODUCTION BOARD: 9200517329)
-[monday.column_mapping.production.headers]
+[monday.column_mapping.development.headers]
 # === Core Order Information ===
 "AAG ORDER NUMBER"         = "text_mkr5wya6"    # text - AAG ORDER NUMBER
 "PO NUMBER"                = "text_mkr5ej2x"    # text - PO NUMBER
@@ -378,7 +384,7 @@ wait_for_completion = true              # Wait for group creation to complete be
 
 
 # Column mapping - ORDER_LIST_LINES to Monday subitems (PRODUCTION)
-[monday.column_mapping.production.lines]
+[monday.column_mapping.development.lines]
 "size_code" = "dropdown_mkrak7qp"          # Production size code for line items
 "qty" = "numeric_mkra7j8e"                   # Production quantity per size
 
@@ -509,7 +515,7 @@ map_to = "group_name"                                    # Maps to group_name co
 
 # PHASE 3: PRODUCTION CONFIGURATION (FUTURE)
 # ==========================================
-# [environment.production]
+# [environment.development]
 # mode = "production"
 # target_table = "ORDER_LIST"           # Production table after cutover
 # database = "orders"

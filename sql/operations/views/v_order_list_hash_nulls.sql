@@ -6,7 +6,7 @@
 -- Purpose: Generate a hash for ORDER_LIST rows based on specific columns
 CREATE OR ALTER VIEW [dbo].[v_order_list_hash_nulls]
 AS
-SELECT distinct
+SELECT record_uuid,
     CONVERT(VARCHAR(32), HASHBYTES('MD5',
         CONCAT(
             COALESCE([PLANNED DELIVERY METHOD], ''),
@@ -20,3 +20,11 @@ SELECT distinct
         )
     ), 2) AS [hash_ord_3_10]
 FROM [swp_ORDER_LIST_SYNC]
+where  COALESCE([PLANNED DELIVERY METHOD], '') = ''
+            AND COALESCE([CUSTOMER STYLE], '') = ''
+            AND COALESCE([PO NUMBER], '') = ''
+            AND COALESCE([CUSTOMER ALT PO], '') = ''
+            AND COALESCE([AAG SEASON], '') = ''
+            AND COALESCE([CUSTOMER SEASON], '') = ''
+            AND COALESCE([CUSTOMER COLOUR DESCRIPTION], '') = ''
+            AND COALESCE([TOTAL QTY], 0) = 0
