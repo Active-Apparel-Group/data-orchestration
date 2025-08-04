@@ -178,6 +178,13 @@ delay_between_batches = 2.0             # Seconds between batch requests
 max_concurrent_batches = 1              # Serialize batch operations
 request_timeout = 30.0                  # API request timeout
 
+# TASK030: Success rate thresholds for sync status calculations
+[monday.sync.success_thresholds]
+success_rate = 0.95                     # ≥95% = ✅ Success
+partial_rate = 0.80                     # 80-94% = ⚠️ Needs Attention  
+# <80% = ❌ Critical/Failed
+enable_threshold_based_status = true    # Enable new threshold-based status logic
+
 # ENVIRONMENT-SPECIFIC MONDAY.COM CONFIGURATION
 # ===============================================
 
@@ -316,7 +323,6 @@ wait_for_completion = true              # Wait for group creation to complete be
 "FREIGHT" = "numeric_mksfr0r2"  # numbers - FREIGHT
 "HANDLING" = "text_mkr5s3tm"  # text - HANDLING
 "HS CODE" = "long_text_mktdz0g"  # long_text - HS CODE
-"UK FREIGHT" = "numeric_mksfr0r2"  # numbers - FREIGHT
 
 # Column mapping - ORDER_LIST_LINES to Monday subitems (DEVELOPMENT)
 [monday.column_mapping.production.lines]

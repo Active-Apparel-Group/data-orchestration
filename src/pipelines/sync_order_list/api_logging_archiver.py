@@ -571,15 +571,15 @@ class APILoggingArchiver:
             str: Comprehensive markdown formatted diagnostic report
         """
         
-        # Customer processing summary from FACT_ORDER_LIST
+        # TASK030: Fixed customer processing summary from FACT_ORDER_LIST
         summary_query = """
         SELECT 
             COUNT(*) as total_items,
             SUM(CASE WHEN monday_item_id IS NOT NULL THEN 1 ELSE 0 END) as items_loaded,
-            SUM(CASE WHEN api_status = 'SUCCESS' OR monday_item_id IS NOT NULL THEN 1 ELSE 0 END) as successful,
-            SUM(CASE WHEN api_status = 'ERROR' THEN 1 ELSE 0 END) as errors,
+            SUM(CASE WHEN api_status = 'SUCCESS' AND sync_state = 'COMPLETED' THEN 1 ELSE 0 END) as successful,
+            SUM(CASE WHEN api_status = 'ERROR' OR sync_state = 'FAILED' THEN 1 ELSE 0 END) as errors,
             SUM(CASE WHEN COALESCE(retry_count, 0) > 0 THEN 1 ELSE 0 END) as retries,
-            SUM(CASE WHEN sync_state = 'PENDING' AND api_status IS NULL THEN 1 ELSE 0 END) as pending,
+            SUM(CASE WHEN sync_state = 'PENDING' THEN 1 ELSE 0 END) as pending,
             COUNT(DISTINCT group_id) as groups_created,
             COUNT(DISTINCT record_uuid) as unique_orders
         FROM FACT_ORDER_LIST
@@ -630,7 +630,7 @@ class APILoggingArchiver:
             [CUSTOMER COLOUR DESCRIPTION],
             [CUSTOMER SEASON],
             sync_state,
-            record_uuid
+            api_response_payload
         FROM FACT_ORDER_LIST 
         WHERE [CUSTOMER NAME] = ? 
         AND sync_state IN ('ERROR', 'FAILED')
@@ -651,29 +651,71 @@ class APILoggingArchiver:
             report.append("|-------|-------|--------|--------|---------------|")
             
             for record in error_records:
-                aag_order, style, color, season, error_msg, response_data, sync_state, uuid = record
+                aag_order, style, color, season, sync_state, api_payload = record
                 
-                # Parse error message for dropdown issues
+                # Parse API response payload for detailed error information
                 error_summary = "Unknown error"
-                if error_msg:
-                    if "dropdown label" in error_msg and "does not exist" in error_msg:
-                        # Extract dropdown details
-                        if "REBUY" in error_msg:
-                            error_summary = "❌ Dropdown: REBUY → Should be SPRING 26 REBUY (Column: CUSTOMER SEASON)"
-                            dropdown_errors.append({
-                                'record': f"{aag_order} | {style}",
-                                'issue': 'Invalid dropdown value: REBUY',
-                                'solution': 'Map REBUY → SPRING 26 REBUY',
-                                'column': 'CUSTOMER SEASON (dropdown_mkr5rgs6)'
-                            })
+                
+                if api_payload:
+                    try:
+                        import json
+                        payload_data = json.loads(api_payload)
+                        
+                        # Extract error details from API response
+                        if payload_data.get('error') and isinstance(payload_data['error'], list):
+                            first_error = payload_data['error'][0]
+                            
+                            # Get column-specific error details
+                            extensions = first_error.get('extensions', {})
+                            error_data = extensions.get('error_data', {})
+                            
+                            column_name = error_data.get('column_name', 'Unknown')
+                            column_type = error_data.get('column_type', 'Unknown')
+                            column_value = error_data.get('column_value', 'N/A')
+                            
+                            # Create detailed error summary
+                            if column_name and column_type:
+                                error_summary = f"❌ {column_type.upper()} Column '{column_name}': Invalid value"
+                                
+                                # Handle specific error types
+                                if column_type == 'dropdown':
+                                    dropdown_errors.append({
+                                        'record': f"{aag_order} | {style}",
+                                        'issue': f'Invalid dropdown value: {column_value}',
+                                        'solution': f'Fix mapping for column {column_name}',
+                                        'column': f'{column_name} ({error_data.get("column_id", "unknown")})'
+                                    })
+                                elif column_type == 'numeric':
+                                    error_summary += f" (received: {column_value[:50]}...)" if len(str(column_value)) > 50 else f" (received: {column_value})"
+                                    other_errors.append({
+                                        'record': f"{aag_order} | {style}",
+                                        'error': f'Numeric column "{column_name}" received invalid value: {column_value}'
+                                    })
+                                else:
+                                    other_errors.append({
+                                        'record': f"{aag_order} | {style}",
+                                        'error': f'{column_type} column "{column_name}" error: {first_error.get("message", "Unknown error")}'
+                                    })
+                            else:
+                                # Fallback to generic message
+                                error_message = first_error.get('message', 'Unknown API error')
+                                error_summary = f"❌ API Error: {error_message[:50]}..."
+                                other_errors.append({
+                                    'record': f"{aag_order} | {style}",
+                                    'error': error_message
+                                })
                         else:
-                            error_summary = f"❌ Dropdown mapping issue: {error_msg[:80]}..."
-                    else:
-                        error_summary = f"❌ API Error: {error_msg[:50]}..."
+                            # No detailed error array, use basic message
+                            error_summary = "❌ API Error: Check payload for details"
+                            
+                    except (json.JSONDecodeError, KeyError, TypeError) as e:
+                        error_summary = f"❌ Error parsing response: {str(e)[:50]}..."
                         other_errors.append({
                             'record': f"{aag_order} | {style}",
-                            'error': error_msg
+                            'error': f'Failed to parse API response: {str(e)}'
                         })
+                else:
+                    error_summary = "❌ No error details available"
                 
                 report.append(f"| {aag_order or 'N/A'} | {style or 'N/A'} | {color or 'N/A'} | {season or 'N/A'} | {error_summary} |")
             
@@ -882,17 +924,42 @@ class APILoggingArchiver:
             
             report.append("| Metric | Value |")
             report.append("|--------|-------|")
-            report.append(f"| Sync Status | {'✅ Success' if sync_session_data.get('success', False) else '❌ Failed'} |")
+            
+            # TASK030: Use enhanced status from sync session data
+            if 'status_emoji' in sync_session_data and 'status' in sync_session_data:
+                # Use enhanced status with emoji and percentage
+                status_emoji = sync_session_data.get('status_emoji', '❌')
+                status_text = sync_session_data.get('status', 'FAILED')
+                batch_success_rate = sync_session_data.get('batch_success_rate', 0.0)
+                
+                if batch_success_rate < 1.0:
+                    sync_status_display = f"{status_emoji} {status_text} ({batch_success_rate:.1%})"
+                else:
+                    sync_status_display = f"{status_emoji} {status_text}"
+            else:
+                # Fallback to original logic for compatibility
+                sync_status_display = '✅ Success' if sync_session_data.get('success', False) else '❌ Failed'
+                
+            report.append(f"| Sync Status | {sync_status_display} |")
             report.append(f"| Total Execution Time | {total_time:.2f}s |")
             report.append(f"| Records Processed | {actual_records_processed:,} |")
             report.append(f"| Throughput | {actual_throughput:.1f} records/second |")
             
-            # Batch processing metrics
+            # Batch processing metrics with TASK030 enhanced status context
             successful_batches = sync_session_data.get('successful_batches', 0)
             total_batches = sync_session_data.get('total_batches', 0)
             if total_batches > 0:
-                batch_success_rate = (successful_batches / total_batches) * 100
-                report.append(f"| Batch Success Rate | {batch_success_rate:.1f}% ({successful_batches}/{total_batches}) |")
+                batch_success_rate_pct = (successful_batches / total_batches) * 100
+                
+                # TASK030: Add status context to batch success rate
+                if batch_success_rate_pct >= 95:
+                    batch_status_emoji = "✅"
+                elif batch_success_rate_pct >= 80:
+                    batch_status_emoji = "⚠️"
+                else:
+                    batch_status_emoji = "❌"
+                    
+                report.append(f"| Batch Success Rate | {batch_status_emoji} {batch_success_rate_pct:.1f}% ({successful_batches}/{total_batches}) |")
             
             # Performance milestones
             milestones = performance.get('milestones', {})

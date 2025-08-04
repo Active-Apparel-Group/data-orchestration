@@ -87,11 +87,21 @@
       "metadata_path": "configs/boards/board_9609317948_metadata.json",
       "config_path": "configs/boards/board_9609317948.json",
       "workflow_path": "workflows/extract_board_9609317948.yaml"
+    },
+    "8873840035": {
+      "board_name": "Subitems of Partner Purchase Orders",
+      "table_name": "MON_SubitemsofPartnerPurchaseOrders",
+      "database": "orders",
+      "discovered_at": "2025-08-04T11:43:48.482067",
+      "status": "discovered",
+      "metadata_path": "configs/boards/board_8873840035_metadata.json",
+      "config_path": "configs/boards/board_8873840035.json",
+      "workflow_path": "workflows/extract_board_8873840035.yaml"
     }
   },
   "metadata": {
     "version": "1.0",
     "created_at": "2025-06-29T00:00:00Z",
-    "updated_at": "2025-08-01T16:03:00.872875"
+    "updated_at": "2025-08-04T11:43:48.486131"
   }
 }

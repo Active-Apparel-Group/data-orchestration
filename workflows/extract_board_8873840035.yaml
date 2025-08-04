@@ -1,0 +1,25 @@
+id: extract_board_8873840035
+namespace: monday.boards
+
+description: "Extract data from Monday.com board: Subitems of Partner Purchase Orders"
+
+tasks:
+  - id: extract_board_data
+    type: io.kestra.plugin.scripts.python.Script
+    description: "Extract board 8873840035 using unified loader"
+    script: |
+      python pipelines/scripts/load_boards.py --board-id 8873840035
+    
+  - id: validate_data
+    type: io.kestra.plugin.scripts.python.Script
+    description: "Validate extracted data"
+    script: |
+      python tests/validation/validate_board_8873840035.py
+
+triggers:
+  - id: daily_refresh
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 6 * * *"  # Daily at 6 AM
+    
+  - id: manual_trigger
+    type: io.kestra.plugin.core.trigger.Webhook

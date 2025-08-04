@@ -183,3 +183,6 @@ WHERE r.rn = 1
        or r.[Precut Quantity] <> p.[Precut Quantity])   
 ORDER BY r.MO_Number;
 
+
+
+Select [Item ID] as [monday_item_id] from MON_Purchase_Contracts_Subitems

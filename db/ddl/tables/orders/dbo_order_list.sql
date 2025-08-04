@@ -463,6 +463,7 @@ CREATE TABLE [dbo].[ORDER_LIST] (
     [api_response_timestamp] DATETIME2 NULL,
     [api_operation_type] NVARCHAR(50) NULL,
     [api_status] NVARCHAR(20) NULL,
+    [api_error_message] NVARCHAR(2000) NULL,
     
     -- Audit columns
     created_at          DATETIME2 DEFAULT GETUTCDATE(),

@@ -1,0 +1,55 @@
+# OPUS Universal Monday.com Update Configuration
+# Generated from: board_8873840035_metadata.json
+# Generated at: 2025-08-04 11:43:48
+# Board: Subitems of Partner Purchase Orders (8873840035)
+
+[metadata]
+board_id = 8873840035
+board_name = "Subitems of Partner Purchase Orders"
+table_name = "MON_SubitemsofPartnerPurchaseOrders"
+database = "orders"
+update_type = "batch_item_updates"
+description = "Update Subitems of Partner Purchase Orders items with latest data"
+
+[query_config]
+# SQL query to get update data
+query = """
+SELECT 
+    [Item ID] AS [monday_item_id],
+    CAST([Agreed Process Time] AS int) as   [Agreed Process time],
+    CONVERT(nvarchar(10), TRY_CAST(DATEADD(DAY, [Agreed Process Time]+1, [Start Date])  AS date), 23) AS [Baseline Date]
+FROM MON_Purchase_Contracts_Subitems
+WHERE [Due Date] IS NOT NULL 
+"""
+
+# Column mapping configuration
+item_id_column = "monday_item_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+# Name
+"name" = "Name"
+# Owner
+"person" = "Owner"
+# Status
+"status" = "Status"
+# Start Date
+"date0" = "Start Date"
+# Due Date
+"formula_mksdq2y5" = "Due Date"
+# Actual Completion Date
+"date_mkrh3p4a" = "Actual Completion Date"
+# Actual Lead Time
+"formula_mks9d1f" = "Actual Lead Time"
+# Agreed Process time
+"numeric_mksa7bex" = "Agreed Process time"
+# Progress tracking
+"columns_battery_mks7ekn8" = "Progress tracking"
+# xStart Date
+"formula_mktc6ewq" = "xStart Date"
+# xDue Date
+"date_mktcrwy3" = "xDue Date"
+# Baseline Date
+"date_mktcxppr" = "Baseline Date"
+# Timeline
+"timerange_mktf8rp7" = "Timeline"

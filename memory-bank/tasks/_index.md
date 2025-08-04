@@ -1,6 +1,7 @@
 # Tasks Index
 
 ## In Progress
+- [TASK030](TASK030-fix-sync-reporting-status-calculations.md) Fix Sync Reporting Status Calculations - **IN PROGRESS** Critical sync status and executive summary calculation fixes for production accuracy
 - [TASK026](TASK026-performance-optimization.md) Performance Optimization for Large-Scale Production - **PHASE 2** Critical fixes complete, implementing default batch mode (90% complete)
 - [TASK025](TASK025-async-batch-item-creation.md) Async Batch Item Creation - **IN PROGRESS** Enterprise rate-limited async batch items for 5-10x performance improvement
 - [TASK021](TASK021_PRODUCTION_CUTOVER.md) Production Cutover Plan - **PLANNING** Production deployment readiness assessment and scaling validation

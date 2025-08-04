@@ -243,7 +243,7 @@ class UltraLightweightSyncCLI:
             self.logger.warning(f"Failed to save customer report: {e}")
     
     def retry_command(self, customer: Optional[str] = None, dry_run: bool = False, 
-                     max_retries: int = 3) -> Dict[str, Any]:
+                     max_retries: int = 3, generate_report: bool = False) -> Dict[str, Any]:
         """
         Retry failed records command (Fix #3: Retry Functionality).
         
@@ -251,6 +251,7 @@ class UltraLightweightSyncCLI:
             customer: Optional customer filter for retry
             dry_run: If True, show what would be retried without executing
             max_retries: Maximum retry attempts per record
+            generate_report: If True, generate customer processing report after retry
             
         Returns:
             Retry processing results
@@ -271,6 +272,34 @@ class UltraLightweightSyncCLI:
                 self.logger.info(f"✅ Retry processing completed")
                 self.logger.info(f"   Records identified: {retry_results['records_identified']}")
                 self.logger.info(f"   Records reset: {retry_results['records_reset']}")
+                
+                # Generate customer report if requested
+                if generate_report and customer and not dry_run:
+                    self.logger.info(f"📊 Generating customer processing report for {customer}...")
+                    try:
+                        report_content = self.sync_engine.generate_customer_processing_report(customer)
+                        # TASK027 Phase 1: Use sync folder from retry results for organized output
+                        sync_folder = retry_results.get('sync_folder')
+                        self._save_customer_report(customer, report_content, sync_folder)
+                        retry_results['customer_report'] = report_content
+                        retry_results['report_generated'] = True
+                        
+                        if sync_folder:
+                            self.logger.info(f"✅ Customer report generated and saved to sync folder: {sync_folder}")
+                        else:
+                            self.logger.info(f"✅ Customer report generated and saved for {customer}")
+                    except Exception as e:
+                        self.logger.warning(f"⚠️ Failed to generate customer report: {e}")
+                        retry_results['report_generated'] = False
+                        retry_results['report_error'] = str(e)
+                elif generate_report and not customer:
+                    self.logger.warning(f"⚠️ --generate-report requires --customer to be specified")
+                    retry_results['report_generated'] = False
+                    retry_results['report_error'] = "Customer name required for report generation"
+                elif generate_report and dry_run:
+                    self.logger.info(f"📊 Report generation skipped (dry run mode)")
+                    retry_results['report_generated'] = False
+                    retry_results['report_error'] = "Report generation skipped in dry run mode"
             else:
                 self.logger.error(f"❌ Retry processing failed: {retry_results.get('error', 'Unknown error')}")
             
@@ -418,6 +447,8 @@ Examples:
     retry_parser.add_argument('--customer', type=str, help='Filter retry by customer name')
     retry_parser.add_argument('--max-retries', type=int, default=3, 
                             help='Maximum retry attempts per record (default: 3)')
+    retry_parser.add_argument('--generate-report', action='store_true',
+                            help='Generate customer processing report after retry operation')
     
     # Report command
     report_parser = subparsers.add_parser('report', help='Generate customer processing report')
@@ -463,7 +494,8 @@ Examples:
             result = cli.retry_command(
                 customer=args.customer,
                 dry_run=dry_run,
-                max_retries=args.max_retries
+                max_retries=args.max_retries,
+                generate_report=args.generate_report
             )
         elif args.command == 'report':
             result = cli.report_command(args.customer)

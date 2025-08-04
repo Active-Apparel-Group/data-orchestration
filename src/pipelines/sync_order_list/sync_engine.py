@@ -174,16 +174,24 @@ class SyncEngine:
         
         return sync_session_dir
     
-    def _persist_executive_summary(self, sync_folder: Path, sync_results: Dict[str, Any]) -> None:
+    def _persist_executive_summary(self, sync_results: Dict[str, Any], sync_folder: Path, sync_id: Optional[str] = None) -> None:
         """
-        Persist executive summary to _SYNC_SUMMARY.md (TASK027 Phase 1.4)
+        Persist executive summary using TASK030 Phase 4.3 filename format
         
         Args:
+            sync_results: Complete sync/retry operation results (can be sync_results or retry_summary)
             sync_folder: Path to sync session folder
-            sync_results: Complete sync operation results
+            sync_id: Optional sync ID for filename generation (defaults to folder name)
         """
         try:
-            summary_file = sync_folder / "_SYNC_SUMMARY.md"
+            # TASK030 Phase 4.3: Use {FOLDER_NAME}_SUMMARY.md format instead of _SYNC_SUMMARY.md
+            if sync_id:
+                summary_filename = f"{sync_id}_SUMMARY.md"
+            else:
+                # Fallback to folder name if sync_id not provided
+                summary_filename = f"{sync_folder.name}_SUMMARY.md"
+            
+            summary_file = sync_folder / summary_filename
             
             # Generate comprehensive executive summary
             summary_content = self._generate_executive_summary_content(sync_results)
@@ -199,10 +207,11 @@ class SyncEngine:
     
     def _generate_executive_summary_content(self, sync_results: Dict[str, Any]) -> str:
         """
-        Generate comprehensive executive summary content (TASK027 Phase 1.4)
+        Generate comprehensive executive summary content for sync or retry operations
+        Enhanced for TASK027 Phase 1.4 and Phase 3 retry support
         
         Args:
-            sync_results: Complete sync operation results
+            sync_results: Complete sync or retry operation results
             
         Returns:
             Formatted markdown executive summary
@@ -210,13 +219,66 @@ class SyncEngine:
         sync_id = sync_results.get('sync_id', 'UNKNOWN')
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        # Build comprehensive summary
+        # Phase 3: Detect operation type (sync vs retry)
+        operation_type = sync_results.get('operation_type', 'SYNC')
+        is_retry_operation = operation_type == 'RETRY'
+        
+        # TASK030: Enhanced overall status calculation using success thresholds
+        overall_success = sync_results.get('success', False)
+        overall_status = '❌ FAILED'
+        
+        # Calculate overall status based on customer success rates if available (for sync operations)
+        if sync_results.get('per_customer_results') and not is_retry_operation:
+            total_customers = len(sync_results['per_customer_results'])
+            successful_customers = sum(1 for customer_data in sync_results['per_customer_results'].values() 
+                                     if customer_data.get('status') == 'SUCCESS')
+            
+            if total_customers > 0:
+                customer_success_rate = successful_customers / total_customers
+                
+                # Apply TASK030 success thresholds
+                if customer_success_rate >= 0.95:  # 95%+ threshold
+                    overall_status = '✅ SUCCESS'
+                elif customer_success_rate >= 0.80:  # 80%+ threshold  
+                    overall_status = '⚠️ PARTIAL SUCCESS'
+                else:
+                    overall_status = '❌ FAILED'
+                    
+                # Add success rate to status display
+                overall_status += f' ({customer_success_rate:.1%})'
+        elif is_retry_operation and sync_results.get('records_identified', 0) > 0:
+            # Phase 3: Retry-specific status calculation
+            records_reset = sync_results.get('records_reset', 0)
+            records_identified = sync_results.get('records_identified', 0)
+            retry_success_rate = records_reset / records_identified if records_identified > 0 else 0
+            
+            if retry_success_rate >= 0.95:
+                overall_status = '✅ SUCCESS'
+            elif retry_success_rate >= 0.80:
+                overall_status = '⚠️ PARTIAL SUCCESS'
+            else:
+                overall_status = '❌ FAILED'
+                
+            overall_status += f' ({retry_success_rate:.1%})'
+        elif overall_success:
+            overall_status = '✅ SUCCESS'
+        
+        # Phase 3: Build operation-specific header
+        if is_retry_operation:
+            header = "# RETRY EXECUTIVE SUMMARY"
+            operation_description = "Error Record Retry Processing"
+        else:
+            header = "# SYNC EXECUTIVE SUMMARY"
+            operation_description = "Order List Synchronization"
+        
+        # Build comprehensive summary with TASK030 enhanced status
         summary_lines = [
-            f"# SYNC EXECUTIVE SUMMARY",
+            header,
             f"",
+            f"**Operation**: {operation_description}",
             f"**Sync ID**: {sync_id}",
             f"**Timestamp**: {timestamp}",
-            f"**Status**: {'✅ SUCCESS' if sync_results.get('success', False) else '❌ FAILED'}",
+            f"**Overall Status**: {overall_status}",
             f"",
         ]
         
@@ -225,31 +287,66 @@ class SyncEngine:
             summary_lines.extend([
                 f"## Customer Results",
                 f"",
-                f"| Customer | Status | Records Processed | Number of Errors | Execution Time |",
-                f"|----------|--------|-------------------|------------------|----------------|",
+                f"| Customer | Status | Records Processed | Number of Errors | Batch Success Rate (x/y and %) | Execution Time |",
+                f"|----------|--------|-------------------|------------------|--------------------------------|----------------|",
             ])
             
             for customer_name, customer_data in sync_results['per_customer_results'].items():
-                status_emoji = "✅ SUCCESS" if customer_data.get('success', False) else "❌ FAILED"
+                # TASK030: Use enhanced status with success rate percentage
+                status_emoji = customer_data.get('status_emoji', '❌')
+                status_text = customer_data.get('status', 'FAILED')
+                batch_success_rate = customer_data.get('batch_success_rate', 0.0)
+                
                 records_processed = customer_data.get('records_synced', 0)
-                errors = len(customer_data.get('batch_results', []))  # Count failed batches as errors
                 errors = sum(1 for batch in customer_data.get('batch_results', []) if not batch.get('success', True))
                 execution_time = f"{customer_data.get('execution_time', 0):.2f}s"
                 
-                summary_lines.append(f"| {customer_name} | {status_emoji} | {records_processed} | {errors} | {execution_time} |")
+                # TASK030: Enhanced status display with success percentage
+                status_display = f"{status_emoji} {status_text}"
+                if batch_success_rate < 1.0:  # Show percentage for non-perfect success
+                    status_display += f" ({batch_success_rate:.1%})"
+                
+                # TASK030: Calculate batch success statistics (x/y and %)
+                batch_results = customer_data.get('batch_results', [])
+                total_batches = len(batch_results)
+                successful_batches = sum(1 for batch in batch_results if batch.get('success', False))
+                
+                if total_batches > 0:
+                    batch_success_display = f"{successful_batches}/{total_batches} ({batch_success_rate:.1%})"
+                else:
+                    batch_success_display = "0/0 (0.0%)"
+                
+                summary_lines.append(f"| {customer_name} | {status_display} | {records_processed} | {errors} | {batch_success_display} | {execution_time} |")
             
             summary_lines.append(f"")
         
-        summary_lines.extend([
-            f"## Performance Metrics",
-            f"- **Records Processed**: {sync_results.get('total_synced', 0):,}",
-            f"- **Execution Time**: {sync_results.get('execution_time_seconds', 0):.2f}s",
-        ])
-        
-        # Add throughput if available
-        if sync_results.get('total_synced', 0) > 0 and sync_results.get('execution_time_seconds', 0) > 0:
-            throughput = sync_results['total_synced'] / sync_results['execution_time_seconds']
-            summary_lines.append(f"- **Throughput**: {throughput:.1f} records/second")
+        # Phase 3: Add retry-specific metrics or sync-specific metrics
+        if is_retry_operation:
+            summary_lines.extend([
+                f"## Retry Metrics",
+                f"- **Records Identified for Retry**: {sync_results.get('records_identified', 0):,}",
+                f"- **Records Successfully Reset**: {sync_results.get('records_reset', 0):,}",
+                f"- **Retry Success Rate**: {(sync_results.get('records_reset', 0) / max(sync_results.get('records_identified', 1), 1)) * 100:.1f}%",
+                f"- **Customer Scope**: {sync_results.get('customer_scope', 'ALL')}",
+                f"- **Execution Time**: {sync_results.get('execution_time_seconds', 0):.2f}s",
+            ])
+            
+            # Add throughput for retry operations
+            if sync_results.get('records_reset', 0) > 0 and sync_results.get('execution_time_seconds', 0) > 0:
+                throughput = sync_results['records_reset'] / sync_results['execution_time_seconds']
+                summary_lines.append(f"- **Processing Throughput**: {throughput:.1f} resets/second")
+        else:
+            # Original sync metrics
+            summary_lines.extend([
+                f"## Performance Metrics",
+                f"- **Records Processed**: {sync_results.get('total_synced', 0):,}",
+                f"- **Execution Time**: {sync_results.get('execution_time_seconds', 0):.2f}s",
+            ])
+            
+            # Add throughput if available
+            if sync_results.get('total_synced', 0) > 0 and sync_results.get('execution_time_seconds', 0) > 0:
+                throughput = sync_results['total_synced'] / sync_results['execution_time_seconds']
+                summary_lines.append(f"- **Throughput**: {throughput:.1f} records/second")
         
         # Add customer information
         if sync_results.get('customer'):
@@ -259,14 +356,28 @@ class SyncEngine:
                 f"- **Target Customer**: {sync_results['customer']}",
             ])
         
-        # Add batch processing results
+        # Add batch processing results with TASK030 enhanced status
         if sync_results.get('successful_batches') and sync_results.get('batches_processed'):
-            success_rate = (sync_results['successful_batches'] / sync_results['batches_processed']) * 100
+            success_rate = (sync_results['successful_batches'] / sync_results['batches_processed'])
+            success_rate_pct = success_rate * 100
+            
+            # TASK030: Apply status thresholds to batch success rate
+            if success_rate >= 0.95:
+                batch_status_emoji = "✅"
+                batch_status_text = "SUCCESS"
+            elif success_rate >= 0.80:
+                batch_status_emoji = "⚠️"
+                batch_status_text = "PARTIAL SUCCESS"
+            else:
+                batch_status_emoji = "❌"
+                batch_status_text = "FAILED"
+            
             summary_lines.extend([
                 f"",
                 f"## Batch Processing",
+                f"- **Batch Status**: {batch_status_emoji} {batch_status_text} ({success_rate_pct:.1f}%)",
                 f"- **Successful Batches**: {sync_results['successful_batches']}/{sync_results['batches_processed']}",
-                f"- **Success Rate**: {success_rate:.1f}%",
+                f"- **Batch Success Rate**: {success_rate_pct:.1f}%",
             ])
         
         # Add error information if any
@@ -278,17 +389,39 @@ class SyncEngine:
                 f"{sync_results['error']}",
                 f"```",
             ])
+        elif is_retry_operation and sync_results.get('records_identified', 0) == 0:
+            # Phase 3: Retry-specific information when no records found
+            summary_lines.extend([
+                f"",
+                f"## Retry Status",
+                f"✅ No ERROR records found requiring retry.",
+                f"This indicates all previous records have been successfully processed or manually resolved.",
+            ])
         
-        summary_lines.extend([
-            f"",
-            f"## Output Organization",
-            f"- **Customer Reports**: Available in `customer_reports/` folder",
-            f"- **Detailed Logs**: Available in `logs/` folder", 
-            f"- **Summary Files**: Available in `summaries/` folder",
-            f"",
-            f"---",
-            f"*Generated by TASK027 Phase 1 Sync-Based Output Organization*"
-        ])
+        # Phase 3: Operation-specific output organization info
+        if is_retry_operation:
+            summary_lines.extend([
+                f"",
+                f"## Output Organization",
+                f"- **Retry Reports**: Available in sync folder structure",
+                f"- **Executive Summary**: {sync_results.get('sync_id', 'UNKNOWN')}_SUMMARY.md",
+                f"- **Customer Reports**: Generated when --generate-report flag used",
+                f"- **Detailed Logs**: Available in integrated logging system",
+                f"",
+                f"---",
+                f"*Generated by TASK027 Phase 1 + Phase 3 Output Harmonization*"
+            ])
+        else:
+            summary_lines.extend([
+                f"",
+                f"## Output Organization",
+                f"- **Customer Reports**: Available in `customer_reports/` folder",
+                f"- **Detailed Logs**: Available in `logs/` folder", 
+                f"- **Summary Files**: Available in `summaries/` folder",
+                f"",
+                f"---",
+                f"*Generated by TASK027 Phase 1 Sync-Based Output Organization*"
+            ])
         
         return '\n'.join(summary_lines)
     
@@ -554,8 +687,8 @@ class SyncEngine:
             enhanced_results['success'] = successful_batches > 0  # TASK027 Phase 2: Fix sync status reporting
             enhanced_results['total_synced'] = total_synced
             
-            # TASK027 Phase 1.4: Persist executive summary to sync folder
-            self._persist_executive_summary(sync_folder, enhanced_results)
+            # TASK027 Phase 1.4: Persist executive summary to sync folder with TASK030 Phase 4.3 filename format
+            self._persist_executive_summary(enhanced_results, sync_folder, sync_id)
             
             return enhanced_results
             
@@ -585,9 +718,10 @@ class SyncEngine:
                     else:
                         enhanced_results['customer_reports'] = {'error': f"Report generation failed: {report_error}"}
             
-            # TASK027 Phase 1.4: Persist executive summary even on failure
+            # TASK027 Phase 1.4: Persist executive summary even on failure with TASK030 Phase 4.3 filename format
             if hasattr(self, 'sync_session_dir') and self.sync_session_dir:
-                self._persist_executive_summary(self.sync_session_dir, enhanced_results)
+                sync_id = getattr(self, 'sync_id', None)
+                self._persist_executive_summary(enhanced_results, self.sync_session_dir, sync_id)
             
             return enhanced_results
     
@@ -801,15 +935,47 @@ class SyncEngine:
                                 'records_processed': 0
                             })
                     
-                    # Phase 4: Calculate customer results
+                    # Phase 4: Calculate customer results with TASK030 success thresholds
                     customer_execution_time = (datetime.now() - customer_start_time).total_seconds()
                     customer_successful_batches = len([r for r in customer_results if r.get('success', False)])
-                    customer_success = customer_successful_batches > 0
                     
-                    # Store per-customer results
+                    # TASK030: Fix broken success logic - use success rate thresholds
+                    total_batches = len(customer_results)
+                    if total_batches > 0:
+                        batch_success_rate = customer_successful_batches / total_batches
+                        
+                        # Get success thresholds from TOML config (with defaults)
+                        success_threshold = self.toml_config.get('monday', {}).get('sync', {}).get('success_thresholds', {}).get('success_rate', 0.95)
+                        partial_threshold = self.toml_config.get('monday', {}).get('sync', {}).get('success_thresholds', {}).get('partial_rate', 0.80)
+                        
+                        # Determine customer success based on thresholds
+                        if batch_success_rate >= success_threshold:
+                            customer_success = True
+                            customer_status = 'SUCCESS'
+                            customer_status_emoji = '✅'
+                        elif batch_success_rate >= partial_threshold:
+                            customer_success = False  # Changed: Partial is not full success
+                            customer_status = 'PARTIAL'
+                            customer_status_emoji = '⚠️'
+                        else:
+                            customer_success = False
+                            customer_status = 'FAILED'
+                            customer_status_emoji = '❌'
+                            
+                        self.logger.info(f"🎯 [{current_customer}] Batch Success Rate: {batch_success_rate:.1%} ({customer_successful_batches}/{total_batches}) = {customer_status_emoji} {customer_status}")
+                    else:
+                        # No batches processed
+                        batch_success_rate = 0.0
+                        customer_success = False
+                        customer_status = 'FAILED'
+                        customer_status_emoji = '❌'
+                    
+                    # Store per-customer results with TASK030 enhanced status
                     enhanced_results['per_customer_results'][current_customer] = {
                         'success': customer_success,
-                        'status': 'COMPLETED' if customer_success else 'FAILED',
+                        'status': customer_status,
+                        'status_emoji': customer_status_emoji,
+                        'batch_success_rate': batch_success_rate,
                         'records_synced': customer_synced,
                         'execution_time': customer_execution_time,
                         'batches_processed': len(customer_results),
@@ -827,7 +993,10 @@ class SyncEngine:
                                 'customer_summary': self._generate_customer_summary_data(customer_headers, customer_results, current_customer),
                                 'sync_id': sync_id,
                                 'sync_folder': sync_folder,
-                                'success': customer_success,  # Fix sync status reporting bug
+                                'success': customer_success,  # TASK030: Fixed sync status reporting
+                                'status': customer_status,  # TASK030: Enhanced status with PARTIAL/FAILED/SUCCESS
+                                'status_emoji': customer_status_emoji,  # TASK030: Status emoji
+                                'batch_success_rate': batch_success_rate,  # TASK030: Actual success percentage  
                                 'successful_batches': customer_successful_batches,
                                 'total_batches': len(customer_results),
                                 'execution_time_seconds': customer_execution_time
@@ -874,8 +1043,8 @@ class SyncEngine:
                 'status': 'COMPLETED' if overall_success else 'FAILED'
             })
             
-            # Step 4: Persist executive summary
-            self._persist_executive_summary(sync_folder, enhanced_results)
+            # Step 4: Persist executive summary with TASK030 Phase 4.3 filename format
+            self._persist_executive_summary(enhanced_results, sync_folder, sync_id)
             
             self.logger.info(f"✅ PER-CUSTOMER SEQUENTIAL SYNC COMPLETED:")
             self.logger.info(f"   Total Records: {total_synced_all_customers}")
@@ -968,6 +1137,12 @@ class SyncEngine:
                     self.logger.info(f"📥 API RESPONSE - Batch #{batch_number}: Received in {api_duration:.3f}s")
                     
                     if not api_result.get('success', False):
+                        # TASK030 Phase 3.3: Extract error message from API response
+                        error_message = self._extract_api_error_message(api_result)
+                        
+                        # TASK030 Phase 3.2: Update sync_state to FAILED for failed batches
+                        self._update_batch_records_to_failed(record_uuids, error_message, api_result)
+                        
                         raise Exception(f"Monday.com API call failed: {api_result}")
                     
                     # Step 2: Extract monday_item_ids from response
@@ -1028,6 +1203,23 @@ class SyncEngine:
         except Exception as e:
             batch_duration = (datetime.now() - batch_start_time).total_seconds()
             self.logger.error(f"❌ BATCH #{batch_number} FAILED: {e} (duration: {batch_duration:.3f}s)")
+            
+            # TASK030 Phase 3.2: Update batch records to FAILED state for general exceptions
+            if not dry_run:
+                try:
+                    # Extract record_uuids from batch_records
+                    record_uuids = []
+                    for record in batch_records:
+                        if 'record_uuid' in record:
+                            record_uuids.append(record['record_uuid'])
+                    
+                    if record_uuids:
+                        error_message = f"Batch processing failed: {str(e)}"
+                        api_result = {'error': str(e), 'type': 'batch_exception'}
+                        self._update_batch_records_to_failed(record_uuids, error_message, api_result)
+                except Exception as cleanup_error:
+                    self.logger.error(f"Failed to update records to FAILED state during exception cleanup: {cleanup_error}")
+            
             return {
                 'success': False,
                 'batch_number': batch_number,
@@ -2272,6 +2464,7 @@ class SyncEngine:
         - Exponential backoff for rate limits
         - Error categorization for targeted retry strategies
         - Customer-specific retry processing
+        - TASK027 Phase 1 compliant output organization with sync folder structure
         
         Args:
             customer_name: Process specific customer, or None for all
@@ -2279,7 +2472,7 @@ class SyncEngine:
             dry_run: If True, show what would be retried without executing
             
         Returns:
-            Dict: Retry processing results and statistics
+            Dict: Retry processing results and statistics with sync folder information
         """
         import time
         from datetime import datetime
@@ -2287,12 +2480,20 @@ class SyncEngine:
         self.logger.info(f"🔁 Starting retry processing (customer: {customer_name or 'ALL'})")
         
         start_time = datetime.now()
+        
+        # TASK027 Phase 1: Create sync folder structure for organized output
+        sync_id = self._generate_sync_id()
+        sync_folder = self._create_sync_folder_structure(sync_id)
+        
         retry_stats = {
             'customer': customer_name or 'ALL',
             'records_identified': 0,
             'records_reset': 0,
             'errors': 0,
-            'success': False
+            'success': False,
+            'sync_id': sync_id,
+            'sync_folder': str(sync_folder),
+            'execution_time_seconds': 0
         }
         
         try:
@@ -2364,6 +2565,7 @@ class SyncEngine:
                 retry_stats['success'] = True
                 
                 execution_time = (datetime.now() - start_time).total_seconds()
+                retry_stats['execution_time_seconds'] = execution_time
                 self.logger.info(f"✅ Retry processing completed in {execution_time:.2f}s")
                 
                 cursor.close()
@@ -2372,6 +2574,28 @@ class SyncEngine:
             self.logger.error(f"❌ Retry processing failed: {e}")
             retry_stats['error'] = str(e)
             retry_stats['errors'] = 1
+            retry_stats['execution_time_seconds'] = (datetime.now() - start_time).total_seconds()
+        
+        # TASK027 Phase 1: Generate executive summary for retry in sync folder
+        if retry_stats.get('sync_folder'):
+            try:
+                retry_summary = {
+                    'operation_type': 'RETRY',
+                    'sync_id': sync_id,
+                    'customer_scope': customer_name or 'ALL',
+                    'records_processed': retry_stats['records_identified'],
+                    'records_reset': retry_stats['records_reset'],
+                    'success_rate': (retry_stats['records_reset'] / max(retry_stats['records_identified'], 1)) * 100,
+                    'execution_time_seconds': retry_stats['execution_time_seconds'],
+                    'status': 'SUCCESS' if retry_stats['success'] else 'ERROR'
+                }
+                
+                # Use existing executive summary method with retry-specific content
+                self._persist_executive_summary(retry_summary, sync_folder, sync_id)
+                self.logger.info(f"📄 Executive summary saved to {sync_folder}")
+                
+            except Exception as summary_error:
+                self.logger.warning(f"⚠️ Could not generate executive summary: {summary_error}")
         
         return retry_stats
     
@@ -2645,3 +2869,85 @@ class SyncEngine:
                 'success_rate': 0.0,
                 'error': str(e)
             }
+    
+    def _extract_api_error_message(self, api_result: Dict[str, Any]) -> str:
+        """
+        TASK030 Phase 3.3: Extract readable error message from Monday.com API response
+        
+        Args:
+            api_result: API response containing error information
+            
+        Returns:
+            Extracted error message string
+        """
+        try:
+            # Handle different error formats from Monday.com API
+            if 'error' in api_result:
+                error_data = api_result['error']
+                
+                # Format: {'error': [{'message': 'Group not found', ...}]}
+                if isinstance(error_data, list) and len(error_data) > 0:
+                    if isinstance(error_data[0], dict) and 'message' in error_data[0]:
+                        return error_data[0]['message']
+                
+                # Format: {'error': 'Error message string'}
+                if isinstance(error_data, str):
+                    return error_data
+                
+                # Format: {'error': {'message': 'Error message'}}
+                if isinstance(error_data, dict) and 'message' in error_data:
+                    return error_data['message']
+            
+            # Fallback: Check for 'message' at root level
+            if 'message' in api_result:
+                return api_result['message']
+            
+            # Last resort: Convert entire error to string
+            return str(api_result.get('error', 'Unknown API error'))
+            
+        except Exception as e:
+            self.logger.warning(f"Failed to extract error message from API result: {e}")
+            return f"Error extraction failed: {str(e)}"
+    
+    def _update_batch_records_to_failed(self, record_uuids: List[str], error_message: str, api_result: Dict[str, Any]) -> None:
+        """
+        TASK030 Phase 3.2: Update batch records to FAILED state with error message
+        
+        Args:
+            record_uuids: List of record UUIDs in the failed batch
+            error_message: Extracted error message
+            api_result: Full API result for logging
+        """
+        try:
+            connection = db.get_connection(self.db_key)
+            cursor = connection.cursor()
+            
+            # Build comma-separated list of UUIDs for IN clause
+            uuid_list = "', '".join(record_uuids)
+            
+            # TASK030: Update sync_state to FAILED and add error message
+            update_query = f"""
+            UPDATE [{self.headers_table}]
+            SET [sync_state] = 'FAILED',
+                [api_error_message] = ?,
+                [api_response_payload] = ?,
+                [api_response_timestamp] = GETUTCDATE(),
+                [api_status] = 'ERROR'
+            WHERE [record_uuid] IN ('{uuid_list}')
+            """
+            
+            # Prepare API response payload for logging
+            api_response_payload = json.dumps(api_result, default=str, ensure_ascii=False)
+            
+            cursor.execute(update_query, error_message, api_response_payload)
+            connection.commit()
+            
+            self.logger.error(f"🚨 TASK030: Updated {len(record_uuids)} records to FAILED state")
+            self.logger.error(f"   Error Message: {error_message}")
+            self.logger.error(f"   Record UUIDs: {record_uuids}")
+            
+            cursor.close()
+            
+        except Exception as e:
+            self.logger.error(f"Failed to update batch records to FAILED state: {e}")
+            # Don't re-raise - this is cleanup, main error should still propagate

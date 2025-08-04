@@ -1,29 +1,41 @@
 # OPUS Universal Monday.com Update Configuration
-# Generated from: board_8709134353_metadata.json
-# Generated at: 2025-08-03 19:46:06
-# Board: Planning (8709134353)
+# Purpose = TOML-based configuration for metadata-driven updates
+# Board = Planning (8709134353)
 
 [metadata]
 board_id = 8709134353
 board_name = "Planning"
-table_name = "MON_Planning"
-database = "orders"
 update_type = "batch_item_updates"
-description = "Update Planning items with latest data"
+description = "Update planning items with a lookup key for Customer Master Schedule "
 
 [query_config]
 # SQL query to get update data
 query = """
-# TODO: Add your SQL query here
-# SELECT
-#     [Item ID] as monday_item_id,
-#     -- Add your columns here
-# FROM your_table
-# WHERE your_conditions
+    SELECT
+    [Item ID] as monday_item_id,
+    concat(
+    [STYLE CODE], 
+    COLOR, coalesce([SEASON], [CUSTOMER SEASON])) as keyCustMastSch,
+    concat(
+    [STYLE CODE], [COLOR],
+    [BULK PO]) as keyStyleColPO
+FROM MON_COO_Planning
+where CUSTOMER = 'PELOTON'
+ORDER BY [Group], [STYLE CODE], [COLOR]
 """
 
 # Column mapping configuration
 item_id_column = "monday_item_id"
+
+[validation]
+required_fields = ["monday_item_id", "board_id"]
+max_batch_size = 15  # Process 15 records per API call
+timeout_seconds = 30
+
+[retry_config]
+max_retries = 3
+retry_delay_seconds = 5
+backoff_multiplier = 2
 
 [column_mapping]
 # Monday.com column_id -> SQL query column mapping
@@ -145,10 +157,18 @@ item_id_column = "monday_item_id"
 "dropdown_mkp4f6se" = "COUNTRY OF ORIGIN"
 # REMARK
 "text_mkp4m83f" = "REMARK"
+# Factory (linked)
+"board_relation_mkp69zh3" = "Factory (linked)"
+# PRODUCTION TYPE
+"lookup_mkr5pgwg" = "PRODUCTION TYPE"
+# Factory Location
+"lookup_mkp64c3y" = "Factory Location"
+# Factory Country
+"lookup_mkp61hs" = "Factory Country"
 # PARTNER PO
 "board_relation_mkp6dhn7" = "PARTNER PO"
-# Contract ID
-"lookup_mksxysq6" = "Contract ID"
+# Partner Trading Entity
+"lookup_mkp6ktnm" = "Partner Trading Entity"
 # Item ID
 "pulse_id_mkp5y5d9" = "Item ID"
 # PO APPROVAL STATUS
@@ -311,31 +331,17 @@ item_id_column = "monday_item_id"
 "dropdown_mksq1152" = "QIMA STATUS"
 # EXTENSION APPROVAL
 "color_mksqat54" = "EXTENSION APPROVAL"
-# Factory (linked)
-"text_mksvkq3k" = "Factory (linked)"
-# Factory Country
-"country_mksv4c5v" = "Factory Country"
-# Partner Trading Entity
-"long_text_mksv7jnz" = "Partner Trading Entity"
+# xFactory (linked)
+"text_mksvkq3k" = "xFactory (linked)"
+# xFactory Location
+"dropdown_mkswkx3w" = "xFactory Location"
+# xFactory Country
+"country_mksv4c5v" = "xFactory Country"
+# xPartner Trading Entity
+"long_text_mksv7jnz" = "xPartner Trading Entity"
+# xPRODUCTION TYPE
+"dropdown_mkswrvc9" = "xPRODUCTION TYPE"
 # Last updated
 "pulse_updated_mksv6tsf" = "Last updated"
-# Factory Location
-"dropdown_mkswkx3w" = "Factory Location"
-# PRODUCTION TYPE
-"dropdown_mkswrvc9" = "PRODUCTION TYPE"
-# Ship Date Actual
-"date_mksw16zp" = "Ship Date Actual"
-# Running Days Prior To Bulk
-"formula_mkswrv4k" = "Running Days Prior To Bulk"
-# EXTENSION CHANGES
-"long_text_mksy20m1" = "EXTENSION CHANGES"
-# Number of extension requests
-"numeric_mksyw87t" = "Number of extension requests"
-# USA PPS Approval Date
-"date_mksyfacg" = "USA PPS Approval Date"
-# QTY CUT
-"numeric_mktbwjf1" = "QTY CUT"
-# QTY SEW
-"numeric_mktb1dd3" = "QTY SEW"
-# QTY FINISH
-"numeric_mktbg5e4" = "QTY FINISH"
+
+"text_mktfea77" = "keyStyleColPO"
