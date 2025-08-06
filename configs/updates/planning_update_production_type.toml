@@ -10,12 +10,7 @@ description = "Update planning items factory details - migration from Factory Li
 
 [query_config]
 # SQL query to get update data
-query = """
-SELECT 
-    [Item ID] as monday_item_id,
-    [PRODUCTION TYPE] as [xPRODUCTION TYPE]
-FROM MON_COO_Planning;
-"""
+file = "sql/operations/views/v_planning_update_production_type.sql"
 
 # Column mapping configuration
 item_id_column = "monday_item_id"

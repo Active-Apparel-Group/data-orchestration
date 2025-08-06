@@ -12,6 +12,7 @@
 - [TASK025-old](TASK025-production-group-distribution-testing.md) Production Group Distribution Testing - **DEFERRED** Validate group distribution (superseded by TASK024 performance focus)
 
 ## Completed
+- [TASK031](TASK031-externalize-sql-queries.md) Externalize SQL Queries in Update Configs and Refactor Update Scripts - **COMPLETED** on 2025-08-06 - TOML/SQL file mapping and script fallback logic
 - [TASK029](TASK029-sync-engine-enhancement.md) Sync Engine Enhancement Session - **COMPLETED** on 2025-08-02 - ✅ JSONB cleanup, sync status fixes, group creation architecture, executive summary enhancements
 - [TASK028](TASK028-per-customer-group-creation-architecture.md) Per-Customer Group Creation Architecture - **COMPLETED** on 2025-08-02 - ✅ Customer isolation, sequential processing, and group tracking implemented
 - [TASK024](TASK024-optional-subitem-sync.md) Optional Subitem Sync Argument - **COMPLETED** on 2025-07-31 - ✅ Production-ready CLI flag to skip subitems for 3-5x performance improvement

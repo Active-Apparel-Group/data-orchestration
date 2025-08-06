@@ -365,16 +365,3 @@ Select * from ORDER_LIST_V2
 
 
 
-        Select * from MON_Purchase_Contracts
-
-SELECT
-    [Item ID] as monday_item_id,
-    concat(
-    [STYLE CODE], 
-    COLOR, coalesce([SEASON], [CUSTOMER SEASON])) as keyCustMastSch,
-    concat(
-    [STYLE CODE], [COLOR],
-    [BULK PO]) as keyStyleColPO
-FROM MON_COO_Planning
-where CUSTOMER = 'PELOTON'
-AND [Item ID] = '8772700881'

@@ -2,15 +2,48 @@
 # Purpose = TOML-based configuration for metadata-driven updates
 # Board = Planning (8709134353)
 
-[metadata]
-board_id = 8709134353
-board_name = "Planning"
-update_type = "batch_item_updates"
-description = "Update planning items factory details - migration from Factory Linked (linked / connected column) to lookup using workflows"
-
-[query_config]
 # SQL query to get update data
-file = "sql/operations/views/v_planning_update_factories.sql"
+file = "sql/operations/views/planning_update_planner.sql"
+query = """
+WITH CustomerPlannerCTE AS (
+    SELECT *
+    FROM (VALUES
+        ('AESCAPE', 'Zoey Cheng \u7a0b\u4e1c\u7ea2', '74522471'),
+        ('AIME LEON DORE', 'Zoey Cheng \u7a0b\u4e1c\u7ea2', '74522471'),
+        ('ALWRLD', 'Nina Ma \u9a6c\u73ca\u73ca', '74522468'),
+        ('ASRV', 'Zoey Cheng \u7a0b\u4e1c\u7ea2', '74522471'),
+        ('BAD BIRDIE', 'Nina Ma \u9a6c\u73ca\u73ca', '74522468'),
+        ('BANDIT', 'Zoey Cheng \u7a0b\u4e1c\u7ea2', '74522471'),
+        ('BOGGI MILANO', 'Lancy Su \u82cf\u7f8e\u5170', '74522477'),
+        ('BORN PRIMITIVE', 'Lancy Su \u82cf\u7f8e\u5170', '74522477'),
+        ('FEETURES', 'Lancy Su \u82cf\u7f8e\u5170', '74522477'),
+        ('GREYSON', 'Zoey Cheng \u7a0b\u4e1c\u7ea2', '74522471'),
+        ('JOHNNIE O', 'Lancy Su \u82cf\u7f8e\u5170', '74522477'),
+        ('LAMBS', 'Zoey Cheng \u7a0b\u4e1c\u7ea2', '74522471'),
+        ('MACK WELDON', 'Nina Ma \u9a6c\u73ca\u73ca', '74522468'),
+        ('PELOTON', 'Lancy Su \u82cf\u7f8e\u5170', '74522477'),
+        ('RHONE', 'Zoey Cheng \u7a0b\u4e1c\u7ea2', '74522471'),
+        ('RHYTHM', 'Nina Ma \u9a6c\u73ca\u73ca', '74522468'),
+        ('SOULCYCLE', 'Nina Ma \u9a6c\u73ca\u73ca', '74522468'),
+        ('SPIRITUAL GANGSTER', 'Nina Ma \u9a6c\u73ca\u73ca', '74522468'),
+        ('SUN DAY RED', 'Nina Ma \u9a6c\u73ca\u73ca', '74522468'),
+        ('TAYLORMADE', 'Nina Ma \u9a6c\u73ca\u73ca', '74522468'),
+        ('TITLE NINE', 'Lancy Su \u82cf\u7f8e\u5170', '74522477'),
+        ('TRACKSMITH', 'Lancy Su \u82cf\u7f8e\u5170', '74522477'),
+        ('UNE PIECE', 'Nina Ma \u9a6c\u73ca\u73ca', '74522468')
+    ) AS cte (Customer, Planner, PlannerID)
+)
+
+SELECT
+    p.[Item ID] AS monday_item_id,
+    p.[CUSTOMER] AS monday_customer,
+    p.Planner, 
+    cte.Planner as CTE_Planner,
+    cte.PlannerID as PLANNER
+FROM MON_COO_Planning p
+JOIN CustomerPlannerCTE cte ON p.[CUSTOMER] = cte.Customer
+and left(p.[Planner],3) != left(cte.Planner,3)
+"""
 
 # Column mapping configuration
 item_id_column = "monday_item_id"
@@ -18,7 +51,7 @@ item_id_column = "monday_item_id"
 [validation]
 required_fields = ["monday_item_id", "board_id"]
 max_batch_size = 15  # Process 15 records per API call
-timeout_seconds = 300
+timeout_seconds = 30
 
 [retry_config]
 max_retries = 3
@@ -145,8 +178,18 @@ backoff_multiplier = 2
 "dropdown_mkp4f6se" = "COUNTRY OF ORIGIN"
 # REMARK
 "text_mkp4m83f" = "REMARK"
+# Factory (linked)
+"board_relation_mkp69zh3" = "Factory (linked)"
+# PRODUCTION TYPE
+"lookup_mkr5pgwg" = "PRODUCTION TYPE"
+# Factory Location
+"lookup_mkp64c3y" = "Factory Location"
+# Factory Country
+"lookup_mkp61hs" = "Factory Country"
 # PARTNER PO
 "board_relation_mkp6dhn7" = "PARTNER PO"
+# Partner Trading Entity
+"lookup_mkp6ktnm" = "Partner Trading Entity"
 # Item ID
 "pulse_id_mkp5y5d9" = "Item ID"
 # PO APPROVAL STATUS
@@ -310,12 +353,16 @@ backoff_multiplier = 2
 # EXTENSION APPROVAL
 "color_mksqat54" = "EXTENSION APPROVAL"
 # xFactory (linked)
-"text_mksvkq3k" = "Factory (linked)"
+"text_mksvkq3k" = "xFactory (linked)"
 # xFactory Location
-"dropdown_mkswkx3w" = "Factory Location"
+"dropdown_mkswkx3w" = "xFactory Location"
 # xFactory Country
-"country_mksv4c5v" = "Factory Country"
+"country_mksv4c5v" = "xFactory Country"
 # xPartner Trading Entity
-"long_text_mksv7jnz" = "Partner Trading Entity"
+"long_text_mksv7jnz" = "xPartner Trading Entity"
+# xPRODUCTION TYPE
+"dropdown_mkswrvc9" = "xPRODUCTION TYPE"
 # Last updated
 "pulse_updated_mksv6tsf" = "Last updated"
+
+"text_mktfea77" = "keyStyleColPO"

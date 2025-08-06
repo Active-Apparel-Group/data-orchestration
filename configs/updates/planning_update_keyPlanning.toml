@@ -10,19 +10,7 @@ description = "Update planning items with a lookup key for Customer Master Sched
 
 [query_config]
 # SQL query to get update data
-query = """
-    SELECT
-    [Item ID] as monday_item_id,
-    concat(
-    [STYLE CODE], 
-    COLOR, coalesce([SEASON], [CUSTOMER SEASON])) as keyCustMastSch,
-    concat(
-    [STYLE CODE], [COLOR],
-    [BULK PO]) as keyStyleColPO
-FROM MON_COO_Planning
-where CUSTOMER = 'PELOTON'
-ORDER BY [Group], [STYLE CODE], [COLOR]
-"""
+file = "sql/operations/views/v_planning_update_keyPlanning.sql"
 
 # Column mapping configuration
 item_id_column = "monday_item_id"

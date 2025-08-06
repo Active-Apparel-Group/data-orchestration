@@ -38,6 +38,27 @@ import db_helper as db
 import logger_helper
 
 class BatchMondayUpdater:
+    def load_query_from_config(self, query_config: dict) -> str:
+        """
+        Load SQL from file if 'file' is present in query_config, else use inline 'query'.
+        """
+        if not query_config:
+            raise ValueError("No query_config provided.")
+        # Try file first
+        file_path = query_config.get('file')
+        if file_path:
+            sql_path = Path(file_path)
+            if not sql_path.is_absolute():
+                sql_path = (Path(__file__).parent.parent.parent.parent / file_path).resolve()
+            if sql_path.exists():
+                with open(sql_path, 'r', encoding='utf-8') as f:
+                    return f.read()
+            else:
+                self.logger.warning(f"SQL file specified in config not found: {sql_path}. Falling back to inline query.")
+        # Fallback to inline query
+        if 'query' in query_config:
+            return query_config['query']
+        raise ValueError("No SQL file found and no inline query provided in query_config.")
     """
     Batch Monday.com update handler for efficient bulk operations
     
@@ -441,8 +462,8 @@ def main():
     updater = BatchMondayUpdater(args.config)
     
     # Batch update from TOML config
-    if 'query_config' in updater.update_config and 'query' in updater.update_config['query_config']:
-        query = updater.update_config['query_config']['query']
+    if 'query_config' in updater.update_config:
+        query = updater.load_query_from_config(updater.update_config['query_config'])
         result = updater.batch_update_from_query(query, updater.update_config, dry_run)
         self.logger.info(json.dumps(result, indent=2))
     else:

@@ -10,18 +10,7 @@ author = "CTO / Head Data Engineer"
 
 [query_config]
 # SQL query to get update data
-query = """
-SELECT 
-    monday_item_id,
-    fob_date,
-    country_of_origin,
-    last_updated
-FROM planning_board_updates 
-WHERE needs_update = 1 
-    AND monday_item_id IS NOT NULL
-    AND fob_date IS NOT NULL
-ORDER BY last_updated DESC
-"""
+file = "sql/operations/views/v_async_batch_fob_update.sql"
 
 # Column mapping from SQL results to Monday.com column IDs
 [column_mapping]

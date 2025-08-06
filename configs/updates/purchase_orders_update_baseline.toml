@@ -13,14 +13,7 @@ description = "Update Subitems of Partner Purchase Orders items with latest data
 
 [query_config]
 # SQL query to get update data
-query = """
-SELECT 
-    [Item ID] AS [monday_item_id],
-    CAST([Agreed Process Time] AS int) as   [Agreed Process time],
-    CONVERT(nvarchar(10), TRY_CAST(DATEADD(DAY, [Agreed Process Time]+1, [Start Date])  AS date), 23) AS [Baseline Date]
-FROM MON_Purchase_Contracts_Subitems
-WHERE [Due Date] IS NOT NULL 
-"""
+file = "sql/operations/views/v_purchase_orders_update_baseline.sql"
 
 # Column mapping configuration
 item_id_column = "monday_item_id"
