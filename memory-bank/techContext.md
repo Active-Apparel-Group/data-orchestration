@@ -1,6 +1,31 @@
 # Tech Context
 
-## Technologies and FrameIn summary, the tech context of this project is centered on a Python-based ETL-like process, using web APIs and SQL, configured via external files, and aligned with our existing data engineering frameworks. The choices made keep the solution efficient and maintainable given our team's skill set and the technologies at hand.
+## Technologies and Framework
+
+## Current Technology Stack (Updated 2025-08-08)
+
+**Core Backend Technologies:**
+- **Programming Language:** Python 3.x for ETL pipeline implementation and FastAPI web services
+- **Database:** Microsoft SQL Server for source order data with SQL queries via Jinja2 templating
+- **Monday.com GraphQL API:** Async HTTP GraphQL operations with rate limiting and batch processing
+- **HTTP Client:** `aiohttp` for asynchronous API calls with intelligent retry logic
+- **Config Files:** TOML configuration for hierarchical dev/prod settings via `sync_order_list.toml`
+- **Jinja2 Templating:** Dynamic SQL generation with embedded logic for complex transformations
+
+**New Web Interface Technologies (TASK036):**
+- **Frontend Framework:** React 18.3.1 with TypeScript for type-safe component development
+- **UI Library:** Material-UI 6.5.0 for professional, accessible user interface components
+- **Build System:** Create React App with react-scripts for optimized production builds
+- **File Upload:** react-dropzone 14.3.8 for drag-and-drop file handling with validation
+- **Backend API:** FastAPI with automatic OpenAPI documentation and async request handling
+- **API Integration:** RESTful endpoints for file upload, column mapping, and Monday.com operations
+- **Development Server:** Hot-reload React development server with TypeScript compilation
+
+**Web Interface Architecture:**
+- **Backend Services:** File parsing, column mapping, upload management, Monday.com wrapper
+- **Frontend Components:** Stepper wizard, file upload, column mapping, progress tracking
+- **API Documentation:** Comprehensive OpenAPI docs with interactive testing at /docs endpoint
+- **Production Integration:** Leverages existing AsyncBatchMondayUpdater and rate limiting infrastructure
 
 ## Performance Optimization Context (2025-08-01)
 

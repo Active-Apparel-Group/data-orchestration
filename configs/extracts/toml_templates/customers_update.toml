@@ -1,0 +1,57 @@
+# OPUS Universal Monday.com Update Configuration
+# Generated from: board_8983946335_metadata.json
+# Generated at: 2025-08-06 21:42:35
+# Board: Customers (8983946335)
+
+[metadata]
+board_id = 8983946335
+board_name = "Customers"
+table_name = "MON_Customers"
+database = "orders"
+update_type = "batch_item_updates"
+description = "Update Customers items with latest data"
+
+[query_config]
+# SQL query to get update data
+query = """
+# TODO: Add your SQL query here
+# SELECT
+#     [Item ID] as monday_item_id,
+#     -- Add your columns here
+# FROM your_table
+# WHERE your_conditions
+"""
+
+# Column mapping configuration
+item_id_column = "monday_item_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+# Name
+"name" = "Name"
+# Subitems
+"subtasks_mkqqd4ny" = "Subitems"
+# Account Manager
+"person" = "Account Manager"
+# link to Accounts
+"board_relation_mkq9b20p" = "link to Accounts"
+# CUSTOMER_Dropdown
+"dropdown_mkq9dzm3" = "CUSTOMER_Dropdown"
+# Customer_Map_LP
+"dropdown_mkq9pjdf" = "Customer_Map_LP"
+# Customer_Category_LP
+"dropdown_mkq9mpg9" = "Customer_Category_LP"
+# CUSTOMER ALLOCATION
+"dropdown_mkq9aqtm" = "CUSTOMER ALLOCATION"
+# Item ID
+"pulse_id_mkq9qdr" = "Item ID"
+# PLANNING BOARD
+"board_relation_mkqjwvtf" = "PLANNING BOARD"
+# Customer_Map_MOL
+"dropdown_mkqjdkj5" = "Customer_Map_MOL"
+# CUSTOMER GROUP
+"dropdown_mkqjtv6n" = "CUSTOMER GROUP"
+# Planner
+"multiple_person_mkr554pe" = "Planner"
+# SEASON LIBRARY
+"board_relation_mkrb8r47" = "SEASON LIBRARY"

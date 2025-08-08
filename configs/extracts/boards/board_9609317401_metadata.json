@@ -1,9 +1,9 @@
 {
   "board_id": 9609317401,
-  "board_name": "Customer Master Schedule",
-  "table_name": "MON_CustomerMasterSchedule",
+  "board_name": "Customer Master Schedule x",
+  "table_name": "MON_CustomerMasterSchedulex",
   "database": "orders",
-  "discovered_at": "2025-08-01T16:03:00.865388",
+  "discovered_at": "2025-08-07T23:48:22.586454",
   "item_terminology": {
     "name": "Order",
     "overwrite_name": ""
@@ -141,6 +141,48 @@
       "monday_type": "dropdown",
       "sql_column": "CUSTOMER SEASON",
       "sql_type": "NVARCHAR(100)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null,
+      "exclude": false,
+      "custom_sql_type": null,
+      "custom_extraction_field": null
+    },
+    {
+      "monday_id": "text_mktk9z4p",
+      "monday_title": "SEASON NAME",
+      "monday_type": "text",
+      "sql_column": "SEASON NAME",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null,
+      "exclude": false,
+      "custom_sql_type": null,
+      "custom_extraction_field": null
+    },
+    {
+      "monday_id": "text_mktk9281",
+      "monday_title": "SEASON AND YEAR",
+      "monday_type": "text",
+      "sql_column": "SEASON AND YEAR",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null,
+      "exclude": false,
+      "custom_sql_type": null,
+      "custom_extraction_field": null
+    },
+    {
+      "monday_id": "text_mktkv9ke",
+      "monday_title": "BUDGET SEASON",
+      "monday_type": "text",
+      "sql_column": "BUDGET SEASON",
+      "sql_type": "NVARCHAR(MAX)",
       "extraction_field": "text",
       "nullable": true,
       "is_system_field": false,
@@ -724,6 +766,34 @@
       "custom_extraction_field": null
     },
     {
+      "monday_id": "lookup_mktg5pe",
+      "monday_title": "RM Progress Tracking",
+      "monday_type": "mirror",
+      "sql_column": "RM Progress Tracking",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null,
+      "exclude": false,
+      "custom_sql_type": null,
+      "custom_extraction_field": null
+    },
+    {
+      "monday_id": "lookup_mktgn2fq",
+      "monday_title": "PARTNER ALLOCATION",
+      "monday_type": "mirror",
+      "sql_column": "PARTNER ALLOCATION",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "display_value",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null,
+      "exclude": false,
+      "custom_sql_type": null,
+      "custom_extraction_field": null
+    },
+    {
       "monday_id": "lookup_mkr6113x",
       "monday_title": "EX-FTY (Change Request)",
       "monday_type": "mirror",
@@ -1198,6 +1268,34 @@
       "exclude": false,
       "custom_sql_type": null,
       "custom_extraction_field": null
+    },
+    {
+      "monday_id": "text_mktfwty8",
+      "monday_title": "keyStyleColPO",
+      "monday_type": "text",
+      "sql_column": "keyStyleColPO",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null,
+      "exclude": false,
+      "custom_sql_type": null,
+      "custom_extraction_field": null
+    },
+    {
+      "monday_id": "text_mktfbwhj",
+      "monday_title": "keyStyleColSeason",
+      "monday_type": "text",
+      "sql_column": "keyStyleColSeason",
+      "sql_type": "NVARCHAR(MAX)",
+      "extraction_field": "text",
+      "nullable": true,
+      "is_system_field": false,
+      "conversion_logic": null,
+      "exclude": false,
+      "custom_sql_type": null,
+      "custom_extraction_field": null
     }
   ],
   "global_defaults": {
@@ -1210,7 +1308,7 @@
   },
   "metadata": {
     "description": null,
-    "items_count": 1673,
+    "items_count": 7263,
     "discovery_version": "2.0"
   }
 }

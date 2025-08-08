@@ -68,7 +68,7 @@ BEGIN
         EXEC (N'UPDATE tgt
                  SET [CUSTOMER NAME] = map.[canonical]
                FROM ' + @tgt + ' AS tgt
-               JOIN canonical_customer_map AS map
+               JOIN map_canonical_customer AS map
                  ON map.[name] = tgt.[SOURCE_CUSTOMER_NAME]
               WHERE tgt.[CUSTOMER NAME] <> map.[canonical];');
 

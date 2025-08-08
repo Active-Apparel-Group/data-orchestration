@@ -3,6 +3,8 @@ WITH
 ou AS (
     SELECT
         [AAG ORDER NUMBER],
+        [CUSTOMER ALT PO],
+        [PO NUMBER],
         [CUSTOMER STYLE],
         [ORDER DATE PO RECEIVED],
         TRY_CAST([EX FACTORY DATE] as DATE) AS [EX FACTORY DATE],

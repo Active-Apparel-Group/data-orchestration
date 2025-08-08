@@ -1,0 +1,95 @@
+# OPUS Universal Monday.com Update Configuration
+# Generated from: board_8685586257_metadata.json
+# Generated at: 2025-08-06 21:40:12
+# Board: Factory List (8685586257)
+
+[metadata]
+board_id = 8685586257
+board_name = "Factory List"
+table_name = "MON_FactoryList"
+database = "orders"
+update_type = "batch_item_updates"
+description = "Update Factory List items with latest data"
+
+[query_config]
+# SQL query to get update data
+query = """
+# TODO: Add your SQL query here
+# SELECT
+#     [Item ID] as monday_item_id,
+#     -- Add your columns here
+# FROM your_table
+# WHERE your_conditions
+"""
+
+# Column mapping configuration
+item_id_column = "monday_item_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+# Name
+"name" = "Name"
+# FACTORY LOOKUP
+"dropdown_mks82bg4" = "FACTORY LOOKUP"
+# Factory Address
+"long_text_mkpbqfkn" = "Factory Address"
+# Factory Name (Consignee)
+"long_text_mkpbac6s" = "Factory Name (Consignee)"
+# Factory (City)
+"dropdown_mknz3hen" = "Factory (City)"
+# Factory (Province)
+"dropdown_mkpbqjar" = "Factory (Province)"
+# Country
+"country_mkp6jj5t" = "Country"
+# Phone
+"phone_mkpbf762" = "Phone"
+# Legal Entity
+"long_text_mkp77s3r" = "Legal Entity"
+# Legal Entity Address
+"long_text_mksxda8k" = "Legal Entity Address"
+# Legal Country
+"country_mkp6bbz4" = "Legal Country"
+# link COO Planning
+"board_relation_mkp6bspz" = "link COO Planning"
+# BULK PO QTY
+"lookup_mkphw77c" = "BULK PO QTY"
+# link to POs
+"board_relation_mkp6b374" = "link to POs"
+# PARTNER PO QTY
+"lookup_mkpjq84g" = "PARTNER PO QTY"
+# link to Shipments - Raw Materials
+"board_relation_mkp75k77" = "link to Shipments - Raw Materials"
+# Map_LP
+"dropdown_mkpfyc2" = "Map_LP"
+# Item ID
+"pulse_id_mkpe2az3" = "Item ID"
+# OUTSOURCED
+"dropdown_mkpvpnkv" = "OUTSOURCED"
+# PRODUCTION TYPE
+"dropdown_mkqermmz" = "PRODUCTION TYPE"
+# PAYMENT METHOD NOTES
+"long_text_mkrwdew0" = "PAYMENT METHOD NOTES"
+# PAYMENT METHOD
+"dropdown_mkrw2t05" = "PAYMENT METHOD"
+# PAYMENT TERMS
+"dropdown_mkrwksjx" = "PAYMENT TERMS"
+# CURRENCY
+"board_relation_mkrwtktq" = "CURRENCY"
+# SWIFT CODE
+"text_mksxrhj9" = "SWIFT CODE"
+# ACCOUNT NO. IBAN
+"long_text_mksxd3c9" = "ACCOUNT NO. IBAN"
+# BANK NAME
+"long_text_mksx7jrj" = "BANK NAME"
+# PAYMENT DETAILS
+"long_text_mksxd53d" = "PAYMENT DETAILS"
+# PRICING NOTES
+"long_text_mksxbgdp" = "PRICING NOTES"
+# Factory Contact
+"long_text_mksxtqkx" = "Factory Contact"
+# Shipment Terms - Import Material
+"long_text_mksyeqab" = "Shipment Terms - Import Material"
+# Shipment Terms - Export Garment
+"long_text_mksy36zv" = "Shipment Terms - Export Garment"
+# PRICING TERMS
+"dropdown_mksyheap" = "PRICING TERMS"

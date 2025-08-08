@@ -1,0 +1,21 @@
+# Monday.com Board Registry Entry
+# Generated from: board_8709134353_metadata.json
+# Generated at: 2025-08-06 20:41:49
+# Board: Planning (8709134353)
+
+# Add this section to configs/pipelines/monday_boards.toml
+# under the [boards.registry] section
+
+[boards.registry."8709134353"]
+name = "Planning"
+database_table = "MON_Planning"
+complexity_category = "large"
+optimal_batch_size = 20
+optimal_concurrency = 6
+notes = "High complexity board - 7 formula columns - large dataset (4,327 items)"
+
+# Board Analysis Statistics
+number_of_cols = 156
+number_of_formula_cols = 7
+number_of_lookup_cols = 5
+number_of_items = 4327

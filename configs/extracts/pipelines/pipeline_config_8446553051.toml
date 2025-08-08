@@ -1,0 +1,21 @@
+# Monday.com Board Registry Entry
+# Generated from: board_8446553051_metadata.json
+# Generated at: 2025-08-06 21:45:43
+# Board: Fabric Library (8446553051)
+
+# Add this section to configs/pipelines/monday_boards.toml
+# under the [boards.registry] section
+
+[boards.registry."8446553051"]
+name = "Fabric Library"
+database_table = "MON_FabricLibrary"
+complexity_category = "large"
+optimal_batch_size = 20
+optimal_concurrency = 6
+notes = "High complexity board - large dataset (3,757 items)"
+
+# Board Analysis Statistics
+number_of_cols = 47
+number_of_formula_cols = 1
+number_of_lookup_cols = 1
+number_of_items = 3757

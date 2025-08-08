@@ -1,0 +1,21 @@
+# Monday.com Board Registry Entry
+# Generated from: board_9609317401_metadata.json
+# Generated at: 2025-08-07 23:48:23
+# Board: Customer Master Schedule x (9609317401)
+
+# Add this section to configs/pipelines/monday_boards.toml
+# under the [boards.registry] section
+
+[boards.registry."9609317401"]
+name = "Customer Master Schedule x"
+database_table = "MON_CustomerMasterSchedulex"
+complexity_category = "large"
+optimal_batch_size = 20
+optimal_concurrency = 6
+notes = "High complexity board - 24 lookup/mirror columns - large dataset (7,263 items)"
+
+# Board Analysis Statistics
+number_of_cols = 92
+number_of_formula_cols = 2
+number_of_lookup_cols = 24
+number_of_items = 7263

@@ -2,11 +2,15 @@
 """
 Runner: Extract Monday.com board metadata and generate TOML config in one step.
 
-- Runs universal_board_extractor.py to extract board metadata (does NOT overwrite if file exists)
+- Runs universal_board_extractor.py to extract board metadata
 - Runs create_script_mappings.py to generate TOML config from the metadata file
+- Runs generate_pipeline_config.py to create board registry entries for monday_boards.toml
 
 Usage:
-    python board_metadata_and_toml_runner.py --board-id 9200517329 [--board-name "Customer Master Schedule"] [--table-name "MON_CustMasterSchedule"] [--database "orders"]
+    python board_metadata_and_toml_runner.py --board-id 9200517329 [--board-name "Customer Master Schedule"] [--table-name "MON_CustMasterSchedule"] [--database "orders"] [--overwrite]
+
+Options:
+    --overwrite: Force regeneration of metadata file even if it exists
 
 This script is intended to be used as a VS Code task entry point.
 """
@@ -43,14 +47,23 @@ parser.add_argument("--board-id", type=int, required=True, help="Monday.com boar
 parser.add_argument("--board-name", type=str, help="Board name (optional, for extractor)")
 parser.add_argument("--table-name", type=str, help="Table name (optional, for extractor)")
 parser.add_argument("--database", type=str, default="orders", help="Target database (default: orders)")
+parser.add_argument("--overwrite", action="store_true", help="Overwrite existing metadata file if it exists")
 args = parser.parse_args()
 
 metadata_path = BOARDS_DIR / f"board_{args.board_id}_metadata.json"
 
-# --- Step 1: Extract board metadata if not already present ---
-if metadata_path.exists():
-    logger.info(f"✅ Metadata file already exists: {metadata_path}\n  Skipping extraction.")
+# --- Step 1: Extract board metadata ---
+should_extract = args.overwrite or not metadata_path.exists()
+
+if not should_extract:
+    logger.info(f"✅ Metadata file already exists: {metadata_path}")
+    logger.info("   Use --overwrite flag to regenerate. Skipping extraction.")
 else:
+    if metadata_path.exists():
+        logger.info(f"🔄 Overwriting existing metadata file: {metadata_path}")
+    else:
+        logger.info(f"🔍 Creating new metadata file: {metadata_path}")
+    
     extractor_cmd = [
         sys.executable,
         str(CODEGEN_DIR / "universal_board_extractor.py"),
@@ -82,3 +95,26 @@ if result.returncode != 0:
     logger.info("❌ TOML generation failed.")
     sys.exit(result.returncode)
 logger.info("✅ TOML config generated.")
+
+# --- Step 3: Generate pipeline config for monday_boards.toml ---
+pipeline_cmd = [
+    sys.executable,
+    str(CODEGEN_DIR / "generate_pipeline_config.py"),
+    str(metadata_path)
+]
+logger.info(f"🔧 Generating pipeline config: {' '.join(pipeline_cmd)}")
+result = subprocess.run(pipeline_cmd)
+if result.returncode != 0:
+    logger.info("❌ Pipeline config generation failed.")
+    sys.exit(result.returncode)
+logger.info("✅ Pipeline config generated.")
+
+logger.info(f"\n🎉 Board configuration complete for {args.board_id}!")
+logger.info("📋 Generated files:")
+logger.info(f"  • Metadata: {metadata_path}")
+logger.info(f"  • TOML config: (check configs/extracts/ directory)")
+logger.info(f"  • Pipeline config: configs/extracts/pipelines/pipeline_config_{args.board_id}.toml")
+logger.info("\n💡 Next steps:")
+logger.info("  1. Review the pipeline config file")
+logger.info("  2. Add the board registry entry to configs/pipelines/monday_boards.toml")
+logger.info("  3. Test with load_boards_async.py for optimal settings")

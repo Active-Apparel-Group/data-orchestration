@@ -1,0 +1,15 @@
+query getManagedColumns{
+  managed_column {
+    id
+    title
+    settings {
+      ... on DropdownColumnSettings {
+        labels {
+          id
+          label
+          is_deactivated
+        }
+      }
+    }
+  }
+}

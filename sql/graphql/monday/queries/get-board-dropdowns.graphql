@@ -1,0 +1,11 @@
+query GetBoardDropdowns($boardId: ID!) {
+  boards(ids: [$boardId]) {
+    id
+    name
+    columns(types: [dropdown]) {
+      id
+      title
+      settings_str
+    }
+  }
+}

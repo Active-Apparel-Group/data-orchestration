@@ -1,6 +1,7 @@
 # Tasks Index
 
 ## In Progress
+- [TASK036](TASK036-react-web-interface.md) React Web Interface for Monday.com Data Upload - **PHASE 1 COMPLETE** Revolutionary user experience with FastAPI backend + React frontend foundation (65%+ complete)
 - [TASK030](TASK030-fix-sync-reporting-status-calculations.md) Fix Sync Reporting Status Calculations - **IN PROGRESS** Critical sync status and executive summary calculation fixes for production accuracy
 - [TASK026](TASK026-performance-optimization.md) Performance Optimization for Large-Scale Production - **PHASE 2** Critical fixes complete, implementing default batch mode (90% complete)
 - [TASK025](TASK025-async-batch-item-creation.md) Async Batch Item Creation - **IN PROGRESS** Enterprise rate-limited async batch items for 5-10x performance improvement
@@ -8,10 +9,15 @@
 - [TASK020](TASK020%20-%20Implement%20Change%20Detection%20Logic.md) Implement Change Detection Logic - **PLANNING** Comprehensive technical architecture documented
 
 ## Pending
+- [TASK037](TASK037-integrate-mondayconfig-into-sync-order-list-pipeline.md) Integrate MondayConfig Into Sync Order List Pipeline (Rate Limits + CLI) - PENDING
+- [TASK035](TASK035-universal-data-loader.md) Universal Data Loader Script - **PENDING** Configurable data loading pipeline based on ORDER_LIST architecture for reusable blob→staging→target workflows
 - [TASK027](TASK027-sync-reporting-logging-enhancement.md) Sync Reporting & Logging Enhancement - **PHASE 3 PENDING** Phases 1-2 complete (sync organization, customer reports, executive summaries), structured logging Phase 3 remaining
 - [TASK025-old](TASK025-production-group-distribution-testing.md) Production Group Distribution Testing - **DEFERRED** Validate group distribution (superseded by TASK024 performance focus)
 
 ## Completed
+- [TASK033](TASK033-monday-rate-limit-management.md) Monday.com Rate Limit Management & Centralized Configuration - **COMPLETED** on 2025-08-07 - ✅ Complete MondayConfig system across ALL scripts (ingestion + updates) with intelligent rate limiting
+- [TASK034](TASK034-monday-dropdown-values-extraction.md) Monday.com Dropdown Values Extraction System - **COMPLETED** on 2025-08-07 - ✅ Enterprise optimizations complete: MERGE/UPSERT 10-100x performance, migration-based table creation, MON_Dropdown_Values naming, comprehensive runbook
+- [TASK032](TASK032-async-batch-board-loader.md) Async Batch Monday.com Board Loader - **COMPLETED** on 2025-08-06 - ✅ 1,088% performance improvement (145 vs 12.2 items/sec) with 100% success rate
 - [TASK031](TASK031-externalize-sql-queries.md) Externalize SQL Queries in Update Configs and Refactor Update Scripts - **COMPLETED** on 2025-08-06 - TOML/SQL file mapping and script fallback logic
 - [TASK029](TASK029-sync-engine-enhancement.md) Sync Engine Enhancement Session - **COMPLETED** on 2025-08-02 - ✅ JSONB cleanup, sync status fixes, group creation architecture, executive summary enhancements
 - [TASK028](TASK028-per-customer-group-creation-architecture.md) Per-Customer Group Creation Architecture - **COMPLETED** on 2025-08-02 - ✅ Customer isolation, sequential processing, and group tracking implemented

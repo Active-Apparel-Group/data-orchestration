@@ -1,0 +1,21 @@
+# Monday.com Board Registry Entry
+# Generated from: board_8738178586_metadata.json
+# Generated at: 2025-08-06 21:46:46
+# Board: Partner Purchase Orders (8738178586)
+
+# Add this section to configs/pipelines/monday_boards.toml
+# under the [boards.registry] section
+
+[boards.registry."8738178586"]
+name = "Partner Purchase Orders"
+database_table = "MON_PartnerPurchaseOrders"
+complexity_category = "large"
+optimal_batch_size = 20
+optimal_concurrency = 6
+notes = "High complexity board - 11 lookup/mirror columns"
+
+# Board Analysis Statistics
+number_of_cols = 39
+number_of_formula_cols = 3
+number_of_lookup_cols = 11
+number_of_items = 84

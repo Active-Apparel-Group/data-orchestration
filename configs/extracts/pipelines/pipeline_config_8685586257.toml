@@ -1,0 +1,21 @@
+# Monday.com Board Registry Entry
+# Generated from: board_8685586257_metadata.json
+# Generated at: 2025-08-06 21:41:07
+# Board: Factory List (8685586257)
+
+# Add this section to configs/pipelines/monday_boards.toml
+# under the [boards.registry] section
+
+[boards.registry."8685586257"]
+name = "Factory List"
+database_table = "MON_Factory_List"
+complexity_category = "small"
+optimal_batch_size = 25
+optimal_concurrency = 12
+notes = "Simple board"
+
+# Board Analysis Statistics
+number_of_cols = 24
+number_of_formula_cols = 0
+number_of_lookup_cols = 2
+number_of_items = 36

@@ -12,7 +12,7 @@ CREATE TABLE [dbo].[ORDER_LIST] (
     [AAG ORDER NUMBER] NVARCHAR(100) NULL,  -- Coverage: 100.0%
     [CUSTOMER NAME] NVARCHAR(100) NULL,  -- Coverage: 100.0% (CANONICAL CUSTOMER NAME)
     [SOURCE_CUSTOMER_NAME] NVARCHAR(100) NULL,  -- Original customer name from source files
-    [ORDER DATE PO RECEIVED] DATETIME2 NULL,   -- Coverage: 100.0%
+    [ORDER DATE PO RECEIVED] DATE NULL,   -- Coverage: 100.0%
     [PO NUMBER] NVARCHAR(255) NULL,  -- Coverage: 100.0%
     [CUSTOMER ALT PO] NVARCHAR(255) NULL,  -- Coverage: 100.0%
     [AAG SEASON] NVARCHAR(255) NULL,  -- Coverage: 100.0%
@@ -331,8 +331,8 @@ CREATE TABLE [dbo].[ORDER_LIST] (
     [SHOP NAME] NVARCHAR(255) NULL,  -- Coverage: 100.0%
     [SHOP CODE] NVARCHAR(255) NULL,  -- Coverage: 100.0%
     [COLLECTION DELIVERY] NVARCHAR(255) NULL,  -- Coverage: 100.0%
-    [ETA CUSTOMER WAREHOUSE DATE] DATETIME2 NULL,  -- Coverage: 100.0%, CHANGED from nvarchar
-    [EX FACTORY DATE] DATETIME2 NULL,  -- Coverage: 100.0%, CHANGED from nvarchar
+    [ETA CUSTOMER WAREHOUSE DATE] DATE NULL,  -- Coverage: 100.0%, CHANGED from nvarchar
+    [EX FACTORY DATE] DATE NULL,  -- Coverage: 100.0%, CHANGED from nvarchar
     [DELIVERY TERMS] NVARCHAR(255) NULL,  -- Coverage: 100.0%
     [PLANNED DELIVERY METHOD] NVARCHAR(100) NULL,  -- Coverage: 100.0%
     [NOTES] NVARCHAR(1000) NULL,  -- Coverage: 100.0%

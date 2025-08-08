@@ -131,15 +131,19 @@ WHERE
         WHERE [AAG ORDER NUMBER] IN (
             SELECT [AAG ORDER NUMBER] 
             FROM MON_COO_Planning
-            WHERE [AAG ORDER NUMBER] IS NOT NULL
+            WHERE [AAG ORDER NUMBER] IS NOT NULL 
         )
         AND [PO NUMBER] IS NOT NULL
-    ));
+    )
+    );
 
+-- check orders not yet merged
+select [CUSTOMER NAME], [ORDER DATE PO RECEIVED], count(*)
+from swp_ORDER_LIST_SYNC where [AAG ORDER NUMBER] not in (Select [AAG ORDER NUMBER] from 
+    FACT_ORDER_LIST)
+    group by [CUSTOMER NAME], [ORDER DATE PO RECEIVED]
+    order by 1, 2
 
-
-
-Select * from ORDER_LIST where [AAG ORDER NUMBER] = 'JOO-00579'
 
 DELETE from swp_ORDER_LIST_SYNC
 where NOT ([CUSTOMER NAME] like 'GREYSON%' AND [PO NUMBER] = '4755') or [CUSTOMER NAME] is null
@@ -160,6 +164,9 @@ where NOT ([CUSTOMER NAME] like 'GREYSON%' AND [PO NUMBER] = '4755') or [CUSTOME
     WHERE [record_uuid] IN (SELECT [record_uuid] FROM #ToDelete);
 
     Drop Table #ToDelete;
+
+UPDATE swp_ORDER_LIST_SYNC
+        SET [ORDER TYPE] = UPPER([ORDER TYPE])
 
 -- update status so records will sync
     UPDATE swp_ORDER_LIST_SYNC
@@ -281,7 +288,7 @@ size_code -- only for lines
 [LAST_MODIFIED] >= '2025-07-21 11:00:15' -- not required
 [LINE NUMBER],  -- what it this!
 
-
+Select count(*) from MON_Fabric_Library
 
 SELECT COLUMN_NAME 
 FROM INFORMATION_SCHEMA.COLUMNS 

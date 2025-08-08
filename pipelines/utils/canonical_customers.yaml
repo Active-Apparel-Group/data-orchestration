@@ -896,6 +896,7 @@ customers:
   mon_customer_ms: ''
   aliases:
   - TAYLOR MADE
+  - TAYLORMADE
   order_key_config:
     unique_keys:
     - AAG ORDER NUMBER

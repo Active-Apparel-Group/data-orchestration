@@ -1,0 +1,213 @@
+# OPUS Universal Monday.com Update Configuration
+# Generated from: board_9609317401_metadata.json
+# Generated at: 2025-08-07 23:48:22
+# Board: Customer Master Schedule x (9609317401)
+
+[metadata]
+board_id = 9609317401
+board_name = "Customer Master Schedule x"
+table_name = "MON_CustomerMasterSchedulex"
+database = "orders"
+update_type = "batch_item_updates"
+description = "Update Customer Master Schedule x items with latest data"
+
+[query_config]
+# SQL query to get update data
+query = """
+# TODO: Add your SQL query here
+# SELECT
+#     [Item ID] as monday_item_id,
+#     -- Add your columns here
+# FROM your_table
+# WHERE your_conditions
+"""
+
+# Column mapping configuration
+item_id_column = "monday_item_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+# Name
+"name" = "Name"
+# Subitems
+"subtasks_mkr5c0kp" = "Subitems"
+# ORDER TYPE
+"dropdown_mkr518fc" = "ORDER TYPE"
+# QTY ORDERED
+"lookup_mkrbrdr1" = "QTY ORDERED"
+# QTY PACKED
+"lookup_mkrdm6xp" = "QTY PACKED"
+# QTY SHIPPED
+"lookup_mkrds06t" = "QTY SHIPPED"
+# CUSTOMER
+"dropdown_mkr542p2" = "CUSTOMER"
+# AAG ORDER NUMBER
+"text_mkr5wya6" = "AAG ORDER NUMBER"
+# AAG SEASON
+"dropdown_mkr58de6" = "AAG SEASON"
+# CUSTOMER SEASON
+"dropdown_mkr5rgs6" = "CUSTOMER SEASON"
+# SEASON NAME
+"text_mktk9z4p" = "SEASON NAME"
+# SEASON AND YEAR
+"text_mktk9281" = "SEASON AND YEAR"
+# BUDGET SEASON
+"text_mktkv9ke" = "BUDGET SEASON"
+# ORDER DATE PO RECEIVED
+"date_mkr5zp5" = "ORDER DATE PO RECEIVED"
+# DROP
+"dropdown_mkr5w5e" = "DROP"
+# PO NUMBER
+"text_mkr5ej2x" = "PO NUMBER"
+# CUSTOMER ALT PO
+"text_mkrh94rx" = "CUSTOMER ALT PO"
+# STYLE
+"text_mktdechp" = "STYLE"
+# PATTERN ID
+"text_mkr5cz8m" = "PATTERN ID"
+# ALIAS RELATED ITEM
+"text_mkrhra2c" = "ALIAS RELATED ITEM"
+# STYLE DESCRIPTION
+"long_text_mkr5p0cf" = "STYLE DESCRIPTION"
+# COLOR
+"long_text_mktdy7re" = "COLOR"
+# CATEGORY
+"dropdown_mkr5s5n3" = "CATEGORY"
+# UNIT OF MEASURE
+"color_mkr5yf27" = "UNIT OF MEASURE"
+# DESTINATION
+"text_mkr5kbc6" = "DESTINATION"
+# DESTINATION WAREHOUSE
+"text_mkr5ps35" = "DESTINATION WAREHOUSE"
+# CUSTOMER REQ IN DC DATE
+"date_mkr554yz" = "CUSTOMER REQ IN DC DATE"
+# CUSTOMER EX FACTORY DATE
+"date_mkr57811" = "CUSTOMER EX FACTORY DATE"
+# DELIVERY TERMS
+"dropdown_mkr5kk5" = "DELIVERY TERMS"
+# PLANNED DELIVERY METHOD
+"text_mkr5wcpw" = "PLANNED DELIVERY METHOD"
+# NOTES
+"long_text_mkr5hass" = "NOTES"
+# CUSTOMER PRICE
+"numeric_mkr5cact" = "CUSTOMER PRICE"
+# USA ONLY LSTP 75% EX WORKS
+"numeric_mkr5yne4" = "USA ONLY LSTP 75% EX WORKS"
+# EX WORKS (USD)
+"numeric_mkr5erhv" = "EX WORKS (USD)"
+# ADMINISTRATION FEE
+"numeric_mkr5k68" = "ADMINISTRATION FEE"
+# DESIGN FEE
+"numeric_mkr5h612" = "DESIGN FEE"
+# FX CHARGE
+"numeric_mkr5gp6a" = "FX CHARGE"
+# HANDLING
+"text_mkr5s3tm" = "HANDLING"
+# SURCHARGE FEE
+"numeric_mkr57cem" = "SURCHARGE FEE"
+# DISCOUNT
+"numeric_mkr56xx8" = "DISCOUNT"
+# FINAL FOB (USD)
+"numeric_mkr5nhr7" = "FINAL FOB (USD)"
+# HS CODE
+"long_text_mktdz0g" = "HS CODE"
+# US DUTY RATE
+"numeric_mkr5r6at" = "US DUTY RATE"
+# US DUTY
+"numeric_mkr5ev2q" = "US DUTY"
+# FREIGHT
+"numeric_mksfr0r2" = "FREIGHT"
+# US TARIFF RATE
+"numeric_mkr55zg1" = "US TARIFF RATE"
+# US TARIFF
+"numeric_mkr51ndy" = "US TARIFF"
+# DDP US (USD)
+"numeric_mkr5js0x" = "DDP US (USD)"
+# SMS PRICE USD
+"numeric_mkr58nvp" = "SMS PRICE USD"
+# FINAL PRICES Y/N
+"text_mkr5ptvg" = "FINAL PRICES Y/N"
+# NOTES FOR PRICE
+"long_text_mkr5znxn" = "NOTES FOR PRICE"
+# Item ID
+"pulse_id_mkr5pb5q" = "Item ID"
+# matchAlias
+"text_mkr61hpz" = "matchAlias"
+# PLANNING BOARD
+"board_relation_mkr5cer8" = "PLANNING BOARD"
+# RM Progress Tracking
+"lookup_mktg5pe" = "RM Progress Tracking"
+# PARTNER ALLOCATION
+"lookup_mktgn2fq" = "PARTNER ALLOCATION"
+# EX-FTY (Change Request)
+"lookup_mkr6113x" = "EX-FTY (Change Request)"
+# REQUESTED XFD STATUS
+"lookup_mkr6eatd" = "REQUESTED XFD STATUS"
+# EX-FTY (Forecast)
+"lookup_mkr6bhyv" = "EX-FTY (Forecast)"
+# EX-FTY (Partner PO)
+"lookup_mkr640ap" = "EX-FTY (Partner PO)"
+# EX-FTY (Revised LS)
+"lookup_mkr5nd5t" = "EX-FTY (Revised LS)"
+# PRODUCTION TYPE
+"lookup_mkr5j8kx" = "PRODUCTION TYPE"
+# AQL INSPECTION
+"lookup_mkr51rn0" = "AQL INSPECTION"
+# AQL TYPE
+"lookup_mkr5jem9" = "AQL TYPE"
+# PLANNED CUT DATE
+"lookup_mkr5bnt8" = "PLANNED CUT DATE"
+# MO NUMBER
+"lookup_mkr5ew17" = "MO NUMBER"
+# PRODUCTION STATUS
+"lookup_mkr5aapc" = "PRODUCTION STATUS"
+# FACTORY COUNTRY
+"lookup_mkr5yabx" = "FACTORY COUNTRY"
+# FACTORY
+"lookup_mkr55sr9" = "FACTORY"
+# ALLOCATION STATUS
+"lookup_mkr5hhjy" = "ALLOCATION STATUS"
+# PRODUCTION QTY
+"lookup_mkr5fkj1" = "PRODUCTION QTY"
+# TRIM ETA DATE
+"lookup_mkr53kbm" = "TRIM ETA DATE"
+# FABRIC ETA DATE
+"lookup_mkr5vk6m" = "FABRIC ETA DATE"
+# TRIM STATUS
+"lookup_mkr52fpd" = "TRIM STATUS"
+# FABRIC STATUS
+"lookup_mkr5k4yj" = "FABRIC STATUS"
+# ORDER STATUS
+"color_mkr5j5pp" = "ORDER STATUS"
+# FCST QTY
+"numeric_mkrb56rj" = "FCST QTY"
+# FCST CONSUMED QTY
+"numeric_mkrbty8b" = "FCST CONSUMED QTY"
+# Net Demand
+"formula_mkrb53jx" = "Net Demand"
+# REVENUE (FOB)
+"formula_mkrd937j" = "REVENUE (FOB)"
+# ADD TO PLANNING
+"color_mkrerxrs" = "ADD TO PLANNING"
+# PPS CMT DUE
+"date_mkrvx550" = "PPS CMT DUE"
+# PPS CMT RCV
+"date_mkrvpbcr" = "PPS CMT RCV"
+# PPS STATUS
+"color_mkrvzryf" = "PPS STATUS"
+# RANGE / COLLECTION
+"long_text_mks0vs1p" = "RANGE / COLLECTION"
+# Last updated
+"pulse_updated_mks8qpqh" = "Last updated"
+# ORDER QTY
+"numeric_mktb1d19" = "ORDER QTY"
+# PACKED QTY
+"numeric_mktb14eh" = "PACKED QTY"
+# SHIPPED QTY
+"numeric_mktb1k33" = "SHIPPED QTY"
+# CUSTOMER COLOR CODE
+"long_text_mktdjzcg" = "CUSTOMER COLOR CODE"
+# keyStyleColPO
+"text_mktfwty8" = "keyStyleColPO"
+# keyStyleColSeason
+"text_mktfbwhj" = "keyStyleColSeason"

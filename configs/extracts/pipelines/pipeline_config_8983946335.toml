@@ -1,0 +1,21 @@
+# Monday.com Board Registry Entry
+# Generated from: board_8983946335_metadata.json
+# Generated at: 2025-08-06 21:43:07
+# Board: Customers (8983946335)
+
+# Add this section to configs/pipelines/monday_boards.toml
+# under the [boards.registry] section
+
+[boards.registry."8983946335"]
+name = "Customers"
+database_table = "MON_Customers"
+complexity_category = "small"
+optimal_batch_size = 25
+optimal_concurrency = 12
+notes = "Simple board"
+
+# Board Analysis Statistics
+number_of_cols = 14
+number_of_formula_cols = 0
+number_of_lookup_cols = 0
+number_of_items = 36

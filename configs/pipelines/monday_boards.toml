@@ -1,0 +1,204 @@
+# Monday.com Boards & API Configuration
+# =====================================
+# Centralized configuration for all Monday.com operations across ingestion and update scripts
+# Manages rate limiting, error handling, and performance optimization
+
+# API CONFIGURATION
+# =================
+[api]
+base_url = "https://api.monday.com/v2"
+api_version = "2025-04"
+timeout_seconds = 60
+max_retries = 5
+
+# GLOBAL RATE LIMITING - Based on Monday.com documented limits
+# ============================================================
+[rate_limits]
+# Overall API limits (Monday.com documented)
+requests_per_minute = 500              # Monday.com overall API limit
+complexity_per_minute = 1000000        # GraphQL complexity budget per minute
+
+# Field-specific limits (discovered through testing)
+field_rate_limit_buffer = 1.2          # 20% buffer for field-specific limits
+display_value_requests_per_minute = 100 # Conservative estimate for display_value field
+
+# RETRY CONFIGURATION - Enhanced Monday.com error handling
+# ========================================================
+[retry]
+# Standard retry settings
+base_delay_seconds = 1.0               # Base delay between retries
+max_delay_seconds = 60.0               # Maximum delay cap
+exponential_backoff_multiplier = 2.0   # Exponential backoff factor
+jitter_factor = 0.1                   # Random jitter to prevent thundering herd
+
+# Monday.com specific retry settings
+respect_retry_in_seconds = true        # Always respect Monday.com retry_in_seconds
+retry_in_seconds_buffer = 2.0          # Add 2 seconds buffer to Monday.com suggested delay
+max_retry_in_seconds = 300             # Cap retry delays at 5 minutes
+
+# Error codes that trigger specific retry behavior
+field_rate_limit_codes = [
+    "FIELD_MINUTE_RATE_LIMIT_EXCEEDED",
+    "RATE_LIMIT_EXCEEDED"
+]
+
+# PERFORMANCE OPTIMIZATION - Based on testing results
+# ===================================================
+[performance]
+# Optimal settings discovered through testing
+optimal_batch_size = 25               # Monday.com complexity limit for detailed queries
+optimal_concurrency_ingestion = 8     # Balanced performance for load operations
+optimal_concurrency_updates = 5       # Conservative for update operations
+
+# Dynamic performance adjustment
+enable_dynamic_adjustment = true      # Automatically adjust based on rate limits
+min_batch_size = 10                   # Minimum batch size
+max_batch_size = 100                  # Maximum batch size (API limit)
+min_concurrency = 1                   # Minimum concurrency
+max_concurrency = 20                  # Maximum concurrency
+
+# Performance monitoring
+track_requests_per_minute = true      # Monitor actual request rate
+track_success_rate = true             # Monitor operation success rate
+adjust_on_failure_rate = 0.05         # Adjust settings if >5% failure rate
+
+# BOARD-SPECIFIC CONFIGURATION - Optimized settings per board
+# ===========================================================
+
+# Large boards (3000+ items) - Conservative settings
+[boards.large]
+batch_size = 20                       # Smaller batches for complex boards
+max_concurrency = 6                   # Lower concurrency to avoid rate limits
+delay_between_batches = 1.0           # Mandatory delay between batches
+complexity_threshold = 3000           # Items count that triggers large board settings
+
+# Medium boards (500-3000 items) - Balanced settings  
+[boards.medium]
+batch_size = 25                       # Standard optimal batch size
+max_concurrency = 8                   # Standard optimal concurrency
+delay_between_batches = 0.5           # Minimal delay
+complexity_threshold = 500            # Items count that triggers medium board settings
+
+# Small boards (<500 items) - Aggressive settings
+[boards.small]
+batch_size = 25                       # Standard batch size (complexity limited)
+max_concurrency = 12                  # Higher concurrency for small boards
+delay_between_batches = 0.1           # Minimal delay
+complexity_threshold = 0              # Default for all boards
+
+# OPERATION-SPECIFIC CONFIGURATION
+# ================================
+
+# Ingestion operations (load_boards_async.py, load_boards.py)
+[operations.ingestion]
+default_batch_size = 25
+default_concurrency = 8
+enable_harvest_optimization = true    # Use two-phase extraction
+harvest_page_size = 500               # IDs per harvest page
+detail_fetch_timeout = 120            # Extended timeout for detail fetches
+
+# Update operations (update_boards.py, update_boards_async_batch.py)
+[operations.updates]
+default_batch_size = 15               # Conservative for updates
+default_concurrency = 5               # Lower concurrency for updates
+enable_batch_updates = true           # Use batch update operations
+update_timeout = 60                   # Timeout for update operations
+validate_before_update = true         # Validate data before updates
+
+# Sync operations (sync engine)
+[operations.sync]
+default_batch_size = 10               # Conservative for sync operations
+default_concurrency = 3               # Very conservative for sync
+group_creation_delay = 2.0            # Delay between group creations
+item_creation_delay = 1.0             # Delay between item creations
+
+# BOARD REGISTRY - Known boards with optimal settings
+# ===================================================
+
+# Fabric Library (Large board - 3,757 items)
+[boards.registry."8446553051"]
+name = "Fabric Library"
+database_table = "MON_Fabric_Library"
+complexity_category = "large"
+optimal_batch_size = 20
+optimal_concurrency = 6
+notes = "High complexity board - large dataset (3,756 items)"
+
+[boards.registry."8685586257"]
+name = "Factory List"
+database_table = "MON_Factory_List"
+complexity_category = "small"
+optimal_batch_size = 25
+optimal_concurrency = 12
+notes = "Simple board"
+
+# Customer Master Schedule (Large board)
+[boards.registry."8709134353"]
+name = "Planning"
+database_table = "MON_Planning"
+complexity_category = "large"
+optimal_batch_size = 20
+optimal_concurrency = 6
+notes = "High complexity board - 7 formula columns - large dataset (4,327 items)"
+
+[boards.registry."9609317401"]
+name = "Customer Master Schedule"
+database_table = "MON_CustomerMasterSchedule"
+complexity_category = "large"
+optimal_batch_size = 20
+optimal_concurrency = 10
+notes = "High complexity board - 22 lookup/mirror columns"
+
+# Planning Board (Production)
+[boards.registry."9200517329"]
+name = "Customer Master Schedule"
+database_table = "MON_CustMasterSchedule"
+complexity_category = "large"
+optimal_batch_size = 20
+optimal_concurrency = 6
+notes = "High complexity board - 22 lookup/mirror columns"
+
+[boards.registry."8983946335"]
+name = "Customers"
+database_table = "MON_Customers"
+complexity_category = "small"
+optimal_batch_size = 25
+optimal_concurrency = 12
+notes = "Simple board"
+
+[boards.registry."8738178586"]
+name = "Partner Purchase Orders"
+database_table = "MON_PartnerPurchaseOrders"
+complexity_category = "large"
+optimal_batch_size = 20
+optimal_concurrency = 6
+notes = "High complexity board - 11 lookup/mirror columns"
+
+# MONITORING AND LOGGING
+# ======================
+[monitoring]
+enable_performance_logging = true     # Log performance metrics
+enable_rate_limit_tracking = true     # Track rate limit encounters
+enable_error_classification = true    # Classify and count error types
+log_successful_operations = true      # Log successful operations for analysis
+
+# Performance alerts
+alert_on_high_failure_rate = true     # Alert when failure rate > 10%
+alert_on_rate_limits = true           # Alert when hitting rate limits
+alert_threshold_failure_rate = 0.10   # 10% failure rate threshold
+
+# ENVIRONMENT-SPECIFIC OVERRIDES
+# ==============================
+
+[environments.development]
+# More aggressive settings for development
+default_concurrency_multiplier = 1.5  # 50% higher concurrency
+enable_debug_logging = true           # Verbose logging
+simulate_rate_limits = false          # Don't simulate rate limits
+
+[environments.production]
+# Conservative settings for production
+default_concurrency_multiplier = 0.8  # 20% lower concurrency  
+enable_debug_logging = false          # Minimal logging
+respect_all_rate_limits = true        # Strict rate limit compliance
+enable_circuit_breaker = true         # Circuit breaker for protection

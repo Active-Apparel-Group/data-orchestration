@@ -1,7 +1,7 @@
 {
   "board_id": 8446553051,
   "board_name": "Fabric Library",
-  "table_name": "MON_FabricLibrary",
+  "table_name": "MON_Fabric_Library",
   "database": "orders",
   "discovered_at": "2025-07-18T20:32:09.442147",
   "item_terminology": {

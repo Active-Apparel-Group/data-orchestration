@@ -11,7 +11,7 @@ WITH AccountManagerCTE AS (
         ('Natalie James', '72091244', 'GREYSON'),
         ('Etienne Ong', '56977858', 'JOHNNIE O'),
         ('Viviana Garcia', '60873682', 'LAMBS'),
-        ('Natalie James', '65324767', 'MACK WELDON'),
+        ('Natalie James', '72091244', 'MACK WELDON'),
         ('Jennifer Nyberg', '50432816', 'PELOTON'),
         ('Etienne Ong', '56977858', 'RHONE'),
         ('Viviana Garcia', '60873682', 'SOULCYCLE'),
@@ -28,3 +28,4 @@ SELECT
     cte.AMID as [Account Manager]
 FROM MON_COO_Planning p
 JOIN AccountManagerCTE cte ON p.CUSTOMER = cte.Customer
+WHERE cte.Customer = 'MACK WELDON'

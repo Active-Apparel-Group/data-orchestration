@@ -52,6 +52,10 @@ import db_helper as db
 import logger_helper
 from country_mapper import format_country_for_monday
 
+# Import Monday.com configuration system
+sys.path.insert(0, str(repo_root / "src"))
+from pipelines.utils.monday_config import MondayConfig
+
 class AsyncBatchMondayUpdater:
     def load_query_from_config(self, query_config: dict) -> str:
         """
@@ -88,12 +92,27 @@ class AsyncBatchMondayUpdater:
     def __init__(self, config_file: str = None, max_concurrent_batches: int = 3):
         self.logger = logger_helper.get_logger(__name__)
         self.config = db.load_config()
+        
+        # Initialize Monday.com configuration system
+        self.monday_config = MondayConfig()
+        
+        # Override max_concurrent_batches if not provided or use MondayConfig defaults
+        if max_concurrent_batches == 3:  # Default value, check if we should use MondayConfig
+            if config_file:
+                # Try to determine board_id from config for optimal concurrency
+                with open(config_file, 'rb') as f:
+                    temp_config = tomli.load(f)
+                board_id = None
+                if 'metadata' in temp_config and 'board_id' in temp_config['metadata']:
+                    board_id = str(temp_config['metadata']['board_id'])
+                max_concurrent_batches = self.monday_config.get_optimal_concurrency(board_id=board_id, operation="updates")
+        
         self.max_concurrent_batches = max_concurrent_batches
         
-        # Monday.com API configuration
-        self.api_url = self.config['monday']['api_url']
+        # Monday.com API configuration from MondayConfig
+        self.api_url = self.monday_config.get_api_url()
         self.api_key = self.config['monday']['api_key']
-        self.api_version = self.config['monday']['api_version']
+        self.api_version = self.monday_config.get_api_version()
         
         # HTTP headers for Monday.com API
         self.headers = {
@@ -102,11 +121,11 @@ class AsyncBatchMondayUpdater:
             'Content-Type': 'application/json'
         }
         
-        # Batch configuration with fallback strategy
-        self.initial_batch_size = 15  # Start with moderate size
+        # Get batch configuration from MondayConfig (will be overridden per board)
+        self.initial_batch_size = 15  # Default, will be optimized per board
         self.fallback_batch_sizes = [5, 1]  # Fallback to smaller sizes on timeout
-        self.batch_delay = 0.1  # 100ms between batches
-        self.request_timeout = 25  # 25 seconds to avoid 30s timeout
+        self.batch_delay = 0.1  # Default, will be optimized per board
+        self.request_timeout = self.monday_config.get_timeout()
         
         # Load update configuration
         if config_file:
@@ -115,7 +134,7 @@ class AsyncBatchMondayUpdater:
         else:
             self.update_config = {}
             
-        self.logger.info(f"AsyncBatchMondayUpdater initialized - Max concurrent batches: {max_concurrent_batches}")
+        self.logger.info(f"AsyncBatchMondayUpdater initialized with MondayConfig - Max concurrent batches: {max_concurrent_batches}")
     
     def format_country_value(self, country_name: str) -> dict:
         """Format country value for Monday.com country column type"""
@@ -155,37 +174,66 @@ class AsyncBatchMondayUpdater:
         return str(value)
     
     async def execute_graphql_async(self, session: aiohttp.ClientSession, query: str, variables: dict = None) -> dict:
-        """Execute GraphQL query against Monday.com API asynchronously"""
+        """Execute GraphQL query against Monday.com API asynchronously with MondayConfig retry logic"""
         
         payload = {'query': query}
         if variables:
             payload['variables'] = variables
         
-        try:
-            async with session.post(
-                self.api_url,
-                headers=self.headers,
-                json=payload,
-                timeout=aiohttp.ClientTimeout(total=self.request_timeout),
-                ssl=False
-            ) as response:
-                
-                if response.status != 200:
-                    error_text = await response.text()
-                    raise Exception(f"API request failed: {response.status} - {error_text}")
-                
-                result = await response.json()
-                
-                if 'errors' in result and result['errors']:
-                    raise Exception(f"GraphQL errors: {result['errors']}")
-                
-                return result
-                
-        except asyncio.TimeoutError:
-            raise Exception("Request timeout - batch may be too large")
-        except Exception as e:
-            self.logger.error(f"ERROR: GraphQL execution failed: {e}")
-            raise
+        # Get retry settings from MondayConfig
+        retry_settings = self.monday_config.get_retry_settings()
+        
+        for attempt in range(retry_settings.max_retries):
+            try:
+                async with session.post(
+                    self.api_url,
+                    headers=self.headers,
+                    json=payload,
+                    timeout=aiohttp.ClientTimeout(total=self.request_timeout),
+                    ssl=False
+                ) as response:
+                    
+                    if response.status != 200:
+                        error_text = await response.text()
+                        raise Exception(f"API request failed: {response.status} - {error_text}")
+                    
+                    result = await response.json()
+                    
+                    if 'errors' in result and result['errors']:
+                        # Check for Monday.com rate limit errors
+                        if self.monday_config.is_rate_limit_error(result):
+                            retry_delay = self.monday_config.get_retry_delay(result)
+                            self.logger.warning(f"MONDAY RATE LIMIT: retry_in_seconds={retry_delay:.1f}s (attempt {attempt + 1}/{retry_settings.max_retries})")
+                            await asyncio.sleep(retry_delay)
+                            continue
+                        else:
+                            raise Exception(f"GraphQL errors: {result['errors']}")
+                    
+                    return result
+                    
+            except asyncio.TimeoutError:
+                if attempt == retry_settings.max_retries - 1:
+                    raise Exception("Request timeout - batch may be too large")
+                else:
+                    # Calculate exponential backoff delay for timeout
+                    delay = min(
+                        retry_settings.base_delay * (retry_settings.exponential_multiplier ** attempt),
+                        retry_settings.max_delay
+                    )
+                    self.logger.warning(f"Timeout retry in {delay:.1f}s (attempt {attempt + 1}/{retry_settings.max_retries})")
+                    await asyncio.sleep(delay)
+            except Exception as e:
+                if attempt == retry_settings.max_retries - 1:
+                    self.logger.error(f"ERROR: GraphQL execution failed after {retry_settings.max_retries} attempts: {e}")
+                    raise
+                else:
+                    # Calculate exponential backoff delay
+                    delay = min(
+                        retry_settings.base_delay * (retry_settings.exponential_multiplier ** attempt),
+                        retry_settings.max_delay
+                    )
+                    self.logger.warning(f"Retrying in {delay:.1f}s (attempt {attempt + 1}/{retry_settings.max_retries})")
+                    await asyncio.sleep(delay)
     
     def build_batch_mutation(self, batch_updates: List[dict]) -> tuple:
         """Build GraphQL batch mutation with variables"""
@@ -480,6 +528,21 @@ class AsyncBatchMondayUpdater:
             
             self.logger.info(f"Processing {len(df)} records for async batch update")
             
+            # Get board_id for MondayConfig optimization
+            board_id = None
+            if 'metadata' in update_config and 'board_id' in update_config['metadata']:
+                board_id = str(update_config['metadata']['board_id'])
+            
+            # Use MondayConfig for optimal settings
+            optimal_batch_size = self.monday_config.get_optimal_batch_size(board_id=board_id, operation="updates")
+            rate_limits = self.monday_config.get_rate_limits()
+            
+            # Update instance settings with optimal values
+            self.initial_batch_size = optimal_batch_size
+            self.batch_delay = rate_limits.delay_between_batches
+            
+            self.logger.info(f"Using MondayConfig settings - batch_size: {optimal_batch_size}, delay: {self.batch_delay}s, concurrency: {self.max_concurrent_batches}")
+            
             # Prepare all batch updates
             all_batch_updates = self.prepare_batch_updates(df)
             
@@ -586,9 +649,9 @@ class AsyncBatchMondayUpdater:
                         total_success += result['success_count']
                         total_errors += result['error_count']
                 
-                # Delay between batch groups to respect rate limiting
+                # Delay between batch groups to respect rate limiting using MondayConfig
                 if batch_group_end < len(batch_groups):
-                    await asyncio.sleep(self.batch_delay * 2)
+                    await asyncio.sleep(self.batch_delay)
                 
                 # Progress update
                 progress = (batch_group_end / len(batch_groups)) * 100

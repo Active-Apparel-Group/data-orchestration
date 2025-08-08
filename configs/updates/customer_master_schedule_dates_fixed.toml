@@ -1,0 +1,38 @@
+# OPUS Universal Monday.com Update Configuration
+# CORRECTED VERSION - Customer Master Schedule Dates Only
+# Generated from: board_9609317401_metadata.json
+# Generated at: 2025-08-07 21:45:00
+# Board: Customer Master Schedule (9609317401)
+
+[metadata]
+board_id = 9609317401
+board_name = "Customer Master Schedule"
+table_name = "MON_CustomerMasterSchedule"
+database = "orders"
+update_type = "batch_item_updates"
+description = "Update Customer Master Schedule date fields only"
+
+[query_config]
+# SQL query to get update data - FILTERED to only rows with valid monday_item_id
+query = """
+SELECT
+    monday_item_id,
+    [ORDER DATE PO RECEIVED],
+    [ETA CUSTOMER WAREHOUSE DATE] as [CUSTOMER REQ IN DC DATE],
+    [EX FACTORY DATE]
+FROM FACT_ORDER_LIST
+WHERE monday_item_id IS NOT NULL
+"""
+
+# Column mapping configuration
+item_id_column = "monday_item_id"
+
+[column_mapping]
+# Monday.com column_id -> SQL query column mapping
+# Only mapping the date fields that are returned by the query
+# ORDER DATE PO RECEIVED
+"date_mkr5zp5" = "ORDER DATE PO RECEIVED"
+# CUSTOMER REQ IN DC DATE
+"date_mkr554yz" = "CUSTOMER REQ IN DC DATE"
+# EX FACTORY DATE - mapped to CUSTOMER EX FACTORY DATE column
+"date_mkr57811" = "EX FACTORY DATE"

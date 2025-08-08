@@ -14,6 +14,7 @@ Features:
 
 import sys
 import os
+import time
 from pathlib import Path
 import tomli
 import json
@@ -39,6 +40,10 @@ import db_helper as db
 import logger_helper
 from country_mapper import format_country_for_monday
 
+# Import Monday.com configuration system
+sys.path.insert(0, str(repo_root / "src"))
+from pipelines.utils.monday_config import MondayConfig
+
 class BatchMondayUpdater:
     """
     Batch Monday.com update handler for efficient bulk operations
@@ -55,11 +60,14 @@ class BatchMondayUpdater:
     def __init__(self, config_file: str = None):
         self.logger = logger_helper.get_logger(__name__)
         self.config = db.load_config()
+        
+        # Initialize Monday.com configuration system
+        self.monday_config = MondayConfig()
 
-        # Monday.com API configuration
-        self.api_url = self.config['monday']['api_url']
+        # Monday.com API configuration from MondayConfig
+        self.api_url = self.monday_config.get_api_url()
         self.api_key = self.config['monday']['api_key']
-        self.api_version = self.config['monday']['api_version']
+        self.api_version = self.monday_config.get_api_version()
 
         # Load update configuration
         if config_file:
@@ -68,7 +76,7 @@ class BatchMondayUpdater:
         else:
             self.update_config = {}
 
-        self.logger.info("BatchMondayUpdater initialized")
+        self.logger.info("BatchMondayUpdater initialized with MondayConfig integration")
 
     def load_query_from_config(self, query_config: dict) -> str:
         """
@@ -157,7 +165,7 @@ class BatchMondayUpdater:
         return str(value)
     
     def execute_graphql(self, query: str, variables: dict = None) -> dict:
-        """Execute GraphQL query against Monday.com API"""
+        """Execute GraphQL query against Monday.com API with MondayConfig retry logic"""
         
         headers = {
             'Authorization': self.api_key,
@@ -174,27 +182,48 @@ class BatchMondayUpdater:
         
         self.logger.info(f"Executing GraphQL: {query[:100]}...")
         
-        try:
-            response = requests.post(
-                self.api_url,
-                headers=headers,
-                json=payload,
-                timeout=30
-            )
-            
-            if response.status_code != 200:
-                raise Exception(f"API request failed: {response.status_code} - {response.text}")
-            
-            result = response.json()
-            
-            if 'errors' in result and result['errors']:
-                raise Exception(f"GraphQL errors: {result['errors']}")
-            
-            return result
-            
-        except Exception as e:
-            self.logger.error(f"ERROR: GraphQL execution failed: {e}")
-            raise
+        # Get retry settings from MondayConfig
+        retry_settings = self.monday_config.get_retry_settings()
+        timeout = self.monday_config.get_timeout()
+        
+        for attempt in range(retry_settings.max_retries):
+            try:
+                response = requests.post(
+                    self.api_url,
+                    headers=headers,
+                    json=payload,
+                    timeout=timeout
+                )
+                
+                if response.status_code != 200:
+                    raise Exception(f"API request failed: {response.status_code} - {response.text}")
+                
+                result = response.json()
+                
+                if 'errors' in result and result['errors']:
+                    # Check for Monday.com rate limit errors
+                    if self.monday_config.is_rate_limit_error(result):
+                        retry_delay = self.monday_config.get_retry_delay(result)
+                        self.logger.warning(f"MONDAY RATE LIMIT: retry_in_seconds={retry_delay:.1f}s (attempt {attempt + 1}/{retry_settings.max_retries})")
+                        time.sleep(retry_delay)
+                        continue
+                    else:
+                        raise Exception(f"GraphQL errors: {result['errors']}")
+                
+                return result
+                
+            except Exception as e:
+                if attempt == retry_settings.max_retries - 1:
+                    self.logger.error(f"ERROR: GraphQL execution failed after {retry_settings.max_retries} attempts: {e}")
+                    raise
+                else:
+                    # Calculate exponential backoff delay
+                    delay = min(
+                        retry_settings.base_delay * (retry_settings.exponential_multiplier ** attempt),
+                        retry_settings.max_delay
+                    )
+                    self.logger.warning(f"Retrying in {delay:.1f}s (attempt {attempt + 1}/{retry_settings.max_retries})")
+                    time.sleep(delay)
     
     def batch_update_from_query(self, query: str, update_config: dict, dry_run: bool = True) -> dict:
         """
@@ -222,8 +251,19 @@ class BatchMondayUpdater:
             
             self.logger.info(f"Processing {len(df)} records for batch update")
             
-            # Get batch size from config (default to 15)
-            batch_size = update_config.get('validation', {}).get('max_batch_size', 15)
+            # Get optimal batch size from MondayConfig based on operation type
+            board_id = None
+            if 'metadata' in update_config and 'board_id' in update_config['metadata']:
+                board_id = str(update_config['metadata']['board_id'])
+            
+            # Use MondayConfig for optimal batch size
+            batch_size = self.monday_config.get_optimal_batch_size(board_id=board_id, operation="updates")
+            
+            # Also get delay between batches from MondayConfig  
+            rate_limits = self.monday_config.get_rate_limits()
+            delay_between_batches = rate_limits.delay_between_batches
+            
+            self.logger.info(f"Using MondayConfig settings - batch_size: {batch_size}, delay: {delay_between_batches}s")
             
             # Process in batches
             all_results = []
@@ -242,10 +282,9 @@ class BatchMondayUpdater:
                 total_success += batch_result['success_count']
                 total_errors += batch_result['error_count']
                 
-                # Rate limiting - small delay between batches
+                # Rate limiting - use MondayConfig delay between batches
                 if not dry_run and batch_end < len(df):
-                    import time
-                    time.sleep(0.5)  # 500ms delay between batches
+                    time.sleep(delay_between_batches)
             
             success_rate = (total_success / len(df) * 100) if len(df) > 0 else 0
             
@@ -475,7 +514,7 @@ class BatchMondayUpdater:
         error_count = 0
         
         # Load single update template
-        template_path = repo_root / "integrations" / "graphql" / "mutations" / "monday" / "update_item.graphql"
+        template_path = repo_root / "sql" / "graphql" / "monday" / "mutations" / "update_item.graphql"
         with open(template_path, 'r') as f:
             update_query = f.read()
         

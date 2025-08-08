@@ -23,8 +23,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent  # edit if repo layout differs
 YAML_PATH = REPO_ROOT / "utils" / "canonical_customers.yaml"
 DB_NAME = "orders"
-PROD_TABLE = "canonical_customer_map"
-STAGING_TABLE = "swp_canonical_customer_map"
+PROD_TABLE = "map_canonical_customer"
+STAGING_TABLE = "swp_map_canonical_customer"
 
 # ─────────────────── Repository Root & Utils Import ───────────────────
 def find_repo_root() -> Path:
